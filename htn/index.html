@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#b3122e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="高血圧治療ナビ">
+<title>高血圧治療ナビ</title>
+<style>
+:root{
+  /* 高血圧＝赤。白地に深紅を主色、背景は赤みを帯びたごく淡いグレー。縦スクロール1カラム、下部に判定バー */
+  --accent:#b3122e;
+  --accent-ink:#ffffff;
+  --accent-soft:#fbe9ec;
+  --bg:#f7f4f4;
+  --surface:#ffffff;
+  --ink:#231a1c;
+  --muted:#6b5e61;
+  --line:#e6dcde;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec;
+  --warn:#a36200; --warn-soft:#fdf1dc;
+  --crit:#b3122e; --crit-soft:#fde4e7;
+  --info:#2b5b9a; --info-soft:#e7eef8;
+  --font-body:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --font-num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --accent:#ff5c74; --accent-ink:#1a0c0f; --accent-soft:#3a1920;
+    --bg:#151112; --surface:#1f1a1b; --ink:#f3eced; --muted:#b3a5a8; --line:#3a3033;
+    --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12;
+    --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --accent:#ff5c74; --accent-ink:#1a0c0f; --accent-soft:#3a1920;
+  --bg:#151112; --surface:#1f1a1b; --ink:#f3eced; --muted:#b3a5a8; --line:#3a3033;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12;
+  --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:96px}
+header{background:var(--accent);color:var(--accent-ink);padding:calc(14px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left))}
+header .row{max-width:720px;margin:0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-size:20px;margin:0;letter-spacing:.02em;text-wrap:balance}
+header .sub{font-size:12px;opacity:.9}
+main{max-width:720px;margin:0 auto;padding:12px calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px;text-wrap:balance}
+h2 .num{font-family:var(--font-num);font-size:12px;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 7px}
+h3{font-size:14px;margin:12px 0 6px}
+.hint{font-size:12px;color:var(--muted);margin:4px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:14px;line-height:1.3;cursor:pointer;user-select:none;min-height:36px}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.chip input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
+.scene{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.scene .chip span{width:100%;border-radius:10px;padding:10px 12px;min-height:48px;display:flex;align-items:center}
+@media (max-width:400px){.scene{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=number],select,input[type=text]{font:inherit;font-family:var(--font-num);font-size:18px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
+select,input[type=text]{font-family:var(--font-body);font-size:15px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--info);outline-offset:1px}
+.bp{display:flex;align-items:center;gap:6px}
+.bp input{text-align:center}
+.bp .slash{font-size:22px;color:var(--muted)}
+.unit{font-size:12px;color:var(--muted)}
+.sub-group{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.hidden{display:none !important}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 12px;min-height:40px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+button.ghost{background:transparent}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+
+/* results */
+#result{scroll-margin-top:8px}
+.verdict{border-radius:12px;padding:14px;border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.verdict.crit{background:var(--crit-soft);border-color:var(--crit)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.ok{background:var(--ok-soft);border-color:var(--ok)}
+.verdict.info{background:var(--info-soft);border-color:var(--info)}
+.verdict .pill{align-self:flex-start;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:#fff}
+.verdict.crit .pill{background:var(--crit)} .verdict.warn .pill{background:var(--warn)} .verdict.ok .pill{background:var(--ok)} .verdict.info .pill{background:var(--info)}
+:root[data-theme="dark"] .verdict .pill{color:#111}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .verdict .pill{color:#111}}
+.verdict .big{font-size:18px;font-weight:700;text-wrap:balance}
+.targets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:4px}
+.tgt{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.tgt .k{font-size:12px;color:var(--muted)}
+.tgt .v{font-family:var(--font-num),var(--font-body);font-size:18px;font-variant-numeric:tabular-nums;line-height:1.3}
+.tgt .v.txt{font-family:var(--font-body);font-size:16px;font-weight:500}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.item{border-left:4px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 11px}
+.item.do{border-left-color:var(--ok)}
+.item.avoid{border-left-color:var(--crit)}
+.item.caution{border-left-color:var(--warn)}
+.item.consult{border-left-color:var(--info)}
+.item .t{font-weight:700;font-size:15px}
+.item .d{font-size:14px;margin-top:2px}
+.item .ex{font-size:13px;color:var(--muted);margin-top:2px}
+.src{display:inline-flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.src a{font-size:11px;text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--muted);background:var(--surface)}
+.src a.prac{border-style:dashed}
+.rank{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.rk-name{font-size:14px}
+.rk-name small{display:block;color:var(--muted);font-size:12px}
+.refs{font-size:13px;padding-left:18px;margin:0;display:flex;flex-direction:column;gap:6px}
+.refs a{color:var(--info);word-break:break-all}
+.refs .tag{font-family:var(--font-num);font-size:11px;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 5px;margin-right:4px}
+.saved{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.saved .row{display:flex;align-items:center;gap:8px;justify-content:space-between;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--bg)}
+.saved .row span{font-size:14px;overflow-wrap:anywhere}
+.saved .row small{color:var(--muted);font-family:var(--font-num)}
+.dock{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px calc(16px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));z-index:5}
+.dock .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.dock .s{font-size:13px;line-height:1.35;min-width:0}
+.dock .s b{display:block;font-size:15px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;background:var(--muted)}
+.dot.crit{background:var(--crit)}.dot.warn{background:var(--warn)}.dot.ok{background:var(--ok)}.dot.info{background:var(--info)}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}html{scroll-behavior:auto}}
+.disclaimer{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <h1>高血圧治療ナビ</h1>
+    <div class="sub">JSH2025・脳卒中治療GL2021〔改訂2025〕準拠／病棟用</div>
+  </div>
+</header>
+
+<main>
+<form id="f" autocomplete="off" onsubmit="return false">
+
+<section class="card">
+  <h2><span class="num">1</span>場面</h2>
+  <div class="scene" id="scene">
+    <label class="chip"><input type="radio" name="scene" value="general" checked><span>一般・入院中の降圧薬調整</span></label>
+    <label class="chip"><input type="radio" name="scene" value="chronicStroke"><span>脳卒中 亜急性期〜慢性期（再発予防）</span></label>
+    <label class="chip"><input type="radio" name="scene" value="isNone"><span>脳梗塞 急性期（再灌流療法なし）</span></label>
+    <label class="chip"><input type="radio" name="scene" value="ivt"><span>脳梗塞 静注血栓溶解（rt-PA/TNK）前後</span></label>
+    <label class="chip"><input type="radio" name="scene" value="evt"><span>脳梗塞 血栓回収療法後</span></label>
+    <label class="chip"><input type="radio" name="scene" value="ich"><span>脳出血 急性期</span></label>
+    <label class="chip"><input type="radio" name="scene" value="sah"><span>くも膜下出血（動脈瘤未処置）</span></label>
+  </div>
+  <div id="evtIvt" class="sub-group hidden">
+    <div class="chips">
+      <label class="chip"><input type="checkbox" id="evtWithIvt"><span>静注血栓溶解も併用した</span></label>
+      <label class="chip"><input type="checkbox" id="evtIncomplete"><span>再開通不良（TICI 2a以下）</span></label>
+    </div>
+  </div>
+  <div id="ivtPhase" class="sub-group hidden">
+    <div class="chips">
+      <label class="chip"><input type="radio" name="ivtPhase" value="pre" checked><span>投与前</span></label>
+      <label class="chip"><input type="radio" name="ivtPhase" value="post"><span>投与後24時間以内</span></label>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="num">2</span>血圧・脈拍</h2>
+  <div class="grid">
+    <label class="f">診察室・病棟血圧（mmHg）
+      <div class="bp"><input type="number" id="sbp" inputmode="numeric" min="50" max="300" value="152" aria-label="収縮期血圧"><span class="slash">/</span><input type="number" id="dbp" inputmode="numeric" min="20" max="200" value="88" aria-label="拡張期血圧"></div>
+    </label>
+    <label class="f">家庭血圧（任意）
+      <div class="bp"><input type="number" id="hsbp" inputmode="numeric" min="50" max="300" placeholder="—" aria-label="家庭収縮期血圧"><span class="slash">/</span><input type="number" id="hdbp" inputmode="numeric" min="20" max="200" placeholder="—" aria-label="家庭拡張期血圧"></div>
+    </label>
+    <label class="f">脈拍（/分）<input type="number" id="hr" inputmode="numeric" min="20" max="250" value="76"></label>
+  </div>
+  <div class="chips" style="margin-top:10px">
+    <label class="chip"><input type="checkbox" id="hypoSx"><span>立ちくらみ・ふらつき・失神</span></label>
+    <label class="chip"><input type="checkbox" id="reactive"><span>疼痛・尿閉・不穏など一過性要因あり</span></label>
+  </div>
+</section>
+
+<section class="card" id="emergCard">
+  <h2><span class="num">3</span>急性臓器障害のサイン</h2>
+  <div class="chips">
+    <label class="chip"><input type="checkbox" class="emerg" value="enceph"><span>頭痛・意識障害・痙攣（高血圧性脳症/PRES疑い）</span></label>
+    <label class="chip"><input type="checkbox" class="emerg" value="retina"><span>視力障害・乳頭浮腫/眼底出血</span></label>
+    <label class="chip"><input type="checkbox" class="emerg" value="acs"><span>胸痛・急性冠症候群</span></label>
+    <label class="chip"><input type="checkbox" class="emerg" value="ahf"><span>呼吸困難・急性心不全/肺水腫</span></label>
+    <label class="chip"><input type="checkbox" class="emerg" value="aad"><span>背部痛・大動脈解離疑い</span></label>
+    <label class="chip"><input type="checkbox" class="emerg" value="aki"><span>急性腎障害・溶血/TMA</span></label>
+    <label class="chip"><input type="checkbox" class="emerg" value="eclampsia"><span>妊娠高血圧腎症・子癇</span></label>
+    <label class="chip"><input type="checkbox" class="emerg" value="pheo"><span>発作性の頭痛・動悸・発汗（褐色細胞腫クリーゼ疑い）</span></label>
+  </div>
+  <p class="hint">脳卒中急性期の場面では、脳卒中そのもの以外の臓器障害（解離・ACS・心不全など）がある場合にチェックします。</p>
+</section>
+
+<section class="card">
+  <h2><span class="num">4</span>患者背景・検査</h2>
+  <div class="grid">
+    <label class="f">年齢<input type="number" id="age" inputmode="numeric" min="15" max="110" value="72"></label>
+    <label class="f">ADL・健康状態
+      <select id="adl">
+        <option value="1">自立（元気な高齢者含む）</option>
+        <option value="2">手段的ADL低下・軽度認知障害</option>
+        <option value="3">基本的ADL低下・要介護</option>
+        <option value="4">高度要介護・終末期</option>
+      </select>
+    </label>
+    <label class="f">血清K（mEq/L）<input type="number" id="k" inputmode="decimal" step="0.1" min="1.5" max="9" value="4.2"></label>
+    <label class="f">eGFR（mL/分/1.73m²）<input type="number" id="egfr" inputmode="numeric" min="1" max="200" value="58"></label>
+    <label class="f">尿蛋白（アルブミン）区分
+      <select id="prot">
+        <option value="A1">A1（正常）／未測定</option>
+        <option value="A2">A2（微量アルブミン尿・軽度蛋白尿）</option>
+        <option value="A3">A3（顕性アルブミン尿・高度蛋白尿）</option>
+      </select>
+    </label>
+  </div>
+
+  <h3>併存疾患・状態</h3>
+  <div class="chips" id="comorb">
+    <label class="chip"><input type="checkbox" value="dm"><span>糖尿病</span></label>
+    <label class="chip"><input type="checkbox" value="strokeHx"><span>脳卒中既往</span></label>
+    <label class="chip"><input type="checkbox" value="ichHx"><span>脳出血・微小出血多発</span></label>
+    <label class="chip"><input type="checkbox" value="stenosis"><span>頭蓋内外主幹動脈の高度狭窄・閉塞</span></label>
+    <label class="chip"><input type="checkbox" value="bad"><span>BAD・進行性脳梗塞</span></label>
+    <label class="chip"><input type="checkbox" value="dysphagia"><span>嚥下障害・誤嚥性肺炎リスク</span></label>
+    <label class="chip"><input type="checkbox" value="hfref"><span>心不全（HFrEF）</span></label>
+    <label class="chip"><input type="checkbox" value="hfpef"><span>心不全（HFpEF）</span></label>
+    <label class="chip"><input type="checkbox" value="cad"><span>狭心症・冠動脈疾患</span></label>
+    <label class="chip"><input type="checkbox" value="vsa"><span>冠攣縮性狭心症</span></label>
+    <label class="chip"><input type="checkbox" value="mi"><span>心筋梗塞後</span></label>
+    <label class="chip"><input type="checkbox" value="af"><span>心房細動</span></label>
+    <label class="chip"><input type="checkbox" value="lvh"><span>左室肥大</span></label>
+    <label class="chip"><input type="checkbox" value="brady"><span>徐脈・房室ブロック</span></label>
+    <label class="chip"><input type="checkbox" value="asthma"><span>気管支喘息</span></label>
+    <label class="chip"><input type="checkbox" value="copd"><span>COPD</span></label>
+    <label class="chip"><input type="checkbox" value="mg"><span>重症筋無力症</span></label>
+    <label class="chip"><input type="checkbox" value="noh"><span>神経原性起立性低血圧（PD・MSA・DLBなど）</span></label>
+    <label class="chip"><input type="checkbox" value="supine"><span>臥位高血圧</span></label>
+    <label class="chip"><input type="checkbox" value="gout"><span>痛風・高尿酸血症</span></label>
+    <label class="chip"><input type="checkbox" value="edema"><span>浮腫</span></label>
+    <label class="chip"><input type="checkbox" value="bph"><span>前立腺肥大</span></label>
+    <label class="chip"><input type="checkbox" value="rasStenosis"><span>両側腎動脈狭窄（単腎の狭窄）</span></label>
+    <label class="chip"><input type="checkbox" value="angioedema"><span>血管浮腫の既往</span></label>
+    <label class="chip"><input type="checkbox" value="pregnant"><span>妊娠中</span></label>
+    <label class="chip"><input type="checkbox" value="childbearing"><span>妊娠の可能性あり</span></label>
+    <label class="chip"><input type="checkbox" value="adherence"><span>服薬管理が難しい・認知症</span></label>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="num">5</span>現在の降圧薬</h2>
+  <div class="chips" id="meds">
+    <label class="chip"><input type="checkbox" value="CCB"><span>Ca拮抗薬</span></label>
+    <label class="chip"><input type="checkbox" value="ARB"><span>ARB</span></label>
+    <label class="chip"><input type="checkbox" value="ACEI"><span>ACE阻害薬</span></label>
+    <label class="chip"><input type="checkbox" value="THZ"><span>サイアザイド系（類似）利尿薬</span></label>
+    <label class="chip"><input type="checkbox" value="BB"><span>β遮断薬</span></label>
+    <label class="chip"><input type="checkbox" value="ARNI"><span>ARNI</span></label>
+    <label class="chip"><input type="checkbox" value="MRA"><span>MR拮抗薬</span></label>
+    <label class="chip"><input type="checkbox" value="LOOP"><span>ループ利尿薬</span></label>
+    <label class="chip"><input type="checkbox" value="ALPHA"><span>α遮断薬</span></label>
+  </div>
+  <div class="chips" style="margin-top:8px">
+    <label class="chip"><input type="checkbox" id="roomUp"><span>現行薬に増量余地あり</span></label>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="num">6</span>二次性高血圧・薬剤性の手がかり</h2>
+  <div class="chips" id="sec">
+    <label class="chip"><input type="checkbox" value="young"><span>40歳未満で発症</span></label>
+    <label class="chip"><input type="checkbox" value="lowK"><span>低K血症（利尿薬なしで）</span></label>
+    <label class="chip"><input type="checkbox" value="adrenal"><span>副腎偶発腫</span></label>
+    <label class="chip"><input type="checkbox" value="youngStroke"><span>若年の脳卒中</span></label>
+    <label class="chip"><input type="checkbox" value="sudden"><span>急な発症・急な増悪</span></label>
+    <label class="chip"><input type="checkbox" value="paroxysmal"><span>発作性高血圧・頭痛/動悸/発汗</span></label>
+    <label class="chip"><input type="checkbox" value="cushing"><span>満月様顔貌・中心性肥満・皮膚線条</span></label>
+    <label class="chip"><input type="checkbox" value="osa"><span>いびき・日中の眠気・肥満</span></label>
+    <label class="chip"><input type="checkbox" value="bruit"><span>腹部血管雑音・反復する肺水腫</span></label>
+    <label class="chip"><input type="checkbox" value="crRise"><span>RAS阻害薬開始後にCr 30%以上上昇</span></label>
+    <label class="chip"><input type="checkbox" value="thyroid"><span>甲状腺機能異常の徴候</span></label>
+  </div>
+  <h3>血圧を上げうる併用薬</h3>
+  <div class="chips" id="drugs">
+    <label class="chip"><input type="checkbox" value="nsaid"><span>NSAIDs</span></label>
+    <label class="chip"><input type="checkbox" value="steroid"><span>ステロイド（パルス含む）</span></label>
+    <label class="chip"><input type="checkbox" value="licorice"><span>甘草含有漢方（抑肝散・芍薬甘草湯など）</span></label>
+    <label class="chip"><input type="checkbox" value="pressor"><span>ミドドリン・ドロキシドパ</span></label>
+    <label class="chip"><input type="checkbox" value="cni"><span>カルシニューリン阻害薬</span></label>
+    <label class="chip"><input type="checkbox" value="vegf"><span>VEGF阻害薬・分子標的薬</span></label>
+    <label class="chip"><input type="checkbox" value="esa"><span>ESA（エリスロポエチン製剤）</span></label>
+    <label class="chip"><input type="checkbox" value="snri"><span>SNRI・三環系</span></label>
+    <label class="chip"><input type="checkbox" value="estrogen"><span>エストロゲン製剤</span></label>
+  </div>
+</section>
+
+<div class="btnrow">
+  <button type="button" class="primary" id="goResult">判定を見る</button>
+  <button type="button" id="resetBtn">入力をリセット</button>
+</div>
+
+</form>
+
+<section class="card" id="result" aria-live="polite">
+  <h2><span class="num">→</span>判定と推奨</h2>
+  <div id="verdict"></div>
+  <div id="blocks"></div>
+  <div class="btnrow" style="margin-top:12px">
+    <button type="button" id="copyBtn">カルテ用にコピー</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2>この端末に保存</h2>
+  <p class="hint">保存先はこのブラウザ内だけです。患者氏名・IDは入れず、「5A-12」など自分にわかる符号を付けてください。</p>
+  <div class="btnrow" style="margin-top:8px">
+    <input type="text" id="saveLabel" placeholder="ラベル（例：5A-12 術後）" maxlength="30" style="flex:1;min-width:160px" aria-label="保存ラベル">
+    <button type="button" id="saveBtn">保存</button>
+  </div>
+  <div class="saved" id="savedList"></div>
+</section>
+
+<section class="card" id="refs">
+  <h2>出典</h2>
+  <ol class="refs" id="refList"></ol>
+  <p class="hint">「実臨床」は原典に明記がない、または病棟運用上の工夫として付記した内容です。点線の枠で区別しています。静注薬の用量は添付文書の範囲を示しており、投与前に施設基準と添付文書を確認してください。</p>
+  <p class="disclaimer">本ツールは医師の判断を補助するもので、診療の最終判断は担当医が行います。ガイドライン改訂時は内容の見直しが必要です。</p>
+</section>
+</main>
+
+<div class="dock">
+  <div class="in">
+    <div class="s" id="dockText"><b>—</b></div>
+    <button type="button" class="primary" id="dockBtn">結果へ</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ======================= 出典 ======================= */
+const REFS = {
+  JSH2025:{label:'JSH2025', text:'日本高血圧学会. 高血圧管理・治療ガイドライン2025（JSH2025）. Ohya Y, et al. Hypertens Res. 2026;49(1):9-235.', url:'https://pubmed.ncbi.nlm.nih.gov/41476123/'},
+  JSHKEY:{label:'JSH2025要約', text:'Key highlights of the JSH Guidelines for the management of elevated blood pressure and hypertension 2025 (JSH2025). Hypertens Res. 2025;48(10):2500-2511.', url:'https://pubmed.ncbi.nlm.nih.gov/40877471/'},
+  STROKE:{label:'脳卒中GL', text:'日本脳卒中学会 脳卒中ガイドライン委員会（編）. 脳卒中治療ガイドライン2021〔改訂2025〕. 協和企画, 2025.', url:'https://www.jsts.gr.jp/'},
+  RTPA:{label:'rt-PA指針', text:'日本脳卒中学会. 静注血栓溶解（rt-PA）療法 適正治療指針 第三版（2019年3月、2023年9月追補）.', url:'https://www.jsts.gr.jp/img/rt-PA03.pdf'},
+  STROKEBP:{label:'脳卒中BP比較', text:'Blood pressure management in stroke: comparative review of the 2025 AHA/ACC, 2024 ESC, 2023 ESH, and 2025 JSH guidelines. Hypertens Res. 2026;49(3):984-987.', url:'https://pubmed.ncbi.nlm.nih.gov/41514030/'},
+  INT3:{label:'INTERACT3', text:'Ma L, et al. The third Intensive Care Bundle with Blood Pressure Reduction in Acute Cerebral Haemorrhage Trial (INTERACT3). Lancet. 2023;402:27-40.', url:'https://pubmed.ncbi.nlm.nih.gov/37245517/'},
+  ENC2:{label:'ENCHANTED2/MT', text:'Intensive blood pressure control after endovascular thrombectomy for acute ischaemic stroke (ENCHANTED2/MT). Lancet. 2022;400:1585-1596.', url:'https://pubmed.ncbi.nlm.nih.gov/36341753/'},
+  OPT:{label:'OPTIMAL-BP', text:'Intensive vs Conventional Blood Pressure Lowering After Endovascular Thrombectomy in Acute Ischemic Stroke (OPTIMAL-BP). JAMA. 2023;330:832-842.', url:'https://pubmed.ncbi.nlm.nih.gov/37668619/'},
+  JSN:{label:'腎臓学会2026', text:'日本腎臓学会. 慢性腎臓病（CKD）患者の血圧管理に関するステートメント（2026年6月25日）.', url:'https://cdn.jsn.or.jp/data/ckd_ketsuatsukanri_statement_20260625.pdf'},
+  JES:{label:'PA GL2021', text:'Japan Endocrine Society clinical practice guideline for the diagnosis and management of primary aldosteronism 2021. Endocr J. 2022;69(4):327-359.', url:'https://pubmed.ncbi.nlm.nih.gov/35418526/'},
+  AHA:{label:'AHA/ACC2025', text:'2025 AHA/ACC/AANP/AAPA/ABC/ACCP/ACPM/AGS/AMA/ASPC/NMA/PCNA/SGIM Guideline for the Prevention, Detection, Evaluation, and Management of High Blood Pressure in Adults. Hypertension. 2025;82(10):e212-e316.', url:'https://pubmed.ncbi.nlm.nih.gov/40811516/'},
+  ESC:{label:'ESC2024', text:'2024 ESC Guidelines for the management of elevated blood pressure and hypertension. Eur Heart J. 2024;45(38):3912-4018.', url:'https://pubmed.ncbi.nlm.nih.gov/39210715/'},
+  NOH:{label:'nOH合意', text:'Gibbons CH, et al. The recommendations of a consensus panel for the screening, diagnosis, and treatment of neurogenic orthostatic hypotension and associated supine hypertension. J Neurol. 2017;264:1567-1582.', url:'https://pubmed.ncbi.nlm.nih.gov/28050656/'},
+  PRAC:{label:'実臨床', text:'病棟運用上の工夫（原典に明記なし）', url:null}
+};
+const REF_ORDER = ['JSH2025','JSHKEY','STROKE','RTPA','STROKEBP','INT3','ENC2','OPT','JSN','JES','AHA','ESC','NOH'];
+
+/* ======================= 降圧薬クラス ======================= */
+const CLS = {
+  CCB:{name:'Ca拮抗薬（ジヒドロピリジン系）', g:1, ex:'アムロジピン、ベニジピン、アゼルニジピン、シルニジピン、ニフェジピン徐放'},
+  ARB:{name:'ARB', g:1, ras:true, ex:'アジルサルタン、オルメサルタン、テルミサルタン、カンデサルタン、ロサルタン'},
+  ACEI:{name:'ACE阻害薬', g:1, ras:true, ex:'ペリンドプリル、イミダプリル、エナラプリル'},
+  THZ:{name:'サイアザイド系（類似）利尿薬', g:1, ex:'トリクロルメチアジド、インダパミド、ヒドロクロロチアジド（少量）'},
+  BB:{name:'β遮断薬', g:1, ex:'ビソプロロール、カルベジロール（αβ）、メトプロロール'},
+  ARNI:{name:'ARNI', g:2, ras:true, ex:'サクビトリルバルサルタン（ACE阻害薬からは36時間あける）'},
+  MRA:{name:'MR拮抗薬', g:2, ex:'エサキセレノン、スピロノラクトン、エプレレノン'},
+  LOOP:{name:'ループ利尿薬', g:3, ex:'フロセミド、アゾセミド、トラセミド'},
+  ALPHA:{name:'α遮断薬', g:3, ex:'ドキサゾシン（就寝前）'}
+};
+
+/* ======================= 入力の読み取り ======================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const num = id => { const v = parseFloat($('#'+id).value); return isNaN(v) ? null : v; };
+
+function readForm(){
+  return {
+    scene: ($('input[name=scene]:checked')||{}).value || 'general',
+    ivtPhase: ($('input[name=ivtPhase]:checked')||{}).value || 'pre',
+    evtWithIvt: $('#evtWithIvt').checked,
+    evtIncomplete: $('#evtIncomplete').checked,
+    sbp:num('sbp'), dbp:num('dbp'), hsbp:num('hsbp'), hdbp:num('hdbp'), hr:num('hr'),
+    hypoSx:$('#hypoSx').checked, reactive:$('#reactive').checked,
+    emerg:$$('.emerg:checked').map(e=>e.value),
+    age:num('age'), adl:parseInt($('#adl').value,10), k:num('k'), egfr:num('egfr'), prot:$('#prot').value,
+    co:$$('#comorb input:checked').map(e=>e.value),
+    meds:$$('#meds input:checked').map(e=>e.value),
+    roomUp:$('#roomUp').checked,
+    sec:$$('#sec input:checked').map(e=>e.value),
+    drugs:$$('#drugs input:checked').map(e=>e.value)
+  };
+}
+function writeForm(d){
+  const setR=(name,v)=>{const el=$(`input[name=${name}][value="${v}"]`); if(el) el.checked=true;};
+  setR('scene',d.scene); setR('ivtPhase',d.ivtPhase||'pre');
+  $('#evtWithIvt').checked=!!d.evtWithIvt; $('#evtIncomplete').checked=!!d.evtIncomplete;
+  ['sbp','dbp','hsbp','hdbp','hr','age','k','egfr'].forEach(id=>{$('#'+id).value = d[id]==null?'':d[id];});
+  $('#adl').value=String(d.adl||1); $('#prot').value=d.prot||'A1';
+  $('#hypoSx').checked=!!d.hypoSx; $('#reactive').checked=!!d.reactive; $('#roomUp').checked=!!d.roomUp;
+  $$('.emerg').forEach(e=>e.checked=(d.emerg||[]).includes(e.value));
+  $$('#comorb input').forEach(e=>e.checked=(d.co||[]).includes(e.value));
+  $$('#meds input').forEach(e=>e.checked=(d.meds||[]).includes(e.value));
+  $$('#sec input').forEach(e=>e.checked=(d.sec||[]).includes(e.value));
+  $$('#drugs input').forEach(e=>e.checked=(d.drugs||[]).includes(e.value));
+}
+
+/* ======================= 判定ロジック（純粋関数） ======================= */
+function bpGrade(s,d){
+  if(s==null||d==null) return {g:-1,label:'未入力'};
+  if(s>=180||d>=110) return {g:5,label:'Ⅲ度高血圧'};
+  if(s>=160||d>=100) return {g:4,label:'Ⅱ度高血圧'};
+  if(s>=140||d>=90) return {g:3,label:'Ⅰ度高血圧'};
+  if(s>=130||d>=80) return {g:2,label:'高値血圧'};
+  if(s>=120) return {g:1,label:'正常高値血圧'};
+  return {g:0,label:'正常血圧'};
+}
+
+function evaluate(d){
+  const has = x => d.co.includes(x);
+  const onMed = x => d.meds.includes(x);
+  const R = {level:'info', headline:'', sub:'', targets:[], blocks:[], dock:''};
+  const it = (kind,t,desc,src,ex) => ({kind,t,d:desc,src:src||[],ex:ex||''});
+  const s=d.sbp, di=d.dbp;
+  const grade = bpGrade(s,di);
+  const highRisk = has('dm')||d.egfr!=null&&d.egfr<60||d.prot!=='A1'||has('strokeHx')||has('cad')||has('mi')||has('hfref')||has('hfpef')||d.scene==='chronicStroke';
+  const consult = [];
+  const notes = [];
+  const pregnant = has('pregnant');
+  const emergOrgan = d.emerg.length>0;
+
+  /* ---------- 脳卒中急性期 ---------- */
+  const acute = ['isNone','ivt','evt','ich','sah'].includes(d.scene);
+  if(acute){
+    const acts=[];
+    const ivDrugs = it('do','静注薬の選択','ニカルジピン持続静注（0.5〜6 μg/kg/分）またはジルチアゼム持続静注（5〜15 μg/kg/分）を少量から。急激な降圧と血圧変動を避ける。',['STROKEBP','STROKE'],'用量は高血圧緊急症の添付文書範囲。開始量・増量幅は施設のプロトコルに合わせる');
+    if(d.scene==='isNone'){
+      R.targets=[{k:'原則',v:'降圧しない'},{k:'降圧を考える閾値',v:'>220/120'}];
+      if(s!=null&&(s>220||di>120)){
+        R.level='warn'; R.headline='閾値超え：24時間で約15%の緩徐な降圧';
+        R.sub=`目安：収縮期 ${s} → ${Math.round(s*0.85)} mmHg 前後（24時間で）`;
+        acts.push(it('do','緩徐に降圧（24時間で約15%）',`現在 ${s}/${di}。目安は収縮期 ${Math.round(s*0.85)} mmHg 前後。神経症状の悪化に注意し、急激に下げない。`,['STROKEBP','STROKE']), ivDrugs);
+      } else {
+        R.level='ok'; R.headline='降圧しないで経過観察';
+        R.sub='脳灌流を保つため、閾値未満では原則として降圧しない';
+        acts.push(it('do','経過観察（降圧しない）','収縮期220 mmHg以下かつ拡張期120 mmHg以下では降圧を始めない。脱水・疼痛・尿閉・不穏を先に是正する。',['STROKEBP','STROKE']));
+      }
+      if(has('stenosis')||has('bad')) acts.push(it('caution','主幹動脈狭窄・BAD','灌流圧依存の病態。内服継続中の降圧薬も一時減量・中止を検討し、症状進行時の血圧低下を避ける。',['PRAC']));
+      acts.push(it('do','経口薬の開始・再開','神経症状が安定したら経口降圧薬を開始・再開し、最終的に130/80 mmHg未満をめざす（目安：発症数日〜1週）。',['JSH2025','STROKE','PRAC']));
+    }
+    if(d.scene==='ivt'){
+      const pre = d.ivtPhase==='pre';
+      const lim = pre?[185,110]:[180,105];
+      R.targets=[{k:pre?'投与前':'投与後24時間',v:`<${lim[0]}/${lim[1]}`},{k:'測定間隔（投与後）',v:'15分→30分→1時間'}];
+      const over = s!=null&&(s>=lim[0]||di>=lim[1]);
+      if(over){
+        R.level='crit'; R.headline= pre?'このままでは静注血栓溶解を始められない':'投与後の上限を超えている';
+        R.sub= pre?'185/110 mmHg未満まで静注薬で下げてから投与。下がらなければ適応外':'180/105 mmHg未満に速やかに下げる';
+        acts.push(it('do',pre?'投与前に静注で降圧':'速やかに静注で降圧',`現在 ${s}/${di}。${pre?'185/110':'180/105'} mmHg未満へ。`,['RTPA','STROKEBP']), ivDrugs);
+      } else {
+        R.level='ok'; R.headline= pre?'血圧は投与可能な範囲':'投与後の管理範囲内';
+        R.sub='上限を超えないよう頻回に測定する';
+      }
+      acts.push(it('do','測定間隔','投与開始〜2時間は15分毎、2〜8時間は30分毎、8〜24時間は1時間毎に測定（rt-PA指針）。上限を超えたら直ちに降圧。',['RTPA']));
+      acts.push(it('caution','下げすぎない','上限未満であれば積極的な降圧は不要。症状悪化時はまず出血を疑い画像評価。',['PRAC']));
+    }
+    if(d.scene==='evt'){
+      const lim = d.evtWithIvt?[180,105]:[180,null];
+      R.targets=[{k:'上限',v:d.evtWithIvt?'≤180/105':'収縮期 ≤180'},{k:'下げすぎない',v:'収縮期 >140'}];
+      if(s!=null&&(s>180||(d.evtWithIvt&&di>=105))){
+        R.level='crit'; R.headline='上限超え：速やかに降圧'; R.sub='収縮期180 mmHg以下へ。ただし140 mmHg以下にはしない';
+        acts.push(it('do','速やかに降圧',`現在 ${s}/${di}。収縮期180 mmHg以下へ（推奨度B）。`,['STROKE','STROKEBP']), ivDrugs);
+      } else if(s!=null&&s<=140){
+        R.level='warn'; R.headline='過度な降圧の可能性'; R.sub='収縮期140 mmHg以下の過度な血圧低下は避ける（推奨度E）';
+        acts.push(it('avoid','降圧薬を減量・中止',`現在 収縮期 ${s}。血栓回収後の厳格降圧（<120〜140）は転帰不良と関連した。持続静注中なら減量・中止を検討。`,['STROKE','ENC2','OPT']));
+      } else {
+        R.level='ok'; R.headline='目標範囲内（140〜180）'; R.sub='過度な降圧も上昇も避けて維持';
+      }
+      if(d.evtIncomplete) acts.push(it('caution','再開通不良例','側副血行に依存するため血圧低下に特に注意。下限側を高めに保つ。',['PRAC']));
+      if(d.evtWithIvt) acts.push(it('do','静注血栓溶解併用','24時間は180/105 mmHg未満を維持し、rt-PA指針の測定間隔に従う。',['RTPA']));
+    }
+    if(d.scene==='ich'){
+      R.targets=[{k:'早期目標',v:'収縮期 <140'},{k:'維持',v:'7日間（>110を保つ）'}];
+      if(s!=null&&s>220){
+        R.level='crit'; R.headline='著明高値：持続静注で慎重に降圧'; R.sub='目標は収縮期140前後だが、短時間の大幅な降下を避け段階的に';
+        acts.push(it('do','持続静注で段階的に降圧',`現在 ${s}/${di}。140 mmHg前後をめざすが、初期の急激・大幅な降圧と行き過ぎ（過降圧）を避ける。`,['STROKEBP','STROKE']), ivDrugs);
+      } else if(s!=null&&s>=140){
+        R.level='crit'; R.headline='できるだけ早く収縮期140未満へ'; R.sub='発症早期ほど有効。到達後は7日間維持し、変動を小さく';
+        acts.push(it('do','早期に収縮期140 mmHg未満へ',`現在 ${s}/${di}。可及的早期に140 mmHg未満、7日間維持。収縮期110 mmHg超は保つ。`,['STROKE','STROKEBP','INT3']), ivDrugs);
+      } else if(s!=null&&s<=110){
+        R.level='warn'; R.headline='下がりすぎ：降圧薬を減量'; R.sub='収縮期110 mmHg超を保つ';
+        acts.push(it('avoid','過降圧','持続静注の減量・中止を検討。',['STROKE']));
+      } else {
+        R.level='ok'; R.headline='目標範囲（110〜140）'; R.sub='7日間この範囲で維持し、血圧変動を小さく';
+      }
+      acts.push(it('do','血圧以外のバンドル','高血糖・発熱の是正、抗凝固薬内服例の早期中和を同時に行う。',['INT3']));
+      acts.push(it('do','経口薬への移行','経口摂取可能になれば経口降圧薬へ移行し、慢性期は130/80 mmHg未満。',['JSH2025','STROKE']));
+      consult.push(it('consult','脳神経外科','小脳出血（最大径3 cm以上・脳幹圧迫・水頭症）、意識障害を伴う大きな皮質下・被殻出血、脳室穿破＋水頭症では手術適応を相談。',['STROKE']));
+    }
+    if(d.scene==='sah'){
+      R.targets=[{k:'動脈瘤処置まで',v:'収縮期 <160'}];
+      if(s!=null&&s>=160){ R.level='crit'; R.headline='再出血予防：収縮期160未満へ'; R.sub='鎮痛・鎮静を十分に行い、持続静注で降圧';
+        acts.push(it('do','収縮期160 mmHg未満へ',`現在 ${s}/${di}。疼痛・不穏の制御が前提。`,['STROKE']), ivDrugs);
+      } else { R.level='ok'; R.headline='再出血予防の範囲内'; R.sub='過度の降圧は脳虚血を招くため避ける'; }
+      acts.push(it('caution','処置後は方針が変わる','動脈瘤処置後は遅発性脳血管攣縮期に入るため、降圧目標を緩める。',['STROKE','PRAC']));
+      consult.push(it('consult','脳神経外科（緊急）','動脈瘤の評価と再出血予防処置。',['STROKE']));
+    }
+    if(emergOrgan){
+      acts.unshift(it('avoid','脳卒中以外の臓器障害を合併','大動脈解離・ACS・急性心不全・子癇などがあれば、その病態の降圧目標が優先される。直ちに該当科と相談。',['JSH2025','PRAC']));
+      consult.push(it('consult','循環器内科／心臓血管外科','合併する急性臓器障害の評価。',['PRAC']));
+    }
+    R.blocks.push({title:'いまやること', items:acts});
+    if(consult.length) R.blocks.push({title:'必要なコンサルト', items:consult});
+    R.dock = `${R.headline}`;
+    return R;
+  }
+
+  /* ---------- 一般・慢性期 ---------- */
+  // 目標
+  let tOffice='<130/80', tHome='<125/75';
+  if(d.adl>=3) notes.push(it('caution','ADL低下・要介護の高齢者','JSH2025では健康・機能状態のカテゴリー（1〜4）で個別目標を設定する。起立時血圧・転倒・食事量を見ながら、少量から数週かけて下げる。カテゴリー別の数値は原典の表で確認。',['JSH2025']));
+  if(d.adl===4) notes.push(it('caution','終末期・高度要介護','降圧による利益は小さい。症状性低血圧があれば減量・中止（デプレスクライビング）を優先。',['JSH2025','PRAC']));
+  if(d.egfr!=null && d.prot==='A1' && !has('dm') && d.egfr<60) notes.push(it('caution','蛋白尿陰性・糖尿病なしのCKD','目標は130/80未満。必要に応じ140/90未満を中間目標として慎重に下げる。',['JSN']));
+  if(has('stenosis')) notes.push(it('caution','主幹動脈の高度狭窄・閉塞','灌流低下症状（めまい・一過性症状の再燃）が出ないか確認しながら段階的に下げる。両側頸動脈高度狭窄では特に慎重に。',['JSH2025','PRAC']));
+  if(has('noh')) notes.push(it('caution','神経原性起立性低血圧','目標評価は座位・立位で行い、立位の症状を優先。日中の降圧薬は避ける。臥位高血圧は頭部挙上（10°以上）と就寝前の短時間作用薬で対応。',['NOH']));
+
+  R.targets=[{k:'診察室血圧',v:tOffice},{k:'家庭血圧',v:tHome},{k:'分類',v:grade.label}];
+  const atTarget = s!=null && s<130 && di<80;
+  const homeOK = d.hsbp!=null && d.hdbp!=null ? (d.hsbp<125 && d.hdbp<75) : null;
+
+  // 緊急症
+  if(emergOrgan && s!=null && (s>=180||di>=120)){
+    R.level='crit'; R.headline='高血圧緊急症の疑い'; R.sub='静注薬で管理できる環境（ICU・HCU）へ。病態ごとに目標が異なる';
+    const e=[];
+    e.push(it('do','初期の降圧幅','最初の1時間は平均血圧の25%以内、その後2〜6時間で160/100〜110程度、24〜48時間で通常の目標へ。',['JSH2025','AHA']));
+    if(d.emerg.includes('aad')) e.push(it('avoid','大動脈解離は例外','収縮期120 mmHg未満・心拍60/分未満を速やかに。β遮断薬静注を先行し、心臓血管外科へ。',['AHA','ESC']));
+    if(d.emerg.includes('eclampsia')||pregnant) e.push(it('avoid','妊娠関連は例外','ACE阻害薬・ARB・ARNI・MR拮抗薬は使わない。ニカルジピン静注、硫酸Mgなど。産科と同時に対応。',['JSH2025']));
+    if(d.emerg.includes('pheo')) e.push(it('avoid','褐色細胞腫クリーゼ疑い','α遮断（フェントラミン）を先行。β遮断薬単独は禁忌。',['JSH2025']));
+    if(d.emerg.includes('enceph')) e.push(it('do','高血圧性脳症／PRES','MRI（FLAIR）で評価。2〜3時間で約25%の降圧。けいれんは抗てんかん薬で治療。',['JSH2025','PRAC']));
+    e.push(it('do','静注薬','ニカルジピン（0.5〜6 μg/kg/分）、ジルチアゼム（5〜15 μg/kg/分）、ニトログリセリン（心不全・ACS、0.5〜5 μg/kg/分）。',['JSH2025'],'用量は添付文書の範囲'));
+    R.blocks.push({title:'いまやること', items:e});
+    consult.push(it('consult','集中治療／循環器内科','緊急症の全身管理。',['JSH2025']));
+    if(d.emerg.includes('aad')) consult.push(it('consult','心臓血管外科（緊急）','大動脈解離の評価。',['PRAC']));
+    if(d.emerg.includes('eclampsia')||pregnant) consult.push(it('consult','産婦人科（緊急）','妊娠高血圧腎症・子癇。',['JSH2025']));
+    if(d.emerg.includes('aki')) consult.push(it('consult','腎臓内科','AKI・TMAの評価。',['PRAC']));
+    R.blocks.push({title:'必要なコンサルト', items:consult});
+    R.dock='高血圧緊急症の疑い';
+    return R;
+  }
+
+  // 状態判定
+  if(s!=null && (s>=180||di>=120)){
+    R.level='warn'; R.headline='重症高血圧（臓器障害なし）';
+    R.sub='静注での急速降圧は不要。経口薬で数時間〜数日かけて下げる';
+  } else if(atTarget && (d.hypoSx || s<110)){
+    R.level='warn'; R.headline='下がりすぎの可能性'; R.sub='症状性低血圧・腎機能・電解質を確認し、減量を検討';
+  } else if(atTarget){
+    R.level='ok'; R.headline='目標達成'; R.sub= homeOK===false ? '家庭血圧は未達。仮面高血圧として評価' : '現行治療を継続し、有害事象を確認';
+  } else if(grade.g===2){
+    R.level='info'; R.headline='高値血圧（130〜139/80〜89）';
+    R.sub= highRisk ? '高リスク：生活習慣の改善を1か月以内試み、未達なら薬物治療' : '低・中等リスク：生活習慣の改善を強化';
+  } else {
+    R.level='warn'; R.headline=`目標未達（${grade.label}）`; R.sub='140/90以上は速やかに薬物治療を開始・強化';
+  }
+  if(d.reactive && !atTarget) R.sub += '。一過性要因の是正後に再評価';
+
+  /* ---- クラスごとのスコア ---- */
+  const sc={}, why={}, avoid={}, caution={};
+  Object.keys(CLS).forEach(k=>{sc[k]=0; why[k]=[];});
+  const add=(k,p,r)=>{sc[k]+=p; if(r) why[k].push(r);};
+  const av=(k,r)=>{(avoid[k]=avoid[k]||[]).push(r);};
+  const ca=(k,r)=>{(caution[k]=caution[k]||[]).push(r); sc[k]-=1;};
+  // 基本（グループ1）
+  add('CCB',3); add('ARB',3); add('ACEI',2.5); add('THZ',2.5); add('BB',1.5);
+  // 積極的適応
+  if(d.prot!=='A1'){ add('ARB',3,'蛋白尿'); add('ACEI',3,'蛋白尿'); }
+  if(has('dm') && d.prot!=='A1'){ add('ARB',1,'糖尿病＋アルブミン尿'); add('ACEI',1,'糖尿病＋アルブミン尿'); }
+  if(has('hfref')){ add('ARNI',6,'HFrEF'); add('ARB',2,'HFrEF'); add('ACEI',2,'HFrEF'); add('BB',4,'HFrEF'); add('MRA',4,'HFrEF'); add('THZ',0.5,'うっ血'); }
+  if(has('hfpef')){ add('THZ',1,'HFpEF（うっ血）'); add('ARNI',1.5,'HFpEF'); add('MRA',1.5,'HFpEF'); }
+  if(has('cad')){ add('BB',2.5,'狭心症'); add('CCB',1.5,'狭心症'); }
+  if(has('vsa')){ add('CCB',3,'冠攣縮'); }
+  if(has('mi')){ add('BB',3,'心筋梗塞後'); add('ACEI',2,'心筋梗塞後'); add('ARB',1.5,'心筋梗塞後'); }
+  if(has('af') || (d.hr!=null && d.hr>=90)){ add('BB',2.5, has('af')?'心房細動のレートコントロール':'頻脈'); }
+  if(has('lvh')){ add('CCB',1,'左室肥大'); add('ARB',1,'左室肥大'); add('ACEI',1,'左室肥大'); }
+  if(has('strokeHx')||d.scene==='chronicStroke'){ add('CCB',1,'脳卒中再発予防'); add('ARB',0.5,'脳卒中再発予防'); add('ACEI',0.5,'脳卒中再発予防'); add('THZ',1,'脳卒中再発予防'); }
+  if(has('dysphagia')){ add('ACEI',1.5,'嚥下障害（咳反射の改善が期待される）'); }
+  if(has('bph')){ add('ALPHA',2,'前立腺肥大'); }
+  if(has('edema')||has('hfref')||has('hfpef')){ if(d.egfr!=null&&d.egfr<30) add('LOOP',3,'体液過剰（eGFR<30）'); }
+  if(d.egfr!=null && d.egfr<30){ add('LOOP',2,'eGFR<30で利尿が必要'); ca('THZ','eGFR<30では効果が減弱（ループ利尿薬を検討）'); }
+  // 禁忌・回避
+  if(pregnant||has('childbearing')){ ['ARB','ACEI','ARNI'].forEach(k=>av(k, pregnant?'妊娠中は禁忌':'妊娠の可能性：避けるか確実な避妊下で')); av('MRA','妊娠中は避ける'); }
+  if(has('rasStenosis')){ ['ARB','ACEI','ARNI'].forEach(k=>av(k,'両側腎動脈狭窄・単腎の狭窄')); }
+  if(has('angioedema')){ av('ACEI','血管浮腫の既往'); av('ARNI','血管浮腫の既往'); ca('ARB','血管浮腫の既往'); }
+  if(d.k!=null && d.k>=5.5){ av('MRA','K≥5.5'); ca('ARB','高K'); ca('ACEI','高K'); ca('ARNI','高K'); }
+  else if(d.k!=null && d.k>=5.0){ av('MRA','K≥5.0では開始しない'); ca('ARB','K≥5.0'); ca('ACEI','K≥5.0'); ca('ARNI','K≥5.0'); }
+  if(d.k!=null && d.k<3.5){ ca('THZ','低K'); ca('LOOP','低K'); add('MRA',1,'低K'); }
+  if(d.egfr!=null && d.egfr<30){ ca('MRA','eGFR<30は原則避ける（薬剤ごとに確認）'); ca('ARNI','eGFR<30は慎重'); }
+  if(has('asthma')){ av('BB','気管支喘息'); }
+  if(has('copd')){ ca('BB','COPD：β1選択性を少量から'); }
+  if(has('mg')){ av('BB','重症筋無力症を増悪させうる'); }
+  if(has('brady')||(d.hr!=null&&d.hr<55)){ av('BB','徐脈・房室ブロック'); }
+  if(has('vsa') && !has('hfref')){ ca('BB','冠攣縮：単独では増悪しうる'); }
+  if(has('gout')){ ca('THZ','痛風・高尿酸'); ca('LOOP','痛風・高尿酸'); add('ARB',0.3,'ロサルタンは尿酸低下作用'); }
+  if(has('noh')||d.hypoSx){ av('ALPHA','起立性低血圧'); ca('THZ','起立性低血圧・脱水'); ca('LOOP','起立性低血圧・脱水'); }
+  if(has('edema')){ ca('CCB','浮腫'); }
+  if(has('dm')){ ca('BB','低血糖症状をマスクしうる'); }
+  if(has('hfref')){ av('ALPHA','HFrEFでは避ける'); }
+  // ARNI/MRAはSTEP2以降
+  const rasCurrent = d.meds.filter(m=>CLS[m].ras);
+  const curSet = new Set(d.meds.map(m=>CLS[m].ras?'RAS':m));
+  const stepNow = [...curSet].filter(m=>!['LOOP','ALPHA'].includes(m)).length;
+
+  if(stepNow>=3) add('MRA',3,'治療抵抗性高血圧');
+  // 現行薬の問題
+  const medIssues=[];
+  d.meds.forEach(m=>{ if(avoid[m]) medIssues.push(it('avoid',`現行の${CLS[m].name}を見直す`,avoid[m].join('、'),srcFor(m,avoid[m]))); });
+  if(rasCurrent.length>=2) medIssues.push(it('avoid','RAS阻害薬の重複','ARB・ACE阻害薬・ARNIの併用は行わない。1剤にまとめる。',['JSH2025']));
+  if(onMed('ACEI')&&onMed('ARNI')) medIssues.push(it('avoid','ACE阻害薬とARNIの併用は禁忌','血管浮腫のリスク。切替時は36時間あける。',['JSH2025']));
+
+  // 候補（現行薬を除く・回避を除く・RAS重複を除く）
+  const canAdd = k => !onMed(k) && !avoid[k] && !(CLS[k].ras && rasCurrent.length>0) ;
+  const ranked = Object.keys(CLS).filter(k=>canAdd(k)).filter(k=>{
+    if((k==='ARNI'||k==='MRA') && stepNow<1 && !has('hfref')) return false; // グループ2はSTEP2以降
+    if(k==='LOOP' && !(d.egfr!=null&&d.egfr<30) && !has('hfref') && !has('hfpef')) return false;
+    if(k==='ALPHA' && !has('bph')) return false;
+    return true;
+  }).sort((a,b)=>sc[b]-sc[a]);
+
+  const plan=[];
+  const pickPair = () => {
+    const first = ranked[0]; if(!first) return [];
+    const second = ranked.find(k=>k!==first && !(CLS[k].ras&&CLS[first].ras) && CLS[k].g===1);
+    return second?[first,second]:[first];
+  };
+  const clsLine = k => `${CLS[k].name}${why[k].length?`（${[...new Set(why[k])].join('・')}）`:''}`;
+
+  if(R.level==='crit'){/*no-op*/}
+  else if(atTarget){
+    plan.push(it('do','現行治療を継続','有害事象（めまい・ふらつき・AKI・高K）がなければ継続。',['JSH2025']));
+    if(d.hypoSx||s<110) plan.push(it('caution','減量を検討','症状性低血圧があれば利尿薬やα遮断薬から減量。',['JSH2025','PRAC']));
+    if(homeOK===false) plan.push(it('caution','家庭血圧が未達','仮面高血圧。家庭血圧125/75 mmHg未満をめざして強化を検討。',['JSH2025']));
+    // 積極的適応の抜け
+    if(d.prot!=='A1' && rasCurrent.length===0 && !avoid.ARB) plan.push(it('do','RAS阻害薬への組み替えを検討','蛋白尿があるため、腎保護目的でARBまたはACE阻害薬を含める。',['JSH2025','JSN']));
+    if(has('hfref') && !onMed('BB') && !avoid.BB) plan.push(it('do','β遮断薬の追加を検討','HFrEFの予後改善薬。循環器と相談。',['JSH2025']));
+  } else if(grade.g===2 && !highRisk){
+    plan.push(it('do','生活習慣の改善を強化','減塩（食塩6 g/日未満）、減量、運動、節酒。',['JSH2025']));
+  } else if(grade.g===2 && highRisk && stepNow===0){
+    plan.push(it('do','生活習慣の改善を最大1か月','未達なら薬物治療を開始。第一候補：'+ (ranked[0]?clsLine(ranked[0]):'—'),['JSH2025']));
+  } else {
+    if(stepNow===0){
+      if(grade.g>=4 || (grade.g>=3 && highRisk)){
+        const p=pickPair();
+        plan.push(it('do','STEP 1〜2：2剤併用（配合剤）から開始を考慮', p.map(clsLine).join(' ＋ ') + '。単剤高用量より作用機序の異なる少量併用で速やかに下げる。',['JSH2025','AHA'], p.map(k=>CLS[k].ex).join(' ／ ')));
+      } else {
+        const k=ranked[0];
+        if(k) plan.push(it('do','STEP 1：グループ1降圧薬を単剤で開始', clsLine(k)+'。目標未達なら速やかに2剤へ。',['JSH2025'], CLS[k].ex));
+      }
+    } else if(stepNow===1){
+      const k = ranked.find(x=>CLS[x].g<=2);
+      if(k) plan.push(it('do','STEP 2：2剤併用へ', clsLine(k)+' を追加。'+(d.roomUp?'増量余地はあるが、JSH2025は単剤増量より作用機序の異なる併用を優先。':''),['JSH2025'], CLS[k].ex));
+      if(onMed('ARB') && !avoid.ARNI) plan.push(it('do','ARB→ARNIへの切替も選択肢','STEP 2以降でグループ2のARNIが使える。同じ1錠のまま降圧を強化できる。',['JSH2025'], CLS.ARNI.ex));
+    } else if(stepNow===2){
+      if(!onMed('THZ') && !avoid.THZ && !(d.egfr!=null&&d.egfr<30)){
+        plan.push(it('do','STEP 3：サイアザイド系利尿薬を加えて3剤','STEP 3では原則サイアザイド系を含める。'+(onMed('CCB')&&rasCurrent.length?'Ca拮抗薬＋RAS阻害薬＋利尿薬の組み合わせ。':''),['JSH2025'], CLS.THZ.ex));
+      } else if(d.egfr!=null&&d.egfr<30 && !onMed('LOOP')){
+        plan.push(it('do','STEP 3：ループ利尿薬を加えて3剤','eGFR<30ではサイアザイドの効果が落ちるため。',['JSH2025','JSN'], CLS.LOOP.ex));
+      } else {
+        const k = ranked.find(x=>CLS[x].g<=2);
+        if(k) plan.push(it('do','STEP 3：3剤併用へ', clsLine(k)+' を追加。',['JSH2025'], CLS[k].ex));
+      }
+    } else {
+      const hasDiuretic = onMed('THZ')||onMed('LOOP');
+      if(!hasDiuretic && !avoid.THZ){
+        plan.push(it('do','利尿薬を含める','3剤以上でも利尿薬が入っていない。サイアザイド系（eGFR<30はループ）を加える。',['JSH2025'], CLS.THZ.ex));
+      } else {
+        plan.push(it('caution','治療抵抗性高血圧','利尿薬を含む3剤で未達。まず服薬アドヒアランス、白衣効果（家庭血圧）、食塩摂取、併用薬、二次性高血圧を確認。',['JSH2025','AHA']));
+        if(!onMed('MRA') && !avoid.MRA) plan.push(it('do','STEP 4：MR拮抗薬を追加', 'K・eGFRを2〜4週後に再検。'+(caution.MRA?'注意：'+caution.MRA.join('、'):''),['JSH2025','ESC'], CLS.MRA.ex));
+        if(!onMed('BB') && !avoid.BB) plan.push(it('do','β遮断薬も選択肢','心拍数が高い例など。',['JSH2025'], CLS.BB.ex));
+        consult.push(it('consult','高血圧専門医（腎臓内科・内分泌内科・循環器内科）','治療抵抗性高血圧の評価。',['JSH2025']));
+      }
+    }
+    if(R.headline.startsWith('重症高血圧')) plan.unshift(it('do','経口薬で段階的に','数時間〜数日で160/100程度、その後外来で目標へ。疼痛・尿閉・不穏・不眠・内服中断を先に確認。ニフェジピン速効型の舌下は使わない。',['JSH2025','PRAC']));
+  }
+
+  // 回避・注意のまとめ（候補にならない理由）
+  const avoidItems = Object.keys(avoid).filter(k=>!onMed(k)).map(k=>it('avoid',`${CLS[k].name}は避ける`,[...new Set(avoid[k])].join('、'),srcFor(k,avoid[k])));
+  const cautionItems = Object.keys(caution).filter(k=>!avoid[k]).map(k=>it('caution',`${CLS[k].name}は注意`,[...new Set(caution[k])].join('、'),['JSH2025']));
+
+  // 神経内科的な注意
+  const neuro=[];
+  if(has('noh')&&has('supine')) neuro.push(it('do','臥位高血圧への対応','就寝時の頭部挙上、就寝前の短時間作用型降圧薬（例：ロサルタン）。日中の降圧薬は起立性低血圧を悪化させる。',['NOH']));
+  if(d.drugs.includes('pressor')) neuro.push(it('caution','昇圧薬の内服時刻','ミドドリン・ドロキシドパは就寝4時間前以降は投与しない。臥位高血圧を確認。',['NOH']));
+  if(d.drugs.includes('steroid')) neuro.push(it('caution','ステロイド（パルス含む）','投与中は血圧・血糖を頻回に。一時的な上昇はCa拮抗薬で対応しやすい。',['PRAC']));
+  if(d.drugs.includes('licorice')) neuro.push(it('caution','甘草による偽アルドステロン症','低K・浮腫・高血圧。抑肝散・芍薬甘草湯の併用や長期投与を確認し、中止を検討。',['JSH2025']));
+  if(d.drugs.includes('nsaid')) neuro.push(it('caution','NSAIDs','降圧効果の減弱・AKI。RAS阻害薬＋利尿薬との3者併用に注意。',['JSH2025']));
+  ['cni','vegf','esa','snri','estrogen'].forEach(x=>{ if(d.drugs.includes(x)) neuro.push(it('caution',{cni:'カルシニューリン阻害薬',vegf:'VEGF阻害薬・分子標的薬',esa:'ESA',snri:'SNRI・三環系',estrogen:'エストロゲン製剤'}[x]+'による血圧上昇','可能なら減量・変更を処方医と相談。',['JSH2025'])); });
+  if(has('adherence')) neuro.push(it('do','服薬を単純に','1日1回の配合剤で錠数を減らす。一包化・服薬支援を依頼。',['JSH2025']));
+
+  // 二次性・コンサルト
+  const sec = d.sec;
+  const paFlags = ['young','lowK','adrenal','youngStroke'].filter(x=>sec.includes(x)).length + (grade.g>=4?1:0) + (stepNow>=3&&!atTarget?1:0) + (sec.includes('osa')?1:0);
+  if(paFlags>0) consult.push(it('consult','内分泌内科：原発性アルドステロン症','ARR（PAC/PRA）でスクリーニング：ARR 200以上かつPAC 60 pg/mL以上（CLEIA法）で陽性。採血は早朝・座位が望ましく、MR拮抗薬投与前に。',['JES','JSH2025']));
+  else if(!atTarget && stepNow<=1) notes.push(it('do','原発性アルドステロン症のスクリーニング','高血圧患者では一度はARRで評価を考慮（特に治療開始前）。',['JES','JSH2025']));
+  if(sec.includes('paroxysmal')) consult.push(it('consult','内分泌内科：褐色細胞腫・パラガングリオーマ','血中・尿中メタネフリン分画。β遮断薬単独の先行投与は避ける。',['JSH2025']));
+  if(sec.includes('cushing')) consult.push(it('consult','内分泌内科：クッシング症候群','早朝コルチゾール、1 mgデキサメタゾン抑制試験など。',['JSH2025']));
+  if(sec.includes('thyroid')) consult.push(it('consult','内分泌内科：甲状腺機能','TSH・FT4。',['PRAC']));
+  if(sec.includes('bruit')||sec.includes('crRise')||sec.includes('sudden')) consult.push(it('consult','腎臓内科／循環器内科：腎血管性高血圧','腎動脈エコー・CTA/MRA。RAS阻害薬の可否を判断。',['JSH2025']));
+  if(sec.includes('osa')) consult.push(it('consult','睡眠外来・呼吸器内科','睡眠時無呼吸の評価（簡易PSG）。CPAPで夜間・早朝高血圧が改善しうる。',['JSH2025']));
+  // CKD
+  const egfrRef = d.age!=null && d.age>=70 ? 40 : (d.age!=null&&d.age<40?60:45);
+  if((d.egfr!=null && d.egfr<egfrRef) || d.prot==='A3') consult.push(it('consult','腎臓内科',`eGFR ${d.egfr??'—'}（紹介目安 <${egfrRef}）／尿蛋白 ${d.prot}。CKDの評価と降圧薬の調整。`,['JSN','PRAC']));
+  if(d.k!=null && d.k>=5.5) consult.push(it('consult','腎臓内科（高K）','K≥5.5。RAS阻害薬・MR拮抗薬の調整、K吸着薬の検討。',['PRAC']));
+  if(pregnant) consult.push(it('consult','産婦人科','妊娠中の降圧薬はニフェジピン、ラベタロール、メチルドパ、ヒドララジンから。',['JSH2025']));
+  if(has('hfref')) consult.push(it('consult','循環器内科','HFrEFの心保護薬（ARNI・β遮断薬・MR拮抗薬・SGLT2阻害薬）の最適化。',['JSH2025','ESC']));
+  if(has('mg') && onMed('BB')) consult.push(it('consult','薬剤部','重症筋無力症に影響する薬剤の総点検（β遮断薬のほか抗菌薬・Mg製剤など）。',['PRAC']));
+
+  // ランキング表示用
+  const rankList = ranked.slice(0,5).map(k=>({k, score:Math.max(0.5,sc[k]), why:[...new Set(why[k])], caution:caution[k]||[]}));
+
+  if(medIssues.length) R.blocks.push({title:'現行薬の問題', items:medIssues});
+  if(plan.length) R.blocks.push({title:'次の一手', items:plan});
+  if(rankList.length && !atTarget) R.blocks.push({title:'追加候補の順位（患者背景で重み付け）', rank:rankList});
+  if(notes.length) R.blocks.push({title:'目標設定の注意', items:notes});
+  if(neuro.length) R.blocks.push({title:'併用薬・神経疾患の注意', items:neuro});
+  if(avoidItems.length||cautionItems.length) R.blocks.push({title:'避ける・注意する薬', items:[...avoidItems,...cautionItems]});
+  if(consult.length) R.blocks.push({title:'必要なコンサルト', items:consult});
+  R.dock = `${R.headline}｜目標 ${tOffice}`;
+  R._debug={stepNow, ranked};
+  return R;
+}
+function srcFor(k,reasons){ return ['JSH2025']; }
+
+/* ======================= 描画 ======================= */
+const LV = {crit:'要対応', warn:'要調整', ok:'良好', info:'方針確認'};
+function srcChips(src){
+  return '<span class="src">'+src.map(s=>{const r=REFS[s]; if(!r) return ''; return r.url?`<a href="#ref-${s}">${r.label}</a>`:`<a class="prac" href="#refs">${r.label}</a>`;}).join('')+'</span>';
+}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function render(){
+  const d=readForm();
+  $('#evtIvt').classList.toggle('hidden', d.scene!=='evt');
+  $('#ivtPhase').classList.toggle('hidden', d.scene!=='ivt');
+  const R=evaluate(d);
+  const bp = d.sbp!=null&&d.dbp!=null?`${d.sbp}/${d.dbp}`:'—';
+  $('#verdict').innerHTML = `<div class="verdict ${R.level}">
+    <span class="pill">${LV[R.level]}</span>
+    <div class="big">${esc(R.headline)}</div>
+    <div>${esc(R.sub)}</div>
+    <div class="targets"><div class="tgt"><div class="k">現在の血圧</div><div class="v">${bp}</div></div>${R.targets.map(t=>`<div class="tgt"><div class="k">${esc(t.k)}</div><div class="v${/[ぁ-んァ-ヶ一-龠Ⅰ-Ⅲ]/.test(t.v)?' txt':''}">${esc(t.v)}</div></div>`).join('')}</div>
+  </div>`;
+  $('#blocks').innerHTML = R.blocks.map(b=>{
+    if(b.rank){
+      const max=Math.max(...b.rank.map(r=>r.score));
+      return `<h3>${b.title}</h3><div class="rank">${b.rank.map(r=>`<div class="rk-name">${CLS[r.k].name}<small>${r.why.length?r.why.join('・'):'グループ'+CLS[r.k].g+'の標準候補'}${r.caution.length?' ／ 注意：'+r.caution.join('、'):''}</small></div><div class="bar" aria-label="相対スコア"><i style="width:${Math.round(r.score/max*100)}%"></i></div>`).join('')}</div><p class="hint">スコアは積極的適応・禁忌・注意から算出した相対値です。</p>`;
+    }
+    return `<h3>${b.title}</h3><ul class="list">${b.items.map(x=>`<li class="item ${x.kind}"><div class="t">${esc(x.t)}</div><div class="d">${esc(x.d)}</div>${x.ex?`<div class="ex">${esc(x.ex)}</div>`:''}${srcChips(x.src)}</li>`).join('')}</ul>`;
+  }).join('');
+  $('#dockText').innerHTML = `<b><span class="dot ${R.level}"></span>${esc(LV[R.level])}</b>${esc(R.dock)}`;
+  window._last={d,R};
+  try{ localStorage.setItem('htnnavi.draft', JSON.stringify(d)); }catch(e){}
+}
+function renderRefs(){
+  $('#refList').innerHTML = REF_ORDER.map(k=>{const r=REFS[k]; return `<li id="ref-${k}"><span class="tag">${r.label}</span>${esc(r.text)} <a href="${r.url}" target="_blank" rel="noopener">${r.url.replace('https://','')}</a></li>`;}).join('');
+}
+
+/* ======================= コピー ======================= */
+function summaryText(){
+  const {d,R}=window._last;
+  const sceneName = $(`input[name=scene][value="${d.scene}"]`).nextElementSibling.textContent;
+  let t=`【血圧評価】${sceneName}\nBP ${d.sbp}/${d.dbp}`+(d.hr!=null?` HR ${d.hr}`:'')+(d.hsbp?`（家庭 ${d.hsbp}/${d.hdbp}）`:'')+`\n判定：${R.headline}。${R.sub}\n目標：`+R.targets.map(x=>`${x.k} ${x.v}`).join('、')+'\n';
+  R.blocks.forEach(b=>{ if(b.items){ t+=`■${b.title}\n`+b.items.map(x=>`・${x.t}：${x.d}`).join('\n')+'\n'; } });
+  t+='（JSH2025・脳卒中治療GL2021〔改訂2025〕に基づく補助判定）';
+  return t;
+}
+function toast(m){const el=$('#toast'); el.textContent=m; el.classList.add('on'); setTimeout(()=>el.classList.remove('on'),1600);}
+
+/* ======================= 保存 ======================= */
+const KEY='htnnavi.records';
+function loadRecs(){ try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ return []; } }
+function saveRecs(a){ try{ localStorage.setItem(KEY, JSON.stringify(a)); return true; }catch(e){ return false; } }
+function renderSaved(){
+  const a=loadRecs();
+  $('#savedList').innerHTML = a.length? a.map((r,i)=>`<div class="row"><span>${esc(r.label)} <small>${esc(r.date)}</small></span><span class="btnrow"><button type="button" data-load="${i}">読込</button><button type="button" class="ghost" data-del="${i}">削除</button></span></div>`).join('') : '<p class="hint">保存した入力はありません。</p>';
+}
+
+/* ======================= イベント ======================= */
+document.addEventListener('input', e=>{ if(e.target.closest('#f')) render(); });
+document.addEventListener('change', e=>{ if(e.target.closest('#f')) render(); });
+$('#goResult').addEventListener('click', ()=>$('#result').scrollIntoView({behavior:'smooth'}));
+$('#dockBtn').addEventListener('click', ()=>$('#result').scrollIntoView({behavior:'smooth'}));
+$('#resetBtn').addEventListener('click', ()=>{ writeForm({scene:'general',adl:1,prot:'A1'}); render(); window.scrollTo({top:0}); });
+$('#copyBtn').addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(summaryText()); toast('コピーしました'); }catch(e){ toast('コピーできませんでした'); } });
+$('#saveBtn').addEventListener('click', ()=>{
+  const label=($('#saveLabel').value||'').trim()||'無題';
+  const a=loadRecs(); const now=new Date();
+  a.unshift({label, date:`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`, data:readForm()});
+  if(saveRecs(a.slice(0,30))){ $('#saveLabel').value=''; renderSaved(); toast('この端末に保存しました'); } else toast('この環境では保存できません');
+});
+$('#savedList').addEventListener('click', e=>{
+  const a=loadRecs();
+  if(e.target.dataset.load!=null){ writeForm(a[+e.target.dataset.load].data); render(); toast('読み込みました'); window.scrollTo({top:0}); }
+  if(e.target.dataset.del!=null){ a.splice(+e.target.dataset.del,1); saveRecs(a); renderSaved(); }
+});
+
+/* init */
+renderRefs();
+try{ const dr=JSON.parse(localStorage.getItem('htnnavi.draft')||'null'); if(dr) writeForm(dr); }catch(e){}
+renderSaved();
+render();
+
+/* ======================= PWA：service worker ======================= */
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
