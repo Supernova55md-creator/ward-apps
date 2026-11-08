@@ -6,7 +6,6 @@
 <title>神経病巣局在ナビ</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#D48A00">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -854,7 +853,7 @@ $("caseList").addEventListener("click",function(e){
   var ok=(location.protocol==="https:"||h==="localhost"||h==="127.0.0.1")&&!/(^|\.)claude\.ai$/.test(h)&&!/claudeusercontent|claude\.site/.test(h);
   if(!ok||!("serviceWorker" in navigator))return;
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("sw.js").then(function(reg){
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(r){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(x){if(x.scope===new URL("./",location.href).href)x.unregister();});});return r;}).then(function(reg){
       reg.addEventListener("updatefound",function(){var w=reg.installing;if(!w)return;
         w.addEventListener("statechange",function(){if(w.state==="installed"&&navigator.serviceWorker.controller){var m=document.getElementById("swMsg");m.style.display="block";setTimeout(function(){m.style.display="none";},6000);}});});
     }).catch(function(){});
