@@ -14,6 +14,7 @@ ward-apps/
 │  ├─ icon-192.png / icon-512.png / apple-touch-icon.png
 ├─ dementia/             … 認知症外来ナビ
 ├─ htn/                  … 高血圧治療ナビ
+├─ inf/                  … 感染症治療ナビ（サンフォード2026準拠）
 ├─ lipid/                … 脂質異常症治療ナビ
 ├─ mmt/                  … MMTナビ（徒手筋力テスト・神経支配。園生『MMT・針筋電図ガイドブック』の要約）
 ├─ loc/                  … 神経病巣局在ナビ

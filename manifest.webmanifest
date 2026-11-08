@@ -135,6 +135,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "感染症治療ナビ",
+      "short_name": "感染症ナビ",
+      "url": "inf/",
+      "icons": [
+        {
+          "src": "inf/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
