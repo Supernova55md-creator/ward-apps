@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="糖尿病ナビ">
+<meta name="theme-color" content="#0b5cad">
+<title>糖尿病治療ナビ（病棟用）</title>
+<style>
+:root{
+  --blue:#0b5cad; --blue-d:#073f78; --blue-l:#e8f1fb; --blue-m:#cfe2f7;
+  --ink:#1b2430; --sub:#5a6675; --line:#d7dee7; --bg:#f4f7fb; --card:#fff;
+  --ok:#1f7a4d; --ok-l:#e6f4ec; --warn:#a15c00; --warn-l:#fff3df;
+  --ng:#b3261e; --ng-l:#fde8e6; --rec:#0b5cad; --rec-l:#e3eefb;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+  color:var(--ink);background:var(--bg);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%;}
+header{position:sticky;top:0;z-index:10;background:var(--blue);color:#fff;padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left));display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.02em}
+header .sub{font-size:11px;opacity:.85}
+.logo{flex:none}
+main{padding:12px 12px 96px;max-width:640px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;border:0;background:none;padding:8px 2px 10px;font-size:11px;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button.on{color:var(--blue);font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 12px;overflow:hidden}
+.card > h2{margin:0;font-size:15px;padding:10px 14px;background:var(--blue-l);color:var(--blue-d);border-bottom:1px solid var(--blue-m);display:flex;align-items:center;gap:6px}
+.card .body{padding:12px 14px}
+details.card > summary{list-style:none;cursor:pointer;font-size:15px;font-weight:700;padding:11px 14px;background:var(--blue-l);color:var(--blue-d);display:flex;justify-content:space-between;align-items:center}
+details.card > summary::-webkit-details-marker{display:none}
+details.card > summary::after{content:"＋";font-weight:700}
+details.card[open] > summary::after{content:"－"}
+details.card[open] > summary{border-bottom:1px solid var(--blue-m)}
+.row{margin:0 0 12px}
+.row:last-child{margin-bottom:0}
+.lbl{display:block;font-size:13px;font-weight:700;color:var(--sub);margin-bottom:4px}
+.hint{font-size:12px;color:var(--sub);margin-top:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+input[type=number],select{width:100%;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-family:inherit}
+input[type=number]:focus,select:focus{outline:2px solid var(--blue-m);border-color:var(--blue)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{flex:1 1 auto;min-width:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;text-align:center;padding:8px 8px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;white-space:nowrap}
+.seg input:checked + span{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.chk{display:flex;flex-direction:column;gap:6px}
+.chk label{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff}
+.chk input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--blue)}
+.chk label:has(input:checked){background:var(--blue-l);border-color:var(--blue-m)}
+.calc{font-size:13px;color:var(--blue-d);background:var(--blue-l);border-radius:6px;padding:4px 8px;margin-top:6px;display:inline-block}
+.btns{display:flex;gap:8px;margin:4px 0 14px}
+.btn{flex:1;border:0;border-radius:10px;padding:13px 10px;font-size:15px;font-weight:700;font-family:inherit}
+.btn.pri{background:var(--blue);color:#fff}
+.btn.sec{background:#fff;color:var(--blue);border:1px solid var(--blue)}
+.btn.ghost{background:#fff;color:var(--sub);border:1px solid var(--line);flex:0 0 auto;padding:13px 14px}
+.notice{font-size:12px;color:var(--sub);background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px 10px;margin:0 0 12px}
+.alert{border-radius:10px;padding:10px 12px;margin:0 0 10px;font-size:14px;border-left:5px solid}
+.alert b{display:block;margin-bottom:2px}
+.alert.ng{background:var(--ng-l);border-color:var(--ng);color:#5c1410}
+.alert.warn{background:var(--warn-l);border-color:var(--warn);color:#4d2c00}
+.alert.info{background:var(--rec-l);border-color:var(--blue);color:var(--blue-d)}
+.alert.ok{background:var(--ok-l);border-color:var(--ok);color:#0f3d26}
+ul.tight{margin:4px 0 0;padding-left:1.2em}
+ul.tight li{margin:2px 0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:14px}
+.kv dt{color:var(--sub);font-weight:700}
+.kv dd{margin:0}
+.big{font-size:20px;font-weight:800;color:var(--blue-d)}
+.drug{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin:0 0 8px;background:#fff}
+.drug .hd{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.drug .hd small{font-weight:400;font-size:12px;color:var(--sub)}
+.drug .why{font-size:13px;color:var(--ink);margin-top:4px}
+.drug .why div{margin:1px 0}
+.tag{flex:none;display:inline-block;min-width:28px;text-align:center;font-size:13px;font-weight:800;border-radius:6px;padding:1px 6px}
+.t-rec{background:var(--blue);color:#fff}
+.t-ok{background:var(--ok-l);color:var(--ok);border:1px solid #b5dcc6}
+.t-cau{background:var(--warn-l);color:var(--warn);border:1px solid #f0d19b}
+.t-ng{background:var(--ng-l);color:var(--ng);border:1px solid #f1b9b4}
+.drug.rec{border-color:#9cc1ea;background:#f6faff}
+.drug.ng{opacity:.82}
+.legend{font-size:12px;color:var(--sub);margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px}
+.step{font-size:12px;font-weight:800;color:#fff;background:var(--blue);border-radius:4px;padding:0 6px;margin-right:4px}
+.src{font-size:11px;color:var(--sub);margin-top:6px}
+table.sc{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+table.sc th,table.sc td{border:1px solid var(--line);padding:5px 6px;text-align:center}
+table.sc th{background:var(--blue-l);color:var(--blue-d)}
+.cons{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin:0 0 8px;background:#fff}
+.cons .hd{display:flex;gap:8px;align-items:center;font-weight:700}
+.pri-1{background:var(--ng);color:#fff}.pri-2{background:var(--warn);color:#fff}.pri-3{background:var(--ok);color:#fff}
+.cls{border:1px solid var(--line);border-radius:10px;margin:0 0 10px;background:#fff;overflow:hidden}
+.cls h3{margin:0;font-size:15px;padding:8px 12px;background:var(--blue-l);color:var(--blue-d)}
+.cls .kv{padding:8px 12px}
+.ref{font-size:13px;margin:0 0 10px;padding:0 0 10px;border-bottom:1px solid var(--line)}
+.ref:last-child{border-bottom:0}
+.ref a{color:var(--blue);word-break:break-all}
+.empty{color:var(--sub);font-size:14px;text-align:center;padding:24px 8px}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#1b2430;color:#fff;padding:8px 14px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30}
+.toast.show{opacity:1}
+textarea.copy{width:100%;min-height:140px;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit;display:none}
+.hidden{display:none!important}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+#titResult{scroll-margin-top:70px}
+table.bgt input.unsure{outline:2px dashed #7a4fd1;outline-offset:1px}
+table.bgt input.fromimg{box-shadow:inset 0 0 0 2px #9cc1ea}
+.photo-btns{display:flex;gap:8px}
+.photo-btns label{flex:1;text-align:center;border:1px solid var(--blue);color:var(--blue);background:#fff;border-radius:10px;padding:12px 6px;font-weight:700;font-size:15px}
+.photo-btns input{display:none}
+.prev{max-width:100%;max-height:160px;border-radius:8px;border:1px solid var(--line);margin-top:8px;display:block}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--blue-m);border-top-color:var(--blue);border-radius:50%;animation:sp 1s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.grid-wrap{overflow-x:auto;margin:0 -4px}
+table.bgt{width:100%;border-collapse:separate;border-spacing:4px;table-layout:fixed}
+table.bgt th{font-size:12px;color:var(--sub);font-weight:700;text-align:center;padding:0}
+table.bgt th.rh,table.bgt td.rh{width:68px;text-align:left;font-size:12px;font-weight:700;color:var(--blue-d);line-height:1.25}
+table.bgt td{padding:0}
+table.bgt input{width:100%;font-size:17px;padding:10px 2px;text-align:center;border:1px solid var(--line);border-radius:8px;font-family:inherit;color:var(--ink);background:#fff}
+table.bgt input:focus{outline:2px solid var(--blue);border-color:var(--blue);background:#f6faff}
+table.bgt input.lo{background:var(--ng-l);border-color:var(--ng);color:var(--ng);font-weight:700}
+table.bgt input.hi{background:var(--warn-l);border-color:#e2b66b;color:var(--warn);font-weight:700}
+table.bgt input.ok{background:var(--ok-l);border-color:#b5dcc6}
+table.bgt td.na{background:repeating-linear-gradient(45deg,#f1f4f8,#f1f4f8 4px,#fff 4px,#fff 8px);border-radius:8px}
+table.bgt select{width:100%;font-size:11px;padding:2px 0;margin-top:2px;border:1px solid var(--line);border-radius:5px;background:#fff;font-family:inherit}
+table.bgt tr.sep td{height:4px}
+.ins-lbl small{display:block;font-weight:400;color:var(--sub);font-size:10px}
+.actbar{position:sticky;bottom:64px;z-index:5;display:flex;gap:8px;padding:8px 0;background:linear-gradient(to top,var(--bg) 70%,rgba(244,247,251,0))}
+.prop{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin:0 0 8px;background:#fff}
+.prop .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}
+.prop .dose{font-size:20px;font-weight:800;white-space:nowrap}
+.prop .dose .arr{color:var(--sub);font-weight:400;font-size:15px;margin:0 4px}
+.prop.up .dose .nw{color:var(--warn)} .prop.down .dose .nw{color:var(--ng)} .prop.keep .dose .nw{color:var(--ok)} .prop.new .dose .nw{color:var(--blue)}
+.prop .rs{font-size:13px;margin-top:4px}
+.prop .ty{font-size:12px;color:var(--sub)}
+.mini-legend{font-size:11px;color:var(--sub);display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 0}
+.mini-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:3px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<header>
+  <svg class="logo" width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" fill="none" stroke="#fff" stroke-width="6"/></svg>
+  <div><h1>糖尿病治療ナビ（病棟用）</h1><div class="sub">入院中の血糖管理・薬剤選択・コンサルト判断</div></div>
+</header>
+
+<main>
+<!-- ============ 入力 ============ -->
+<section id="v-input" class="view active">
+  <div class="notice">患者氏名・IDなど個人を特定できる情報は入力しないでください。入力内容はこの端末のブラウザ内だけに保存されます。</div>
+
+  <details class="card" open>
+    <summary>① 基本情報</summary>
+    <div class="body">
+      <div class="row">
+        <span class="lbl">病型</span>
+        <div class="seg">
+          <label><input type="radio" name="type" value="t2" checked><span>2型</span></label>
+          <label><input type="radio" name="type" value="t1"><span>1型</span></label>
+          <label><input type="radio" name="type" value="other"><span>膵性・その他</span></label>
+          <label><input type="radio" name="type" value="new"><span>未診断の高血糖</span></label>
+        </div>
+      </div>
+      <div class="grid3 row">
+        <div><span class="lbl">年齢</span><input type="number" id="age" inputmode="numeric" placeholder="歳"></div>
+        <div><span class="lbl">身長 cm</span><input type="number" id="ht" inputmode="decimal"></div>
+        <div><span class="lbl">体重 kg</span><input type="number" id="wt" inputmode="decimal"></div>
+      </div>
+      <div id="bmiOut" class="calc hidden"></div>
+      <div class="row" style="margin-top:10px">
+        <span class="lbl">性別（eGFR計算用）</span>
+        <div class="seg">
+          <label><input type="radio" name="sex" value="m" checked><span>男性</span></label>
+          <label><input type="radio" name="sex" value="f"><span>女性</span></label>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="card" open>
+    <summary>② 血糖・検査値</summary>
+    <div class="body">
+      <div class="grid2 row">
+        <div><span class="lbl">HbA1c %</span><input type="number" id="a1c" inputmode="decimal" step="0.1"></div>
+        <div><span class="lbl">最近24時間の最高血糖 mg/dL</span><input type="number" id="bg" inputmode="numeric"></div>
+      </div>
+      <div class="chk row">
+        <label><input type="checkbox" id="bg180x2">最近24時間で血糖 ≥180 mg/dL が2回以上</label>
+        <label><input type="checkbox" id="hypoNow">最近24時間で血糖 &lt;70 mg/dL があった</label>
+      </div>
+      <div class="grid2 row">
+        <div><span class="lbl">血清Cr mg/dL</span><input type="number" id="cr" inputmode="decimal" step="0.01"></div>
+        <div><span class="lbl">eGFR（直接入力も可）</span><input type="number" id="egfr" inputmode="decimal" placeholder="自動計算"></div>
+      </div>
+      <div id="egfrOut" class="calc hidden"></div>
+      <div class="grid2 row" style="margin-top:10px">
+        <div><span class="lbl">空腹時CPR ng/mL（任意）</span><input type="number" id="cpr" inputmode="decimal" step="0.01"></div>
+        <div><span class="lbl">同時の血糖 mg/dL（任意）</span><input type="number" id="cprbg" inputmode="numeric"></div>
+      </div>
+      <div id="cpiOut" class="calc hidden"></div>
+      <div class="row" style="margin-top:10px">
+        <span class="lbl">肝機能</span>
+        <div class="seg">
+          <label><input type="radio" name="liver" value="0" checked><span>問題なし</span></label>
+          <label><input type="radio" name="liver" value="1"><span>軽〜中等度障害</span></label>
+          <label><input type="radio" name="liver" value="2"><span>重度・肝硬変</span></label>
+        </div>
+      </div>
+      <div class="chk row">
+        <label><input type="checkbox" id="ketone">尿／血中ケトン陽性・アシドーシス所見あり</label>
+        <label><input type="checkbox" id="hhs">著明な脱水・意識障害・血漿浸透圧上昇（HHS疑い）</label>
+      </div>
+    </div>
+  </details>
+
+  <details class="card" open>
+    <summary>③ 入院の状況</summary>
+    <div class="body">
+      <div class="row">
+        <span class="lbl">病棟区分</span>
+        <div class="seg">
+          <label><input type="radio" name="ward" value="gen" checked><span>一般病棟</span></label>
+          <label><input type="radio" name="ward" value="icu"><span>ICU・重症</span></label>
+        </div>
+      </div>
+      <div class="row">
+        <span class="lbl">栄養</span>
+        <select id="nutr">
+          <option value="eat">経口摂取 良好（ほぼ全量）</option>
+          <option value="poor">経口摂取 不安定（半量以下のことがある）</option>
+          <option value="npo">絶食（検査・手術・嚥下評価待ちなど）</option>
+          <option value="tfc">経管栄養 持続投与</option>
+          <option value="tfb">経管栄養 間欠（ボーラス）投与</option>
+          <option value="tpn">中心静脈栄養（TPN）</option>
+        </select>
+      </div>
+      <div class="row">
+        <span class="lbl">脳卒中</span>
+        <select id="stroke">
+          <option value="none">該当なし</option>
+          <option value="tpa">超急性期（rt-PA・血栓回収を検討中）</option>
+          <option value="acute">脳卒中急性期（発症後数日以内）</option>
+        </select>
+      </div>
+      <div class="row">
+        <span class="lbl">ステロイド</span>
+        <select id="ster">
+          <option value="none">使用なし</option>
+          <option value="psl">PSL（プレドニゾロン）1日1回・朝</option>
+          <option value="psl2">PSL 1日2回以上に分割</option>
+          <option value="mpsl">mPSLパルス（500〜1000 mg/日）</option>
+          <option value="dex">デキサメタゾン</option>
+        </select>
+        <div id="pslWrap" class="hidden" style="margin-top:8px">
+          <span class="lbl">PSL換算 1日量 mg</span>
+          <input type="number" id="psl" inputmode="numeric">
+          <div class="hint">換算目安：PSL 5 mg ＝ mPSL 4 mg ＝ デキサメタゾン 0.75 mg</div>
+        </div>
+      </div>
+      <div class="chk row">
+        <label><input type="checkbox" id="surg">手術・全身麻酔の予定がある</label>
+        <label><input type="checkbox" id="contrast">ヨード造影剤を使う検査・治療の予定がある</label>
+        <label><input type="checkbox" id="infect">重症感染症・重度外傷がある</label>
+        <label><input type="checkbox" id="dysph">嚥下障害・嘔気嘔吐・消化器症状がある</label>
+      </div>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary>④ 併存症・患者背景</summary>
+    <div class="body">
+      <div class="chk row">
+        <label><input type="checkbox" id="ascvd">動脈硬化性心血管疾患（脳梗塞・冠動脈疾患・末梢動脈疾患）</label>
+        <label><input type="checkbox" id="hf">心不全</label>
+        <label><input type="checkbox" id="alb">アルブミン尿・蛋白尿（CKD）</label>
+        <label><input type="checkbox" id="masld">脂肪肝（MASLD）</label>
+        <label><input type="checkbox" id="pdr">増殖網膜症・未治療の網膜症／眼底未評価</label>
+        <label><input type="checkbox" id="panc">膵炎の既往</label>
+        <label><input type="checkbox" id="mtc">甲状腺髄様癌・MEN2の既往／家族歴</label>
+        <label><input type="checkbox" id="uti">尿路・性器感染症の反復</label>
+        <label><input type="checkbox" id="osteo">骨粗鬆症・骨折リスクが高い</label>
+        <label><input type="checkbox" id="ileus">腸閉塞の既往・開腹手術歴</label>
+        <label><input type="checkbox" id="sevhypo">重症低血糖の既往・低血糖を繰り返す</label>
+        <label><input type="checkbox" id="preg">妊娠中・妊娠を計画している</label>
+        <label><input type="checkbox" id="pump">インスリンポンプ・CGMを使用している</label>
+        <label><input type="checkbox" id="selfinj">自己注射・服薬管理が難しい（独居・認知機能低下など）</label>
+        <label><input type="checkbox" id="wtloss">最近の体重減少・口渇多飲多尿</label>
+      </div>
+      <div class="row" id="catWrap">
+        <span class="lbl">高齢者（65歳以上）のカテゴリー</span>
+        <select id="cat">
+          <option value="1">I：認知機能正常 かつ ADL自立</option>
+          <option value="2">II：軽度認知障害〜軽度認知症、または手段的ADL低下</option>
+          <option value="3">III：中等度以上の認知症、基本的ADL低下、または多くの併存疾患・機能障害</option>
+        </select>
+        <div class="hint">高齢者糖尿病診療ガイドライン2023の区分</div>
+      </div>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary>⑤ 現在の糖尿病治療薬</summary>
+    <div class="body">
+      <div class="chk row">
+        <label><input type="checkbox" class="med" value="met">メトホルミン（メトグルコ）</label>
+        <label><input type="checkbox" class="med" value="dpp4">DPP-4阻害薬（ジャヌビア・グラクティブ、エクア、トラゼンタ、テネリアなど）</label>
+        <label><input type="checkbox" class="med" value="sglt2">SGLT2阻害薬（ジャディアンス、フォシーガ、カナグル、スーグラなど）</label>
+        <label><input type="checkbox" class="med" value="glp1">GLP-1受容体作動薬（オゼンピック、トルリシティ、ビクトーザ、経口リベルサス）</label>
+        <label><input type="checkbox" class="med" value="tirz">チルゼパチド（マンジャロ）</label>
+        <label><input type="checkbox" class="med" value="su">SU薬（アマリール、グリミクロンなど）</label>
+        <label><input type="checkbox" class="med" value="glinide">グリニド薬（グルファスト、シュアポスト、スターシス・ファスティック）</label>
+        <label><input type="checkbox" class="med" value="agi">α-グルコシダーゼ阻害薬（ベイスン、グルコバイ、セイブル）</label>
+        <label><input type="checkbox" class="med" value="tzd">ピオグリタゾン（アクトス）</label>
+        <label><input type="checkbox" class="med" value="imeg">イメグリミン（ツイミーグ）</label>
+        <label><input type="checkbox" class="med" value="ins">インスリン（配合注のゾルトファイ・ソリクアを含む）</label>
+      </div>
+      <div id="insWrap" class="hidden">
+        <span class="lbl">自宅でのインスリン1日総量（単位）</span>
+        <input type="number" id="instdd" inputmode="numeric">
+      </div>
+    </div>
+  </details>
+
+  <div class="btns">
+    <button class="btn pri" id="runBtn">判定する</button>
+    <button class="btn ghost" id="clrBtn">クリア</button>
+  </div>
+</section>
+
+<!-- ============ インスリン調整 ============ -->
+<section id="v-tit" class="view">
+  <div class="notice">直近3日の血糖と、いま使っているインスリンの量を入れると、責任インスリンの考え方で翌日の量と種類を提案します。年齢・体重・eGFR・ステロイド・栄養は「入力」タブの内容を使います。</div>
+  <div class="card hidden" id="photoCard"><h2>📷 写真から読み込む（オンライン時のみ）</h2><div class="body">
+    <div class="alert warn" style="margin-bottom:10px"><b>患者氏名・IDが写らないように撮影してください</b>血糖とインスリン量の欄だけを写すか、撮影後に切り取ってから選んでください。画像は読み取りのためにClaudeへ送られます。</div>
+    <div class="photo-btns">
+      <label>撮影する<input type="file" accept="image/*" capture="environment" id="camIn"></label>
+      <label>写真を選ぶ<input type="file" accept="image/*" id="picIn"></label>
+    </div>
+    <img id="photoPrev" class="prev hidden" alt="">
+    <div id="photoStatus" class="hint" style="margin-top:8px"></div>
+    <div class="btns hidden" id="undoWrap" style="margin-top:8px"><button class="btn ghost" id="undoBtn" style="flex:1">読み込み前に戻す</button></div>
+  </div></div>
+  <div class="card"><h2>📋 インスリン量と血糖</h2><div class="body">
+    <div class="grid-wrap"><table class="bgt" id="bgt"></table></div>
+    <div class="mini-legend"><span><i style="background:var(--ng-l);border:1px solid var(--ng)"></i>&lt;70</span><span><i style="background:var(--ok-l);border:1px solid #b5dcc6"></i>70〜180</span><span><i style="background:var(--warn-l);border:1px solid #e2b66b"></i>&gt;180</span><span>空欄＝未測定でOK</span></div>
+    <div class="chk" style="margin-top:10px">
+      <label><input type="checkbox" id="show3am">深夜3時の血糖も入れる（朝の高血糖の原因を見分ける）</label>
+    </div>
+    <div class="hint">数字は3桁入ると次の欄へ自動で移ります。基礎インスリンは打っている時刻の欄（朝 または 眠前）に入れてください。</div>
+  </div></div>
+  <div class="actbar">
+    <button class="btn pri" id="titBtn">調整案を出す</button>
+    <button class="btn ghost" id="shiftBtn" title="3日目→2日目へずらし、3日目を空にする">1日進める</button>
+  </div>
+  <div id="titResult"></div>
+</section>
+
+<!-- ============ 結果 ============ -->
+<section id="v-result" class="view">
+  <div id="result"><div class="empty">「入力」タブで項目を入れて「判定する」を押してください。</div></div>
+</section>
+
+<!-- ============ 早見表 ============ -->
+<section id="v-table" class="view"></section>
+
+<!-- ============ 出典 ============ -->
+<section id="v-ref" class="view"></section>
+</main>
+
+<nav class="tabs">
+  <button data-v="v-input" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg>入力</button>
+  <button data-v="v-tit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18l5-6 4 3 7-9"/><path d="M4 21h16"/></svg>調整</button>
+  <button data-v="v-result"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>推奨</button>
+  <button data-v="v-table"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg>早見表</button>
+  <button data-v="v-ref"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h9l3 3v13H6z"/><path d="M9 11h6M9 15h6"/></svg>出典</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var $ = function(id){return document.getElementById(id);};
+var KEY = "dmWardNavi.v1";
+
+/* ---------- 出典（画面表示用） ---------- */
+var REFS = {
+  JDSalg: {s:"JDS 薬物療法アルゴリズム第2版", t:"Bouchi R, et al. A consensus statement from the Japan Diabetes Society (JDS): a proposed algorithm for pharmacotherapy in people with type 2 diabetes—2nd Edition (English version). Diabetol Int. 2024;15(3):327-345.", u:"https://pubmed.ncbi.nlm.nih.gov/39101173/", j:"日本語版：糖尿病 2023;66(10):715-733"},
+  JDSgl: {s:"糖尿病診療ガイドライン2024", t:"日本糖尿病学会. 糖尿病診療ガイドライン2024. 南江堂, 2024.", u:"https://minds.jcqhc.or.jp/summary/c00864/"},
+  Elderly: {s:"高齢者糖尿病診療GL2023", t:"日本老年医学会・日本糖尿病学会. 高齢者糖尿病診療ガイドライン2023. 南江堂, 2023.", u:"https://minds.jcqhc.or.jp/?p=9983"},
+  Met: {s:"メトホルミン適正使用Rec", t:"日本糖尿病学会 ビグアナイド薬の適正使用に関する委員会. メトホルミンの適正使用に関するRecommendation（2020年3月18日改訂）.", u:"https://www.nittokyo.or.jp/uploads/files/recommendation_metformin_200318.pdf"},
+  SGLT2: {s:"SGLT2阻害薬適正使用Rec", t:"日本糖尿病学会 SGLT2阻害薬の適正使用に関する委員会. SGLT2阻害薬の適正使用に関するRecommendation（2022年7月26日改訂）.", u:"http://www.jds.or.jp/modules/important/index.php?page=article&storyid=48"},
+  ADA9: {s:"ADA SOC 2026 §9", t:"American Diabetes Association Professional Practice Committee. 9. Pharmacologic Approaches to Glycemic Treatment: Standards of Care in Diabetes—2026. Diabetes Care. 2026;49(Suppl 1):S183-S215.", u:"https://doi.org/10.2337/dc26-S009"},
+  ADA16: {s:"ADA SOC 2026 §16", t:"American Diabetes Association Professional Practice Committee. 16. Diabetes Care in the Hospital: Standards of Care in Diabetes—2026. Diabetes Care. 2026;49(Suppl 1).", u:"https://doi.org/10.2337/dc26-S016"},
+  ES22: {s:"Endocrine Society 2022", t:"Korytkowski MT, et al. Management of Hyperglycemia in Hospitalized Adult Patients in Non-Critical Care Settings: An Endocrine Society Clinical Practice Guideline. J Clin Endocrinol Metab. 2022;107(8):2101-2128.", u:"https://doi.org/10.1210/clinem/dgac278"},
+  GC: {s:"Clore 2009（ステロイド高血糖）", t:"Clore JN, Thurber-Hay L. Glucocorticoid-induced hyperglycemia. Endocr Pract. 2009;15(5):469-474.", u:"https://pubmed.ncbi.nlm.nih.gov/19454391/"},
+  Crisis: {s:"高血糖緊急症コンセンサス2024", t:"Umpierrez GE, et al. Hyperglycemic Crises in Adults With Diabetes: A Consensus Report. Diabetes Care. 2024;47(8):1257-1275.", u:"https://doi.org/10.2337/dci24-0032"},
+  KDIGO: {s:"KDIGO 2022 DM in CKD", t:"KDIGO Diabetes Work Group. KDIGO 2022 Clinical Practice Guideline for Diabetes Management in Chronic Kidney Disease. Kidney Int. 2022;102(5S):S1-S127.", u:"https://doi.org/10.1016/j.kint.2022.06.008"},
+  AHA19: {s:"AHA/ASA 2019 急性期脳梗塞", t:"Powers WJ, et al. Guidelines for the Early Management of Patients With Acute Ischemic Stroke: 2019 Update. Stroke. 2019;50(12):e344-e418.", u:"https://doi.org/10.1161/STR.0000000000000211"},
+  tPA: {s:"rt-PA適正治療指針 第三版", t:"日本脳卒中学会 脳卒中医療向上・社会保険委員会. 静注血栓溶解（rt-PA）療法 適正治療指針 第三版（2019年3月、2023年9月追補）.", u:"https://www.jsts.gr.jp/"}
+};
+function cite(){ var a=[].slice.call(arguments); return '<div class="src">出典：'+a.map(function(k){return REFS[k]?REFS[k].s:k;}).join("／")+'</div>'; }
+
+/* ---------- タブ ---------- */
+var tabBtns = document.querySelectorAll("nav.tabs button");
+function show(v){
+  document.querySelectorAll(".view").forEach(function(s){s.classList.toggle("active", s.id===v);});
+  tabBtns.forEach(function(b){b.classList.toggle("on", b.dataset.v===v);});
+  try{ window.scrollTo(0,0); }catch(e){}
+}
+tabBtns.forEach(function(b){ b.addEventListener("click", function(){ show(b.dataset.v); }); });
+
+function toast(msg){ var t=$("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(function(){t.classList.remove("show");},1600); }
+
+/* ---------- 入力の取得 ---------- */
+function num(id){ var v=parseFloat($(id).value); return isNaN(v)?null:v; }
+function radio(n){ var e=document.querySelector('input[name="'+n+'"]:checked'); return e?e.value:null; }
+function chk(id){ return $(id).checked; }
+
+function calcBMI(){ var h=num("ht"), w=num("wt"); if(h&&w&&h>50){ return w/Math.pow(h/100,2);} return null; }
+function calcEGFR(){
+  var cr=num("cr"), age=num("age");
+  if(cr&&age&&cr>0&&age>=18){ var e=194*Math.pow(cr,-1.094)*Math.pow(age,-0.287); if(radio("sex")==="f") e*=0.739; return e; }
+  return null;
+}
+function getEGFR(){ var d=num("egfr"); if(d!==null) return d; return calcEGFR(); }
+function getCPI(){ var c=num("cpr"), g=num("cprbg"); if(c!==null&&g&&g>0) return c/g*100; return null; }
+
+function liveCalc(){
+  var b=calcBMI(), o=$("bmiOut");
+  if(b){ o.textContent="BMI "+b.toFixed(1)+(b>=25?"（肥満）":b<18.5?"（やせ）":"（非肥満）"); o.classList.remove("hidden"); } else o.classList.add("hidden");
+  var e=calcEGFR(), eo=$("egfrOut");
+  if(e && num("egfr")===null){ eo.textContent="推算eGFR "+e.toFixed(0)+" mL/分/1.73m²（日本人式）"; eo.classList.remove("hidden"); } else eo.classList.add("hidden");
+  var c=getCPI(), co=$("cpiOut");
+  if(c!==null){ co.textContent="CPI "+c.toFixed(2)+(c<0.8?"（インスリン治療が必要な水準）":c<1.2?"（境界域）":"（経口薬で管理できる可能性）"); co.classList.remove("hidden"); } else co.classList.add("hidden");
+  var age=num("age"); $("catWrap").style.display=(age!==null&&age<65)?"none":"";
+  $("pslWrap").classList.toggle("hidden", !/psl|dex/.test($("ster").value));
+  $("insWrap").classList.toggle("hidden", !document.querySelector('.med[value="ins"]').checked);
+}
+
+function collect(){
+  var meds={}; document.querySelectorAll(".med").forEach(function(m){ meds[m.value]=m.checked; });
+  var bmi=calcBMI();
+  return {
+    type:radio("type"), age:num("age"), wt:num("wt"), bmi:bmi, a1c:num("a1c"), bg:num("bg"),
+    bg180x2:chk("bg180x2"), hypoNow:chk("hypoNow"), egfr:getEGFR(), cpr:num("cpr"), cpi:getCPI(),
+    liver:+radio("liver"), ketone:chk("ketone"), hhs:chk("hhs"),
+    ward:radio("ward"), nutr:$("nutr").value, stroke:$("stroke").value, ster:$("ster").value, psl:num("psl"),
+    surg:chk("surg"), contrast:chk("contrast"), infect:chk("infect"), dysph:chk("dysph"),
+    ascvd:chk("ascvd"), hf:chk("hf"), alb:chk("alb"), masld:chk("masld"), pdr:chk("pdr"), panc:chk("panc"),
+    mtc:chk("mtc"), uti:chk("uti"), osteo:chk("osteo"), ileus:chk("ileus"), sevhypo:chk("sevhypo"),
+    preg:chk("preg"), pump:chk("pump"), selfinj:chk("selfinj"), wtloss:chk("wtloss"),
+    cat:+$("cat").value, meds:meds, instdd:num("instdd")
+  };
+}
+
+/* ---------- 保存（この端末のみ） ---------- */
+function save(){
+  try{
+    var o={};
+    document.querySelectorAll("#v-input input, #v-input select").forEach(function(e){
+      if(e.type==="radio"){ if(e.checked) o["r:"+e.name]=e.value; }
+      else if(e.type==="checkbox"){ o[(e.id||("m:"+e.value))]=e.checked; }
+      else if(e.id){ o[e.id]=e.value; }
+    });
+    localStorage.setItem(KEY, JSON.stringify(o));
+  }catch(err){}
+}
+function load(){
+  try{
+    var s=localStorage.getItem(KEY); if(!s) return; var o=JSON.parse(s);
+    document.querySelectorAll("#v-input input, #v-input select").forEach(function(e){
+      if(e.type==="radio"){ if(o["r:"+e.name]!==undefined) e.checked=(o["r:"+e.name]===e.value); }
+      else if(e.type==="checkbox"){ var k=e.id||("m:"+e.value); if(o[k]!==undefined) e.checked=o[k]; }
+      else if(e.id && o[e.id]!==undefined){ e.value=o[e.id]; }
+    });
+  }catch(err){}
+}
+function clearAll(){
+  document.querySelectorAll("#v-input input[type=number]").forEach(function(e){e.value="";});
+  document.querySelectorAll("#v-input input[type=checkbox]").forEach(function(e){e.checked=false;});
+  ["type","sex","liver","ward"].forEach(function(n){ var f=document.querySelector('input[name="'+n+'"]'); if(f) f.checked=true; });
+  ["nutr","stroke","ster","cat"].forEach(function(id){ $(id).selectedIndex=0; });
+  try{ localStorage.removeItem(KEY); }catch(err){}
+  $("result").innerHTML='<div class="empty">「入力」タブで項目を入れて「判定する」を押してください。</div>';
+  liveCalc(); toast("入力をクリアしました");
+}
+
+/* ---------- 判定ロジック ---------- */
+function fmt(n,d){ return (n===null||n===undefined)?"—":(+n).toFixed(d||0); }
+function r5(x){ return Math.max(1, Math.round(x)); }
+
+function judge(p){
+  var out={alerts:[], target:null, a1cTarget:null, insIndic:null, plan:[], meds:[], cands:[], consults:[], tests:[], copy:[]};
+  var E=p.egfr, age=p.age, elderly=(age!==null&&age>=65);
+  var poorIntake=(p.nutr==="poor"||p.nutr==="npo");
+  var t1=(p.type==="t1");
+
+  /* ===== 緊急アラート ===== */
+  if(p.ketone){
+    out.alerts.push(["ng","DKA（正常血糖DKAを含む）を除外","ケトン陽性・アシドーシス所見あり。血液ガス（pH・HCO₃⁻・アニオンギャップ）と血中ケトンを確認し、DKAなら輸液＋持続静注インスリンで治療する。SGLT2阻害薬内服中は血糖が高くなくてもDKAがありうる。"+cite("Crisis","SGLT2")]);
+  }
+  if(p.hhs){
+    out.alerts.push(["ng","HHSを疑う","著明な脱水・意識障害・高浸透圧。大量輸液と持続静注インスリンが基本。ICU管理を検討する。"+cite("Crisis")]);
+  }
+  if(p.hypoNow || (p.bg!==null && p.bg<70)){
+    out.alerts.push(["ng","低血糖への対応と治療の見直し","経口可：ブドウ糖10 g（または砂糖20 g）→15分後に再検。経口不可：50%ブドウ糖20〜40 mL静注。<b>血糖 &lt;70 mg/dL があったら、その日のうちにインスリン・SU薬の量を見直す。</b>"+cite("JDSgl","ADA16")]);
+  }
+  if(p.stroke==="tpa"){
+    var tx="血糖 &lt;50 mg/dL または &gt;400 mg/dL は静注血栓溶解療法の禁忌項目。低血糖は脳卒中類似症状（stroke mimic）の原因にもなるため、治療前に必ず血糖を測る。";
+    if(p.bg!==null && (p.bg<50||p.bg>400)) tx="<b>入力された血糖 "+p.bg+" mg/dL は禁忌範囲。</b> "+tx;
+    out.alerts.push([(p.bg!==null&&(p.bg<50||p.bg>400))?"ng":"warn","rt-PA：血糖の禁忌範囲",tx+cite("tPA","AHA19")]);
+  }
+  if(t1){
+    out.alerts.push(["warn","1型糖尿病：基礎インスリンは絶食中も止めない","基礎インスリンを中止するとDKAになる。絶食時はブドウ糖を含む輸液を入れ、基礎インスリンは継続する。"+cite("ADA16","Crisis")]);
+  }
+  if(p.preg){
+    out.alerts.push(["warn","妊娠：インスリンが基本","経口薬・GLP-1受容体作動薬は使わない。糖尿病内科・産科へ相談する。"+cite("JDSgl")]);
+  }
+
+  /* ===== 入院中の血糖目標 ===== */
+  if(p.ward==="icu"){
+    out.target={v:"140〜180 mg/dL", d:"重症患者。血糖 ≥180 mg/dLが続くなら持続静注インスリンを開始する。110〜140 mg/dLを目指すのは低血糖なく達成できる一部の患者に限る。", c:cite("ADA16")};
+  } else if(p.stroke!=="none"){
+    out.target={v:"140〜180 mg/dL", d:"脳卒中急性期。高血糖（&gt;180 mg/dL）を避け、低血糖（&lt;60 mg/dL）は直ちに補正する。", c:cite("AHA19","ADA16")};
+  } else {
+    out.target={v:"100〜180 mg/dL", d:"一般病棟（非重症）。血糖 ≥180 mg/dLが24時間で2回以上なら定時インスリンを開始・増量する。&lt;70 mg/dLを作らない。", c:cite("ADA16","ES22")};
+  }
+
+  /* ===== 長期（退院後）のHbA1c目標 ===== */
+  var riskDrug = p.meds.su || p.meds.glinide || p.meds.ins || t1;
+  if(elderly){
+    var tg, low=null;
+    if(!riskDrug){ tg = (p.cat===3)?"8.0%未満":"7.0%未満"; }
+    else {
+      if(p.cat===1){ if(age>=75){tg="8.0%未満";low="7.0%";} else {tg="7.5%未満";low="6.5%";} }
+      else if(p.cat===2){ tg="8.0%未満"; low="7.0%"; }
+      else { tg="8.5%未満"; low="7.5%"; }
+    }
+    out.a1cTarget={v:tg+(low?"（下限 "+low+"）":""), d:"高齢者カテゴリー"+["","I","II","III"][p.cat]+"・"+(riskDrug?"低血糖リスクの高い薬剤（インスリン・SU薬・グリニド薬）あり":"低血糖リスクの高い薬剤なし")+"。重症低血糖が懸念される場合は個別に緩める。", c:cite("Elderly")};
+  } else {
+    out.a1cTarget={v:"7.0%未満", d:"合併症予防の目標。低血糖などの副作用なく達成できれば6.0%未満（血糖正常化）も可。治療強化が難しい場合は8.0%未満。", c:cite("JDSgl")};
+  }
+
+  /* ===== インスリン適応 ===== */
+  var abs=[], rel=[];
+  if(t1) abs.push("1型糖尿病（インスリン依存状態）");
+  if(p.cpr!==null && p.cpr<0.5) abs.push("空腹時CPR "+p.cpr+" ng/mL（&lt;0.5：インスリン依存状態の目安）");
+  if(p.ketone||p.hhs) abs.push("高血糖緊急症（DKA・HHS）の疑い");
+  if(p.liver===2) abs.push("重度の肝障害");
+  if(E!==null && E<30) abs.push("高度腎機能障害（eGFR "+fmt(E)+"）で経口薬の選択肢が限られる");
+  if(p.infect) abs.push("重症感染症・重度外傷");
+  if(p.surg) abs.push("中等度以上の手術（周術期）");
+  if(p.preg) abs.push("妊娠");
+  if(p.nutr==="tpn") abs.push("静脈栄養中");
+  if(p.bg!==null && p.bg>=350) rel.push("著明な高血糖（随時 ≥350 mg/dL）");
+  if(p.a1c!==null && p.a1c>=10) rel.push("HbA1c "+p.a1c+"%（≥10%）で糖毒性の解除が必要");
+  if(p.cpi!==null && p.cpi<0.8) rel.push("CPI "+fmt(p.cpi,2)+"（&lt;0.8）でインスリン分泌が低下");
+  if(p.wtloss) rel.push("体重減少・口渇多尿（インスリン作用不足の症状）");
+  if(p.ster!=="none" && (p.bg===null || p.bg>=180)) rel.push("ステロイド治療中の高血糖");
+  if(p.bmi!==null && p.bmi<18.5) rel.push("やせ・栄養状態不良");
+  out.insIndic={abs:abs, rel:rel};
+
+  /* ===== 入院中のインスリン計画 ===== */
+  var plan=out.plan;
+  var w=p.wt;
+  var needSched = t1 || p.meds.ins || p.bg180x2 || (p.bg!==null&&p.bg>=180) || (p.a1c!==null&&p.a1c>=9) || abs.length>0;
+  var sens = (t1 || (age!==null&&age>=70) || (E!==null&&E<30) || (p.bmi!==null&&p.bmi<18.5));
+  var resis = (!sens) && ((p.bmi!==null&&p.bmi>=30) || p.ster!=="none" || p.infect);
+  var scaleName = sens?"感受性が高い":resis?"抵抗性":"標準";
+
+  if(p.ward==="icu"){
+    plan.push(["持続静注インスリン","重症例で血糖 ≥180 mg/dLが続く場合は、院内プロトコルに従って持続静注インスリンを開始し、1〜2時間ごとに血糖を測る。目標 140〜180 mg/dL。病態が安定して経口摂取が始まったら皮下注へ移行（移行時は静注量の約60〜80%を基礎インスリンに）。"+cite("ADA16")]);
+  } else if(!needSched){
+    plan.push(["補正インスリン（スライディングスケール）単独で開始してよい","血糖が概ね180 mg/dL未満で、自宅でインスリンを使っていない場合。補正のみで ≥180 mg/dLが24時間に2回以上出たら定時インスリンを追加する。DPP-4阻害薬は軽度の高血糖なら継続してよい。"+cite("ES22","ADA16")]);
+  } else {
+    var tdd=null, basis="";
+    if(p.meds.ins && p.instdd){
+      var f = (poorIntake || p.sevhypo || (p.a1c!==null&&p.a1c<7) || (E!==null&&E<30)) ? 0.7 : 0.8;
+      tdd = p.instdd*f; basis="自宅のインスリン量 "+p.instdd+" 単位 × "+f+"（"+(f<0.8?"摂取不良・低血糖リスク・腎障害などで減量":"入院時は約20%減から")+"）";
+    } else if(w){
+      var k = sens?0.25:(p.bg!==null&&p.bg>200)?0.5:0.4;
+      tdd = w*k; basis="体重 "+w+" kg × "+k+" 単位/kg"+(sens?"（高齢・腎障害・やせ・1型のため少なめ）":(k===0.5?"（血糖 &gt;200 mg/dL）":"（血糖 140〜200 mg/dL相当）"));
+    }
+    if(tdd){
+      var basal=tdd*0.5, bolus=tdd*0.5/3;
+      if(p.nutr==="eat"){
+        plan.push(["基礎・追加・補正（basal-bolus）","1日総量の目安 <b>"+r5(tdd)+" 単位</b>（"+basis+"）。<br>基礎インスリン（持効型：トレシーバ、ランタス／グラルギンBS など）<b>"+r5(basal)+" 単位</b> 1日1回 ＋ 追加インスリン（超速効型：ノボラピッド、ヒューマログ、フィアスプ、ルムジェブ など）<b>各食前 "+r5(bolus)+" 単位</b> ＋ 補正。<br>食事摂取が半分未満なら追加分は減量または食後に摂取量に合わせて打つ。"+cite("ADA16","ES22")]);
+      } else if(p.nutr==="poor"){
+        plan.push(["基礎インスリン＋補正（追加は食後打ち）","1日総量の目安 "+r5(tdd)+" 単位（"+basis+"）。<br>摂取が不安定なため、基礎インスリン <b>"+r5(basal)+" 単位</b> ＋ 補正を基本にし、追加インスリンは<b>食後に摂取量を見て</b>（全量なら "+r5(bolus)+" 単位、半量なら半分、少量なら打たない）。"+cite("ADA16","ES22")]);
+      } else if(p.nutr==="npo"){
+        var b2 = t1?basal:basal*0.8;
+        plan.push(["絶食：基礎インスリン＋補正","基礎インスリン <b>"+r5(b2)+" 単位</b>（"+(t1?"1型は減らしすぎない":"通常量の約80%")+"）＋ 4〜6時間ごとの補正。追加インスリンは中止。"+(t1?"<b>1型は基礎インスリンを止めず、ブドウ糖入り輸液を併用。</b>":"")+cite("ADA16")]);
+      } else if(p.nutr==="tfc"){
+        plan.push(["経管栄養（持続）","基礎インスリン 約 <b>"+r5(basal*0.8)+" 単位</b> ＋ 栄養に対するインスリン（速効型：ヒューマリンR・ノボリンR、または超速効型を4〜6時間ごと、あるいは中間型：ヒューマリンNを8〜12時間ごと）＋ 補正。<b>経管が中断したら栄養分のインスリンは止め、ブドウ糖入り輸液を検討</b>（低血糖予防）。"+cite("ADA16","ES22")]);
+      } else if(p.nutr==="tfb"){
+        plan.push(["経管栄養（間欠）","基礎インスリン 約 <b>"+r5(basal)+" 単位</b> ＋ 各注入の直前に超速効型（目安 "+r5(bolus)+" 単位/回から）＋ 補正。注入を中止・減量した回は打たない。"+cite("ADA16")]);
+      } else if(p.nutr==="tpn"){
+        plan.push(["中心静脈栄養","速効型インスリン（ヒューマリンR、ノボリンR）をTPNバッグに混注（目安：ブドウ糖10 gあたり1単位から）または持続静注で調整。補正インスリンを併用し、混注量は前日の補正量の約2/3を上乗せして調整する。"+cite("ADA16")]);
+      }
+    } else {
+      plan.push(["定時インスリンの適応あり","体重（または自宅のインスリン量）を入れると開始量の目安を表示します。"]);
+    }
+  }
+
+  /* ステロイド */
+  if(p.ster!=="none" && p.ward!=="icu"){
+    var pslD=p.psl;
+    if(p.ster==="psl" && pslD && w){
+      var nph=Math.min(0.1*pslD/10, 0.4)*w;
+      var nphAdj = sens? nph*0.75 : nph;
+      plan.push(["ステロイド高血糖：PSL朝1回投与","PSLの作用は昼〜夕に強く、翌朝には軽くなる。<b>朝のPSLと同時に中間型（NPH）インスリン（ヒューマリンN）</b>を追加する。<br>目安：PSL 10 mgあたり 0.1 単位/kg（上限 0.4 単位/kg）→ <b>"+r5(nphAdj)+" 単位</b>"+(sens?"（高齢・腎障害などで約75%に減量）":"")+"。<br>夕食前〜就寝前の血糖を必ず測る。PSL減量時はNPHも同じ割合で減らす。"+cite("GC","ES22")]);
+    } else if(p.ster==="psl"){
+      plan.push(["ステロイド高血糖：PSL朝1回投与","朝のPSLと同時に中間型（NPH）インスリンを追加（PSL 10 mgあたり 0.1 単位/kg、上限 0.4 単位/kg）。PSL量と体重を入れると単位数を表示します。"+cite("GC","ES22")]);
+    }
+    if(p.ster==="psl2"){
+      plan.push(["ステロイド高血糖：PSL分割投与","作用が1日中続くため、基礎インスリン（持効型）＋各食前の追加インスリンで調整する（basal-bolus）。夕食前の追加を多めにすることが多い。"+cite("ES22","ADA9")]);
+    }
+    if(p.ster==="mpsl"){
+      plan.push(["ステロイドパルス（mPSL 500〜1000 mg）","投与日の午後〜夜にかけて著明な高血糖になり、翌日以降に戻る。<b>昼・夕食前の追加インスリンと補正を強める</b>（抵抗性スケールを使う）。1日4回以上（各食前・就寝前）血糖を測り、パルス終了後は追加分を速やかに減らす（低血糖予防）。既知の糖尿病・HbA1c高値・血糖 &gt;300 mg/dLが続く場合は糖尿病内科へ相談。後療法のPSL内服に移ったら朝のNPH法へ切り替える。"+cite("ES22","GC","ADA9")]);
+    }
+    if(p.ster==="dex"){
+      plan.push(["ステロイド高血糖：デキサメタゾン","作用時間が長く（36〜72時間）、1日中高血糖になる。持効型の基礎インスリンを中心に、追加インスリン＋補正で調整する。"+cite("ES22")]);
+    }
+  }
+
+  /* 補正スケール */
+  if(p.ward!=="icu"){
+    var sc = sens?[1,2,3,4,5]:resis?[4,6,8,10,12]:[2,4,6,8,10];
+    plan.push(["補正インスリン（超速効型：ノボラピッド、ヒューマログなど）の例："+scaleName+"スケール",
+      '<table class="sc"><tr><th>血糖 mg/dL</th><th>151–200</th><th>201–250</th><th>251–300</th><th>301–350</th><th>351–400</th></tr><tr><td>単位</td><td>'+sc.join("</td><td>")+'</td></tr></table>'+
+      '<div class="hint">&gt;400 mg/dLは医師へ報告。就寝前は補正しないか半量。院内の標準プロトコルがあればそちらを優先。食事を食べた場合は食前の追加インスリンに上乗せする。補正が連日必要なら、前日の補正量を翌日の定時量に振り替える。</div>'+cite("ADA16","ES22")]);
+  }
+
+  /* ===== 内服薬の入院時の扱い ===== */
+  var M=out.meds, m=p.meds;
+  if(m.met){
+    var x=[];
+    if(E!==null&&E<30) x.push("eGFR &lt;30 のため禁忌 → 中止");
+    if(p.contrast) x.push("ヨード造影剤：検査前に中止し、検査後48時間は再開しない（緊急検査は検査後に中止）");
+    if(p.surg) x.push("手術前後は中止（食事が始まり腎機能を確認してから再開）");
+    if(poorIntake||p.nutr==="npo") x.push("経口摂取が不十分なら中止（脱水・乳酸アシドーシスのリスク）");
+    if(p.infect||p.hf||p.ward==="icu") x.push("重症感染症・心不全増悪・ショックなど低酸素や脱水を伴う状態では中止");
+    if(p.liver===2) x.push("重度の肝障害では使わない");
+    if(E!==null&&E>=30&&E<45) x.push("eGFR 30〜45：最大 750 mg/日。新規開始は勧められない");
+    else if(E!==null&&E>=45&&E<60) x.push("eGFR 45〜60：最大 1,500 mg/日");
+    M.push(["メトホルミン（メトグルコ）", x.some(function(s){return /中止|禁忌|使わない/.test(s);})?"ng":"ok", x.length?x:["全身状態が安定し食事が摂れていれば継続可"], cite("Met")]);
+  }
+  if(m.sglt2){
+    var x2=[];
+    if(p.surg) x2.push("手術予定：<b>術前3日前から休薬</b>（食事が十分摂れるようになってから再開）");
+    if(p.nutr==="npo"||p.nutr==="poor"||p.dysph) x2.push("絶食・食事摂取不良・嘔吐ではシックデイとして休薬（正常血糖DKAの予防）");
+    if(p.ketone) x2.push("ケトン陽性：直ちに中止");
+    if(p.stroke!=="none") x2.push("脳卒中急性期：脱水を避ける。経口摂取が不安定な間は休薬を考える");
+    if(p.ward==="icu"||p.infect) x2.push("重症疾患・重症感染症では休薬");
+    M.push(["SGLT2阻害薬（ジャディアンス、フォシーガなど）", x2.length?"ng":"ok", x2.length?x2:["食事・水分が十分摂れていれば継続可。脱水に注意"], cite("SGLT2","ADA16")]);
+  }
+  if(m.su){
+    var x3=[];
+    if(poorIntake||p.nutr==="npo") x3.push("食事が不安定・絶食 → 中止（遷延性低血糖）");
+    if(E!==null&&E<30) x3.push("高度腎障害では使わない（遷延性低血糖）");
+    if(elderly) x3.push("高齢者は低血糖リスクが高い。続けるなら最小量（グリメピリド（アマリール）0.5〜1 mg 程度）");
+    if(m.ins||needSched) x3.push("定時インスリン開始時は中止または減量");
+    M.push(["SU薬（アマリール、グリミクロンなど）", x3.length?"ng":"cau", x3.length?x3:["食事が全量摂れていれば継続可。入院中は多くの場合インスリンに切り替える"], cite("JDSalg","ADA16")]);
+  }
+  if(m.glinide){
+    M.push(["グリニド薬（グルファスト、シュアポスト、スターシス・ファスティック）", (poorIntake||p.nutr==="npo")?"ng":"cau", [(poorIntake||p.nutr==="npo")?"食事が摂れない回は内服しない（絶食中は中止）":"食直前に内服。食べない時は飲まない", (E!==null&&E<30)?"腎排泄型（ナテグリニド）は高度腎障害で禁忌":"" ].filter(Boolean), cite("JDSalg")]);
+  }
+  if(m.dpp4){
+    var x4=["低血糖を起こしにくく、入院中も継続しやすい（軽度の高血糖なら補正インスリンと併用で可）"];
+    if(E!==null&&E<50) x4.push("腎機能に応じて減量（リナグリプチン（トラゼンタ）・テネリグリプチン（テネリア）は調整不要）");
+    if(m.glp1||m.tirz) x4.push("GLP-1受容体作動薬・チルゼパチドとは併用しない");
+    if(p.panc) x4.push("膵炎の既往：慎重に");
+    M.push(["DPP-4阻害薬（ジャヌビア・グラクティブ、エクア、トラゼンタなど）", (m.glp1||m.tirz)?"cau":"ok", x4, cite("ES22","JDSalg")]);
+  }
+  if(m.glp1||m.tirz){
+    var x5=[];
+    if(p.dysph) x5.push("嘔気・嘔吐・腹部症状・嚥下障害がある間は継続を慎重に判断（胃排出遅延・誤嚥）");
+    if(p.surg) x5.push("手術・内視鏡：胃内容残存のリスク。麻酔科と院内ルールに従う（消化器症状があれば延期・休薬を検討）");
+    if(p.nutr==="npo") x5.push("絶食が長引く場合は休薬を考える");
+    M.push([m.tirz?"GLP-1受容体作動薬／チルゼパチド（マンジャロ）":"GLP-1受容体作動薬（オゼンピック、トルリシティ、ビクトーザ、リベルサス）", x5.length?"cau":"ok", x5.length?x5:["食事が摂れていれば継続可"], cite("ADA16","ADA9")]);
+  }
+  if(m.agi){
+    M.push(["α-グルコシダーゼ阻害薬（ベイスン、グルコバイ、セイブル）", (p.nutr==="npo")?"ng":"ok", [p.nutr==="npo"?"絶食中は中止":"食事に合わせて継続可", "併用中の低血糖はブドウ糖で処置する（砂糖は効きにくい）", p.ileus?"腸閉塞の既往：慎重に":""].filter(Boolean), cite("JDSgl")]);
+  }
+  if(m.tzd){
+    M.push(["ピオグリタゾン（アクトス）", p.hf?"ng":"ok", [p.hf?"心不全では使わない（体液貯留）→ 中止":"浮腫・体重増加を確認しながら継続可", p.liver===2?"重度の肝障害では使わない":""].filter(Boolean), cite("JDSalg")]);
+  }
+  if(m.imeg){
+    M.push(["イメグリミン（ツイミーグ）", (E!==null&&E<45)?"ng":"ok", [(E!==null&&E<45)?"eGFR &lt;45 では使用が推奨されない":"食事が摂れていれば継続可", m.met?"メトホルミンとの併用は消化器症状が増えやすい":""].filter(Boolean), cite("JDSalg")]);
+  }
+  if(m.ins){
+    M.push(["インスリン", "ok", ["入院時は自宅量の約80%から（摂取不良・低血糖既往・腎障害ではさらに減量）","混合型（ノボラピッド30ミックス、ヒューマログミックス25・50など）は食事が不安定だと低血糖を起こしやすい → basal-bolusへの切り替えを考える","配合注（ゾルトファイ＝デグルデク＋リラグルチド、ソリクア＝グラルギン＋リキシセナチド）は入院中、基礎インスリン＋補正へ切り替えると調整しやすい", t1?"1型：基礎インスリンは中止しない":""].filter(Boolean), cite("ADA16","ES22")]);
+  }
+
+  /* ===== 退院後を見据えた薬剤選択（JDSアルゴリズム＋心腎保護） ===== */
+  var obese = (p.bmi!==null && p.bmi>=25);
+  var nonObeseList=["dpp4","met","agi","glinide","su","sglt2","glp1","imeg"];
+  var obeseList=["met","sglt2","glp1","dpp4","tzd","agi","su","glinide","imeg","tirz"];
+  var step1 = (p.bmi===null)? null : (obese?obeseList:nonObeseList);
+  var NAMES={met:"ビグアナイド薬<small>（メトホルミン：メトグルコ）</small>",dpp4:"DPP-4阻害薬<small>（ジャヌビア・グラクティブ、エクア、ネシーナ、トラゼンタ、テネリア、スイニー、週1回：ザファテック・マリゼブ）</small>",sglt2:"SGLT2阻害薬<small>（ジャディアンス、フォシーガ、カナグル、スーグラ、ルセフィ、デベルザ）</small>",glp1:"GLP-1受容体作動薬<small>（週1回：オゼンピック・トルリシティ、1日1回：ビクトーザ、経口：リベルサス）</small>",tirz:"チルゼパチド<small>（GIP/GLP-1受容体作動薬：マンジャロ）</small>",tzd:"チアゾリジン薬<small>（ピオグリタゾン：アクトス）</small>",agi:"α-グルコシダーゼ阻害薬<small>（ボグリボース：ベイスン、アカルボース：グルコバイ、ミグリトール：セイブル）</small>",su:"SU薬<small>（グリメピリド：アマリール、グリクラジド：グリミクロン）</small>",glinide:"グリニド薬<small>（ミチグリニド：グルファスト、レパグリニド：シュアポスト、ナテグリニド：スターシス・ファスティック）</small>",imeg:"イメグリミン<small>（ツイミーグ）</small>"};
+  var order=["sglt2","glp1","tirz","met","dpp4","tzd","imeg","agi","glinide","su"];
+  var C={};
+  order.forEach(function(k){ C[k]={k:k, lvl:"ok", why:[]}; });
+  function add(k,t){ C[k].why.push(t); }
+  function lv(k,l){ var r={ng:3,cau:2,rec:1,ok:0}; var cur=C[k].lvl;
+    if(l==="ng"){C[k].lvl="ng";return;}
+    if(l==="cau"){ if(cur!=="ng") C[k].lvl=(cur==="rec")?"rec-cau":"cau"; return; }
+    if(l==="rec"){ if(cur==="ok") C[k].lvl="rec"; else if(cur==="cau") C[k].lvl="rec-cau"; return; }
+  }
+  // Step1
+  if(step1){
+    order.forEach(function(k){
+      if(step1.indexOf(k)>=0) add(k,'<span class="step">Step1</span>'+(obese?"肥満（インスリン抵抗性を想定）":"非肥満（インスリン分泌不全を想定）")+"の候補");
+      else { add(k,'<span class="step">Step1</span>'+(obese?"肥満":"非肥満")+"のリストには含まれない"); lv(k,"cau"); }
+    });
+    if(!obese){ add("sglt2","非肥満では体重減少・やせに注意"); add("glp1","非肥満では体重減少に注意"); }
+  }
+  // Step2 安全性
+  if(elderly){ ["su","glinide"].forEach(function(k){ add(k,'<span class="step">Step2</span>高齢者では低血糖リスクの高い薬剤を避ける'); lv(k, (p.cat===3||p.sevhypo)?"ng":"cau"); }); }
+  if(p.sevhypo){ ["su","glinide"].forEach(function(k){ add(k,"低血糖を繰り返す・重症低血糖の既往"); lv(k,"ng"); }); }
+  if(E!==null){
+    if(E<30){ add("met",'<span class="step">Step2</span>eGFR &lt;30：禁忌'); lv("met","ng");
+      add("su",'<span class="step">Step2</span>腎機能障害では避ける'); lv("su","ng");
+      add("glinide","腎排泄型（ナテグリニド）は禁忌。ミチグリニド・レパグリニドも慎重に"); lv("glinide","cau"); }
+    else if(E<45){ add("met","eGFR 30〜45：最大750 mg/日、新規開始は勧められない"); lv("met","cau"); add("su","腎機能低下で遷延性低血糖に注意"); lv("su","cau"); }
+    else if(E<60){ add("met","eGFR 45〜60：最大1,500 mg/日"); }
+    if(E<45){ add("imeg","eGFR &lt;45：使用は推奨されない"); lv("imeg","ng"); }
+    if(E<20){ add("sglt2","eGFR &lt;20：新規開始は勧められない（使用中の継続は腎保護目的で可）"); lv("sglt2","cau"); }
+    else if(E<45){ add("sglt2","eGFR &lt;45では血糖低下作用は弱いが、心腎保護効果は保たれる"); }
+    if(E<50){ add("dpp4","腎機能に応じて減量（リナグリプチン・テネリグリプチンは不要）"); }
+  }
+  if(p.hf){ add("met",'<span class="step">Step2</span>心不全では慎重に（増悪時・脱水時は中止）'); lv("met","cau"); add("tzd",'<span class="step">Step2</span>心不全では使わない'); lv("tzd","ng"); }
+  if(p.liver===2){ add("met","重度肝障害：使わない"); lv("met","ng"); add("tzd","重度肝障害：使わない"); lv("tzd","ng"); }
+  if(age!==null&&age>=75){ add("met","75歳以上は慎重に（原則として新規開始は控える）"); lv("met","cau"); }
+  if(elderly&&(age>=75||p.cat>=2)){ add("sglt2","高齢・老年症候群：脱水・体重減少・サルコペニアに注意"); lv("sglt2","cau"); }
+  if(p.bmi!==null&&p.bmi<18.5){ ["sglt2","glp1","tirz"].forEach(function(k){ add(k,"やせ：体重減少に注意"); lv(k,"cau"); }); }
+  if(p.uti){ add("sglt2","尿路・性器感染症の反復"); lv("sglt2","cau"); }
+  if(p.ketone){ add("sglt2","ケトーシス：使わない"); lv("sglt2","ng"); }
+  if(p.panc){ ["glp1","tirz","dpp4"].forEach(function(k){ add(k,"膵炎の既往：慎重に"); lv(k,"cau"); }); }
+  if(p.mtc){ ["glp1","tirz"].forEach(function(k){ add(k,"甲状腺髄様癌・MEN2の既往／家族歴：避ける"); lv(k,"ng"); }); }
+  if(p.pdr){ ["glp1","tirz"].forEach(function(k){ add(k,"網膜症：急速な血糖改善で一時的に悪化することがある → 眼科と連携"); lv(k,"cau"); }); }
+  if(p.dysph){ ["glp1","tirz"].forEach(function(k){ add(k,"嚥下障害・消化器症状：導入は症状が落ち着いてから"); lv(k,"cau"); }); }
+  if(p.osteo){ add("tzd","骨折リスク（特に女性）"); lv("tzd","cau"); }
+  if(p.ileus){ add("agi","腸閉塞の既往・開腹術後：慎重に"); lv("agi","cau"); }
+  if(p.selfinj){ ["glp1","tirz"].forEach(function(k){ add(k,"自己注射が難しい場合は週1回製剤の訪問・外来投与、または経口セマグルチドを検討"); }); }
+  // Step3 併存症
+  if(p.ascvd){ add("glp1",'<span class="step">Step3</span>心血管疾患：心血管イベント抑制のエビデンスのある薬剤'); lv("glp1","rec");
+    add("sglt2",'<span class="step">Step3</span>心血管疾患：心血管イベント抑制のエビデンスのある薬剤'); lv("sglt2","rec");
+    add("tzd","脳梗塞の既往ではピオグリタゾンに再発抑制のエビデンス（心不全・骨折・浮腫に注意）"); }
+  if(p.hf){ add("sglt2",'<span class="step">Step3</span>心不全：入院・心血管死を減らす'); lv("sglt2","rec"); }
+  if(p.alb || (E!==null&&E<60)){ add("sglt2",'<span class="step">Step3</span>CKD：腎保護（eGFR ≥20で開始）'); lv("sglt2","rec");
+    add("glp1",'<span class="step">Step3</span>CKD：腎保護のエビデンス（セマグルチド）'); lv("glp1","rec"); }
+  if(p.masld){ ["tzd","glp1","tirz","sglt2"].forEach(function(k){ add(k,"脂肪肝（MASLD）への効果が報告されている"); }); }
+  if(obese){ add("tirz","肥満：体重減少効果が大きい"); add("glp1","肥満：体重減少効果あり"); }
+  if(t1||p.preg){ order.forEach(function(k){ if(!(t1&&k==="sglt2")){ lv(k,"ng"); } });
+    if(t1){ add("sglt2","1型：一部の薬剤のみ適応。専門医の管理下で使う"); lv("sglt2","cau"); }
+  }
+  // Step4
+  var cands=order.map(function(k){ return C[k]; });
+  var rank={"rec":0,"rec-cau":1,"ok":2,"cau":3,"ng":4};
+  cands.sort(function(a,b){ return rank[a.lvl]-rank[b.lvl]; });
+  out.cands={list:cands, names:NAMES, obese:obese, bmiKnown:p.bmi!==null, insFirst:(abs.length>0||rel.length>0), t1:t1, preg:p.preg};
+
+  /* ===== コンサルト ===== */
+  var K=out.consults;
+  if(p.ketone||p.hhs) K.push([1,"糖尿病・代謝内科（至急）","DKA・HHSの疑い。ICU管理の要否も相談。"]);
+  if(t1) K.push([1,"糖尿病・代謝内科","1型糖尿病の入院管理（基礎インスリンの継続、周術期・絶食時の計画）。"]);
+  if(p.pump) K.push([1,"糖尿病・代謝内科","インスリンポンプ・CGM使用中。入院中の継続可否と設定は専門チームと決める。"]);
+  if(p.preg) K.push([1,"糖尿病・代謝内科／産科","妊娠中・妊娠計画中の血糖管理。"]);
+  if(p.sevhypo||p.hypoNow) K.push([1,"糖尿病・代謝内科","低血糖を繰り返す・重症低血糖。治療の組み直し。"]);
+  if(p.ster==="mpsl" && ((p.a1c!==null&&p.a1c>=8)||(p.bg!==null&&p.bg>=300)||p.meds.ins)) K.push([2,"糖尿病・代謝内科","ステロイドパルス中の高度高血糖（既知の糖尿病・HbA1c高値・インスリン使用中）。"]);
+  if(p.bg!==null&&p.bg>=300) K.push([2,"糖尿病・代謝内科","血糖 ≥300 mg/dLが続く。"]);
+  if(p.a1c!==null&&p.a1c>=10) K.push([2,"糖尿病・代謝内科","HbA1c ≥10%：インスリン導入と退院後の治療計画。"]);
+  if(p.type==="new"||p.wtloss||(p.cpi!==null&&p.cpi<0.8)) K.push([2,"糖尿病・代謝内科","新規診断・病型が不明（やせ・体重減少・ケトーシス・CPI低値なら1型や緩徐進行1型、膵性糖尿病を鑑別）。"]);
+  if(p.surg) K.push([2,"糖尿病・代謝内科／麻酔科","周術期の血糖管理計画（休薬・インスリン調整）。"]);
+  if(p.type==="other") K.push([2,"糖尿病・代謝内科","膵性糖尿病など：インスリン分泌が乏しく血糖が乱高下しやすい。"]);
+  if(E!==null&&E<30) K.push([2,"腎臓内科","eGFR &lt;30。腎機能に合わせた薬剤選択と腎代替療法の見通し。"]);
+  else if(p.alb||(E!==null&&E<45)) K.push([3,"腎臓内科","アルブミン尿・eGFR低下（CKD）。腎保護治療の確認。"]);
+  if(p.pdr || (p.a1c!==null&&p.a1c>=10)) K.push([2,"眼科","網膜症の評価。HbA1c高値から急速に下げる前（インスリン強化・GLP-1受容体作動薬導入）に確認しておく。"]);
+  if(p.hf) K.push([3,"循環器内科","心不全合併：SGLT2阻害薬を含む治療の調整。"]);
+  if(p.meds.ins||needSched||p.selfinj) K.push([3,"糖尿病看護（療養指導）・薬剤部","自己注射・血糖測定・低血糖時の対応の指導。服薬管理の工夫（配合錠・週1回製剤）。"]);
+  K.push([3,"栄養科","入院中の食事量の評価と退院後の栄養指導。"]);
+  if(p.selfinj) K.push([3,"MSW・退院支援","独居・認知機能低下などで自己管理が難しい場合の在宅支援（訪問看護など）。"]);
+  K.push([3,"歯科・フットケア（外来で可）","歯周病・足病変の確認（入院中にできる範囲で）。"]);
+  K.sort(function(a,b){return a[0]-b[0];});
+
+  /* ===== 追加で確認したい検査 ===== */
+  var T=out.tests;
+  if(p.cpr===null && (p.type!=="t1")) T.push("空腹時血清CPR（同時血糖）→ CPIでインスリン分泌能を評価");
+  if(p.type==="new"||p.wtloss||(p.bmi!==null&&p.bmi<22&&p.a1c!==null&&p.a1c>=9)) T.push("抗GAD抗体（1型・緩徐進行1型の鑑別）");
+  if(p.ketone||p.hhs||(p.bg!==null&&p.bg>=300)) T.push("血液ガス・血中ケトン・血漿浸透圧・電解質（K）");
+  if(!p.alb) T.push("尿アルブミン/クレアチニン比");
+  if(p.egfr===null) T.push("血清Cr・eGFR");
+  if(!p.pdr) T.push("眼底検査（最近1年以内に未実施なら）");
+  if(p.a1c===null) T.push("HbA1c（入院前の血糖状態の評価）");
+
+  return out;
+}
+
+/* ---------- 表示 ---------- */
+var LV={rec:["◎","t-rec","rec"],"rec-cau":["◎△","t-rec","rec"],ok:["○","t-ok",""],cau:["△","t-cau",""],ng:["×","t-ng","ng"]};
+var MV={ok:["継続","t-ok"],cau:["注意","t-cau"],ng:["中止・休薬","t-ng"]};
+
+function render(p,o){
+  var h=[];
+  var copy=[];
+  copy.push("【糖尿病治療ナビ 判定メモ】");
+  // サマリー
+  var sm=[];
+  if(p.age!==null) sm.push(p.age+"歳");
+  sm.push({t2:"2型",t1:"1型",other:"膵性・その他",new:"未診断の高血糖"}[p.type]);
+  if(p.bmi) sm.push("BMI "+p.bmi.toFixed(1));
+  if(p.a1c!==null) sm.push("HbA1c "+p.a1c+"%");
+  if(p.egfr!==null) sm.push("eGFR "+p.egfr.toFixed(0));
+  if(p.bg!==null) sm.push("最高血糖 "+p.bg);
+  copy.push(sm.join("、"));
+
+  if(o.alerts.length){
+    o.alerts.forEach(function(a){ h.push('<div class="alert '+a[0]+'"><b>'+a[1]+'</b>'+a[2]+'</div>'); copy.push("⚠ "+a[1]); });
+  }
+
+  // 目標
+  h.push('<div class="card"><h2>🎯 血糖目標</h2><div class="body"><dl class="kv">'+
+    '<dt>入院中</dt><dd><span class="big">'+o.target.v+'</span><div class="hint" style="color:var(--ink)">'+o.target.d+'</div>'+o.target.c+'</dd>'+
+    '<dt>HbA1c</dt><dd><span class="big" style="font-size:17px">'+o.a1cTarget.v+'</span><div class="hint" style="color:var(--ink)">'+o.a1cTarget.d+'</div>'+o.a1cTarget.c+'</dd></dl></div></div>');
+  copy.push("入院中の血糖目標："+o.target.v+"／HbA1c目標："+o.a1cTarget.v.replace(/<[^>]+>/g,""));
+
+  // インスリン適応
+  var ia=o.insIndic, ih="";
+  if(ia.abs.length) ih+='<div class="alert ng"><b>インスリンの絶対的適応</b><ul class="tight">'+ia.abs.map(function(s){return"<li>"+s+"</li>";}).join("")+'</ul></div>';
+  if(ia.rel.length) ih+='<div class="alert warn"><b>インスリンの相対的適応</b><ul class="tight">'+ia.rel.map(function(s){return"<li>"+s+"</li>";}).join("")+'</ul></div>';
+  if(!ih) ih='<div class="alert ok"><b>インスリンの絶対的・相対的適応は入力上なし</b>経口薬・GLP-1受容体作動薬を中心に組み立てられる。</div>';
+  h.push('<div class="card"><h2>💉 インスリンの適応</h2><div class="body">'+ih+cite("JDSgl","JDSalg")+'</div></div>');
+  if(ia.abs.length) copy.push("インスリン絶対的適応："+ia.abs.join("、").replace(/<[^>]+>|&lt;/g,""));
+  if(ia.rel.length) copy.push("インスリン相対的適応："+ia.rel.join("、").replace(/<[^>]+>|&lt;/g,""));
+
+  // 入院中の計画
+  h.push('<div class="card"><h2>🏥 入院中の血糖管理</h2><div class="body">'+
+    o.plan.map(function(x){ return '<div class="drug"><div class="hd">'+x[0]+'</div><div class="why">'+x[1]+'</div></div>'; }).join("")+'</div></div>');
+  o.plan.forEach(function(x){ if(!/補正インスリン（超速効型/.test(x[0])) copy.push("・"+x[0]+"："+x[1].replace(/<div class="src">.*?<\/div>/g,"").replace(/<br>/g," ").replace(/<[^>]+>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">")); });
+
+  // 内服薬の扱い
+  if(o.meds.length){
+    h.push('<div class="card"><h2>💊 使用中の薬の入院中の扱い</h2><div class="body">'+
+      o.meds.map(function(x){ var mv=MV[x[1]]; return '<div class="drug"><div class="hd"><span class="tag '+mv[1]+'">'+mv[0]+'</span>'+x[0]+'</div><div class="why">'+x[2].map(function(s){return"<div>・"+s+"</div>";}).join("")+'</div>'+x[3]+'</div>'; }).join("")+'</div></div>');
+    o.meds.forEach(function(x){ copy.push("・"+x[0]+"【"+MV[x[1]][0]+"】"+x[2].join("／").replace(/<[^>]+>/g,"").replace(/&lt;/g,"<")); });
+  }
+
+  // 薬剤選択
+  var cd=o.cands, ch="";
+  if(cd.t1){
+    ch='<div class="alert warn"><b>1型糖尿病</b>強化インスリン療法（基礎＋追加）またはポンプが基本。経口薬の選択はこの画面の対象外。</div>';
+  } else if(cd.preg){
+    ch='<div class="alert warn"><b>妊娠</b>インスリンで管理する。</div>';
+  } else {
+    if(cd.insFirst) ch+='<div class="alert info"><b>まずインスリンで糖毒性を解除</b>血糖が落ち着いたら（またはインスリンと併用で）下の候補から退院後の治療を組み立て、インスリンの減量・離脱を検討する。</div>';
+    if(!cd.bmiKnown) ch+='<div class="alert info"><b>身長・体重を入れるとStep1（肥満／非肥満）が反映されます</b></div>';
+    ch+='<div class="legend"><span><span class="tag t-rec">◎</span> 併存症に対し優先</span><span><span class="tag t-ok">○</span> 候補</span><span><span class="tag t-cau">△</span> 注意して使用</span><span><span class="tag t-ng">×</span> 避ける</span></div>';
+    ch+=cd.list.map(function(c){ var l=LV[c.lvl]; return '<div class="drug '+l[2]+'"><div class="hd"><span class="tag '+l[1]+'">'+l[0]+'</span>'+cd.names[c.k]+'</div>'+(c.why.length?'<div class="why">'+c.why.map(function(s){return"<div>・"+s+"</div>";}).join("")+'</div>':'')+'</div>'; }).join("");
+    ch+='<div class="alert info" style="margin-top:8px"><b><span class="step">Step4</span>患者背景</b>服薬回数・アドヒアランス、自己注射の可否、薬剤費を考えて最終決定する。目標未達なら最初の判断（インスリン適応の再評価を含む）に戻る。</div>';
+    ch+='<div class="hint">Step1の候補は日本の処方実態を踏まえた並びで、優先順位を示すものではない。ADA 2026では、心血管疾患・心不全・CKDがある（またはリスクが高い）場合、HbA1cに関わらず心腎保護のエビデンスのある薬剤を含めることを推奨。</div>';
+    var recs=cd.list.filter(function(c){return c.lvl==="rec"||c.lvl==="rec-cau";}).map(function(c){return cd.names[c.k];});
+    var oks=cd.list.filter(function(c){return c.lvl==="ok";}).map(function(c){return cd.names[c.k];});
+    recs=recs.map(function(x){return x.replace(/<small>.*?<\/small>/,"");}); oks=oks.map(function(x){return x.replace(/<small>.*?<\/small>/,"");});
+    if(recs.length) copy.push("退院後の薬剤（優先）："+recs.join("、"));
+    if(oks.length) copy.push("退院後の薬剤（候補）："+oks.join("、"));
+  }
+  h.push('<div class="card"><h2>🧭 退院後を見据えた薬剤選択</h2><div class="body">'+ch+cite("JDSalg","ADA9","KDIGO")+'</div></div>');
+
+  // コンサルト
+  var lvN={1:["至急","pri-1"],2:["推奨","pri-2"],3:["考慮","pri-3"]};
+  h.push('<div class="card"><h2>📞 コンサルト</h2><div class="body">'+
+    o.consults.map(function(c){ return '<div class="cons"><div class="hd"><span class="tag '+lvN[c[0]][1]+'">'+lvN[c[0]][0]+'</span>'+c[1]+'</div><div class="why" style="font-size:13px;margin-top:3px">'+c[2]+'</div></div>'; }).join("")+'</div></div>');
+  o.consults.filter(function(c){return c[0]<=2;}).forEach(function(c){ copy.push("コンサルト（"+lvN[c[0]][0]+"）："+c[1]+" — "+c[2].replace(/&lt;/g,"<")); });
+
+  // 検査
+  if(o.tests.length){
+    h.push('<div class="card"><h2>🔬 追加で確認したい検査</h2><div class="body"><ul class="tight">'+o.tests.map(function(t){return"<li>"+t+"</li>";}).join("")+'</ul></div></div>');
+  }
+
+  h.push('<div class="btns"><button class="btn sec" id="copyBtn">カルテ用メモをコピー</button></div><textarea class="copy" id="copyArea" readonly></textarea>');
+  h.push('<div class="notice">本アプリはガイドラインの要点と一般的な開始量の目安を示す補助ツールです。用量は院内プロトコル・添付文書・患者の状態を優先し、最終判断は担当医が行ってください。</div>');
+
+  $("result").innerHTML=h.join("");
+  var txt=copy.join("\n");
+  $("copyBtn").addEventListener("click", function(){
+    var area=$("copyArea"); area.value=txt;
+    try{
+      navigator.clipboard.writeText(txt).then(function(){toast("コピーしました");}, function(){ area.style.display="block"; area.select(); toast("下の欄から手動でコピーしてください"); });
+    }catch(e){ area.style.display="block"; area.select(); toast("下の欄から手動でコピーしてください"); }
+  });
+}
+
+/* ---------- 早見表 ---------- */
+var CLS=[
+ ["ビグアナイド薬（メトホルミン）",{"代表薬（商品名）":"メトホルミン：メトグルコ（最大2,250 mg/日）、グリコラン（最大750 mg/日）","主な作用":"肝糖新生の抑制","低血糖":"単独では起こしにくい","体重":"増えにくい","腎機能":"eGFR <30 禁忌／30〜45 最大750 mg／45〜60 最大1,500 mg","入院時":"造影剤前・手術前後・脱水・摂取不良・重症時は中止","注意":"乳酸アシドーシス、消化器症状、75歳以上は慎重"}],
+ ["DPP-4阻害薬",{"代表薬（商品名）":"シタグリプチン：ジャヌビア・グラクティブ／ビルダグリプチン：エクア／アログリプチン：ネシーナ／リナグリプチン：トラゼンタ／テネリグリプチン：テネリア／アナグリプチン：スイニー／サキサグリプチン：オングリザ／週1回：トレラグリプチン（ザファテック）、オマリグリプチン（マリゼブ）","主な作用":"血糖依存性のインスリン分泌促進・グルカゴン抑制","低血糖":"単独では起こしにくい（SU薬併用で注意）","体重":"不変","腎機能":"多くは減量要。リナグリプチン・テネリグリプチンは調整不要","入院時":"継続しやすい","注意":"類天疱瘡、膵炎。GLP-1受容体作動薬と併用しない"}],
+ ["SGLT2阻害薬",{"代表薬（商品名）":"エンパグリフロジン：ジャディアンス／ダパグリフロジン：フォシーガ／カナグリフロジン：カナグル／イプラグリフロジン：スーグラ／ルセオグリフロジン：ルセフィ／トホグリフロジン：デベルザ","主な作用":"尿糖排泄の促進","低血糖":"単独では起こしにくい","体重":"減る","腎機能":"eGFR ≥20で開始（腎保護）。<45では血糖低下作用は弱い","入院時":"術前3日前から休薬、絶食・シックデイで休薬","注意":"正常血糖DKA、脱水、尿路・性器感染、高齢者のサルコペニア。心不全・CKD・心血管疾患に優先"}],
+ ["GLP-1受容体作動薬",{"代表薬（商品名）":"セマグルチド：オゼンピック（週1回注）、リベルサス（経口・1日1回）／デュラグルチド：トルリシティ（週1回注）／リラグルチド：ビクトーザ（1日1回注）","主な作用":"血糖依存性のインスリン分泌促進・胃排出遅延・食欲抑制","低血糖":"単独では起こしにくい","体重":"減る","腎機能":"多くは調整不要","入院時":"消化器症状・嚥下障害・周術期は慎重","注意":"嘔気、膵炎、胆石。網膜症の一時的悪化（急速な改善時）。心血管疾患・CKDに優先"}],
+ ["チルゼパチド",{"代表薬（商品名）":"マンジャロ（週1回注）","主な作用":"GIP/GLP-1受容体作動","低血糖":"単独では起こしにくい","体重":"大きく減る","腎機能":"調整不要","入院時":"GLP-1受容体作動薬と同様","注意":"消化器症状。アルゴリズムでは肥満の候補"}],
+ ["チアゾリジン薬（ピオグリタゾン）",{"代表薬（商品名）":"ピオグリタゾン：アクトス","主な作用":"インスリン抵抗性の改善","低血糖":"単独では起こしにくい","体重":"増える","腎機能":"重度腎障害で禁忌","入院時":"心不全では中止","注意":"浮腫、心不全、骨折、膀胱癌。脳梗塞再発抑制のエビデンス、MASLDに有効"}],
+ ["α-グルコシダーゼ阻害薬",{"代表薬（商品名）":"ボグリボース：ベイスン／アカルボース：グルコバイ／ミグリトール：セイブル","主な作用":"糖の吸収遅延（食後高血糖の改善）","低血糖":"単独では起こしにくい","体重":"不変","腎機能":"薬剤により慎重","入院時":"絶食中は中止","注意":"腹部膨満・放屁、腸閉塞の既往。低血糖時はブドウ糖で"}],
+ ["SU薬",{"代表薬（商品名）":"グリメピリド：アマリール／グリクラジド：グリミクロン／グリベンクラミド：オイグルコン・ダオニール（遷延性低血糖が多く高齢者では避ける）","主な作用":"インスリン分泌の促進","低血糖":"起こしやすい（遷延性）","体重":"増える","腎機能":"腎障害で遷延性低血糖。高度腎障害では使わない","入院時":"摂取不安定・絶食では中止","注意":"高齢者は避けるか最小量"}],
+ ["グリニド薬",{"代表薬（商品名）":"ミチグリニド：グルファスト／レパグリニド：シュアポスト／ナテグリニド：スターシス・ファスティック","主な作用":"速効性のインスリン分泌促進（食後高血糖）","低血糖":"起こしうる","体重":"増える","腎機能":"ナテグリニドは高度腎障害・透析で禁忌","入院時":"食べない時は飲まない","注意":"食直前に内服"}],
+ ["イメグリミン",{"代表薬（商品名）":"ツイミーグ","主な作用":"インスリン分泌促進・インスリン抵抗性改善","低血糖":"単独では起こしにくい","体重":"不変","腎機能":"eGFR <45では推奨されない","入院時":"摂取不良時は中止","注意":"メトホルミン併用で消化器症状が増える"}],
+["配合錠",{"代表薬（商品名）":"DPP-4阻害薬＋メトホルミン：エクメット、イニシンク、メトアナ／SGLT2阻害薬＋DPP-4阻害薬：カナリア、トラディアンス、スージャヌ／ピオグリタゾン＋メトホルミン：メタクト／ピオグリタゾン＋DPP-4阻害薬：リオベル","注意":"成分それぞれの注意（腎機能・シックデイ・心不全など）がそのまま当てはまる。入院時の中止判断は成分ごとに行う"}],
+ ["インスリン",{"代表薬（商品名）":"持効型：トレシーバ（デグルデク）、ランタス・ランタスXR・グラルギンBS（グラルギン）／超速効型：ノボラピッド・フィアスプ（アスパルト）、ヒューマログ・ルムジェブ（リスプロ）、アピドラ（グルリジン）／速効型：ヒューマリンR、ノボリンR／中間型：ヒューマリンN／混合型：ノボラピッド30ミックス、ヒューマログミックス25・50／配合注：ゾルトファイ、ソリクア","主な作用":"インスリンの補充","低血糖":"起こしうる","体重":"増える","腎機能":"腎障害で必要量が減る","入院時":"病棟管理の中心（基礎・追加・補正）","注意":"1型は基礎インスリンを止めない。混合型は摂取不安定で低血糖に注意"}]
+];
+function renderTable(){
+  var h=['<div class="notice">各薬剤の要点。商品名は主なもの（後発品・院内採用は施設で確認）。詳細は添付文書と各ガイドラインを確認してください。</div>'];
+  CLS.forEach(function(c){
+    h.push('<div class="cls"><h3>'+c[0]+'</h3><dl class="kv">'+Object.keys(c[1]).map(function(k){return"<dt>"+k+"</dt><dd>"+c[1][k].replace(/</g,"&lt;")+"</dd>";}).join("")+'</dl></div>');
+  });
+  h.push('<div class="card"><h2>🩸 低血糖時の対応</h2><div class="body"><ul class="tight">'+
+    '<li>経口可能：ブドウ糖10 g（または砂糖20 g、ブドウ糖を含む飲料150〜200 mL）。α-グルコシダーゼ阻害薬内服中は必ずブドウ糖。</li>'+
+    '<li>経口不可・意識障害：50%ブドウ糖20〜40 mLを静注。</li>'+
+    '<li>15分後に再検し、改善しなければ繰り返す。SU薬による低血糖は遷延・再発するため数時間は監視。</li>'+
+    '<li>原因（食事量・腎機能・薬剤量）を見直し、その日のうちに指示を変更する。</li></ul>'+cite("JDSgl","ADA16")+'</div></div>');
+  h.push('<div class="card"><h2>🧠 脳神経内科でよくある場面</h2><div class="body"><ul class="tight">'+
+    '<li><b>脳卒中急性期</b>：目標140〜180 mg/dL。低血糖を作らないことが最優先。嚥下評価待ちの絶食中はSU薬・グリニド薬・SGLT2阻害薬を止め、基礎インスリン＋補正で。</li>'+
+    '<li><b>rt-PA</b>：血糖 &lt;50 または &gt;400 mg/dLは禁忌項目。来院時に必ず測る。</li>'+
+    '<li><b>ステロイドパルス（MS・NMOSD・MG・自己免疫性脳炎・CIDPなど）</b>：投与日の午後〜夜に高血糖。昼・夕の追加と補正を強め、終了後は速やかに戻す。</li>'+
+    '<li><b>PSL内服（後療法）</b>：朝のPSLに合わせて朝NPH（PSL 10 mgあたり0.1単位/kg、上限0.4単位/kg）。減量に合わせてNPHも減らす。</li>'+
+    '<li><b>造影CT・血管撮影</b>：メトホルミンは検査前に中止、検査後48時間は再開しない。</li>'+
+    '<li><b>嚥下障害・経管栄養</b>：持続注入なら基礎＋定期の速効型、注入中断時はインスリン中止とブドウ糖輸液。</li>'+
+    '</ul>'+cite("AHA19","tPA","GC","ES22","Met")+'</div></div>');
+  $("v-table").innerHTML=h.join("");
+}
+function renderRefs(){
+  var h=['<div class="notice">アプリ内の推奨は以下の文献に基づきます（2026年11月時点で確認）。リンクはPubMed・DOI（出版社）・学会公式ページです。</div>'];
+  Object.keys(REFS).forEach(function(k){ var r=REFS[k];
+    h.push('<div class="ref"><b>'+r.s+'</b><br>'+r.t+(r.j?"<br>"+r.j:"")+'<br><a href="'+r.u+'" target="_blank" rel="noopener">'+r.u+'</a></div>');
+  });
+  h.push('<div class="notice">補正スケール・体重あたりの開始量は、上記ガイドラインと一般的な臨床研究（basal-bolus法）に基づく目安です。院内プロトコルがある場合はそちらを優先してください。</div>');
+  $("v-ref").innerHTML='<div class="card"><h2>📚 出典</h2><div class="body">'+h.join("")+'</div></div>';
+}
+
+/* ---------- インスリン調整 ---------- */
+var TSL=[["am","朝食前"],["noon","昼食前"],["pm","夕食前"],["hs","眠前"],["n3","3時"]];
+var INS=[
+  ["bo","追加","超速効型",{am:1,noon:1,pm:1}],
+  ["ba","基礎","持効型",{am:1,hs:1}],
+  ["np","中間型","NPH",{am:1,pm:1}],
+  ["mx","混合型","30ミックス等",{am:1,pm:1}]
+];
+var TKEY="dmWardNavi.tit.v1";
+function buildGrid(){
+  var show3=$("show3am").checked, cols=TSL.filter(function(c){return show3||c[0]!=="n3";});
+  var h='<colgroup><col style="width:68px">'+cols.map(function(){return"<col>";}).join("")+'</colgroup>';
+  h+='<tr><th class="rh"></th>'+cols.map(function(c){return"<th>"+c[1]+"</th>";}).join("")+'</tr>';
+  h+='<tr><th class="rh" colspan="'+(cols.length+1)+'" style="padding-top:2px">いまのインスリン（単位）</th></tr>';
+  INS.forEach(function(r){
+    h+='<tr><td class="rh ins-lbl">'+r[1]+'<small>'+r[2]+'</small></td>'+cols.map(function(c){
+      return r[3][c[0]]?'<td><input type="number" inputmode="numeric" class="ti dose" id="'+r[0]+'_'+c[0]+'" enterkeyhint="next"></td>':'<td class="na"></td>';
+    }).join("")+'</tr>';
+  });
+  h+='<tr class="sep"><td colspan="'+(cols.length+1)+'"></td></tr>';
+  h+='<tr><th class="rh" colspan="'+(cols.length+1)+'">血糖（mg/dL）</th></tr>';
+  for(var d=1; d<=3; d++){
+    h+='<tr><td class="rh">'+(d===3?"3日目<br><span style=\"font-weight:400;color:var(--sub)\">（直近）</span>":d+"日目")+
+      '<select id="meal'+d+'"><option value="full">食事 全量</option><option value="half">半量</option><option value="little">少量</option><option value="npo">絶食</option></select></td>'+
+      cols.map(function(c){ return '<td><input type="number" inputmode="numeric" class="ti bgv" id="d'+d+'_'+c[0]+'" enterkeyhint="next"></td>'; }).join("")+'</tr>';
+  }
+  var keep=readTit();
+  $("bgt").innerHTML=h;
+  writeTit(keep);
+  wireGrid();
+}
+function readTit(){
+  var o={}; document.querySelectorAll("#bgt input, #bgt select").forEach(function(e){ o[e.id]=e.value; }); return o;
+}
+function writeTit(o){
+  if(!o) return;
+  Object.keys(o).forEach(function(k){ if(k==="show3am"||k==="__show3") return; var e=$(k); if(e) e.value=o[k]; });
+  colorAll();
+}
+function saveTit(){ try{ var o=readTit(); o.show3am=$("show3am").checked; localStorage.setItem(TKEY, JSON.stringify(o)); }catch(e){} }
+function loadTit(){ try{ var s=localStorage.getItem(TKEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+function colorCell(e){
+  if(!e.classList.contains("bgv")) return;
+  e.classList.remove("lo","hi","ok");
+  var v=parseFloat(e.value); if(isNaN(v)) return;
+  e.classList.add(v<70?"lo":v>180?"hi":"ok");
+}
+function colorAll(){ document.querySelectorAll("#bgt input.bgv").forEach(colorCell); }
+function wireGrid(){
+  var all=[].slice.call(document.querySelectorAll("#bgt input.ti"));
+  all.forEach(function(e,i){
+    e.addEventListener("input", function(){
+      e.classList.remove("unsure","fromimg"); colorCell(e); saveTit();
+      if(e.classList.contains("bgv") && e.value.length>=3 && all[i+1]) all[i+1].focus();
+    });
+    e.addEventListener("keydown", function(ev){ if(ev.key==="Enter"){ ev.preventDefault(); if(all[i+1]) all[i+1].focus(); else e.blur(); } });
+  });
+  document.querySelectorAll("#bgt select").forEach(function(s){ s.addEventListener("change", saveTit); });
+}
+function shiftDay(){
+  var o=readTit();
+  TSL.forEach(function(c){
+    var k=c[0];
+    if($("d1_"+k)){ $("d1_"+k).value=$("d2_"+k).value; $("d2_"+k).value=$("d3_"+k).value; $("d3_"+k).value=""; }
+  });
+  $("meal1").value=$("meal2").value; $("meal2").value=$("meal3").value; $("meal3").value="full";
+  colorAll(); saveTit(); toast("1日進めました（3日目を空にしました）");
+  var f=$("d3_am"); if(f) f.focus();
+}
+function tv(id){ var e=$(id); if(!e) return null; var v=parseFloat(e.value); return isNaN(v)?null:v; }
+
+function evalVals(arr){
+  var vals=arr.filter(function(x){return x.v!==null;});
+  var n=vals.length, r={n:n, vals:vals};
+  if(!n){ r.dec="nodata"; return r; }
+  var vs=vals.map(function(x){return x.v;});
+  r.min=Math.min.apply(null,vs); r.max=Math.max.apply(null,vs);
+  r.mean=vs.reduce(function(a,b){return a+b;},0)/n;
+  r.hi=vs.filter(function(v){return v>180;}).length;
+  r.lo100=vs.filter(function(v){return v<100;}).length;
+  r.hypo=vs.some(function(v){return v<70;}); r.sev=vs.some(function(v){return v<54;});
+  r.hypoLowMeal=vals.some(function(x){return x.v<70 && (x.meal==="half"||x.meal==="little"||x.meal==="npo");});
+  r.latestHi = vals.length && vals[vals.length-1].v>180;
+  return r;
+}
+function slotVals(slot){
+  var a=[]; for(var d=1; d<=3; d++){ a.push({d:d, v:tv("d"+d+"_"+slot), meal:$("meal"+d).value}); } return a;
+}
+function decide(r, sens){
+  if(r.dec==="nodata") return {pct:0, k:"nodata", why:"この時間帯の血糖がない"};
+  var rng=" ("+r.vals.map(function(x){return x.v;}).join("・")+")";
+  if(r.sev) return {pct:-0.2, k:"down", why:"&lt;54 mg/dLの低血糖あり"+rng+" → 20%減"};
+  if(r.hypo) return {pct:sens?-0.2:-0.1, k:"down", why:"&lt;70 mg/dLの低血糖あり"+rng+" → "+(sens?"20%":"10%")+"減"+(r.hypoLowMeal?"（食事量が少ない日。食後打ちへの変更も考える）":"")};
+  if(r.lo100>=2) return {pct:-0.1, k:"down", why:"100 mg/dL未満が2回以上"+rng+" → 10%減（低血糖予防）"};
+  if(r.hi>=2){
+    var big=r.mean>250 && !sens;
+    return {pct:big?0.2:0.1, k:"up", why:"180 mg/dL超が"+r.hi+"回（平均 "+Math.round(r.mean)+"）"+rng+" → "+(big?"20%":"10%")+"増"};
+  }
+  if(r.n<2) return {pct:0, k:"keep", why:"測定が1回のみ"+rng+"。もう1日みる"};
+  if(r.hi===1 && r.latestHi) return {pct:0, k:"keep", why:"直近のみ180超"+rng+"。原因（間食・感染・ステロイド）を確認して1日みる"};
+  return {pct:0, k:"keep", why:"概ね100〜180 mg/dL"+rng+" → 維持"};
+}
+function applyPct(cur,pct){
+  if(!cur) return cur;
+  var nv=Math.round(cur*(1+pct));
+  if(pct>0 && nv<=cur) nv=cur+1;
+  if(pct<0 && nv>=cur) nv=cur-1;
+  return Math.max(0,nv);
+}
+function mergeR(a,b){ return evalVals(a.vals.concat(b.vals)); }
+
+function titrate(){
+  var p=collect(); var E=p.egfr, age=p.age, w=p.wt;
+  var sens=(p.type==="t1"||(age!==null&&age>=70)||(E!==null&&E<30)||(p.bmi!==null&&p.bmi<18.5)||p.sevhypo);
+  var D={}; INS.forEach(function(r){ Object.keys(r[3]).forEach(function(s){ D[r[0]+"_"+s]=tv(r[0]+"_"+s); }); });
+  var hasBo=D.bo_am||D.bo_noon||D.bo_pm, basal=(D.ba_am||0)+(D.ba_hs||0), basalSlot=D.ba_hs?"hs":(D.ba_am?"am":null);
+  var hasNp=D.np_am||D.np_pm, hasMx=D.mx_am||D.mx_pm;
+  var R={}; ["am","noon","pm","hs","n3"].forEach(function(s){ R[s]=evalVals(slotVals(s)); });
+  var allN=["am","noon","pm","hs"].reduce(function(a,s){return a+R[s].n;},0);
+  var out=[], notes=[], warn=[], props=[];
+  if(allN===0){ $("titResult").innerHTML='<div class="alert warn"><b>血糖が入っていません</b>最低でも直近1〜2日分の各食前・眠前の血糖を入れてください。</div>'; return; }
+
+  function prop(label,type,curK,cur,dec,extra){
+    var nv=(dec.k==="new")?dec.nv:applyPct(cur,dec.pct);
+    props.push({label:label, type:type, key:curK, cur:cur, nv:nv, k:(dec.k==="new"?"new":(nv>cur?"up":nv<cur?"down":"keep")), why:dec.why+(extra?"<br>"+extra:"")});
+  }
+  var T={bo:"超速効型：ノボラピッド、ヒューマログ、フィアスプ、ルムジェブ（食直前）", ba:"持効型：トレシーバ、ランタス／グラルギンBS", np:"中間型：ヒューマリンN", mx:"混合型：ノボラピッド30ミックス、ヒューマログミックス25・50"};
+
+  /* --- 基礎インスリン：朝食前（＋3時） --- */
+  if(basal){
+    var d=decide(R.am, sens), ex="";
+    if(R.n3.n){
+      if(R.n3.hypo){ d={pct:-0.2,k:"down",why:"深夜3時に低血糖（"+R.n3.vals.map(function(x){return x.v;}).join("・")+"）"+(R.am.hi?"。朝の高血糖は反跳性（ソモジー効果）の可能性":"")+" → 20%減"}; }
+      else if(d.k==="up" && R.n3.mean<=150){ ex="3時は高くないため、朝の上昇は暁現象の可能性。持効型の時刻変更（眠前→朝）や夕の追加量の見直しも考える"; }
+    }
+    if(d.k==="up" && (R.hs.hypo || (R.n3.n && R.n3.min<100))){ d={pct:0,k:"keep",why:"朝食前は高いが、眠前または深夜に低め・低血糖がある → 基礎は増やさない（反跳性高血糖の可能性。3時の血糖を確認）"}; }
+    if(d.k==="up" && R.hs.hi>=2){ ex+=(ex?"<br>":"")+"眠前から高いまま朝に持ち越している。まず夕の追加インスリン・夕食後の間食を見直す"; d.pct=Math.min(d.pct,0.1); }
+    prop("基礎（持効型）"+(basalSlot==="hs"?" 眠前":" 朝"), T.ba, basalSlot==="hs"?"ba_hs":"ba_am", basal, d, ex);
+    if(w && basal/w>=0.5 && R.am.hi<2){ warn.push("基礎インスリンが "+(basal/w).toFixed(2)+" 単位/kg（≥0.5）。これ以上は基礎を増やさず、食後の高血糖は追加インスリンで調整する（過剰な基礎インスリン）"); }
+  } else if(hasNp && D.np_pm){
+    prop("中間型 夕（NPH）", T.np, "np_pm", D.np_pm, decide(R.am,sens), "朝食前の血糖を担当");
+  }
+  /* --- 追加インスリン --- */
+  var steroidAm=(p.ster==="psl");
+  if(D.bo_am) prop("追加 朝（超速効型）", T.bo, "bo_am", D.bo_am, decide(R.noon,sens), "昼食前の血糖を担当");
+  if(D.bo_noon){
+    if(D.np_am && steroidAm){ prop("追加 昼（超速効型）", T.bo, "bo_noon", D.bo_noon, {pct:0,k:"keep",why:"夕食前はステロイド用の朝NPHで調整するため、昼の追加は維持"}); }
+    else prop("追加 昼（超速効型）", T.bo, "bo_noon", D.bo_noon, decide(R.pm,sens), "夕食前の血糖を担当");
+  }
+  if(D.bo_pm) prop("追加 夕（超速効型）", T.bo, "bo_pm", D.bo_pm, decide(R.hs,sens), "眠前の血糖を担当");
+  /* --- 中間型（朝） --- */
+  if(D.np_am){
+    var rr=(D.bo_noon && !steroidAm)? R.pm : (D.bo_noon? R.pm : mergeR(R.noon,R.pm));
+    prop("中間型 朝（NPH）", T.np, "np_am", D.np_am, decide(rr,sens), steroidAm?"朝PSLの作用（昼〜夕の高血糖）を担当。PSLを減量したらNPHも同じ割合で減らす":"昼〜夕の血糖を担当");
+  }
+  /* --- 混合型 --- */
+  if(D.mx_am){ prop("混合型 朝", T.mx, "mx_am", D.mx_am, decide(mergeR(R.noon,R.pm),sens), "昼食前・夕食前の血糖を担当"); }
+  if(D.mx_pm){ prop("混合型 夕", T.mx, "mx_pm", D.mx_pm, decide(mergeR(R.hs,R.am),sens), "眠前・翌朝食前の血糖を担当"); }
+  if(hasMx && (p.nutr==="poor"||[1,2,3].some(function(d){return $("meal"+d).value!=="full";}))){
+    warn.push("混合型は食事量が不安定だと低血糖を起こしやすい。基礎（持効型）＋追加（超速効型、食後打ち）への切り替えを考える。切り替え時は混合型の1日総量の約80%を、基礎50%・追加50%に分ける");
+  }
+
+  /* --- 新しく加える種類 --- */
+  var mealOf={noon:["朝","bo_am"],pm:["昼","bo_noon"],hs:["夕","bo_pm"]};
+  // ステロイドPSL朝でNPHなし、昼〜夕が高い
+  var nphSuggested=false;
+  if(steroidAm && !D.np_am && (R.pm.hi>=2||R.noon.hi>=2) && R.am.hi<2){
+    nphSuggested=true;
+    var nph = (w && p.psl)? Math.round(Math.min(0.1*p.psl/10,0.4)*w*(sens?0.75:1)) : (w? Math.round(w*0.1):null);
+    props.push({label:"中間型 朝（NPH）を開始", type:T.np, key:"np_am", cur:0, nv:nph, k:"new", why:"朝のPSLによる昼〜夕の高血糖パターン（朝食前は概ね目標内）。PSLと同時に"+(nph?nph+"単位":"PSL 10 mgあたり0.1単位/kg")+"から"+((w&&p.psl)?"（PSL "+p.psl+" mg・体重 "+w+" kgで計算"+(sens?"、高齢・腎障害などで75%":"")+"）":"（入力タブでPSL量と体重を入れると計算）")});
+  }
+  // 基礎のみで食後が高い → 追加を1回から
+  if(basal && !hasBo && !hasMx && !nphSuggested){
+    var worst=null; ["noon","pm","hs"].forEach(function(s){ if(R[s].hi>=2 && (!worst||R[s].mean>R[worst].mean)) worst=s; });
+    if(worst && R.am.hi<2){
+      var st=sens?2:(w? Math.max(2,Math.round(w*0.05)) : 4);
+      props.push({label:"追加 "+mealOf[worst][0]+"（超速効型）を開始", type:T.bo, key:mealOf[worst][1], cur:0, nv:st, k:"new", why:TSL.filter(function(c){return c[0]===worst;})[0][1]+"が高い（平均 "+Math.round(R[worst].mean)+"）一方、朝食前は概ね目標内。基礎を増やすより、最も上がる食事の前に追加インスリンを"+st+"単位から（ベーサル・プラス）"});
+    }
+  }
+  // インスリン未使用
+  if(!basal && !hasBo && !hasNp && !hasMx){
+    var hiDays=0; for(var dd=1;dd<=3;dd++){ var c=0; ["am","noon","pm","hs"].forEach(function(s){ var v=tv("d"+dd+"_"+s); if(v!==null&&v>180) c++; }); if(c>=2) hiDays++; }
+    if(hiDays>=1){
+      var anyMean=["am","noon","pm","hs"].map(function(s){return R[s].mean||0;});
+      var mx=Math.max.apply(null,anyMean);
+      var k=sens?0.25:(mx>200?0.5:0.4);
+      if(w){
+        var tdd=w*k, b=Math.round(tdd*0.5), bl=Math.max(1,Math.round(tdd*0.5/3));
+        var poor=(p.nutr!=="eat")||[1,2,3].some(function(d){return $("meal"+d).value==="half"||$("meal"+d).value==="little";});
+        if(p.nutr==="npo"){
+          props.push({label:"基礎（持効型）を開始", type:T.ba, key:"ba_am", cur:0, nv:Math.round(b*0.8), k:"new", why:"180超が1日2回以上ある日がある。絶食中のため基礎のみ（1日総量 "+Math.round(tdd)+"単位の50%×0.8）＋補正"});
+        } else {
+          props.push({label:"基礎（持効型）を開始", type:T.ba, key:"ba_am", cur:0, nv:b, k:"new", why:"180超が1日2回以上ある日がある。1日総量の目安 "+Math.round(tdd)+"単位（体重 "+w+" kg × "+k+"）の50%"});
+          props.push({label:"追加（超速効型）を各食"+(poor?"後":"前")+"に開始", type:T.bo, key:"bo_all", cur:0, nv:bl, k:"new", why:"1日総量の50%を3回に分けた量。"+(poor?"食事量が不安定なため食後に摂取量を見て打つ（半量なら半分、少量なら打たない）":"食事を半分以上食べた時に打つ")});
+        }
+      } else {
+        notes.push("インスリン未使用で180超が続く。入力タブで体重を入れると開始量を計算します");
+      }
+    } else {
+      notes.push("インスリン未使用で、180超が1日2回以上の日はない。補正インスリン（スライディングスケール）のみで継続してよい");
+    }
+  }
+
+  /* --- 全体の注意 --- */
+  var all=[]; ["am","noon","pm","hs","n3"].forEach(function(s){ all=all.concat(R[s].vals.map(function(x){return x.v;})); });
+  var n300=all.filter(function(v){return v>300;}).length, nHypo=all.filter(function(v){return v<70;}).length;
+  if(nHypo){ warn.unshift("3日間で &lt;70 mg/dL が "+nHypo+" 回。低血糖がある日は増量より減量を優先する"+(p.meds.su?"。<b>SU薬は中止</b>":"")+(p.meds.glinide?"。グリニド薬は食事が摂れない回は飲ませない":"")); }
+  if(n300>=3) warn.push("300 mg/dL超が "+n300+" 回。感染・脱水・ケトーシスを確認し、糖尿病内科への相談を考える");
+  if(sens) notes.push("高齢・腎障害・やせ・1型・低血糖既往のいずれかがあるため、増量は10%まで、低血糖時は20%減にしています");
+  if(p.ster==="mpsl") notes.push("ステロイドパルス中：投与日の昼〜夕の高血糖は一時的。パルス後は追加分を速やかに戻す（この提案は前日までの値を元にしているため、パルス最終日の翌日は増量を見送る）");
+  if(p.type==="t1") notes.push("1型：基礎インスリンは低血糖でも中止せず、減量で対応する");
+  notes.push("1回に変えるのは10〜20%まで。調整は1〜2日ごとに行い、各食前・眠前の血糖で効果を確認する");
+  notes.push("補正インスリンを毎日同じ時間帯に使っている場合は、その時間帯を担当するインスリンを増やす根拠になる");
+
+  /* --- 表示 --- */
+  var h=[];
+  warn.forEach(function(x){ h.push('<div class="alert ng"><b>注意</b>'+x+'</div>'); });
+  var cur=0,nw=0; props.forEach(function(x){ if(x.key==="bo_all"){ cur+=0; nw+=(x.nv||0)*3; } else { cur+=x.cur||0; nw+=(x.nv||0); } });
+  if(props.length){
+    h.push('<div class="card"><h2>💉 翌日のインスリン（提案）</h2><div class="body">');
+    props.forEach(function(x){
+      var lab={up:"増量",down:"減量",keep:"維持",new:"新規"}[x.k];
+      h.push('<div class="prop '+x.k+'"><div class="hd"><span>'+x.label+' <span class="tag '+({up:"t-cau",down:"t-ng",keep:"t-ok",new:"t-rec"})[x.k]+'">'+lab+'</span></span><span class="dose">'+(x.k==="new"?"":x.cur+'<span class="arr">→</span>')+'<span class="nw">'+(x.nv===null?"—":x.nv)+'</span><span style="font-size:13px;font-weight:400"> 単位</span></span></div><div class="ty">'+x.type+'</div><div class="rs">'+x.why+'</div></div>');
+    });
+    h.push('<dl class="kv" style="margin-top:6px"><dt>1日総量</dt><dd><b>'+cur+' → '+nw+' 単位</b>'+(w?'（'+(nw/w).toFixed(2)+' 単位/kg）':'')+'（補正インスリンは別）</dd></dl>');
+    h.push('<div class="btns" style="margin-top:10px"><button class="btn sec" id="applyBtn">提案を「いまの量」に反映</button></div>');
+    h.push(cite("ADA16","ES22","GC")+'</div></div>');
+  }
+  // 時間帯ごとの評価
+  h.push('<div class="card"><h2>📈 時間帯ごとの評価</h2><div class="body"><table class="sc"><tr><th>時間帯</th><th>平均</th><th>最低</th><th>&gt;180</th><th>&lt;70</th></tr>'+
+    TSL.filter(function(c){return R[c[0]].n;}).map(function(c){ var r=R[c[0]]; return '<tr><td>'+c[1]+'</td><td>'+Math.round(r.mean)+'</td><td>'+r.min+'</td><td>'+r.hi+'</td><td'+(r.hypo?' style="color:var(--ng);font-weight:700"':'')+'>'+r.vals.filter(function(x){return x.v<70;}).length+'</td></tr>'; }).join("")+
+    '</table><div class="hint">担当（責任インスリン）：朝食前＝基礎（持効型）／昼食前＝朝の追加／夕食前＝昼の追加（PSL朝投与時は朝NPH）／眠前＝夕の追加。混合型は朝→昼・夕食前、夕→眠前・翌朝食前。</div></div></div>');
+  if(notes.length) h.push('<div class="card"><h2>📝 調整のルール</h2><div class="body"><ul class="tight">'+notes.map(function(x){return"<li>"+x+"</li>";}).join("")+'</ul></div></div>');
+  h.push('<div class="btns"><button class="btn sec" id="titCopy">カルテ用メモをコピー</button></div><textarea class="copy" id="titArea" readonly></textarea>');
+  h.push('<div class="notice">目標 100〜180 mg/dL（重症・脳卒中急性期 140〜180）で、10〜20%ずつ調整する一般的な方法に基づく提案です。院内プロトコル・患者の状態を優先し、最終判断は担当医が行ってください。</div>');
+  $("titResult").innerHTML=h.join("");
+
+  var txt=["【インスリン調整メモ】"];
+  TSL.forEach(function(c){ var r=R[c[0]]; if(r.n) txt.push(c[1]+"："+r.vals.map(function(x){return x.v;}).join("→")); });
+  props.forEach(function(x){ txt.push(x.label.replace(/（.*?）/g,"")+"："+(x.k==="new"?"新規 ":x.cur+"→")+(x.nv===null?"—":x.nv)+"単位（"+({up:"増量",down:"減量",keep:"維持",new:"新規"})[x.k]+"）"); });
+  warn.forEach(function(x){ txt.push("注意："+x.replace(/<[^>]+>/g,"").replace(/&lt;/g,"<")); });
+  var t=txt.join("\n");
+  var cb=$("titCopy"); cb.addEventListener("click", function(){ var a=$("titArea"); a.value=t; try{ navigator.clipboard.writeText(t).then(function(){toast("コピーしました");},function(){a.style.display="block";a.select();}); }catch(e){ a.style.display="block"; a.select(); } });
+  var ab=$("applyBtn");
+  if(ab) ab.addEventListener("click", function(){
+    props.forEach(function(x){
+      if(x.nv===null) return;
+      if(x.key==="bo_all"){ ["bo_am","bo_noon","bo_pm"].forEach(function(k){ if($(k)) $(k).value=x.nv; }); }
+      else if($(x.key)) $(x.key).value=x.nv;
+    });
+    saveTit(); toast("いまの量を更新しました。翌日の血糖を入れる前に「1日進める」を押してください"); window.scrollTo&&window.scrollTo(0,0);
+  });
+}
+/* ---------- 写真から読み込み（オンライン時のみ） ---------- */
+var SAMPLE=null, photoBackup=null, photoBusy=false;
+function shrink(file){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file), img=new Image();
+    img.onload=function(){
+      var max=1600, w=img.naturalWidth, h=img.naturalHeight, r=Math.min(1,max/Math.max(w,h));
+      var c=document.createElement("canvas"); c.width=Math.round(w*r); c.height=Math.round(h*r);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(function(b){ b?res(b):rej(new Error("画像を変換できませんでした")); },"image/jpeg",0.85);
+    };
+    img.onerror=function(){ URL.revokeObjectURL(url); rej(new Error("画像を開けませんでした")); };
+    img.src=url;
+  });
+}
+var PHOTO_PROMPT=[
+ "あなたは病棟の血糖記録を読み取るアシスタントです。添付画像（温度板・血糖測定表・電子カルテ画面・手書きメモのいずれか）から、血糖値とインスリン投与量を読み取ってください。",
+ "【出力】次の形のJSONのみを返す。説明文やコードブロック記号は付けない。",
+ '{"days":[{"label":"日付や曜日など画像の表記（なければ空文字）","meal":"full|half|little|npo|null","am":数値|null,"noon":数値|null,"pm":数値|null,"hs":数値|null,"n3":数値|null}],',
+ '"insulin":{"bo_am":数値|null,"bo_noon":数値|null,"bo_pm":数値|null,"ba_am":数値|null,"ba_hs":数値|null,"np_am":数値|null,"np_pm":数値|null,"mx_am":数値|null,"mx_pm":数値|null},',
+ '"insulin_names":["画像にあるインスリンの商品名"],"uncertain":["d1_am のような欄名"],"note":"読み取りの注意点（日本語・短く）"}',
+ "【ルール】",
+ "- days は古い日→新しい日の順。4日以上あれば直近の3日だけ。",
+ "- am=朝食前（空腹時）、noon=昼食前、pm=夕食前、hs=眠前（就寝前・21時ごろ）、n3=深夜（0〜4時）。食後値は入れない。",
+ "- 血糖の単位は mg/dL。mmol/L なら18倍して整数にする。読めない・未測定は null。",
+ "- insulin は直近の日の定時投与量（単位）。補正（スライディングスケール）で打った分は含めない。",
+ "  bo=超速効型・速効型（ノボラピッド、ヒューマログ、フィアスプ、ルムジェブ、アピドラ、ヒューマリンR、ノボリンR など）",
+ "  ba=持効型（トレシーバ、ランタス、グラルギンBS、ランタスXR など）。打つ時刻が朝なら ba_am、夕〜眠前なら ba_hs",
+ "  np=中間型（ヒューマリンN など）、mx=混合型（ノボラピッド30ミックス、ヒューマログミックス25・50 など）。配合注（ゾルトファイ、ソリクア）は ba に入れ note に書く。",
+ "- meal は食事摂取量の記載があれば 10割・全量→full、5割前後→half、3割以下→little、絶食・欠食→npo。なければ null。",
+ "- 少しでも読み取りに自信がない欄は uncertain に入れる（血糖は d1〜d3＋_am/_noon/_pm/_hs/_n3、インスリンは bo_am などのキー）。d1が最も古い日。",
+ "- 患者の氏名・ID・生年月日など個人情報は一切出力しない。",
+ "- 血糖やインスリンの記録が見当たらない画像なら days を空配列にし、note に理由を書く。"
+].join("\n");
+function setStatus(h){ $("photoStatus").innerHTML=h; }
+function parseJSONLoose(t){
+  if(t && typeof t==="object") return t;
+  var m=String(t||"").match(/\{[\s\S]*\}/); if(!m) throw new Error("読み取り結果を解釈できませんでした");
+  return JSON.parse(m[0]);
+}
+function numOrNull(v){ var n=parseFloat(v); return (isNaN(n)||n<=0)?null:Math.round(n); }
+function applyPhoto(o){
+  var days=(o.days||[]).slice(-3);
+  if(!days.length){ setStatus('血糖の記録が見つかりませんでした。'+(o.note?"（"+o.note+"）":"")); return; }
+  photoBackup=readTit(); photoBackup.__show3=$("show3am").checked;
+  var need3=days.some(function(d){ return numOrNull(d.n3)!==null; });
+  if(need3 && !$("show3am").checked){ $("show3am").checked=true; buildGrid(); }
+  // 3日に満たない場合は直近側（3日目）に詰める
+  var off=3-days.length;
+  for(var i=1;i<=3;i++){ ["am","noon","pm","hs","n3"].forEach(function(k){ var e=$("d"+i+"_"+k); if(e){ e.value=""; e.classList.remove("unsure","fromimg"); } }); $("meal"+i).value="full"; }
+  days.forEach(function(d,j){
+    var di=j+1+off;
+    ["am","noon","pm","hs","n3"].forEach(function(k){ var v=numOrNull(d[k]), e=$("d"+di+"_"+k); if(e && v!==null){ e.value=v; e.classList.add("fromimg"); } });
+    if(d.meal && /^(full|half|little|npo)$/.test(d.meal)) $("meal"+di).value=d.meal;
+  });
+  var ins=o.insulin||{}, nIns=0;
+  if(Object.keys(ins).some(function(k){ return numOrNull(ins[k])!==null; })){
+    INS.forEach(function(r){ Object.keys(r[3]).forEach(function(sl){ var id=r[0]+"_"+sl, e=$(id); if(!e) return; var v=numOrNull(ins[id]); e.value=(v===null?"":v); e.classList.remove("unsure","fromimg"); if(v!==null){ e.classList.add("fromimg"); nIns++; } }); });
+  }
+  (o.uncertain||[]).forEach(function(k){
+    var m=String(k).match(/^d([1-3])_(am|noon|pm|hs|n3)$/);
+    if(m){ var di=+m[1]+off; if(di>=1&&di<=3){ var e=$("d"+di+"_"+m[2]); if(e) e.classList.add("unsure"); } }
+    else { var e2=$(k); if(e2) e2.classList.add("unsure"); }
+  });
+  colorAll(); saveTit();
+  var unsureN=document.querySelectorAll("#bgt input.unsure").length;
+  setStatus('<b style="color:var(--ok)">✓ 読み込みました</b>（'+days.length+'日分'+(nIns?'・インスリン '+nIns+'欄':'・インスリン量は読み取れず')+'）。'+
+    (unsureN?'<br><span style="color:#7a4fd1;font-weight:700">点線の欄（'+unsureN+'か所）は読み取りに自信がありません。</span>':'')+
+    '<br>表の値を写真と見比べて確認してから「調整案を出す」を押してください。'+
+    (o.insulin_names&&o.insulin_names.length?'<br>読み取ったインスリン：'+o.insulin_names.join("、").replace(/</g,"&lt;"):'')+
+    (o.note?'<br>メモ：'+String(o.note).replace(/</g,"&lt;"):''));
+  $("undoWrap").classList.remove("hidden");
+  $("titResult").innerHTML="";
+}
+function handlePhoto(file){
+  if(!file || photoBusy || !SAMPLE) return;
+  photoBusy=true;
+  var pv=$("photoPrev"); try{ pv.src=URL.createObjectURL(file); pv.classList.remove("hidden"); }catch(e){}
+  setStatus('<span class="spin"></span>画像を読み取っています（10〜30秒）…');
+  shrink(file).then(function(blob){
+    var call = SAMPLE.json ? SAMPLE.json(PHOTO_PROMPT,{images:[blob],modelTier:"default",cache:false})
+                           : SAMPLE(PHOTO_PROMPT,{images:[blob],modelTier:"default",cache:false}).then(function(r){return r.text;});
+    return call;
+  }).then(function(r){ applyPhoto(parseJSONLoose(r)); })
+  .catch(function(err){
+    var c=err&&err.code;
+    if(c==="not_granted"){ setStatus("写真の読み込みが許可されていません。"); }
+    else if(c==="rate_limited"){ setStatus("混み合っています。少し時間をおいてからもう一度試してください。"); }
+    else setStatus("読み取りに失敗しました："+((err&&err.message)||"不明なエラー").replace(/</g,"&lt;")+"<br>手で入力するか、写真を撮り直してください。");
+  }).then(function(){ photoBusy=false; $("camIn").value=""; $("picIn").value=""; });
+}
+function initPhoto(){
+  if(!(window.claude && typeof window.claude.use==="function")) return; // オフライン版では非表示
+  window.claude.use("sample").then(function(s){
+    if(!s) return;
+    var lim = s.limits ? s.limits() : Promise.resolve({images:true});
+    return Promise.resolve(lim).then(function(l){
+      if(!l || !l.images) return;
+      SAMPLE=s; $("photoCard").classList.remove("hidden");
+    });
+  }).catch(function(){});
+  $("camIn").addEventListener("change", function(e){ handlePhoto(e.target.files[0]); });
+  $("picIn").addEventListener("change", function(e){ handlePhoto(e.target.files[0]); });
+  $("undoBtn").addEventListener("click", function(){
+    if(!photoBackup) return;
+    if($("show3am").checked!==photoBackup.__show3){ $("show3am").checked=photoBackup.__show3; buildGrid(); }
+    document.querySelectorAll("#bgt input").forEach(function(e){ e.classList.remove("unsure","fromimg"); });
+    writeTit(photoBackup); saveTit(); photoBackup=null;
+    $("undoWrap").classList.add("hidden"); setStatus("読み込み前の値に戻しました。"); $("titResult").innerHTML="";
+  });
+}
+(function initTit(){
+  var o=loadTit();
+  if(o && o.show3am) $("show3am").checked=true;
+  buildGrid();
+  if(o) writeTit(o);
+  $("show3am").addEventListener("change", function(){ buildGrid(); saveTit(); });
+  $("titBtn").addEventListener("click", function(){ titrate(); var r=$("titResult"); if(r.scrollIntoView) r.scrollIntoView({behavior:"smooth",block:"start"}); });
+  $("shiftBtn").addEventListener("click", shiftDay);
+  initPhoto();
+})();
+
+/* ---------- オフライン対応（自分のサイトに置いた場合のみ動く） ---------- */
+(function(){
+  try{
+    if(!("serviceWorker" in navigator)) return;
+    if(!(location.protocol==="https:" || location.hostname==="localhost")) return;
+    if(/claude\.ai|claudeusercontent/.test(location.hostname)) return;
+    navigator.serviceWorker.register("sw.js").then(function(reg){
+      reg.addEventListener("updatefound", function(){
+        var nw=reg.installing; if(!nw) return;
+        nw.addEventListener("statechange", function(){
+          if(nw.state==="installed" && navigator.serviceWorker.controller){ toast("新しい版を取り込みました。次に開いたときに反映されます"); }
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+
+/* ---------- 起動 ---------- */
+load();
+liveCalc();
+document.querySelectorAll("#v-input input, #v-input select").forEach(function(e){
+  e.addEventListener("input", function(){ liveCalc(); save(); });
+  e.addEventListener("change", function(){ liveCalc(); save(); });
+});
+$("runBtn").addEventListener("click", function(){
+  var p=collect(); var o=judge(p); render(p,o); save(); show("v-result");
+});
+$("clrBtn").addEventListener("click", clearAll);
+renderTable(); renderRefs();
+})();
+</script>
+</body>
+</html>
