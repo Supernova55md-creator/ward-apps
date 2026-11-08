@@ -141,6 +141,11 @@ nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
 .seg3 button+button{border-left:1px solid var(--line)}
 .seg3 button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-strong);font-weight:700}
 .mres{font-size:13px;margin:8px 0 0;color:var(--ink)}
+table.sg{border-spacing:5px}
+table.sg .mb{min-height:44px;font-size:14px}
+.seg3.sm{margin-top:0}
+.seg3.dim{opacity:.45}
+.seg3.sm button{min-height:36px;font-size:13px}
 .toplist .tl{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:4px 0;font-size:15px}
 .toplist .tn{font-weight:700;line-height:1.35}
 .toplist b{font-family:var(--font-display)}
@@ -310,7 +315,7 @@ var F=[
  {id:"horner",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"Horner症候群",s:1},
  {id:"lnd",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"対光-近見反射解離"},
  {id:"ptosisfat",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"易疲労性の眼瞼下垂・複視",e:"瞳孔は正常"},
- {id:"face_sens",g:"cn",sub:"V 三叉神経",t:"顔面の感覚障害",s:1},
+ {id:"face_sens",g:"cn",sub:"V 三叉神経",t:"顔面の感覚障害",e:"感覚の表と連動",s:1},
  {id:"face_umn",g:"cn",sub:"VII 顔面神経",t:"中枢性顔面麻痺",e:"額のしわ寄せは保たれる",s:1},
  {id:"face_lmn",g:"cn",sub:"VII 顔面神経",t:"末梢性顔面麻痺",e:"額も麻痺",s:1},
  {id:"hearing",g:"cn",sub:"VIII 聴覚・前庭",t:"一側の難聴",s:1},
@@ -345,16 +350,16 @@ var F=[
  {id:"babinski",g:"ref",t:"Babinski徴候",s:1,pw:.6},
  {id:"hyporef",g:"ref",t:"腱反射低下・消失",s:1,pw:.7},
 
- {id:"s_hemi",g:"sen",sub:"半身型（大脳・視床）",t:"半身（体幹・上下肢）の全感覚障害",s:1},
- {id:"s_cheiro",g:"sen",sub:"半身型（大脳・視床）",t:"手口感覚症候群",s:1},
- {id:"s_cort",g:"sen",sub:"半身型（大脳・視床）",t:"皮質性感覚障害",e:"立体覚・2点識別覚・書字覚",s:1},
- {id:"s_thpain",g:"sen",sub:"半身型（大脳・視床）",t:"中枢性疼痛（視床痛）",s:1},
- {id:"s_spth",g:"sen",sub:"解離性・脊髄型",t:"体幹・上下肢の温痛覚障害（顔面は除く）",s:1},
- {id:"s_dors",g:"sen",sub:"解離性・脊髄型",t:"深部覚（位置覚・振動覚）障害",s:1},
- {id:"s_level",g:"sen",sub:"解離性・脊髄型",t:"体幹の感覚レベル"},
- {id:"s_cape",g:"sen",sub:"解離性・脊髄型",t:"宙吊り型（ケープ状）の温痛覚障害"},
- {id:"s_saddle",g:"sen",sub:"解離性・脊髄型",t:"サドル型感覚障害"},
- {id:"romberg",g:"sen",sub:"解離性・脊髄型",t:"Romberg徴候陽性"},
+ {id:"s_hemi",g:"sen",hid:1,t:"半身（体幹・上下肢）の全感覚障害",s:1},
+ {id:"s_cheiro",g:"sen",sub:"大脳・視床に特徴的",t:"手口感覚症候群",s:1},
+ {id:"s_cort",g:"sen",sub:"大脳・視床に特徴的",t:"皮質性感覚障害",e:"立体覚・2点識別覚・書字覚",s:1},
+ {id:"s_thpain",g:"sen",sub:"大脳・視床に特徴的",t:"中枢性疼痛（視床痛）",s:1},
+ {id:"s_spth",g:"sen",hid:1,t:"体幹・上下肢の温痛覚障害（顔面は除く）",s:1},
+ {id:"s_dors",g:"sen",hid:1,t:"深部覚（位置覚・振動覚）障害",s:1},
+ {id:"s_level",g:"sen",sub:"脊髄に特徴的",t:"体幹の感覚レベル"},
+ {id:"s_cape",g:"sen",sub:"脊髄に特徴的",t:"宙吊り型（ケープ状）の温痛覚障害"},
+ {id:"s_saddle",g:"sen",sub:"脊髄に特徴的",t:"サドル型感覚障害"},
+ {id:"romberg",g:"sen",sub:"脊髄に特徴的",t:"Romberg徴候陽性"},
  {id:"s_derm_a",g:"sen",sub:"神経根・末梢神経型",t:"上肢の皮節に沿った感覚障害",s:1},
  {id:"s_derm_l",g:"sen",sub:"神経根・末梢神経型",t:"下肢の皮節に沿った感覚障害",s:1},
  {id:"s_median",g:"sen",sub:"神経根・末梢神経型",t:"母指〜環指橈側の感覚障害（手掌）",s:1},
@@ -638,11 +643,13 @@ var EX=[
 /* ---------------- 状態・保存 ---------------- */
 var KEY="lesionNavi.v1";
 function m0(){return {R:{f:0,a:0,l:0},L:{f:0,a:0,l:0},emph:"eq"};}
-var st={f:{},m:m0(),neg:{},dom:"L",cases:[],open:{cn:1,mot:1}};
+function s0(){return {R:{a:0,t:0,l:0,mod:"all"},L:{a:0,t:0,l:0,mod:"all"}};}
+var st={f:{},m:m0(),sg:s0(),neg:{},dom:"L",cases:[],open:{cn:1,mot:1}};
 var E={};
-function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.f=j.f||{};st.m=j.m||m0();st.neg=j.neg||{};st.dom=j.dom||"L";st.cases=j.cases||[];if(j.open)st.open=j.open;
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.f=j.f||{};st.m=j.m||m0();st.sg=j.sg||s0();st.neg=j.neg||{};st.dom=j.dom||"L";st.cases=j.cases||[];if(j.open)st.open=j.open;
   // 旧版で直接入力された運動パターンは格子へ移す
-  ["hemi_fa","hemi_leg","hemi_eq","hemi_nf","mono_arm","mono_leg","para","tetra"].forEach(function(k){if(st.f[k])delete st.f[k];});}}catch(e){}}
+  ["hemi_fa","hemi_leg","hemi_eq","hemi_nf","mono_arm","mono_leg","para","tetra"].forEach(function(k){if(st.f[k])delete st.f[k];});
+  ["s_hemi","s_spth","s_dors"].forEach(function(k){if(st.f[k]){applySens(k,st.f[k]);delete st.f[k];}});}}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
 
 var $=function(id){return document.getElementById(id);};
@@ -673,6 +680,37 @@ function motorText(d){
   return ks.map(function(k){return flab(k,d[k]);}).join("、");
 }
 
+/* ---------------- 感覚の表 → 感覚障害パターン ---------------- */
+function deriveSens(){
+  var d={};
+  function add(k,S){d[k]=(d[k]&&d[k]!==S)?"B":S;}
+  ["R","L"].forEach(function(S){var x=st.sg[S];var n=(x.a?1:0)+(x.t?1:0)+(x.l?1:0);if(!n)return;
+    if(x.mod==="pain"){ if(n>=2||x.t) add("s_spth",S); }
+    else if(x.mod==="deep"){ add("s_dors",S); }
+    else { if(n>=2||x.t) add("s_hemi",S); }
+  });
+  return d;
+}
+var SMOD={all:"全感覚",pain:"温痛覚",deep:"深部覚"};
+function applySens(id,S){
+  if(!S||S==="Y")return false;
+  (S==="B"?["R","L"]:[S]).forEach(function(x){var g=st.sg[x];g.mod=id==="s_spth"?"pain":id==="s_dors"?"deep":"all";g.a=1;g.l=1;if(id!=="s_dors")g.t=1;});
+  return true;
+}
+function applyMotor(id,S){
+  var m=st.m;
+  if(id==="para"){m.R.l=1;m.L.l=1;return true;}
+  if(id==="tetra"){m.R.a=m.R.l=m.L.a=m.L.l=1;return true;}
+  if(!S||S==="Y")return false;
+  (S==="B"?["R","L"]:[S]).forEach(function(x){var g=m[x];
+    if(id==="mono_arm")g.a=1; else if(id==="mono_leg")g.l=1;
+    else {g.a=1;g.l=1; if(id==="hemi_nf")g.f=0; else if(id!=="hemi_leg")g.f=1; m.emph=id==="hemi_fa"?"arm":id==="hemi_leg"?"leg":"eq";}
+  });
+  return true;
+}
+function faceSides(){var v=st.f.face_sens;return {R:v==="R"||v==="B",L:v==="L"||v==="B"};}
+function setFace(S,on){var fs=faceSides();fs[S]=on;var v=fs.R&&fs.L?"B":fs.R?"R":fs.L?"L":null;if(v){st.f.face_sens=v;delete st.neg.face_sens;}else delete st.f.face_sens;}
+
 /* ---------------- 入力UI ---------------- */
 function rowHTML(f){
   var h='<div class="frow" data-f="'+f.id+'" id="row-'+f.id+'" data-t="'+esc(f.t+(f.e||"")+(f.sub||""))+'"><div class="lb">'+esc(f.t)+(f.e?'<em>'+esc(f.e)+'</em>':'')+'</div>';
@@ -687,11 +725,24 @@ function motorHTML(){
   h+='<p class="mres" id="mres"></p></div></div>';
   return h;
 }
+function sensHTML(){
+  var h='<div class="mgrid" id="sgrid"><div class="subh">感覚障害の範囲と種類（左右それぞれ）</div><div class="mg-in"><table class="sg"><tr><th></th><th>顔</th><th>上肢</th><th>体幹</th><th>下肢</th></tr>';
+  [["R","右"],["L","左"]].forEach(function(s){
+    h+='<tr><th rowspan="2">'+s[1]+'</th>';
+    [["f","顔"],["a","上肢"],["t","体幹"],["l","下肢"]].forEach(function(p){h+='<td><button type="button" class="mb" data-ss="'+s[0]+'" data-sp="'+p[0]+'" aria-pressed="false">'+p[1]+'</button></td>';});
+    h+='</tr><tr><td colspan="4"><div class="seg3 sm" role="group" aria-label="'+s[1]+'の感覚の種類">';
+    ["all","pain","deep"].forEach(function(k){h+='<button type="button" data-smod="'+k+'" data-sside="'+s[0]+'">'+SMOD[k]+'</button>';});
+    h+='</div></td></tr>';
+  });
+  h+='</table><p class="mres" id="sres"></p></div></div>';
+  return h;
+}
 function buildInput(){
   var h="";
   G.forEach(function(g){
     h+='<details class="grp" data-g="'+g[0]+'"'+(st.open[g[0]]?" open":"")+'><summary>'+g[1]+'<span class="cnt" id="cnt-'+g[0]+'"></span></summary>';
     if(g[0]==="mot") h+=motorHTML();
+    if(g[0]==="sen") h+=sensHTML();
     var cur=null, open=false;
     F.filter(function(f){return f.g===g[0]&&!f.hid;}).forEach(function(f){
       var sb=f.sub||"";
@@ -705,6 +756,12 @@ function buildInput(){
   $("groups").addEventListener("click",function(e){
     var mb=e.target.closest("button[data-ms]");
     if(mb){var S=mb.getAttribute("data-ms"),p=mb.getAttribute("data-mp");st.m[S][p]=st.m[S][p]?0:1;save();syncInput();compute();return;}
+    var sb=e.target.closest("button[data-ss]");
+    if(sb){var S=sb.getAttribute("data-ss"),p=sb.getAttribute("data-sp");
+      if(p==="f"){setFace(S,!faceSides()[S]);} else {st.sg[S][p]=st.sg[S][p]?0:1;}
+      save();syncInput();compute();return;}
+    var sm=e.target.closest("button[data-smod]");
+    if(sm){st.sg[sm.getAttribute("data-sside")].mod=sm.getAttribute("data-smod");save();syncInput();compute();return;}
     var em=e.target.closest("button[data-em]");
     if(em){st.m.emph=em.getAttribute("data-em");save();syncInput();compute();return;}
     var b=e.target.closest("button[data-v]");if(!b)return;
@@ -716,8 +773,8 @@ function buildInput(){
   EX.forEach(function(x,i){var o=document.createElement("option");o.value=i;o.textContent=x.n;$("exSel").appendChild(o);});
 }
 function syncInput(){
-  var d=deriveMotor();
-  E=Object.assign({},st.f,d);
+  var d=deriveMotor(), ds=deriveSens();
+  E=Object.assign({},st.f,d,ds);
   document.querySelectorAll(".frow").forEach(function(r){
     var id=r.getAttribute("data-f");var v=st.f[id];
     r.classList.toggle("on",!!v);
@@ -725,6 +782,15 @@ function syncInput(){
   });
   document.querySelectorAll("button[data-ms]").forEach(function(b){b.setAttribute("aria-pressed",st.m[b.getAttribute("data-ms")][b.getAttribute("data-mp")]?"true":"false");});
   document.querySelectorAll("button[data-em]").forEach(function(b){b.setAttribute("aria-pressed",st.m.emph===b.getAttribute("data-em")?"true":"false");});
+  var fs=faceSides();
+  document.querySelectorAll("button[data-ss]").forEach(function(b){var S=b.getAttribute("data-ss"),p=b.getAttribute("data-sp");b.setAttribute("aria-pressed",(p==="f"?fs[S]:st.sg[S][p])?"true":"false");});
+  document.querySelectorAll("button[data-smod]").forEach(function(b){b.setAttribute("aria-pressed",st.sg[b.getAttribute("data-sside")].mod===b.getAttribute("data-smod")?"true":"false");});
+  document.querySelectorAll("#sgrid .seg3").forEach(function(g){var S=g.querySelector("button").getAttribute("data-sside");var x=st.sg[S];g.classList.toggle("dim",!(x.a||x.t||x.l));});
+  var st_=[];Object.keys(ds).forEach(function(k){st_.push(flab(k,ds[k]));});if(st.f.face_sens)st_.unshift(flab("face_sens",st.f.face_sens));
+  var shint="";["R","L"].forEach(function(S){var x=st.sg[S];var n=(x.a?1:0)+(x.t?1:0)+(x.l?1:0);if(n===1&&!x.t&&x.mod!=="deep")shint="一肢だけの感覚障害は、下の「神経根・末梢神経型」から分布を選ぶと判定しやすくなります。";});
+  if(st.f.face_sens&&(ds.s_spth||ds.s_hemi)){var bs=ds.s_spth||ds.s_hemi;if(bs!=="B"&&st.f.face_sens!=="B"&&bs!==st.f.face_sens)st_.push("顔と体幹・四肢で左右が逆（交叉性）");}
+  $("sres").innerHTML=st_.length?("→ "+esc(st_.join("、"))):(shint?esc(shint):"範囲を押し、左右それぞれ種類（全感覚・温痛覚・深部覚）を選びます。顔の欄は脳神経 V と連動します。");
+  if(shint&&st_.length) $("sres").innerHTML+='<br>'+esc(shint);
   var mt=motorText(d), hint="";
   ["R","L"].forEach(function(S){var x=st.m[S];if(x.f&&!x.a&&!x.l&&!st.f.face_umn&&!st.f.face_lmn)hint="顔面だけの麻痺は、脳神経 VII で中枢性か末梢性かを選んでください。";});
   if(d.face_umn) mt+=(mt?"、":"")+flab("face_umn",d.face_umn)+"（VIIで末梢性を選ぶと置き換わる）";
@@ -937,17 +1003,21 @@ document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListe
 $("btnGo").addEventListener("click",function(){show("v-result");});
 $("btnClear").addEventListener("click",function(){
   if(!Object.keys(E).length&&!Object.keys(st.neg).length)return;
-  if(this.getAttribute("data-c")==="1"){st.f={};st.m=m0();st.neg={};save();syncInput();compute();this.textContent="クリア";this.removeAttribute("data-c");}
+  if(this.getAttribute("data-c")==="1"){st.f={};st.m=m0();st.sg=s0();st.neg={};save();syncInput();compute();this.textContent="クリア";this.removeAttribute("data-c");}
   else{this.textContent="もう一度押すと消去";this.setAttribute("data-c","1");var b=this;setTimeout(function(){b.textContent="クリア";b.removeAttribute("data-c");},3000);}
 });
-$("exSel").addEventListener("change",function(){var i=this.value;if(i==="")return;st.f=JSON.parse(JSON.stringify(EX[i].s));st.m=m0();st.neg={};if(EX[i].m){["R","L"].forEach(function(S){if(EX[i].m[S])Object.assign(st.m[S],EX[i].m[S]);});}save();syncInput();compute();this.value="";show("v-result");});
+$("exSel").addEventListener("change",function(){var i=this.value;if(i==="")return;st.f=JSON.parse(JSON.stringify(EX[i].s));st.m=m0();st.sg=s0();st.neg={};["s_hemi","s_spth","s_dors"].forEach(function(k){if(st.f[k]){applySens(k,st.f[k]);delete st.f[k];}});if(EX[i].m){["R","L"].forEach(function(S){if(EX[i].m[S])Object.assign(st.m[S],EX[i].m[S]);});}save();syncInput();compute();this.value="";show("v-result");});
 document.addEventListener("click",function(e){
   var b=e.target.closest("button[data-yes],button[data-no],button[data-unneg],button[data-go]");if(!b)return;
   if(b.hasAttribute("data-go")){show("v-result");return;}
   if(b.hasAttribute("data-unneg")){delete st.neg[b.getAttribute("data-unneg")];save();compute();return;}
   if(b.hasAttribute("data-no")){st.neg[b.getAttribute("data-no")]=1;save();compute();return;}
   var id=b.getAttribute("data-yes"), side=b.getAttribute("data-side"), f=FM[id];
-  if(f.hid){ show("v-input"); var d=document.querySelector('details.grp[data-g="mot"]'); d.open=true; jump($("mgrid")); return; }
+  if(f.hid){
+    var ok=(f.g==="sen")?applySens(id,side):applyMotor(id,side);
+    if(ok){ save(); syncInput(); compute(); return; }
+    show("v-input"); var d=document.querySelector('details.grp[data-g="'+f.g+'"]'); d.open=true; jump($(f.g==="sen"?"sgrid":"mgrid")); return; }
+  if(id==="face_sens"&&side){ (side==="B"?["R","L"]:[side]).forEach(function(x){setFace(x,true);}); save(); syncInput(); compute(); return; }
   if(f.s && !side){ show("v-input"); var g=document.querySelector('details.grp[data-g="'+f.g+'"]'); g.open=true; jump($("row-"+id)); return; }
   st.f[id]=f.s?side:"Y"; delete st.neg[id]; save(); syncInput(); compute();
 });
@@ -957,18 +1027,18 @@ $("q").addEventListener("input",function(){
   var q=this.value.trim().toLowerCase();
   document.querySelectorAll(".frow").forEach(function(r){r.style.display=(!q||r.getAttribute("data-t").toLowerCase().indexOf(q)>=0)?"":"none";});
   document.querySelectorAll(".subg").forEach(function(g){var any=Array.prototype.some.call(g.querySelectorAll(".frow"),function(r){return r.style.display!=="none";});g.style.display=any?"":"none";});
-  var mg=$("mgrid"); if(mg) mg.style.display=q?"none":"";
+  ["mgrid","sgrid"].forEach(function(id){var g=$(id); if(g) g.style.display=q?"none":"";});
   document.querySelectorAll("details.grp").forEach(function(d){var any=Array.prototype.some.call(d.querySelectorAll(".frow"),function(r){return r.style.display!=="none";});d.style.display=(any||!q)?"":"none";if(q&&any)d.open=true;});
 });
 $("btnSave").addEventListener("click",function(){
   if(!Object.keys(E).length)return;
   var n=$("caseName").value.trim()||("ケース "+(st.cases.length+1));
-  st.cases.unshift({n:n,f:JSON.parse(JSON.stringify(st.f)),m:JSON.parse(JSON.stringify(st.m)),neg:JSON.parse(JSON.stringify(st.neg)),t:Date.now()});st.cases=st.cases.slice(0,30);
+  st.cases.unshift({n:n,f:JSON.parse(JSON.stringify(st.f)),m:JSON.parse(JSON.stringify(st.m)),sg:JSON.parse(JSON.stringify(st.sg)),neg:JSON.parse(JSON.stringify(st.neg)),t:Date.now()});st.cases=st.cases.slice(0,30);
   $("caseName").value="";save();renderCases();
 });
 $("caseList").addEventListener("click",function(e){
   var b=e.target.closest("button");if(!b)return;
-  if(b.hasAttribute("data-ld")){var cs=st.cases[+b.getAttribute("data-ld")];st.f=JSON.parse(JSON.stringify(cs.f));st.m=cs.m?JSON.parse(JSON.stringify(cs.m)):m0();st.neg=cs.neg?JSON.parse(JSON.stringify(cs.neg)):{};save();syncInput();compute();show("v-result");}
+  if(b.hasAttribute("data-ld")){var cs=st.cases[+b.getAttribute("data-ld")];st.f=JSON.parse(JSON.stringify(cs.f));st.m=cs.m?JSON.parse(JSON.stringify(cs.m)):m0();st.sg=cs.sg?JSON.parse(JSON.stringify(cs.sg)):s0();["s_hemi","s_spth","s_dors"].forEach(function(k){if(st.f[k]){applySens(k,st.f[k]);delete st.f[k];}});st.neg=cs.neg?JSON.parse(JSON.stringify(cs.neg)):{};save();syncInput();compute();show("v-result");}
   if(b.hasAttribute("data-del")){st.cases.splice(+b.getAttribute("data-del"),1);save();renderCases();}
 });
 })();
