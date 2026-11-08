@@ -1,7 +1,7 @@
 /* 病棟アプリ（ward-apps）共通 service worker
    アプリを更新・追加したら VERSION を必ず変える（例 a→b、日付更新）。
    新しいアプリを足すときは APPS に slug を追加する。 */
-const VERSION = "ward-2026-11-08a";
+const VERSION = "ward-2026-11-08b";
 const APPS = ["dm", "htn", "lipid", "loc", "nih", "referral", "updrs", "dementia"];
 const ROOT = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 const PER_APP = ["", "index.html", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
