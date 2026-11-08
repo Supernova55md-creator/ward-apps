@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#2457c5">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -128,6 +129,14 @@ body.nocrit .anchors:not(.hy),body.nocrit details.instr{display:none}
 
 <main>
   <section data-tab="info">
+    <details class="card instr" id="howto" style="display:block;color:var(--ink)"><summary style="font-size:14px;font-weight:700">使い方</summary><div class="txt" style="font-size:13.5px">1. 初回だけ、下の「判定基準（この端末に保存）」で判定基準JSONを読み込む（端末ごと・ホーム画面アプリごとに1回）。
+2. Part I〜III の各項目で、選択肢の文をタップするか数字ボタンで採点する。左右・部位のある項目は、青字の部位から順に入る。
+3. 各項目の「質問・評価方法」をタップすると説明文が開く。最初から開いておく場合は下の設定をオンにする。
+4. 評価できない項目は UR を選ぶ（合計からは除外し、結果に表示）。
+5. 「結果」タブで合計・左右差・TD/PIGD分類を確認し、「コピー」でカルテに貼り付ける。
+6. 「この端末の履歴に保存」で端末内に記録が残る。次の患者は「新規評価」で入力を消去する。
+・患者氏名など個人を特定できる情報は入力しない。
+・データはこの端末の中だけに保存され、外部へは送信されない。</div></details>
     <div class="card">
       <h2>評価情報</h2>
       <div class="grid">
@@ -138,6 +147,7 @@ body.nocrit .anchors:not(.hy),body.nocrit details.instr{display:none}
       <div class="tools" style="margin-top:12px">
         <label class="toggle"><input type="checkbox" id="showCrit"> 判定基準を表示する</label>
         <label class="toggle"><input type="checkbox" class="autoT"> 入力後に次の項目へ自動スクロール</label>
+        <label class="toggle"><input type="checkbox" id="openInstr"> 説明文を最初から開いて表示</label>
       </div>
       <p class="note" id="critHint">選択肢の文をタップすると、その点数が入力されます（左右・部位のある項目は、未入力の部位から順に入ります）。入力内容はこの端末のブラウザ内にのみ保存されます。</p>
     </div>
@@ -256,7 +266,7 @@ const TREM=['2.10','3.15_R','3.15_L','3.16_R','3.16_L','3.17_RUE','3.17_LUE','3.
 const PIGD=['2.12','2.13','3.10','3.11','3.12'];
 
 const LS='mdsupdrs_local_cur_v1', LSH='mdsupdrs_local_hist_v1';
-function blank(){return {sc:{},f:{date:new Date().toISOString().slice(0,10)},auto:true,crit:true};}
+function blank(){return {sc:{},f:{date:new Date().toISOString().slice(0,10)},auto:true,crit:true,openInstr:false};}
 let S=blank();
 try{const x=JSON.parse(localStorage.getItem(LS));if(x&&x.sc)S=Object.assign(blank(),x);}catch(e){}
 function persist(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
@@ -344,6 +354,9 @@ document.addEventListener('click',e=>{
   if(sb){const f=sb.parentElement.dataset.field;const v=sb.dataset.v;S.f[f]=(S.f[f]===v)?undefined:v;persist();paint();}
 });
 document.querySelectorAll('.autoT').forEach(c=>{c.checked=S.auto;c.addEventListener('change',()=>{S.auto=c.checked;document.querySelectorAll('.autoT').forEach(x=>x.checked=S.auto);persist();});});
+const oi=document.getElementById('openInstr');
+function applyInstr(){document.querySelectorAll('section[data-tab="p1"] details.instr,section[data-tab="p2"] details.instr,section[data-tab="p3"] details.instr').forEach(d=>d.open=!!S.openInstr);}
+oi.checked=!!S.openInstr;oi.addEventListener('change',()=>{S.openInstr=oi.checked;persist();applyInstr();});
 const sc=document.getElementById('showCrit');sc.checked=S.crit;document.body.classList.toggle('nocrit',!S.crit);
 sc.addEventListener('change',()=>{S.crit=sc.checked;document.body.classList.toggle('nocrit',!S.crit);persist();});
 ['date','pid','rater','ltime','etime'].forEach(n=>{const el=document.getElementById('f_'+n);el.value=S.f[n]||'';el.addEventListener('input',()=>{S.f[n]=el.value;persist();paint();});});
@@ -445,9 +458,9 @@ document.getElementById('detail').addEventListener('change',renderRes);
 document.getElementById('copy').addEventListener('click',async()=>{const t=document.getElementById('out');try{await navigator.clipboard.writeText(t.value);toast('コピーしました');}catch(e){t.select();try{document.execCommand('copy');toast('コピーしました');}catch(_){toast('選択しました。手動でコピーしてください');}}});
 function getHist(){try{return JSON.parse(localStorage.getItem(LSH))||[];}catch(e){return [];}}
 function setHist(h){try{localStorage.setItem(LSH,JSON.stringify(h));return true;}catch(e){return false;}}
-function syncFields(){document.querySelectorAll('.autoT').forEach(x=>x.checked=S.auto);sc.checked=S.crit;document.body.classList.toggle('nocrit',!S.crit);['date','pid','rater','ltime','etime'].forEach(n=>document.getElementById('f_'+n).value=S.f[n]||'');}
+function syncFields(){oi.checked=!!S.openInstr;applyInstr();document.querySelectorAll('.autoT').forEach(x=>x.checked=S.auto);sc.checked=S.crit;document.body.classList.toggle('nocrit',!S.crit);['date','pid','rater','ltime','etime'].forEach(n=>document.getElementById('f_'+n).value=S.f[n]||'');}
 document.getElementById('save').addEventListener('click',()=>{const r=calc();const h=getHist();h.unshift({ts:Date.now(),S:JSON.parse(JSON.stringify(S)),p1:r.p1.s,p2:r.p2.s,p3:r.p3.s,tot:r.total});if(setHist(h.slice(0,200)))toast('保存しました');else toast('この環境では保存できません');renderHist();});
-document.getElementById('reset').addEventListener('click',()=>ask('現在の入力をすべて消去して新規評価を始めますか？',()=>{const keep={auto:S.auto,crit:S.crit};S=Object.assign(blank(),keep);persist();syncFields();paint();show('info');toast('新規評価を開始しました');}));
+document.getElementById('reset').addEventListener('click',()=>ask('現在の入力をすべて消去して新規評価を始めますか？',()=>{const keep={auto:S.auto,crit:S.crit,openInstr:S.openInstr};S=Object.assign(blank(),keep);persist();syncFields();paint();show('info');toast('新規評価を開始しました');}));
 function renderHist(){const h=getHist();const el=document.getElementById('hist');
   if(!h.length){el.innerHTML='<p class="note">保存された評価はありません。</p>';return;}
   el.innerHTML='<table class="h"><tr><th>評価日</th><th>メモ</th><th>状態</th><th>I</th><th>II</th><th>III</th><th>計</th><th></th></tr>'+
@@ -472,13 +485,14 @@ document.getElementById('critPasteBtn').addEventListener('click',()=>document.ge
 document.getElementById('critPasteGo').addEventListener('click',()=>importCrit(document.getElementById('critJson').value));
 document.getElementById('critClear').addEventListener('click',()=>ask('この端末に保存した判定基準を消去しますか？（採点データは残ります）',()=>{try{localStorage.removeItem(LSCRIT);}catch(e){}location.reload();}));
 
+applyInstr();
 paint();show('info');
 })();
 // service worker（https か localhost のみ。claude.ai 上では登録しない）
 try{
   const h=location.hostname;
   if('serviceWorker' in navigator && (location.protocol==='https:'||h==='localhost'||h==='127.0.0.1') && !/claude\.ai$|claudeusercontent/.test(h)){
-    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(r){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(x){if(x.scope===new URL("./",location.href).href)x.unregister();});});return r;}).then(reg=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
       reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{
         if(w.state==='installed'&&navigator.serviceWorker.controller){const el=document.getElementById('toast');el.textContent='新しい版を取り込みました。次に開いたときに反映されます';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),4000);}
       });});
