@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#2457c5">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -479,7 +478,7 @@ paint();show('info');
 try{
   const h=location.hostname;
   if('serviceWorker' in navigator && (location.protocol==='https:'||h==='localhost'||h==='127.0.0.1') && !/claude\.ai$|claudeusercontent/.test(h)){
-    navigator.serviceWorker.register('sw.js').then(reg=>{
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(r){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(x){if(x.scope===new URL("./",location.href).href)x.unregister();});});return r;}).then(reg=>{
       reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{
         if(w.state==='installed'&&navigator.serviceWorker.controller){const el=document.getElementById('toast');el.textContent='新しい版を取り込みました。次に開いたときに反映されます';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),4000);}
       });});
