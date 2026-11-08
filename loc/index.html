@@ -6,6 +6,7 @@
 <title>神経病巣局在ナビ</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#D48A00">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -126,6 +127,31 @@ nav.tabs button b{font-size:16px;font-family:var(--font-display)}
 nav.tabs button[aria-selected="true"]{color:var(--accent-strong)}
 nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
 .badge{display:inline-block;min-width:18px;font-size:11px;background:var(--accent);color:#1B1200;border-radius:999px;padding:0 5px;margin-left:3px}
+.subg{border-top:1px solid var(--line)}
+.subh{font-size:12px;font-weight:700;color:var(--accent-strong);background:var(--accent-soft);padding:4px 12px}
+.subh2{font-size:13px;font-weight:700;color:var(--accent-strong);margin:10px 0 2px}
+.mgrid{border-top:1px solid var(--line)}
+.mg-in{padding:8px 12px}
+.mgrid table{width:100%;border-collapse:separate;border-spacing:6px;table-layout:fixed}
+.mgrid tr>th:first-child{width:2em}
+.mgrid th{font-size:13px;color:var(--muted);font-weight:700}
+.mb{width:100%;min-height:48px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;font:inherit;font-size:15px;cursor:pointer}
+.mb[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#1B1200;font-weight:700}
+.seg3{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.seg3 button{flex:1;font:inherit;font-size:14px;border:0;background:var(--bg);color:var(--ink);min-height:40px;cursor:pointer}
+.seg3 button+button{border-left:1px solid var(--line)}
+.seg3 button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-strong);font-weight:700}
+.mres{font-size:13px;margin:8px 0 0;color:var(--ink)}
+.toplist .tl{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:4px 0;font-size:15px}
+.toplist .tn{font-weight:700;line-height:1.35}
+.toplist b{font-family:var(--font-display)}
+.sug{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;border-top:1px solid var(--line);padding:7px 0;font-size:15px;line-height:1.4}
+.sug small{display:block;font-size:12px;color:var(--muted)}
+.btn.yes{border-color:var(--accent);color:var(--accent-strong);font-weight:700}
+.negs{font-size:12px;color:var(--muted);margin-top:8px}
+.negchip{font:inherit;font-size:12px;border:1px solid var(--line);background:var(--bg);color:var(--muted);border-radius:999px;padding:2px 8px;margin:2px;cursor:pointer}
+@keyframes flash{0%{background:var(--accent)}100%{background:transparent}}
+.flash{animation:flash 1.4s ease-out}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -150,8 +176,9 @@ nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
         <option value="">例を読み込む…</option>
       </select>
     </div>
-    <p class="hint">左右のある所見は「<b>症状が出ている側</b>」で入力（眼の偏位は眼が向いている側、注視麻痺は向けない側、舌は偏る側、半盲・無視は欠損側）。もう一度押すと解除。</p>
+    <p class="hint">神経診察の順（高次脳→脳神経→運動→反射→感覚→協調）に並べています。左右のある所見は「<b>症状が出ている側</b>」で入力（眼の偏位は眼が向いている側、注視麻痺は向けない側、舌は偏る側、半盲・無視は欠損側）。もう一度押すと解除。</p>
   </div>
+  <div class="card" id="liveCard"><h2>いまの候補</h2><div id="live"></div></div>
   <div id="groups"></div>
   <div class="card">
     <h2>設定</h2>
@@ -245,99 +272,97 @@ var REF_ORDER=["brazis","blum","fisher82","schm03","bass96","silv95","kim03","ki
 /* ---------------- 所見 ----------------
  s:1 = 左右あり（入力は症状側）, pw = 特異度の重み（低いほど非特異的） */
 var G=[
- ["cog","意識・高次脳機能"],["vis","視野・眼球運動・瞳孔"],["cn","顔面・下位脳神経"],
- ["mot","運動麻痺の分布"],["ref","反射・錐体路徴候"],["sen","感覚障害"],["crd","協調運動・不随意運動"],["oth","自律神経・痛み"]
+ ["cog","意識・高次脳機能"],["cn","脳神経"],["mot","運動"],["ref","反射・錐体路徴候"],["sen","感覚"],["crd","協調運動・不随意運動"],["oth","自律神経・痛み"]
 ];
 var F=[
- {id:"consc",g:"cog",t:"意識障害",pw:.5},
- {id:"aph_motor",g:"cog",t:"非流暢性失語",e:"Broca型：発語努力・失文法、理解は比較的保持"},
- {id:"aph_sens",g:"cog",t:"流暢性失語・理解障害",e:"Wernicke型：錯語・ジャルゴン"},
- {id:"aph_cond",g:"cog",t:"復唱障害が目立つ失語",e:"伝導失語"},
- {id:"aph_tcm",g:"cog",t:"復唱は保たれる非流暢性失語",e:"超皮質性運動失語"},
- {id:"gerstmann",g:"cog",t:"Gerstmann症候群",e:"失算・失書・左右失認・手指失認"},
- {id:"alexia",g:"cog",t:"失書を伴わない失読"},
- {id:"apraxia",g:"cog",t:"観念運動失行"},
- {id:"neglect",g:"cog",t:"半側空間無視",e:"無視される側を選択",s:1},
- {id:"anosog",g:"cog",t:"病態失認"},
- {id:"abulia",g:"cog",t:"無為・自発性低下",pw:.7},
- {id:"disinhib",g:"cog",t:"脱抑制・人格変化"},
- {id:"amnesia",g:"cog",t:"前向性健忘"},
- {id:"balint",g:"cog",t:"Bálint症候群",e:"精神性注視麻痺・視覚性運動失調・同時失認"},
- {id:"cblind",g:"cog",t:"皮質盲（Anton症候群を含む）"},
+ {id:"consc",g:"cog",sub:"意識",t:"意識障害",pw:.5},
+ {id:"aph_motor",g:"cog",sub:"言語",t:"非流暢性失語",e:"Broca型：発語努力・失文法、理解は比較的保持"},
+ {id:"aph_sens",g:"cog",sub:"言語",t:"流暢性失語・理解障害",e:"Wernicke型：錯語・ジャルゴン"},
+ {id:"aph_cond",g:"cog",sub:"言語",t:"復唱障害が目立つ失語",e:"伝導失語"},
+ {id:"aph_tcm",g:"cog",sub:"言語",t:"復唱は保たれる非流暢性失語",e:"超皮質性運動失語"},
+ {id:"alexia",g:"cog",sub:"言語",t:"失書を伴わない失読"},
+ {id:"neglect",g:"cog",sub:"頭頂葉症状",t:"半側空間無視",e:"無視される側を選択",s:1},
+ {id:"anosog",g:"cog",sub:"頭頂葉症状",t:"病態失認"},
+ {id:"gerstmann",g:"cog",sub:"頭頂葉症状",t:"Gerstmann症候群",e:"失算・失書・左右失認・手指失認"},
+ {id:"apraxia",g:"cog",sub:"頭頂葉症状",t:"観念運動失行"},
+ {id:"abulia",g:"cog",sub:"前頭葉・記憶",t:"無為・自発性低下",pw:.7},
+ {id:"disinhib",g:"cog",sub:"前頭葉・記憶",t:"脱抑制・人格変化"},
+ {id:"amnesia",g:"cog",sub:"前頭葉・記憶",t:"前向性健忘"},
+ {id:"balint",g:"cog",sub:"視覚認知",t:"Bálint症候群",e:"精神性注視麻痺・視覚性運動失調・同時失認"},
+ {id:"cblind",g:"cog",sub:"視覚認知",t:"皮質盲（Anton症候群を含む）"},
 
- {id:"hemianopia",g:"vis",t:"同名半盲",e:"欠損側を選択",s:1},
- {id:"quad_up",g:"vis",t:"上1/4同名半盲",e:"欠損側を選択",s:1},
- {id:"quad_low",g:"vis",t:"下1/4同名半盲",e:"欠損側を選択",s:1},
- {id:"macspare",g:"vis",t:"半盲で黄斑回避あり（調和性）"},
- {id:"incong",g:"vis",t:"非調和性の同名半盲"},
- {id:"bitemp",g:"vis",t:"両耳側半盲"},
- {id:"monovis",g:"vis",t:"単眼の視力低下・RAPD",s:1},
- {id:"cn3",g:"vis",t:"動眼神経麻痺",e:"眼瞼下垂・内転/上下転障害±散瞳",s:1},
- {id:"cn4",g:"vis",t:"滑車神経麻痺",e:"上斜筋麻痺・頭部傾斜",s:1},
- {id:"cn6",g:"vis",t:"外転神経麻痺",s:1},
- {id:"conjdev",g:"vis",t:"共同偏視",e:"眼が向いている側を選択",s:1},
- {id:"gazepal",g:"vis",t:"水平注視麻痺",e:"向けない側を選択",s:1},
- {id:"ino",g:"vis",t:"核間性眼筋麻痺（INO）",e:"内転障害側を選択",s:1},
- {id:"onehalf",g:"vis",t:"one-and-a-half症候群",e:"水平注視麻痺側を選択",s:1},
- {id:"vertgaze",g:"vis",t:"上方注視麻痺（垂直注視障害）"},
- {id:"lnd",g:"vis",t:"対光-近見反射解離"},
- {id:"horner",g:"vis",t:"Horner症候群",s:1},
- {id:"nystag",g:"vis",t:"眼振",pw:.6},
- {id:"skew",g:"vis",t:"斜偏倚（skew deviation）",pw:.7},
- {id:"ptosisfat",g:"vis",t:"易疲労性の眼瞼下垂・複視",e:"瞳孔は正常"},
+ {id:"monovis",g:"cn",sub:"II 視力・視野",t:"単眼の視力低下・RAPD",s:1},
+ {id:"hemianopia",g:"cn",sub:"II 視力・視野",t:"同名半盲",e:"欠損側を選択",s:1},
+ {id:"quad_up",g:"cn",sub:"II 視力・視野",t:"上1/4同名半盲",e:"欠損側を選択",s:1},
+ {id:"quad_low",g:"cn",sub:"II 視力・視野",t:"下1/4同名半盲",e:"欠損側を選択",s:1},
+ {id:"macspare",g:"cn",sub:"II 視力・視野",t:"半盲で黄斑回避あり（調和性）"},
+ {id:"incong",g:"cn",sub:"II 視力・視野",t:"非調和性の同名半盲"},
+ {id:"bitemp",g:"cn",sub:"II 視力・視野",t:"両耳側半盲"},
+ {id:"cn3",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"動眼神経麻痺",e:"眼瞼下垂・内転/上下転障害±散瞳",s:1},
+ {id:"cn4",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"滑車神経麻痺",e:"上斜筋麻痺・頭部傾斜",s:1},
+ {id:"cn6",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"外転神経麻痺",s:1},
+ {id:"conjdev",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"共同偏視",e:"眼が向いている側を選択",s:1},
+ {id:"gazepal",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"水平注視麻痺",e:"向けない側を選択",s:1},
+ {id:"ino",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"核間性眼筋麻痺（INO）",e:"内転障害側を選択",s:1},
+ {id:"onehalf",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"one-and-a-half症候群",e:"水平注視麻痺側を選択",s:1},
+ {id:"vertgaze",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"上方注視麻痺（垂直注視障害）"},
+ {id:"skew",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"斜偏倚（skew deviation）",pw:.7},
+ {id:"nystag",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"眼振",pw:.6},
+ {id:"horner",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"Horner症候群",s:1},
+ {id:"lnd",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"対光-近見反射解離"},
+ {id:"ptosisfat",g:"cn",sub:"III・IV・VI 眼球運動・瞳孔",t:"易疲労性の眼瞼下垂・複視",e:"瞳孔は正常"},
+ {id:"face_sens",g:"cn",sub:"V 三叉神経",t:"顔面の感覚障害",s:1},
+ {id:"face_umn",g:"cn",sub:"VII 顔面神経",t:"中枢性顔面麻痺",e:"額のしわ寄せは保たれる",s:1},
+ {id:"face_lmn",g:"cn",sub:"VII 顔面神経",t:"末梢性顔面麻痺",e:"額も麻痺",s:1},
+ {id:"hearing",g:"cn",sub:"VIII 聴覚・前庭",t:"一側の難聴",s:1},
+ {id:"vertigo",g:"cn",sub:"VIII 聴覚・前庭",t:"回転性めまい",pw:.5},
+ {id:"dysarthria",g:"cn",sub:"IX・X 球症状",t:"構音障害",pw:.5},
+ {id:"dysphagia",g:"cn",sub:"IX・X 球症状",t:"嚥下障害・嗄声",pw:.7},
+ {id:"palate",g:"cn",sub:"IX・X 球症状",t:"軟口蓋挙上不良・カーテン徴候",e:"麻痺側を選択",s:1},
+ {id:"hiccup",g:"cn",sub:"IX・X 球症状",t:"吃逆",pw:.6},
+ {id:"pseudob",g:"cn",sub:"IX・X 球症状",t:"強制泣き笑い・下顎反射亢進"},
+ {id:"cn11",g:"cn",sub:"XI・XII",t:"胸鎖乳突筋・僧帽筋の筋力低下",s:1},
+ {id:"tongue",g:"cn",sub:"XI・XII",t:"挺舌時の舌の偏倚",e:"偏る側を選択",s:1},
+ {id:"tonguefas",g:"cn",sub:"XI・XII",t:"舌萎縮・線維束性収縮"},
 
- {id:"face_umn",g:"cn",t:"中枢性顔面麻痺",e:"額のしわ寄せは保たれる",s:1},
- {id:"face_lmn",g:"cn",t:"末梢性顔面麻痺",e:"額も麻痺",s:1},
- {id:"face_sens",g:"cn",t:"顔面の感覚障害",s:1},
- {id:"hearing",g:"cn",t:"一側の難聴",s:1},
- {id:"vertigo",g:"cn",t:"回転性めまい",pw:.5},
- {id:"dysarthria",g:"cn",t:"構音障害",pw:.5},
- {id:"dysphagia",g:"cn",t:"嚥下障害・嗄声",pw:.7},
- {id:"palate",g:"cn",t:"軟口蓋挙上不良・カーテン徴候",e:"麻痺側を選択",s:1},
- {id:"cn11",g:"cn",t:"胸鎖乳突筋・僧帽筋の筋力低下",s:1},
- {id:"tongue",g:"cn",t:"挺舌時の舌の偏倚",e:"偏る側を選択",s:1},
- {id:"tonguefas",g:"cn",t:"舌萎縮・線維束性収縮"},
- {id:"hiccup",g:"cn",t:"吃逆",pw:.6},
- {id:"pseudob",g:"cn",t:"強制泣き笑い・下顎反射亢進"},
-
- {id:"hemi_fa",g:"mot",t:"片麻痺（顔・上肢優位）",e:"麻痺側を選択",s:1},
- {id:"hemi_leg",g:"mot",t:"片麻痺（下肢優位）",s:1},
- {id:"hemi_eq",g:"mot",t:"片麻痺（顔・上下肢ほぼ均等）",s:1},
- {id:"hemi_nf",g:"mot",t:"片麻痺（顔面は保たれ上下肢）",s:1},
- {id:"mono_arm",g:"mot",t:"単麻痺（上肢）",s:1},
- {id:"mono_leg",g:"mot",t:"単麻痺（下肢）",s:1},
- {id:"para",g:"mot",t:"対麻痺（両下肢）"},
- {id:"tetra",g:"mot",t:"四肢麻痺"},
- {id:"prox",g:"mot",t:"近位筋優位の両側性筋力低下"},
- {id:"distal",g:"mot",t:"遠位筋優位の両側性筋力低下"},
- {id:"wristdrop",g:"mot",t:"下垂手",s:1},
- {id:"footdrop",g:"mot",t:"下垂足",s:1},
- {id:"handint",g:"mot",t:"手内筋の萎縮・筋力低下",s:1},
- {id:"thenar",g:"mot",t:"母指球筋の萎縮・筋力低下",s:1},
- {id:"fatigue",g:"mot",t:"易疲労性・日内変動"},
- {id:"fasc",g:"mot",t:"広範な筋萎縮・線維束性収縮"},
+ {id:"hemi_fa",g:"mot",hid:1,t:"片麻痺（顔・上肢優位）",s:1},
+ {id:"hemi_leg",g:"mot",hid:1,t:"片麻痺（下肢優位）",s:1},
+ {id:"hemi_eq",g:"mot",hid:1,t:"片麻痺（顔・上下肢ほぼ均等）",s:1},
+ {id:"hemi_nf",g:"mot",hid:1,t:"片麻痺（顔面は保たれ上下肢）",s:1},
+ {id:"mono_arm",g:"mot",hid:1,t:"単麻痺（上肢）",s:1},
+ {id:"mono_leg",g:"mot",hid:1,t:"単麻痺（下肢）",s:1},
+ {id:"para",g:"mot",hid:1,t:"対麻痺（両下肢）"},
+ {id:"tetra",g:"mot",hid:1,t:"四肢麻痺"},
+ {id:"prox",g:"mot",sub:"分布の特徴",t:"近位筋優位の両側性筋力低下"},
+ {id:"distal",g:"mot",sub:"分布の特徴",t:"遠位筋優位の両側性筋力低下"},
+ {id:"wristdrop",g:"mot",sub:"分布の特徴",t:"下垂手",s:1},
+ {id:"footdrop",g:"mot",sub:"分布の特徴",t:"下垂足",s:1},
+ {id:"handint",g:"mot",sub:"分布の特徴",t:"手内筋の萎縮・筋力低下",s:1},
+ {id:"thenar",g:"mot",sub:"分布の特徴",t:"母指球筋の萎縮・筋力低下",s:1},
+ {id:"fatigue",g:"mot",sub:"性状",t:"易疲労性・日内変動"},
+ {id:"fasc",g:"mot",sub:"性状",t:"広範な筋萎縮・線維束性収縮"},
 
  {id:"hyperref",g:"ref",t:"腱反射亢進",s:1,pw:.6},
  {id:"babinski",g:"ref",t:"Babinski徴候",s:1,pw:.6},
  {id:"hyporef",g:"ref",t:"腱反射低下・消失",s:1,pw:.7},
 
- {id:"s_hemi",g:"sen",t:"半身（体幹・上下肢）の全感覚障害",s:1},
- {id:"s_cheiro",g:"sen",t:"手口感覚症候群",s:1},
- {id:"s_spth",g:"sen",t:"体幹・上下肢の温痛覚障害（顔面は除く）",s:1},
- {id:"s_dors",g:"sen",t:"深部覚（位置覚・振動覚）障害",s:1},
- {id:"s_cort",g:"sen",t:"皮質性感覚障害",e:"立体覚・2点識別覚・書字覚",s:1},
- {id:"s_thpain",g:"sen",t:"中枢性疼痛（視床痛）",s:1},
- {id:"s_level",g:"sen",t:"体幹の感覚レベル"},
- {id:"s_cape",g:"sen",t:"宙吊り型（ケープ状）の温痛覚障害"},
- {id:"s_saddle",g:"sen",t:"サドル型感覚障害"},
- {id:"s_glove",g:"sen",t:"手袋靴下型感覚障害"},
- {id:"s_derm_a",g:"sen",t:"上肢の皮節に沿った感覚障害",s:1},
- {id:"s_derm_l",g:"sen",t:"下肢の皮節に沿った感覚障害",s:1},
- {id:"s_median",g:"sen",t:"母指〜環指橈側の感覚障害（手掌）",s:1},
- {id:"s_ulnar",g:"sen",t:"小指・環指尺側の感覚障害",s:1},
- {id:"s_radial",g:"sen",t:"手背橈側（第1指間背側）の感覚障害",s:1},
- {id:"s_peron",g:"sen",t:"下腿外側〜足背の感覚障害",s:1},
- {id:"romberg",g:"sen",t:"Romberg徴候陽性"},
+ {id:"s_hemi",g:"sen",sub:"半身型（大脳・視床）",t:"半身（体幹・上下肢）の全感覚障害",s:1},
+ {id:"s_cheiro",g:"sen",sub:"半身型（大脳・視床）",t:"手口感覚症候群",s:1},
+ {id:"s_cort",g:"sen",sub:"半身型（大脳・視床）",t:"皮質性感覚障害",e:"立体覚・2点識別覚・書字覚",s:1},
+ {id:"s_thpain",g:"sen",sub:"半身型（大脳・視床）",t:"中枢性疼痛（視床痛）",s:1},
+ {id:"s_spth",g:"sen",sub:"解離性・脊髄型",t:"体幹・上下肢の温痛覚障害（顔面は除く）",s:1},
+ {id:"s_dors",g:"sen",sub:"解離性・脊髄型",t:"深部覚（位置覚・振動覚）障害",s:1},
+ {id:"s_level",g:"sen",sub:"解離性・脊髄型",t:"体幹の感覚レベル"},
+ {id:"s_cape",g:"sen",sub:"解離性・脊髄型",t:"宙吊り型（ケープ状）の温痛覚障害"},
+ {id:"s_saddle",g:"sen",sub:"解離性・脊髄型",t:"サドル型感覚障害"},
+ {id:"romberg",g:"sen",sub:"解離性・脊髄型",t:"Romberg徴候陽性"},
+ {id:"s_derm_a",g:"sen",sub:"神経根・末梢神経型",t:"上肢の皮節に沿った感覚障害",s:1},
+ {id:"s_derm_l",g:"sen",sub:"神経根・末梢神経型",t:"下肢の皮節に沿った感覚障害",s:1},
+ {id:"s_median",g:"sen",sub:"神経根・末梢神経型",t:"母指〜環指橈側の感覚障害（手掌）",s:1},
+ {id:"s_ulnar",g:"sen",sub:"神経根・末梢神経型",t:"小指・環指尺側の感覚障害",s:1},
+ {id:"s_radial",g:"sen",sub:"神経根・末梢神経型",t:"手背橈側（第1指間背側）の感覚障害",s:1},
+ {id:"s_peron",g:"sen",sub:"神経根・末梢神経型",t:"下腿外側〜足背の感覚障害",s:1},
+ {id:"s_glove",g:"sen",sub:"神経根・末梢神経型",t:"手袋靴下型感覚障害"},
 
  {id:"ataxlimb",g:"crd",t:"四肢の運動失調",e:"測定障害・反復拮抗運動障害",s:1},
  {id:"ataxtrunk",g:"crd",t:"体幹失調・歩行失調"},
@@ -383,7 +408,7 @@ var C=[
   p:[["mono_arm|wristdrop","contra",3,1],["s_cort","contra",1,0],["hyperref","contra",1,0]],
   note:"橈骨・尺骨神経麻痺に似た「偽末梢性」の手の麻痺を起こす。感覚障害が皮節・末梢神経分布に合わない点、反射が保たれる点が手がかり。",ref:["brazis"]},
  {id:"par",n:"頭頂葉（MCA下枝）",lv:"cortex",sd:1,vas:"MCA下枝（inferior division）",
-  p:[["s_cort","contra",3,1],["quad_low","contra",2,0],["neglect","cnd",3,0],["anosog","nd",2,0],["gerstmann","dom",3,0],["apraxia","dom",2,0],["aph_cond","dom",2,0],["s_hemi","contra",1,0],["hemianopia","contra",1,0],["hemi_fa","contra",1,0]],
+  p:[["s_cort","contra",3,1],["quad_low","contra",2,0],["neglect","cnd",3,0],["anosog","nd",2,0],["gerstmann","dom",3,0],["apraxia","dom",2,0],["aph_cond","dom",2,0],["s_hemi","contra",1,0],["hemianopia","contra",1,0],["hemi_fa","contra",1,0],["face_umn","contra",1,0]],
   note:"非優位：半側空間無視・病態失認。優位：Gerstmann・失行・伝導失語。下1/4盲は視放線上部。",ref:["brazis","blum"]},
  {id:"temp",n:"側頭葉（Wernicke野・MCA下枝）",lv:"cortex",sd:1,vas:"MCA下枝",
   p:[["aph_sens","dom",3,1],["quad_up","contra",2,0],["hemianopia","contra",1,0],["aph_cond","dom",1,0],["amnesia","any",1,0]],
@@ -397,7 +422,7 @@ var C=[
 
  /* ---- 皮質下・深部 ---- */
  {id:"ic",n:"内包後脚・放線冠（純粋運動性片麻痺）",syn:"ラクナ症候群",lv:"subc",sd:1,vas:"レンズ核線条体動脈・前脈絡叢動脈",
-  p:[["hemi_eq|hemi_fa|hemi_leg","contra",3,1],["face_umn","contra",2,0],["dysarthria","any",1,0],["hyperref","contra",1,0],["babinski","contra",1,0]],
+  p:[["hemi_eq|hemi_fa|hemi_leg|hemi_nf","contra",3,1],["face_umn","contra",2,0],["dysarthria","any",1,0],["hyperref","contra",1,0],["babinski","contra",1,0]],
   ag:["s_hemi","s_cort","consc","vertigo","cn3","cn6","face_sens"],
   note:"皮質徴候（失語・無視・半盲）がないこと自体が手がかり。橋底部でも同じ像になる。BADでは進行に注意。",ref:["fisher82","brazis"]},
  {id:"vpl",n:"視床外側（VPL/VPM）",syn:"純粋感覚性脳卒中",lv:"subc",sd:1,vas:"視床膝状体動脈（下外側動脈）",
@@ -463,7 +488,7 @@ var C=[
   p:[["vertgaze","any",3,1],["lnd","any",2,0],["nystag","any",1,0]],
   note:"上方注視麻痺・対光-近見反射解離・輻輳後退眼振・眼瞼後退（Collier徴候）。",ref:["brazis"]},
  {id:"pons_base",n:"橋底部傍正中（純粋運動性片麻痺）",lv:"bs",sd:1,vas:"脳底動脈傍正中枝（BADが多い）",
-  p:[["hemi_eq|hemi_fa|hemi_leg","contra",3,1],["dysarthria","any",2,0],["ataxlimb","contra",1,0],["face_umn","contra",1,0],["hyperref","contra",1,0],["babinski","contra",1,0]],
+  p:[["hemi_eq|hemi_fa|hemi_leg|hemi_nf","contra",3,1],["dysarthria","any",2,0],["ataxlimb","contra",1,0],["face_umn","contra",1,0],["hyperref","contra",1,0],["babinski","contra",1,0]],
   ag:["s_hemi","cn3","aph_motor","aph_sens","neglect","hemianopia"],
   note:"内包病変と臨床的に区別困難。症状の進行（BAD）に注意。",ref:["bass96","fisher82"]},
  {id:"mg",n:"橋底部腹側尾側",syn:"Millard-Gubler症候群",lv:"bs",sd:1,vas:"脳底動脈傍正中枝・短回旋枝",
@@ -604,17 +629,21 @@ var C=[
 /* ---------------- 例 ---------------- */
 var EX=[
  {n:"左 延髄外側パターン",s:{face_sens:"L",s_spth:"R",horner:"L",palate:"L",dysphagia:"Y",ataxlimb:"L",vertigo:"Y",nystag:"Y"}},
- {n:"右 中脳腹側パターン",s:{cn3:"R",hemi_eq:"L",face_umn:"L"}},
- {n:"右頭頂葉パターン",s:{neglect:"L",anosog:"Y",s_cort:"L",quad_low:"L",hemi_fa:"L"}},
- {n:"左 延髄内側パターン",s:{tongue:"L",hemi_nf:"R",s_dors:"R",babinski:"R"}},
- {n:"脊髄半側パターン",s:{hemi_nf:"R",s_dors:"R",s_spth:"L",babinski:"R",s_level:"Y"}},
+ {n:"右 中脳腹側パターン",s:{cn3:"R",face_umn:"L"},m:{L:{f:1,a:1,l:1}}},
+ {n:"右頭頂葉パターン",s:{neglect:"L",anosog:"Y",s_cort:"L",quad_low:"L"},m:{L:{f:1,a:1}}},
+ {n:"左 延髄内側パターン",s:{tongue:"L",s_dors:"R",babinski:"R"},m:{R:{a:1,l:1}}},
+ {n:"脊髄半側パターン",s:{s_dors:"R",s_spth:"L",babinski:"R",s_level:"Y"},m:{R:{a:1,l:1}}},
  {n:"右 下垂足（腓骨神経か L5 か）",s:{footdrop:"R"}}
 ];
 
 /* ---------------- 状態・保存 ---------------- */
 var KEY="lesionNavi.v1";
-var st={f:{},dom:"L",cases:[]};
-function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.f=j.f||{};st.dom=j.dom||"L";st.cases=j.cases||[];}}catch(e){}}
+function m0(){return {R:{f:0,a:0,l:0},L:{f:0,a:0,l:0},emph:"eq"};}
+var st={f:{},m:m0(),neg:{},dom:"L",cases:[],open:{cn:1,mot:1}};
+var E={};
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.f=j.f||{};st.m=j.m||m0();st.neg=j.neg||{};st.dom=j.dom||"L";st.cases=j.cases||[];if(j.open)st.open=j.open;
+  // 旧版で直接入力された運動パターンは格子へ移す
+  ["hemi_fa","hemi_leg","hemi_eq","hemi_nf","mono_arm","mono_leg","para","tetra"].forEach(function(k){if(st.f[k])delete st.f[k];});}}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
 
 var $=function(id){return document.getElementById(id);};
@@ -622,40 +651,91 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp
 var SIDE={R:"右",L:"左",B:"両側"};
 function flab(id,v){var f=FM[id];if(!f)return id;return (f.s&&v&&SIDE[v]?SIDE[v]+" ":"")+f.t;}
 
+/* ---------------- 運動格子 → 麻痺パターン ---------------- */
+function deriveMotor(){
+  var d={}, m=st.m, e=m.emph, R=m.R, L=m.L;
+  function add(k,S){d[k]=(d[k]&&d[k]!==S)?"B":S;}
+  if(R.a&&R.l&&L.a&&L.l) d.tetra="Y";
+  else if(R.l&&L.l&&!R.a&&!L.a) d.para="Y";
+  else ["R","L"].forEach(function(S){var x=m[S];
+    if(x.a&&x.l){ if(x.f) add(e==="arm"?"hemi_fa":e==="leg"?"hemi_leg":"hemi_eq",S); else add(e==="leg"?"hemi_leg":"hemi_nf",S); }
+    else if(x.a&&x.f) add("hemi_fa",S);
+    else if(x.a) add("mono_arm",S);
+    else if(x.l) add("mono_leg",S);
+  });
+  ["R","L"].forEach(function(S){var x=m[S];
+    if(x.f&&(x.a||x.l)&&!st.f.face_umn&&!st.f.face_lmn) add("face_umn",S);
+  });
+  return d;
+}
+function motorText(d){
+  var ks=Object.keys(d).filter(function(k){return k!=="face_umn";});
+  if(!ks.length) return "";
+  return ks.map(function(k){return flab(k,d[k]);}).join("、");
+}
+
 /* ---------------- 入力UI ---------------- */
+function rowHTML(f){
+  var h='<div class="frow" data-f="'+f.id+'" id="row-'+f.id+'" data-t="'+esc(f.t+(f.e||"")+(f.sub||""))+'"><div class="lb">'+esc(f.t)+(f.e?'<em>'+esc(f.e)+'</em>':'')+'</div>';
+  if(f.s) h+='<div class="sides" role="group" aria-label="'+esc(f.t)+'"><button type="button" data-v="R" aria-pressed="false">右</button><button type="button" data-v="L" aria-pressed="false">左</button><button type="button" data-v="B" aria-pressed="false">両</button></div>';
+  else h+='<div class="sides one" role="group" aria-label="'+esc(f.t)+'"><button type="button" data-v="Y" aria-pressed="false">あり</button></div>';
+  return h+'</div>';
+}
+function motorHTML(){
+  var h='<div class="mgrid" id="mgrid"><div class="subh">麻痺の部位（筋力低下のある部位を押す）</div><div class="mg-in"><table><tr><th></th><th>顔</th><th>上肢</th><th>下肢</th></tr>';
+  [["R","右"],["L","左"]].forEach(function(s){h+='<tr><th>'+s[1]+'</th>';["f","a","l"].forEach(function(p){h+='<td><button type="button" class="mb" data-ms="'+s[0]+'" data-mp="'+p+'" aria-pressed="false">'+(p==="f"?"顔":p==="a"?"上肢":"下肢")+'</button></td>';});h+='</tr>';});
+  h+='</table><div class="seg3" role="group" aria-label="片麻痺の優位"><button type="button" data-em="arm">上肢優位</button><button type="button" data-em="eq">ほぼ均等</button><button type="button" data-em="leg">下肢優位</button></div>';
+  h+='<p class="mres" id="mres"></p></div></div>';
+  return h;
+}
 function buildInput(){
   var h="";
-  G.forEach(function(g,i){
-    h+='<details class="grp" data-g="'+g[0]+'"'+(i<5?" open":"")+'><summary>'+g[1]+'<span class="cnt" id="cnt-'+g[0]+'"></span></summary>';
-    F.filter(function(f){return f.g===g[0];}).forEach(function(f){
-      h+='<div class="frow" data-f="'+f.id+'" data-t="'+esc(f.t+(f.e||""))+'"><div class="lb">'+esc(f.t)+(f.e?'<em>'+esc(f.e)+'</em>':'')+'</div>';
-      if(f.s) h+='<div class="sides" role="group" aria-label="'+esc(f.t)+'"><button type="button" data-v="R" aria-pressed="false">右</button><button type="button" data-v="L" aria-pressed="false">左</button><button type="button" data-v="B" aria-pressed="false">両</button></div>';
-      else h+='<div class="sides one" role="group" aria-label="'+esc(f.t)+'"><button type="button" data-v="Y" aria-pressed="false">あり</button></div>';
-      h+='</div>';
+  G.forEach(function(g){
+    h+='<details class="grp" data-g="'+g[0]+'"'+(st.open[g[0]]?" open":"")+'><summary>'+g[1]+'<span class="cnt" id="cnt-'+g[0]+'"></span></summary>';
+    if(g[0]==="mot") h+=motorHTML();
+    var cur=null, open=false;
+    F.filter(function(f){return f.g===g[0]&&!f.hid;}).forEach(function(f){
+      var sb=f.sub||"";
+      if(sb!==cur){ if(open) h+='</div>'; h+='<div class="subg">'+(sb?'<div class="subh">'+esc(sb)+'</div>':''); cur=sb; open=true; }
+      h+=rowHTML(f);
     });
+    if(open) h+='</div>';
     h+='</details>';
   });
   $("groups").innerHTML=h;
   $("groups").addEventListener("click",function(e){
+    var mb=e.target.closest("button[data-ms]");
+    if(mb){var S=mb.getAttribute("data-ms"),p=mb.getAttribute("data-mp");st.m[S][p]=st.m[S][p]?0:1;save();syncInput();compute();return;}
+    var em=e.target.closest("button[data-em]");
+    if(em){st.m.emph=em.getAttribute("data-em");save();syncInput();compute();return;}
     var b=e.target.closest("button[data-v]");if(!b)return;
     var row=b.closest(".frow");var id=row.getAttribute("data-f");var v=b.getAttribute("data-v");
-    if(st.f[id]===v) delete st.f[id]; else st.f[id]=v;
+    if(st.f[id]===v) delete st.f[id]; else {st.f[id]=v; delete st.neg[id];}
     save();syncInput();compute();
   });
+  document.querySelectorAll("details.grp").forEach(function(d){d.addEventListener("toggle",function(){st.open[d.getAttribute("data-g")]=d.open?1:0;save();});});
   EX.forEach(function(x,i){var o=document.createElement("option");o.value=i;o.textContent=x.n;$("exSel").appendChild(o);});
 }
 function syncInput(){
+  var d=deriveMotor();
+  E=Object.assign({},st.f,d);
   document.querySelectorAll(".frow").forEach(function(r){
     var id=r.getAttribute("data-f");var v=st.f[id];
     r.classList.toggle("on",!!v);
     r.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-v")===v?"true":"false");});
   });
+  document.querySelectorAll("button[data-ms]").forEach(function(b){b.setAttribute("aria-pressed",st.m[b.getAttribute("data-ms")][b.getAttribute("data-mp")]?"true":"false");});
+  document.querySelectorAll("button[data-em]").forEach(function(b){b.setAttribute("aria-pressed",st.m.emph===b.getAttribute("data-em")?"true":"false");});
+  var mt=motorText(d), hint="";
+  ["R","L"].forEach(function(S){var x=st.m[S];if(x.f&&!x.a&&!x.l&&!st.f.face_umn&&!st.f.face_lmn)hint="顔面だけの麻痺は、脳神経 VII で中枢性か末梢性かを選んでください。";});
+  if(d.face_umn) mt+=(mt?"、":"")+flab("face_umn",d.face_umn)+"（VIIで末梢性を選ぶと置き換わる）";
+  $("mres").innerHTML=mt?("→ "+esc(mt)):(hint?esc(hint):"片側の上肢＋下肢を押すと片麻痺、両下肢で対麻痺、四肢で四肢麻痺として扱います。");
   G.forEach(function(g){
-    var n=F.filter(function(f){return f.g===g[0]&&st.f[f.id];}).length;
+    var n=Object.keys(E).filter(function(k){return FM[k]&&FM[k].g===g[0];}).length;
     var el=$("cnt-"+g[0]);el.textContent=n;el.classList.toggle("on",n>0);
   });
   $("domSel").value=st.dom;
-  $("sumN").textContent=Object.keys(st.f).length;
+  $("sumN").textContent=Object.keys(E).length;
 }
 
 /* ---------------- 判定ロジック ---------------- */
@@ -682,17 +762,20 @@ function expSide(rel,S){
   return null;
 }
 function evalC(c,S){
-  var P=st.f, ids=Object.keys(P);
-  var used={}, matched=[], conflict=[], missing=[], against=[];
+  var P=E, ids=Object.keys(P);
+  var used={}, matched=[], conflict=[], missing=[], against=[], negs=[];
   var coreTot=0, coreGot=0, pen=0, expl={};
   c.p.forEach(function(it){
     var alts=it[0].split("|"), rel=it[1], w=it[2], core=it[3];
     if(core) coreTot+=w;
     alts.forEach(function(a){used[a]=1;});
     var hit=-1;for(var i=0;i<alts.length;i++){if(P[alts[i]]){hit=i;break;}}
-    if(hit<0){ if(core) missing.push({id:alts[0],side:expSide(rel,S)}); return; }
+    if(hit<0){
+      if(core){ if(st.neg[alts[0]]){ negs.push(alts[0]); pen+=4*w; } else missing.push({id:alts[0],side:expSide(rel,S)}); }
+      return;
+    }
     var id=alts[hit], q=relQ(rel,id,P[id],S);
-    if(q<0){ conflict.push({id:id,v:P[id],exp:expSide(rel,S)}); pen+=14; if(core) missing.push({id:id,side:expSide(rel,S)}); return; }
+    if(q<0){ conflict.push({id:id,v:P[id],exp:expSide(rel,S)}); pen+=14; return; }
     q*=(hit===0?1:0.7);
     expl[id]=Math.max(expl[id]||0,q);
     if(core) coreGot+=w*q;
@@ -705,28 +788,65 @@ function evalC(c,S){
   ids.forEach(function(id){var pw=FM[id]?(FM[id].pw||1):1; tot+=pw; if(expl[id]) ex+=pw*expl[id]; else if(against.indexOf(id)<0 && !conflict.some(function(x){return x.id===id;})) unexpl.push(id);});
   var cov=tot?ex/tot:0, fit=coreTot?Math.min(1,coreGot/coreTot):0;
   var score=100*cov*(0.5+0.5*fit)-pen;
-  return {c:c,S:S,score:Math.max(0,Math.round(score)),cov:cov,fit:fit,coreGot:coreGot,matched:matched,conflict:conflict,missing:missing,against:against,unexpl:unexpl};
+  return {c:c,S:S,score:Math.max(0,Math.round(score)),cov:cov,fit:fit,coreGot:coreGot,matched:matched,conflict:conflict,missing:missing,against:against,unexpl:unexpl,negs:negs};
 }
 function compute(){
   var res=[];
-  if(Object.keys(st.f).length){
+  if(Object.keys(E).length){
     C.forEach(function(c){
       if(c.sd){
         var r=evalC(c,"R"), l=evalC(c,"L");
-        if(Math.abs(r.score-l.score)<1 && !r.conflict.length && !l.conflict.length && r.score===l.score){ r.S=null; r.sideUnk=true; res.push(r); }
+        if(!r.conflict.length && !l.conflict.length && r.score===l.score){ r.S=null; r.sideUnk=true; res.push(r); }
         else res.push(r.score>=l.score?r:l);
       } else res.push(evalC(c,null));
     });
     res=res.filter(function(r){return r.coreGot>0&&r.score>=8;}).sort(function(a,b){return b.score-a.score||b.fit-a.fit;});
   }
   renderRes(res);
+  renderLive(res);
+}
+/* 次に確認したい所見（上位候補の不足中核所見） */
+function nextChecks(res){
+  var chk={}, order=[];
+  res.slice(0,5).forEach(function(r){r.missing.forEach(function(m){
+    if(st.neg[m.id]) return;
+    var k=m.id+"|"+(m.side||"");
+    if(!chk[k]){chk[k]={m:m,c:[]};order.push(k);}
+    chk[k].c.push(candName(r));
+  });});
+  return order.map(function(k){return chk[k];});
+}
+function chkHTML(list,max){
+  return list.slice(0,max).map(function(x){
+    var f=FM[x.m.id];
+    return '<div class="sug"><div>'+esc(flab(x.m.id,x.m.side))+'<small>→ '+esc(x.c.slice(0,3).join("／"))+'</small></div>'
+      +'<button type="button" class="btn sm yes" data-yes="'+x.m.id+'" data-side="'+(x.m.side||"")+'">あり</button>'
+      +'<button type="button" class="btn sm" data-no="'+x.m.id+'">なし</button></div>';
+  }).join("");
+}
+function negHTML(){
+  var ks=Object.keys(st.neg);if(!ks.length)return "";
+  return '<div class="negs">なしと確認：'+ks.map(function(k){return '<button type="button" class="negchip" data-unneg="'+k+'">'+esc(FM[k]?FM[k].t:k)+' ×</button>';}).join("")+'</div>';
+}
+function renderLive(res){
+  var h="";
+  if(!Object.keys(E).length){ $("live").innerHTML='<p class="hint" style="margin:0">所見を入れると、ここに上位の候補と「次に確認したい所見」が出ます。まず麻痺の部位や目立つ脳神経所見から入れてください。</p>'+negHTML(); return; }
+  if(!res.length){ $("live").innerHTML='<p class="hint" style="margin:0">当てはまる候補がありません。左右や組み合わせを見直してください。</p>'+negHTML(); return; }
+  h+='<div class="toplist">';
+  res.slice(0,3).forEach(function(r,i){h+='<div class="tl"><span class="rank">'+(i+1)+'</span><span class="tn">'+esc(candName(r))+'</span><b>'+r.score+'</b></div>';});
+  h+='</div>';
+  var nc=nextChecks(res);
+  if(nc.length) h+='<div class="subh2">次に確認したい所見</div>'+chkHTML(nc,5);
+  h+=negHTML();
+  h+='<button type="button" class="btn primary" style="width:100%;margin-top:8px" data-go="1">候補の詳細を見る →</button>';
+  $("live").innerHTML=h;
 }
 function candName(r){
   var side=r.c.sd?(r.S?SIDE[r.S]+" ":(r.sideUnk?"（左右未定）":"")):"";
   return side+r.c.n;
 }
 function renderRes(res){
-  var n=Object.keys(st.f).length;
+  var n=Object.keys(E).length;
   $("sumTop").textContent=res.length?candName(res[0]):"—";
   if(!n){$("resWrap").innerHTML='<div class="empty">「所見」タブで所見を入力すると、ここに病巣の候補が出ます。</div>';return;}
   if(!res.length){$("resWrap").innerHTML='<div class="empty">登録された病巣パターンに当てはまる候補がありません。所見の左右や組み合わせを見直してください。</div>';return;}
@@ -742,14 +862,8 @@ function renderRes(res){
     h+='<div class="lvbar"><span>'+LV[l]+'</span><span class="tr"><span class="fl" style="width:'+Math.min(100,lvBest[l])+'%;display:block"></span></span><span class="n">'+lvBest[l]+'</span></div>';
   });
   h+='</div>';
-  // 次に確認
-  var chk={};res.slice(0,5).forEach(function(r){r.missing.forEach(function(m){var k=m.id+(m.side||"");if(!chk[k])chk[k]={m:m,c:[]};chk[k].c.push(candName(r));});});
-  var ck=Object.keys(chk);
-  if(ck.length){
-    h+='<div class="card"><h2>次に確認したい所見</h2><ul class="fl-list">';
-    ck.slice(0,8).forEach(function(k){var x=chk[k];h+='<li class="q">'+esc(flab(x.m.id,x.m.side))+'<br><span style="font-size:12px;color:var(--muted)">→ '+esc(x.c.join("／"))+'</span></li>';});
-    h+='</ul></div>';
-  }
+  var nc=nextChecks(res);
+  if(nc.length) h+='<div class="card"><h2>次に確認したい所見</h2>'+chkHTML(nc,8)+negHTML()+'</div>';
   res.slice(0,12).forEach(function(r,i){
     var c=r.c;
     h+='<div class="cand'+(i===0?" top1":"")+'"><div class="chead"><span class="rank">'+(i+1)+'</span><div class="ctitle"><h3>'+esc(candName(r))+'</h3>'+(c.syn?'<div class="sy">'+esc(c.syn)+'</div>':'')+'</div><div class="sc">'+r.score+'<small>説明'+Math.round(r.cov*100)+'%・一致'+Math.round(r.fit*100)+'%</small></div></div>';
@@ -757,10 +871,11 @@ function renderRes(res){
     h+='<ul class="fl-list">';
     r.matched.forEach(function(m){h+='<li class="m">'+esc(flab(m.id,m.v))+(m.q<1?' <span style="font-size:12px;color:var(--muted)">（部分一致）</span>':'')+'</li>';});
     r.conflict.forEach(function(x){h+='<li class="x">'+esc(flab(x.id,x.v))+' — この病巣側なら'+(x.exp?SIDE[x.exp]:"")+'に出るはず</li>';});
-    r.against.forEach(function(a){h+='<li class="a">'+esc(flab(a,st.f[a]))+' — この部位では通常みられない</li>';});
-    r.unexpl.forEach(function(u){h+='<li class="u">'+esc(flab(u,st.f[u]))+' — この病巣では説明できない</li>';});
+    r.against.forEach(function(a){h+='<li class="a">'+esc(flab(a,E[a]))+' — この部位では通常みられない</li>';});
+    r.unexpl.forEach(function(u){h+='<li class="u">'+esc(flab(u,E[u]))+' — この病巣では説明できない</li>';});
     h+='</ul>';
     var ms=r.missing.filter(function(m){return !r.conflict.some(function(x){return x.id===m.id;});});
+    if(r.negs.length){h+='<div class="sub">なしと確認された中核所見</div><ul class="fl-list">';r.negs.forEach(function(k){h+='<li class="x">'+esc(FM[k].t)+'</li>';});h+='</ul>';}
     if(ms.length){h+='<div class="sub">そろっていない中核所見</div><ul class="fl-list">';ms.forEach(function(m){h+='<li class="q">'+esc(flab(m.id,m.side))+'</li>';});h+='</ul>';}
     if(c.note) h+='<div class="note">'+esc(c.note)+'</div>';
     h+=srcLine(c.ref);
@@ -806,7 +921,7 @@ function buildRefs(){
 /* ---------------- ケース保存 ---------------- */
 function renderCases(){
   if(!st.cases.length){$("caseList").innerHTML='<p class="hint">保存したケースはありません。</p>';return;}
-  $("caseList").innerHTML=st.cases.map(function(c,i){var n=Object.keys(c.f).length;var d=new Date(c.t);
+  $("caseList").innerHTML=st.cases.map(function(c,i){var n=Object.keys(c.f).length+(c.m?["R","L"].reduce(function(a,S){return a+((c.m[S].a||c.m[S].l||c.m[S].f)?1:0);},0):0);var d=new Date(c.t);
     return '<div class="case"><div>'+esc(c.n)+'<small>'+d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+'・所見'+n+'件</small></div><button class="btn sm" data-ld="'+i+'" type="button">読込</button><button class="btn sm" data-del="'+i+'" type="button">削除</button></div>';}).join("");
 }
 
@@ -822,26 +937,39 @@ load();buildInput();buildDict();buildRefs();syncInput();compute();renderCases();
 document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){show(b.getAttribute("data-v"));});});
 $("btnGo").addEventListener("click",function(){show("v-result");});
 $("btnClear").addEventListener("click",function(){
-  if(!Object.keys(st.f).length)return;
-  if(this.getAttribute("data-c")==="1"){st.f={};save();syncInput();compute();this.textContent="クリア";this.removeAttribute("data-c");}
+  if(!Object.keys(E).length&&!Object.keys(st.neg).length)return;
+  if(this.getAttribute("data-c")==="1"){st.f={};st.m=m0();st.neg={};save();syncInput();compute();this.textContent="クリア";this.removeAttribute("data-c");}
   else{this.textContent="もう一度押すと消去";this.setAttribute("data-c","1");var b=this;setTimeout(function(){b.textContent="クリア";b.removeAttribute("data-c");},3000);}
 });
-$("exSel").addEventListener("change",function(){var i=this.value;if(i==="")return;st.f=JSON.parse(JSON.stringify(EX[i].s));save();syncInput();compute();this.value="";show("v-result");});
+$("exSel").addEventListener("change",function(){var i=this.value;if(i==="")return;st.f=JSON.parse(JSON.stringify(EX[i].s));st.m=m0();st.neg={};if(EX[i].m){["R","L"].forEach(function(S){if(EX[i].m[S])Object.assign(st.m[S],EX[i].m[S]);});}save();syncInput();compute();this.value="";show("v-result");});
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-yes],button[data-no],button[data-unneg],button[data-go]");if(!b)return;
+  if(b.hasAttribute("data-go")){show("v-result");return;}
+  if(b.hasAttribute("data-unneg")){delete st.neg[b.getAttribute("data-unneg")];save();compute();return;}
+  if(b.hasAttribute("data-no")){st.neg[b.getAttribute("data-no")]=1;save();compute();return;}
+  var id=b.getAttribute("data-yes"), side=b.getAttribute("data-side"), f=FM[id];
+  if(f.hid){ show("v-input"); var d=document.querySelector('details.grp[data-g="mot"]'); d.open=true; jump($("mgrid")); return; }
+  if(f.s && !side){ show("v-input"); var g=document.querySelector('details.grp[data-g="'+f.g+'"]'); g.open=true; jump($("row-"+id)); return; }
+  st.f[id]=f.s?side:"Y"; delete st.neg[id]; save(); syncInput(); compute();
+});
+function jump(el){ if(!el)return; setTimeout(function(){el.scrollIntoView({block:"center"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");},50); }
 $("domSel").addEventListener("change",function(){st.dom=this.value;save();compute();});
 $("q").addEventListener("input",function(){
   var q=this.value.trim().toLowerCase();
   document.querySelectorAll(".frow").forEach(function(r){r.style.display=(!q||r.getAttribute("data-t").toLowerCase().indexOf(q)>=0)?"":"none";});
-  document.querySelectorAll("details.grp").forEach(function(d){var any=Array.prototype.some.call(d.querySelectorAll(".frow"),function(r){return r.style.display!=="none";});d.style.display=any?"":"none";if(q&&any)d.open=true;});
+  document.querySelectorAll(".subg").forEach(function(g){var any=Array.prototype.some.call(g.querySelectorAll(".frow"),function(r){return r.style.display!=="none";});g.style.display=any?"":"none";});
+  var mg=$("mgrid"); if(mg) mg.style.display=q?"none":"";
+  document.querySelectorAll("details.grp").forEach(function(d){var any=Array.prototype.some.call(d.querySelectorAll(".frow"),function(r){return r.style.display!=="none";});d.style.display=(any||!q)?"":"none";if(q&&any)d.open=true;});
 });
 $("btnSave").addEventListener("click",function(){
-  if(!Object.keys(st.f).length)return;
+  if(!Object.keys(E).length)return;
   var n=$("caseName").value.trim()||("ケース "+(st.cases.length+1));
-  st.cases.unshift({n:n,f:JSON.parse(JSON.stringify(st.f)),t:Date.now()});st.cases=st.cases.slice(0,30);
+  st.cases.unshift({n:n,f:JSON.parse(JSON.stringify(st.f)),m:JSON.parse(JSON.stringify(st.m)),neg:JSON.parse(JSON.stringify(st.neg)),t:Date.now()});st.cases=st.cases.slice(0,30);
   $("caseName").value="";save();renderCases();
 });
 $("caseList").addEventListener("click",function(e){
   var b=e.target.closest("button");if(!b)return;
-  if(b.hasAttribute("data-ld")){st.f=JSON.parse(JSON.stringify(st.cases[+b.getAttribute("data-ld")].f));save();syncInput();compute();show("v-result");}
+  if(b.hasAttribute("data-ld")){var cs=st.cases[+b.getAttribute("data-ld")];st.f=JSON.parse(JSON.stringify(cs.f));st.m=cs.m?JSON.parse(JSON.stringify(cs.m)):m0();st.neg=cs.neg?JSON.parse(JSON.stringify(cs.neg)):{};save();syncInput();compute();show("v-result");}
   if(b.hasAttribute("data-del")){st.cases.splice(+b.getAttribute("data-del"),1);save();renderCases();}
 });
 })();
@@ -853,7 +981,7 @@ $("caseList").addEventListener("click",function(e){
   var ok=(location.protocol==="https:"||h==="localhost"||h==="127.0.0.1")&&!/(^|\.)claude\.ai$/.test(h)&&!/claudeusercontent|claude\.site/.test(h);
   if(!ok||!("serviceWorker" in navigator))return;
   window.addEventListener("load",function(){
-    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(r){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(x){if(x.scope===new URL("./",location.href).href)x.unregister();});});return r;}).then(function(reg){
+    navigator.serviceWorker.register("sw.js").then(function(reg){
       reg.addEventListener("updatefound",function(){var w=reg.installing;if(!w)return;
         w.addEventListener("statechange",function(){if(w.state==="installed"&&navigator.serviceWorker.controller){var m=document.getElementById("swMsg");m.style.display="block";setTimeout(function(){m.style.display="none";},6000);}});});
     }).catch(function(){});
