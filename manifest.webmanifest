@@ -1,0 +1,128 @@
+{
+  "id": "./",
+  "name": "病棟アプリ",
+  "short_name": "病棟アプリ",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7fb",
+  "theme_color": "#0b5cad",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "糖尿病治療ナビ（病棟用）",
+      "short_name": "糖尿病ナビ",
+      "url": "dm/",
+      "icons": [
+        {
+          "src": "dm/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "高血圧治療ナビ（病棟用）",
+      "short_name": "高血圧ナビ",
+      "url": "htn/",
+      "icons": [
+        {
+          "src": "htn/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "脂質異常症治療ナビ",
+      "short_name": "脂質ナビ",
+      "url": "lipid/",
+      "icons": [
+        {
+          "src": "lipid/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "神経病巣局在ナビ",
+      "short_name": "病巣局在ナビ",
+      "url": "loc/",
+      "icons": [
+        {
+          "src": "loc/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "NIHSS評価",
+      "short_name": "NIHSS",
+      "url": "nih/",
+      "icons": [
+        {
+          "src": "nih/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "脳神経クリニック紹介先検索",
+      "short_name": "神経紹介先",
+      "url": "referral/",
+      "icons": [
+        {
+          "src": "referral/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "MDS-UPDRS 評価ツール",
+      "short_name": "UPDRS評価",
+      "url": "updrs/",
+      "icons": [
+        {
+          "src": "updrs/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "認知症外来ナビ",
+      "short_name": "認知症ナビ",
+      "url": "dementia/",
+      "icons": [
+        {
+          "src": "dementia/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
