@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0b6e79">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -507,7 +506,7 @@ renderRecords();
     const ok=(location.protocol==="https:"||h==="localhost"||h==="127.0.0.1")&&!/claude\.ai$|claudeusercontent|claude\.site/.test(h)&&"serviceWorker" in navigator;
     if(!ok) return;
     window.addEventListener("load",()=>{
-      navigator.serviceWorker.register("sw.js").then(reg=>{
+      navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(r){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(x){if(x.scope===new URL("./",location.href).href)x.unregister();});});return r;}).then(reg=>{
         reg.addEventListener("updatefound",()=>{
           const nw=reg.installing; if(!nw) return;
           nw.addEventListener("statechange",()=>{
