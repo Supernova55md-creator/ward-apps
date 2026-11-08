@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#2457c5">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UPDRS評価">
+<title>MDS-UPDRS 評価ツール（Part I–III）</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1d2330;--sub:#5b6475;--line:#e2e5ea;--acc:#2457c5;--acc-weak:#e8eefb;--ur:#8a5a00;--ur-weak:#fff3dc;--ok:#1f7a4d;--warn:#b3261e;
+--s0:#eef6f0;--s1:#e8f1fb;--s2:#fff4d9;--s3:#ffe6d5;--s4:#fbdcdc;--b0:#6fb58c;--b1:#6f9fd8;--b2:#d6a93a;--b3:#de8a4f;--b4:#d0605c}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
+header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 8px calc(14px + env(safe-area-inset-left));flex-wrap:wrap}
+.top h1{font-size:15px;margin:0;font-weight:700;white-space:nowrap}
+.sums{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.sum{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:13px;white-space:nowrap}
+.sum b{font-size:16px;font-variant-numeric:tabular-nums}
+.sum.total{background:var(--acc-weak);border-color:#c9d6f3}
+nav{display:flex;overflow-x:auto;padding:0 calc(8px + env(safe-area-inset-right)) 0 calc(8px + env(safe-area-inset-left))}
+nav button{flex:0 0 auto;border:0;background:none;padding:9px 12px;font-size:14px;color:var(--sub);border-bottom:3px solid transparent;cursor:pointer;font-family:inherit}
+nav button.on{color:var(--acc);border-bottom-color:var(--acc);font-weight:700}
+nav .prog{font-size:11px;margin-left:4px;color:var(--sub);font-weight:400}
+nav .prog.done{color:var(--ok)}
+main{max-width:860px;margin:0 auto;padding:12px calc(12px + env(safe-area-inset-right)) calc(90px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 8px}
+.card h3{font-size:13px;margin:12px 0 6px;color:var(--sub);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+label.f{display:block;font-size:12px;color:var(--sub);margin-bottom:3px}
+input[type=text],input[type=date],input[type=time]{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;font-size:15px;font-family:inherit;background:#fff}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;border-right:1px solid var(--line);background:#fff;padding:7px 12px;font-size:14px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--acc);color:#fff}
+.sec-title{font-size:13px;font-weight:700;color:var(--sub);margin:16px 4px 6px}
+.item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;scroll-margin-top:110px}
+.item.cur{box-shadow:0 0 0 2px var(--acc)}
+.irow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ino{font-variant-numeric:tabular-nums;color:var(--sub);font-size:13px;min-width:36px}
+.iname{font-weight:700;flex:1 1 180px}
+.subrow{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.subname{font-size:13px;color:var(--sub);min-width:84px;padding-left:44px}
+.subrow.next .subname{color:var(--acc);font-weight:700}
+.scores{display:inline-flex;gap:4px;margin-left:auto}
+.scores button{width:40px;height:38px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink);font-variant-numeric:tabular-nums}
+.scores button.ur{width:44px;font-size:12px;color:var(--ur)}
+.scores button.on[data-v="0"]{background:var(--s0);border-color:var(--b0)}
+.scores button.on[data-v="1"]{background:var(--s1);border-color:var(--b1)}
+.scores button.on[data-v="2"]{background:var(--s2);border-color:var(--b2)}
+.scores button.on[data-v="3"]{background:var(--s3);border-color:var(--b3)}
+.scores button.on[data-v="4"]{background:var(--s4);border-color:var(--b4)}
+.scores button.on[data-v="UR"]{background:var(--ur-weak);border-color:#c99a3d}
+details.instr{margin-top:6px;font-size:13px;color:var(--sub)}
+details.instr summary{cursor:pointer;font-size:12.5px;color:var(--acc);list-style:none}
+details.instr summary::before{content:"▸ ";}
+details.instr[open] summary::before{content:"▾ ";}
+details.instr .txt{white-space:pre-wrap;background:#fafbfd;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:4px;color:var(--ink);line-height:1.65}
+.anchors{margin-top:6px;display:flex;flex-direction:column;gap:4px}
+.glabel{font-size:12px;color:var(--sub);font-weight:700;margin-top:4px}
+.anc{display:flex;gap:8px;align-items:flex-start;text-align:left;width:100%;border:1px solid var(--line);background:#fcfcfd;border-radius:8px;padding:6px 8px;font-size:13.5px;line-height:1.55;cursor:pointer;font-family:inherit;color:var(--ink)}
+.anc:hover{border-color:#b9c6e4}
+.anc .sc{flex:0 0 auto;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:1px solid var(--line);background:#fff}
+.anc .lb{flex:0 0 auto;font-weight:700;min-width:4.2em;font-size:12.5px;padding-top:2px;color:var(--sub)}
+.anc .tx{flex:1;white-space:pre-wrap}
+.anc.sel[data-v="0"]{background:var(--s0);border-color:var(--b0)}
+.anc.sel[data-v="1"]{background:var(--s1);border-color:var(--b1)}
+.anc.sel[data-v="2"]{background:var(--s2);border-color:var(--b2)}
+.anc.sel[data-v="3"]{background:var(--s3);border-color:var(--b3)}
+.anc.sel[data-v="4"],.anc.sel[data-v="5"]{background:var(--s4);border-color:var(--b4)}
+.anc.static{cursor:default}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 12px;font-size:14px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.btn.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn.danger{color:var(--warn)}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--sub);cursor:pointer}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.kpi{background:var(--bg);border-radius:10px;padding:10px}
+.kpi .k{font-size:12px;color:var(--sub)}
+.kpi .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:13px;color:var(--sub);font-weight:400}
+.kpi .n{font-size:12px;color:var(--sub)}
+.warnbox{background:var(--ur-weak);border:1px solid #ecd29b;border-radius:10px;padding:8px 10px;font-size:13px;margin-top:8px}
+textarea{width:100%;min-height:220px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fbfcfd}
+table.h{width:100%;border-collapse:collapse;font-size:13px}
+table.h th,table.h td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--sub)}
+.note a{color:var(--acc)}
+.hidden{display:none!important}
+body.nocrit .anchors:not(.hy),body.nocrit details.instr{display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:50}
+.modal .box{background:#fff;border-radius:12px;padding:16px;max-width:340px;width:90%}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1d2330;color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.fab{position:fixed;right:calc(14px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));z-index:20}
+.ok{color:var(--ok);font-weight:700}
+#critJson{min-height:90px}
+@media (max-width:560px){
+  .subname{padding-left:0;min-width:70px}
+  .scores{margin-left:0;width:100%;justify-content:space-between}
+  .scores button{flex:1;width:auto}
+  .scores button.ur{flex:1.1;width:auto}
+  .top h1{font-size:14px}
+  .anc .lb{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>MDS-UPDRS</h1>
+    <div class="sums">
+      <span class="sum">I <b id="h1">0</b></span>
+      <span class="sum">II <b id="h2">0</b></span>
+      <span class="sum">III <b id="h3">0</b></span>
+      <span class="sum total">計 <b id="ht">0</b></span>
+    </div>
+  </div>
+  <nav id="nav"></nav>
+</header>
+
+<main>
+  <section data-tab="info">
+    <div class="card">
+      <h2>評価情報</h2>
+      <div class="grid">
+        <div><label class="f">評価日</label><input type="date" id="f_date"></div>
+        <div><label class="f">メモ（個人情報は入力しない）</label><input type="text" id="f_pid"></div>
+        <div><label class="f">評価者</label><input type="text" id="f_rater"></div>
+      </div>
+      <div class="tools" style="margin-top:12px">
+        <label class="toggle"><input type="checkbox" id="showCrit"> 判定基準を表示する</label>
+        <label class="toggle"><input type="checkbox" class="autoT"> 入力後に次の項目へ自動スクロール</label>
+      </div>
+      <p class="note" id="critHint">選択肢の文をタップすると、その点数が入力されます（左右・部位のある項目は、未入力の部位から順に入ります）。入力内容はこの端末のブラウザ内にのみ保存されます。</p>
+    </div>
+    <div class="card">
+      <h2>判定基準（この端末に保存）</h2>
+      <p class="note" id="critStatus"></p>
+      <div class="tools">
+        <label class="btn" style="display:inline-block">JSONファイルを選んで読み込む<input type="file" id="critFile" accept=".json,application/json,text/plain" style="display:none"></label>
+        <button class="btn" id="critPasteBtn">貼り付けて読み込む</button>
+        <button class="btn danger" id="critClear">この端末から消去</button>
+      </div>
+      <div id="critPasteBox" class="hidden"><textarea id="critJson" placeholder="判定基準JSONの中身を貼り付け"></textarea><div class="tools"><button class="btn pri" id="critPasteGo">読み込む</button></div></div>
+      <p class="note">判定基準は、お手持ちのMDS-UPDRS日本語版から作った JSON をこの端末に読み込んだときだけ表示されます。本文はこのアプリのファイルには含まれず、外部にも送信されません。</p>
+    </div>
+    <div class="card">
+      <h2>Part I・II の情報源</h2>
+      <h3>Part IA の主な情報源</h3>
+      <div class="seg" data-field="srcIA"><button data-v="患者">患者</button><button data-v="介護者">介護者</button><button data-v="患者と介護者">患者と介護者同程度</button></div>
+      <h3>Part IB・II の回答者</h3>
+      <div class="seg" data-field="srcIB"><button data-v="患者">患者</button><button data-v="介護者">介護者</button><button data-v="患者と介護者">患者と介護者同程度</button></div>
+    </div>
+    <div class="card">
+      <h2>Part III 前の確認</h2>
+      <div class="grid">
+        <div><label class="f">3a 薬物療法</label>
+          <div class="seg" data-field="onMed"><button data-v="はい">はい</button><button data-v="いいえ">いいえ</button></div></div>
+        <div><label class="f">3b 臨床状態</label>
+          <div class="seg" data-field="state"><button data-v="ON">ON</button><button data-v="OFF">OFF</button></div></div>
+        <div><label class="f">3c L-ドーパ内服</label>
+          <div class="seg" data-field="ldopa"><button data-v="はい">はい</button><button data-v="いいえ">いいえ</button></div></div>
+        <div><label class="f">最終L-ドーパ内服時刻</label><input type="time" id="f_ltime"></div>
+        <div><label class="f">Part III 評価時刻</label><input type="time" id="f_etime"></div>
+      </div>
+      <p class="note" id="elapsed"></p>
+      <details class="instr" style="display:block"><summary>Part III 概観（評価者向けガイドライン）</summary><div class="txt" id="p3intro"></div></details>
+    </div>
+  </section>
+
+  <section data-tab="p1" class="hidden"></section>
+  <section data-tab="p2" class="hidden"></section>
+  <section data-tab="p3" class="hidden"></section>
+
+  <section data-tab="res" class="hidden">
+    <div class="card">
+      <h2>集計</h2>
+      <div class="res-grid" id="kpis"></div>
+      <div id="urwarn"></div>
+    </div>
+    <div class="card">
+      <h2>サブスコア</h2>
+      <div class="res-grid" id="subs"></div>
+      <p class="note" style="margin-top:8px">TD/PIGD比：振戦11項目（2.10, 3.15–3.18）の平均 ÷ PIGD 5項目（2.12, 2.13, 3.10–3.12）の平均。≥1.15でTD、≤0.90でPIGD、その間は分類不能（Stebbins 2013）。左右合計は3.3–3.8・3.15–3.17の片側項目（各11項目）。</p>
+    </div>
+    <div class="card">
+      <h2>カルテ記載用テキスト</h2>
+      <div class="tools"><label class="toggle"><input type="checkbox" id="detail" checked> Part III 項目別を含める</label></div>
+      <textarea id="out" readonly></textarea>
+      <div class="tools">
+        <button class="btn pri" id="copy">コピー</button>
+        <button class="btn" id="save">この端末の履歴に保存</button>
+        <button class="btn danger" id="reset">新規評価（入力を消去）</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>履歴（この端末のみ）</h2>
+      <div id="hist"></div>
+    </div>
+    <div class="card note">
+      MDS-UPDRS © International Parkinson and Movement Disorder Society。判定基準の本文は利用者が端末に読み込んだ場合のみ表示されます。患者氏名など個人を特定できる情報は入力しないでください。<br><br>
+      <b>参考文献</b><br>
+      1. Goetz CG, et al. Mov Disord. 2008;23:2129-70. <a href="https://pubmed.ncbi.nlm.nih.gov/19025984/">PubMed</a><br>
+      2. Kashihara K, et al. Mov Disord Clin Pract. 2014;1:200-12. <a href="https://pubmed.ncbi.nlm.nih.gov/25328906/">PubMed</a><br>
+      3. Stebbins GT, et al. Mov Disord. 2013;28:668-70. <a href="https://pubmed.ncbi.nlm.nih.gov/23408503/">PubMed</a>
+    </div>
+  </section>
+</main>
+
+<div class="fab"><button class="btn pri" id="nextBtn">未入力へ ↓</button></div>
+<div class="toast" id="toast"></div>
+<div class="modal hidden" id="modal"><div class="box"><p id="mtext" style="margin:0 0 14px"></p><div class="tools" style="justify-content:flex-end"><button class="btn" id="mno">キャンセル</button><button class="btn pri" id="myes">OK</button></div></div></div>
+
+<script>
+const LSCRIT='mdsupdrs_criteria_v1';
+const FALLBACK={'1.1':'認知機能障害','1.2':'幻覚と精神症状','1.3':'抑うつ気分','1.4':'不安気分','1.5':'アパシー','1.6':'ドパミン調節異常症候群','1.7':'睡眠の問題','1.8':'日中の眠気','1.9':'痛みとその他の感覚','1.10':'排尿の問題','1.11':'便秘','1.12':'立ちくらみ','1.13':'疲労',
+'2.1':'会話','2.2':'唾液・よだれ','2.3':'咀嚼と嚥下','2.4':'食事動作','2.5':'着替え','2.6':'身の回りの清潔','2.7':'書字','2.8':'趣味などの活動','2.9':'寝返り','2.10':'振戦','2.11':'ベッド・車・椅子からの立ち上がり','2.12':'歩行とバランス','2.13':'すくみ',
+'3.1':'発語','3.2':'顔の表情','3.3':'固縮','3.4':'指タッピング','3.5':'手の運動','3.6':'手の回内・回外運動','3.7':'つま先タッピング','3.8':'下肢の敏捷性','3.9':'椅子からの立ち上がり','3.10':'歩行','3.11':'歩行のすくみ','3.12':'姿勢の安定性','3.13':'姿勢','3.14':'運動の全般的な自発性','3.15':'手の姿勢時振戦','3.16':'手の運動時振戦','3.17':'静止時振戦の振幅','3.18':'静止時振戦の持続性'};
+function validCrit(d){if(!d||typeof d!=='object'||!d.items)return false;return Object.keys(FALLBACK).every(n=>d.items[n]&&typeof d.items[n].title==='string'&&Array.isArray(d.items[n].groups));}
+let LOADED=null;try{const x=JSON.parse(localStorage.getItem(LSCRIT));if(validCrit(x))LOADED=x;}catch(e){}
+const DATA=LOADED||{items:Object.fromEntries(Object.entries(FALLBACK).map(([k,t])=>[k,{title:t,intro:'',groups:[]}])),intro:{},hy:[0,1,2,3,4,5].map(v=>[v,''])};
+(function(){
+const IT=DATA.items;
+const R='右',L='左';
+const SUBS={
+ '3.3':[['neck','頸部'],['RUE','右上肢'],['LUE','左上肢'],['RLE','右下肢'],['LLE','左下肢']],
+ '3.4':[['R',R],['L',L]],'3.5':[['R',R],['L',L]],'3.6':[['R',R],['L',L]],'3.7':[['R',R],['L',L]],'3.8':[['R',R],['L',L]],
+ '3.15':[['R',R],['L',L]],'3.16':[['R',R],['L',L]],
+ '3.17':[['RUE','右上肢'],['LUE','左上肢'],['RLE','右下肢'],['LLE','左下肢'],['lip','口唇・下顎']]
+};
+// 3.17: 判定基準グループ → 対象部位
+const GROUP_SUBS={'3.17':[['RUE','LUE','RLE','LLE'],['lip']]};
+const rng=(p,a,b)=>Array.from({length:b-a+1},(_,i)=>p+'.'+(a+i));
+const PARTS={
+ p1:{secs:[{t:'IA 複雑な行動（評価者記入）',intro:'P1A',items:rng(1,1,6)},{t:'IB 患者質問票',intro:'P1B',items:rng(1,7,13)}]},
+ p2:{secs:[{t:'日常生活で経験する運動の側面（患者質問票）',items:rng(2,1,13)}]},
+ p3:{secs:[{t:'',items:rng(3,1,18)}]}
+};
+const KEYS={p1:[],p2:[],p3:[]};const LABEL={};
+for(const p in PARTS)for(const s of PARTS[p].secs)for(const no of s.items){
+  const t=IT[no].title;
+  if(SUBS[no])for(const sb of SUBS[no]){const k=no+'_'+sb[0];KEYS[p].push(k);LABEL[k]=`${no} ${t}（${sb[1]}）`;}
+  else{KEYS[p].push(no);LABEL[no]=`${no} ${t}`;}
+}
+const RIGHT=['3.3_RUE','3.3_RLE','3.4_R','3.5_R','3.6_R','3.7_R','3.8_R','3.15_R','3.16_R','3.17_RUE','3.17_RLE'];
+const LEFT =['3.3_LUE','3.3_LLE','3.4_L','3.5_L','3.6_L','3.7_L','3.8_L','3.15_L','3.16_L','3.17_LUE','3.17_LLE'];
+const TREM=['2.10','3.15_R','3.15_L','3.16_R','3.16_L','3.17_RUE','3.17_LUE','3.17_RLE','3.17_LLE','3.17_lip','3.18'];
+const PIGD=['2.12','2.13','3.10','3.11','3.12'];
+
+const LS='mdsupdrs_local_cur_v1', LSH='mdsupdrs_local_hist_v1';
+function blank(){return {sc:{},f:{date:new Date().toISOString().slice(0,10)},auto:true,crit:true};}
+let S=blank();
+try{const x=JSON.parse(localStorage.getItem(LS));if(x&&x.sc)S=Object.assign(blank(),x);}catch(e){}
+function persist(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+// nav
+const TABS=[['info','基本情報'],['p1','Part I'],['p2','Part II'],['p3','Part III'],['res','結果']];
+let cur='info';
+const nav=document.getElementById('nav');
+nav.innerHTML=TABS.map(t=>`<button data-t="${t[0]}">${t[1]}<span class="prog" id="pg_${t[0]}"></span></button>`).join('');
+nav.addEventListener('click',e=>{const b=e.target.closest('button');if(b)show(b.dataset.t);});
+function show(t){cur=t;document.querySelectorAll('section[data-tab]').forEach(s=>s.classList.toggle('hidden',s.dataset.tab!==t));
+  nav.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  document.querySelector('.fab').classList.toggle('hidden',!['p1','p2','p3'].includes(t));
+  if(t==='res')renderRes();window.scrollTo(0,0);}
+
+// build
+function scoreBtns(k){return `<div class="scores" data-k="${k}">`+[0,1,2,3,4].map(v=>`<button data-v="${v}">${v}</button>`).join('')+`<button class="ur" data-v="UR">UR</button></div>`;}
+function anchorsHtml(no){
+  const r=IT[no];let h='<div class="anchors">';
+  r.groups.forEach((g,gi)=>{
+    if(g.label)h+=`<div class="glabel">${esc(g.label)}</div>`;
+    for(const a of g.anchors)h+=`<button class="anc" data-no="${no}" data-g="${gi}" data-v="${a[0]}"><span class="sc">${a[0]}</span><span class="lb">${esc(a[1])}</span><span class="tx">${esc(a[2])}</span></button>`;
+  });
+  return h+'</div>';
+}
+function instrHtml(no){const t=IT[no].intro;return t?`<details class="instr"><summary>質問・評価方法</summary><div class="txt">${esc(t)}</div></details>`:'';}
+document.getElementById('p3intro').textContent=DATA.intro.P3||'';
+if(!DATA.intro.P3)document.getElementById('p3intro').closest('details').classList.add('hidden');
+document.getElementById('critStatus').innerHTML=LOADED?'<span class="ok">読み込み済み</span>（全44項目の選択肢・教示文を表示中）':'未読み込み：採点・集計のみ使えます。';
+if(!LOADED){document.getElementById('critHint').textContent='判定基準を読み込むと、選択肢の文をタップして採点できます。入力内容はこの端末のブラウザ内にのみ保存されます。';}
+for(const p of ['p1','p2','p3']){
+  const sec=document.querySelector(`section[data-tab="${p}"]`);
+  let h=`<div class="tools"><label class="toggle"><input type="checkbox" class="autoT"> 入力後に次の項目へ自動スクロール</label></div>`;
+  for(const s of PARTS[p].secs){
+    if(s.t)h+=`<div class="sec-title">${s.t}</div>`;
+    const it=s.intro?DATA.intro[s.intro]:(p==='p2'?DATA.intro.P1B:'');
+    if(it)h+=`<details class="instr" style="display:block;margin:0 0 8px"><summary>${p==='p1'&&s.intro==='P1A'?'読み聞かせ文（Part IA）':'質問票の説明文（Part IB・II 共通）'}</summary><div class="txt">${esc(it)}</div></details>`;
+    for(const no of s.items){
+      const t=IT[no].title;
+      if(SUBS[no]){
+        h+=`<div class="item" data-group="${no}"><div class="irow"><span class="ino">${no}</span><span class="iname">${esc(t)}</span></div>${instrHtml(no)}${anchorsHtml(no)}`;
+        for(const sb of SUBS[no]){const k=no+'_'+sb[0];h+=`<div class="subrow" id="it_${k}"><span class="subname">${sb[1]}</span>${scoreBtns(k)}</div>`;}
+        h+=`</div>`;
+      }else{
+        h+=`<div class="item" id="it_${no}"><div class="irow"><span class="ino">${no}</span><span class="iname">${esc(t)}</span>${scoreBtns(no)}</div>${instrHtml(no)}${anchorsHtml(no)}</div>`;
+      }
+    }
+  }
+  if(p==='p3'){
+    h+=`<div class="sec-title">Part III におけるジスキネジアの影響</div><div class="card">
+      <div class="grid">
+      <div><label class="f">診察中にジスキネジアは見られましたか</label><div class="seg" data-field="dysk"><button data-v="はい">はい</button><button data-v="いいえ">いいえ</button></div></div>
+      <div><label class="f">評価の支障となりましたか</label><div class="seg" data-field="dyskInt"><button data-v="はい">はい</button><button data-v="いいえ">いいえ</button></div></div>
+      </div>
+      <h3>Hoehn and Yahr 重症度</h3>
+      <div class="anchors hy" style="display:flex;${LOADED?'':'flex-direction:row;flex-wrap:wrap'}">${DATA.hy.map(a=>`<button class="anc" data-hy="${a[0]}" data-v="${a[0]}" ${LOADED?'':'style="width:auto"'}><span class="sc">${a[0]}</span>${a[1]?`<span class="tx">${esc(a[1])}</span>`:''}</button>`).join('')}</div>
+    </div>`;
+  }
+  sec.innerHTML=h;
+}
+
+// scoring
+function setScore(k,v){S.sc[k]=(S.sc[k]===v)?undefined:v;if(S.sc[k]===undefined)delete S.sc[k];persist();paint();if(S.auto&&S.sc[k]!==undefined)goNext(k);}
+function targetFor(no,gi){
+  if(!SUBS[no])return no;
+  let cand=SUBS[no].map(s=>s[0]);
+  if(GROUP_SUBS[no])cand=GROUP_SUBS[no][gi]||cand;
+  const ks=cand.map(c=>no+'_'+c);
+  return ks.find(k=>S.sc[k]===undefined)||null;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.scores button');
+  if(b){const v=b.dataset.v;setScore(b.parentElement.dataset.k,v==='UR'?'UR':+v);return;}
+  const a=e.target.closest('.anc');
+  if(a){
+    if(a.dataset.hy!==undefined){const v=+a.dataset.hy;S.f.hy=(S.f.hy===v)?undefined:v;persist();paint();return;}
+    const no=a.dataset.no,v=+a.dataset.v;const k=targetFor(no,+a.dataset.g);
+    if(!k){toast('この項目の部位はすべて入力済みです。変更は下の数字ボタンで');return;}
+    S.sc[k]=v;persist();paint();
+    if(SUBS[no])toast(LABEL[k].replace(/^.*（/,'').replace('）','')+' に '+v+' を入力');
+    if(S.auto&&(!SUBS[no]||!targetFor(no,+a.dataset.g)))goNext(k);
+    return;}
+  const sb=e.target.closest('.seg button');
+  if(sb){const f=sb.parentElement.dataset.field;const v=sb.dataset.v;S.f[f]=(S.f[f]===v)?undefined:v;persist();paint();}
+});
+document.querySelectorAll('.autoT').forEach(c=>{c.checked=S.auto;c.addEventListener('change',()=>{S.auto=c.checked;document.querySelectorAll('.autoT').forEach(x=>x.checked=S.auto);persist();});});
+const sc=document.getElementById('showCrit');sc.checked=S.crit;document.body.classList.toggle('nocrit',!S.crit);
+sc.addEventListener('change',()=>{S.crit=sc.checked;document.body.classList.toggle('nocrit',!S.crit);persist();});
+['date','pid','rater','ltime','etime'].forEach(n=>{const el=document.getElementById('f_'+n);el.value=S.f[n]||'';el.addEventListener('input',()=>{S.f[n]=el.value;persist();paint();});});
+
+function boxOf(k){const el=document.getElementById('it_'+k);return el?(el.classList.contains('item')?el:el.closest('.item')):null;}
+function goNext(fromK){
+  const keys=KEYS[cur];if(!keys)return;
+  const curBox=fromK?boxOf(fromK):null;
+  let i=fromK?keys.indexOf(fromK):-1;
+  const order=[...keys.slice(i+1),...keys.slice(0,i+1)];
+  const nk=order.find(k=>S.sc[k]===undefined);
+  if(!nk){if(!fromK)toast('このPartは全項目入力済みです');return;}
+  const nb=boxOf(nk);
+  if(fromK&&nb===curBox)return; // 同じ項目内の別部位はスクロールしない
+  focusBox(nb);
+}
+function focusBox(box){document.querySelectorAll('.cur').forEach(x=>x.classList.remove('cur'));if(!box)return;box.classList.add('cur');box.scrollIntoView({behavior:'smooth',block:'start'});}
+document.getElementById('nextBtn').addEventListener('click',()=>goNext(null));
+
+// calc
+function sumOf(keys){let s=0,n=0,ur=0;for(const k of keys){const v=S.sc[k];if(v==='UR')ur++;else if(typeof v==='number'){s+=v;n++;}}return{s,n,ur,tot:keys.length};}
+function calc(){
+  const r={};
+  r.p1=sumOf(KEYS.p1);r.p1a=sumOf(KEYS.p1.slice(0,6));r.p1b=sumOf(KEYS.p1.slice(6));
+  r.p2=sumOf(KEYS.p2);r.p3=sumOf(KEYS.p3);r.R=sumOf(RIGHT);r.L=sumOf(LEFT);
+  r.total=r.p1.s+r.p2.s+r.p3.s;
+  const t=sumOf(TREM),g=sumOf(PIGD);
+  if(t.n===TREM.length&&g.n===PIGD.length){
+    const tm=t.s/TREM.length,gm=g.s/PIGD.length;r.tm=tm;r.gm=gm;
+    if(gm===0){r.ratio=null;r.sub=tm>0?'TD':'分類不能';}
+    else{r.ratio=tm/gm;r.sub=r.ratio>=1.15?'TD':(r.ratio<=0.90?'PIGD':'分類不能');}
+  }else r.sub=null;
+  return r;
+}
+
+// paint
+function paint(){
+  document.querySelectorAll('.scores').forEach(g=>{const v=S.sc[g.dataset.k];g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',v!==undefined&&String(v)===b.dataset.v));});
+  document.querySelectorAll('.anc[data-no]').forEach(a=>{const no=a.dataset.no;let sel=false;
+    if(!SUBS[no])sel=S.sc[no]===+a.dataset.v;
+    else{let cand=SUBS[no].map(s=>s[0]);if(GROUP_SUBS[no])cand=GROUP_SUBS[no][+a.dataset.g];sel=cand.some(c=>S.sc[no+'_'+c]===+a.dataset.v);}
+    a.classList.toggle('sel',sel);});
+  document.querySelectorAll('.anc[data-hy]').forEach(a=>a.classList.toggle('sel',S.f.hy===+a.dataset.hy));
+  document.querySelectorAll('.subrow').forEach(r=>r.classList.remove('next'));
+  for(const no in SUBS){const groups=GROUP_SUBS[no]||[SUBS[no].map(s=>s[0])];groups.forEach((g,gi)=>{const k=targetFor(no,gi);if(k){const el=document.getElementById('it_'+k);el&&el.classList.add('next');}});}
+  document.querySelectorAll('.seg[data-field]').forEach(g=>{const v=S.f[g.dataset.field];g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',v!==undefined&&String(v)===b.dataset.v));});
+  const r=calc();
+  document.getElementById('h1').textContent=r.p1.s;document.getElementById('h2').textContent=r.p2.s;document.getElementById('h3').textContent=r.p3.s;document.getElementById('ht').textContent=r.total;
+  for(const p of ['p1','p2','p3']){const x=r[p];const done=x.n+x.ur;const el=document.getElementById('pg_'+p);el.textContent=done+'/'+x.tot;el.classList.toggle('done',done===x.tot);}
+  const m=elapsedMin();document.getElementById('elapsed').textContent=m!==null?`最終L-ドーパ内服から ${m} 分（${Math.floor(m/60)}時間${m%60}分）`:'';
+  if(cur==='res')renderRes();
+}
+function elapsedMin(){const a=S.f.ltime,b=S.f.etime;if(!a||!b)return null;const[ah,am]=a.split(':').map(Number),[bh,bm]=b.split(':').map(Number);let d=(bh*60+bm)-(ah*60+am);if(d<0)d+=1440;return d;}
+
+// results
+function kpi(k,v,max,n){return `<div class="kpi"><div class="k">${k}</div><div class="v">${v}<small>${max!==''?' / '+max:''}</small></div><div class="n">${n||''}</div></div>`;}
+function cnt(x){const miss=x.tot-x.n-x.ur;let s=`入力 ${x.n+x.ur}/${x.tot}`;if(x.ur)s+=` ・UR ${x.ur}`;if(miss)s+=` ・未入力 ${miss}`;return s;}
+function renderRes(){
+  const r=calc();
+  document.getElementById('kpis').innerHTML=kpi('Part I',r.p1.s,52,`IA ${r.p1a.s} / IB ${r.p1b.s}<br>`+cnt(r.p1))+kpi('Part II',r.p2.s,52,cnt(r.p2))+kpi('Part III',r.p3.s,132,cnt(r.p3))+kpi('I〜III 合計',r.total,236,'')+kpi('Hoehn and Yahr',S.f.hy??'—','','');
+  const all=[...KEYS.p1,...KEYS.p2,...KEYS.p3];const urs=all.filter(k=>S.sc[k]==='UR');const miss=all.filter(k=>S.sc[k]===undefined);
+  let w='';
+  if(urs.length)w+=`<div class="warnbox"><b>UR（評価不能）:</b> ${urs.map(k=>esc(LABEL[k])).join('、')}。合計点はURを除いた値です。</div>`;
+  if(miss.length&&miss.length<20)w+=`<div class="warnbox"><b>未入力:</b> ${miss.map(k=>esc(LABEL[k])).join('、')}</div>`;else if(miss.length)w+=`<div class="warnbox"><b>未入力:</b> ${miss.length}項目</div>`;
+  document.getElementById('urwarn').innerHTML=w;
+  document.getElementById('subs').innerHTML=kpi('右側（Part III）',r.R.s,44,cnt(r.R))+kpi('左側（Part III）',r.L.s,44,cnt(r.L))+
+    kpi('TD/PIGD比',r.sub?(r.ratio==null?'—':r.ratio.toFixed(2)):'—','',r.sub?`<b>${r.sub}</b>（振戦平均 ${r.tm.toFixed(2)} / PIGD平均 ${r.gm.toFixed(2)}）`:'該当16項目がすべて数値入力されると算出');
+  document.getElementById('out').value=buildText(r);renderHist();
+}
+function v(k){const x=S.sc[k];return x===undefined?'-':x;}
+function buildText(r){
+  const f=S.f;const L=[];
+  L.push(`【MDS-UPDRS】${f.date||''}${f.etime?' '+f.etime:''}${f.rater?' 評価者:'+f.rater:''}`);
+  const st=[];if(f.onMed)st.push('薬物療法'+f.onMed);if(f.state)st.push(f.state);if(f.ldopa)st.push('L-ドーパ'+f.ldopa);
+  const m=elapsedMin();if(f.ltime)st.push(`最終L-ドーパ ${f.ltime}`+(m!==null?`（${m}分前）`:''));
+  if(st.length)L.push('状態: '+st.join(' / '));
+  if(f.srcIA||f.srcIB)L.push(`情報源: IA ${f.srcIA||'-'} / IB・II ${f.srcIB||'-'}`);
+  const u=x=>x.ur?`（UR${x.ur}除く）`:'';const ms=x=>{const k=x.tot-x.n-x.ur;return k?`［未入力${k}］`:'';};
+  L.push(`Part I: ${r.p1.s}/52（IA ${r.p1a.s}, IB ${r.p1b.s}）${u(r.p1)}${ms(r.p1)}`);
+  L.push(`Part II: ${r.p2.s}/52${u(r.p2)}${ms(r.p2)}`);
+  L.push(`Part III: ${r.p3.s}/132（右 ${r.R.s} / 左 ${r.L.s}）${u(r.p3)}${ms(r.p3)}`);
+  L.push(`I〜III合計: ${r.total}/236`);
+  L.push(`H&Y: ${f.hy??'-'}`);
+  if(f.dysk)L.push(`診察中ジスキネジア: ${f.dysk}${f.dysk==='はい'&&f.dyskInt?'（評価の支障'+f.dyskInt+'）':''}`);
+  if(r.sub)L.push(`TD/PIGD: ${r.ratio==null?'-':r.ratio.toFixed(2)} → ${r.sub}`);
+  if(document.getElementById('detail').checked){
+    L.push('--- Part III 項目別 ---');
+    L.push(`3.1 言語 ${v('3.1')} / 3.2 表情 ${v('3.2')}`);
+    L.push(`3.3 固縮 頸${v('3.3_neck')} 右上${v('3.3_RUE')} 左上${v('3.3_LUE')} 右下${v('3.3_RLE')} 左下${v('3.3_LLE')}`);
+    L.push(`3.4 指タップ R${v('3.4_R')} L${v('3.4_L')} / 3.5 手の運動 R${v('3.5_R')} L${v('3.5_L')} / 3.6 回内回外 R${v('3.6_R')} L${v('3.6_L')}`);
+    L.push(`3.7 つま先タップ R${v('3.7_R')} L${v('3.7_L')} / 3.8 下肢敏捷性 R${v('3.8_R')} L${v('3.8_L')}`);
+    L.push(`3.9 立ち上がり ${v('3.9')} / 3.10 歩行 ${v('3.10')} / 3.11 すくみ ${v('3.11')} / 3.12 姿勢安定性 ${v('3.12')} / 3.13 姿勢 ${v('3.13')} / 3.14 自発性 ${v('3.14')}`);
+    L.push(`3.15 姿勢時振戦 R${v('3.15_R')} L${v('3.15_L')} / 3.16 運動時振戦 R${v('3.16_R')} L${v('3.16_L')}`);
+    L.push(`3.17 静止時振戦 右上${v('3.17_RUE')} 左上${v('3.17_LUE')} 右下${v('3.17_RLE')} 左下${v('3.17_LLE')} 口唇顎${v('3.17_lip')} / 3.18 持続性 ${v('3.18')}`);
+  }
+  return L.join('\n');
+}
+document.getElementById('detail').addEventListener('change',renderRes);
+document.getElementById('copy').addEventListener('click',async()=>{const t=document.getElementById('out');try{await navigator.clipboard.writeText(t.value);toast('コピーしました');}catch(e){t.select();try{document.execCommand('copy');toast('コピーしました');}catch(_){toast('選択しました。手動でコピーしてください');}}});
+function getHist(){try{return JSON.parse(localStorage.getItem(LSH))||[];}catch(e){return [];}}
+function setHist(h){try{localStorage.setItem(LSH,JSON.stringify(h));return true;}catch(e){return false;}}
+function syncFields(){document.querySelectorAll('.autoT').forEach(x=>x.checked=S.auto);sc.checked=S.crit;document.body.classList.toggle('nocrit',!S.crit);['date','pid','rater','ltime','etime'].forEach(n=>document.getElementById('f_'+n).value=S.f[n]||'');}
+document.getElementById('save').addEventListener('click',()=>{const r=calc();const h=getHist();h.unshift({ts:Date.now(),S:JSON.parse(JSON.stringify(S)),p1:r.p1.s,p2:r.p2.s,p3:r.p3.s,tot:r.total});if(setHist(h.slice(0,200)))toast('保存しました');else toast('この環境では保存できません');renderHist();});
+document.getElementById('reset').addEventListener('click',()=>ask('現在の入力をすべて消去して新規評価を始めますか？',()=>{const keep={auto:S.auto,crit:S.crit};S=Object.assign(blank(),keep);persist();syncFields();paint();show('info');toast('新規評価を開始しました');}));
+function renderHist(){const h=getHist();const el=document.getElementById('hist');
+  if(!h.length){el.innerHTML='<p class="note">保存された評価はありません。</p>';return;}
+  el.innerHTML='<table class="h"><tr><th>評価日</th><th>メモ</th><th>状態</th><th>I</th><th>II</th><th>III</th><th>計</th><th></th></tr>'+
+   h.map((x,i)=>`<tr><td>${esc(x.S.f.date||'')}</td><td>${esc(x.S.f.pid||'')}</td><td>${esc(x.S.f.state||'')}</td><td>${x.p1}</td><td>${x.p2}</td><td>${x.p3}</td><td><b>${x.tot}</b></td><td style="white-space:nowrap"><button class="btn" data-load="${i}" style="padding:4px 8px">開く</button> <button class="btn danger" data-del="${i}" style="padding:4px 8px">削除</button></td></tr>`).join('')+'</table>';}
+document.getElementById('hist').addEventListener('click',e=>{const l=e.target.dataset.load,d=e.target.dataset.del;const h=getHist();
+  if(l!==undefined)ask('現在の入力をこの履歴で置き換えますか？',()=>{S=Object.assign(blank(),JSON.parse(JSON.stringify(h[+l].S)));persist();syncFields();paint();toast('読み込みました');});
+  if(d!==undefined)ask('この履歴を削除しますか？',()=>{h.splice(+d,1);setHist(h);renderHist();});});
+let mcb=null;const modal=document.getElementById('modal');
+function ask(t,cb){document.getElementById('mtext').textContent=t;mcb=cb;modal.classList.remove('hidden');}
+document.getElementById('mno').onclick=()=>modal.classList.add('hidden');
+document.getElementById('myes').onclick=()=>{modal.classList.add('hidden');if(mcb)mcb();};
+let tt;function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),1600);}
+
+function importCrit(txt){
+  let d;try{d=JSON.parse(txt);}catch(e){toast('JSONとして読めません');return;}
+  if(!validCrit(d)){toast('判定基準の形式が違います（1.1〜3.18が揃っていません）');return;}
+  try{localStorage.setItem(LSCRIT,JSON.stringify(d));}catch(e){toast('この端末に保存できませんでした');return;}
+  toast('読み込みました。再表示します');setTimeout(()=>location.reload(),600);
+}
+document.getElementById('critFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>importCrit(r.result);r.readAsText(f);e.target.value='';});
+document.getElementById('critPasteBtn').addEventListener('click',()=>document.getElementById('critPasteBox').classList.toggle('hidden'));
+document.getElementById('critPasteGo').addEventListener('click',()=>importCrit(document.getElementById('critJson').value));
+document.getElementById('critClear').addEventListener('click',()=>ask('この端末に保存した判定基準を消去しますか？（採点データは残ります）',()=>{try{localStorage.removeItem(LSCRIT);}catch(e){}location.reload();}));
+
+paint();show('info');
+})();
+// service worker（https か localhost のみ。claude.ai 上では登録しない）
+try{
+  const h=location.hostname;
+  if('serviceWorker' in navigator && (location.protocol==='https:'||h==='localhost'||h==='127.0.0.1') && !/claude\.ai$|claudeusercontent/.test(h)){
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;w.addEventListener('statechange',()=>{
+        if(w.state==='installed'&&navigator.serviceWorker.controller){const el=document.getElementById('toast');el.textContent='新しい版を取り込みました。次に開いたときに反映されます';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),4000);}
+      });});
+    }).catch(()=>{});
+  }
+}catch(e){}
+</script>
+</body>
+</html>
