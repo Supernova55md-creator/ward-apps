@@ -123,6 +123,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "MMTナビ",
+      "short_name": "MMTナビ",
+      "url": "mmt/",
+      "icons": [
+        {
+          "src": "mmt/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
