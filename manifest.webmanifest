@@ -147,6 +147,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "漢方ナビ",
+      "short_name": "漢方ナビ",
+      "url": "kampo/",
+      "icons": [
+        {
+          "src": "kampo/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
