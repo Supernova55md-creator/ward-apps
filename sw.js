@@ -1,7 +1,8 @@
 /* 病棟アプリ（ward-apps）共通 service worker
    アプリを更新・追加したら VERSION を必ず変える（例 a→b、日付更新）。
-   新しいアプリを足すときは APPS に slug を追加する。 */
-const VERSION = "ward-2026-11-08b";
+   新しいアプリを足すときは APPS に slug を追加する。
+   画面（HTML）は no-cache で毎回サーバーに確認する（GitHub Pages の10分キャッシュで古い版が出るのを防ぐ）。 */
+const VERSION = "ward-2026-11-08c";
 const APPS = ["dm", "htn", "lipid", "loc", "nih", "referral", "updrs", "dementia"];
 const ROOT = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 const PER_APP = ["", "index.html", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
@@ -33,7 +34,7 @@ self.addEventListener("fetch", (e) => {
   if (url.pathname.endsWith("/sw.js")) return;
   if (req.mode === "navigate") {
     e.respondWith(
-      fetch(req)
+      fetch(req.url, { cache: "no-cache", credentials: "same-origin" })
         .then((res) => { if (res.ok) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); } return res; })
         .catch(async () => {
           const c = await caches.open(VERSION);
