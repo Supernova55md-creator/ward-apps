@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#6f4a17">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="漢方ナビ">
+<title>漢方ナビ</title>
+<style>
+:root{
+  /* 漢方＝生薬の褐色。白地に焦げ茶を主色、背景は生成りのごく淡い色 */
+  --accent:#6f4a17; --accent-ink:#ffffff; --accent-soft:#f5ecdd;
+  --bg:#f8f5ef; --surface:#ffffff; --ink:#221c14; --muted:#6b6255; --line:#e5ddd0;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec;
+  --warn:#a36200; --warn-soft:#fdf1dc;
+  --crit:#b3122e; --crit-soft:#fde4e7;
+  --info:#2b5b9a; --info-soft:#e7eef8;
+  --font-body:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --font-num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --accent:#e0b46a; --accent-ink:#1d1608; --accent-soft:#3a2e1a;
+    --bg:#15130f; --surface:#1f1c17; --ink:#f1ece3; --muted:#b0a796; --line:#3a342a;
+    --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12;
+    --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+header{background:var(--accent);color:var(--accent-ink);padding:calc(12px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left))}
+header .row{max-width:720px;margin:0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-size:20px;margin:0;letter-spacing:.02em}
+header .sub{font-size:12px;opacity:.9}
+main{max-width:720px;margin:0 auto;padding:12px calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left))}
+.view{display:none;flex-direction:column;gap:12px}
+.view.active{display:flex}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h2 .num{font-family:var(--font-num);font-size:12px;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 7px}
+h3{font-size:14px;margin:12px 0 6px}
+.hint{font-size:12px;color:var(--muted);margin:4px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:14px;line-height:1.3;cursor:pointer;user-select:none;min-height:36px}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.chip input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
+.scene{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.scene .chip span{width:100%;border-radius:10px;padding:9px 11px;min-height:44px;display:flex;align-items:center}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg .chip{flex:1}
+.seg .chip span{width:100%;text-align:center;border:0;border-radius:0;background:var(--surface)}
+.seg .chip + .chip span{border-left:1px solid var(--line)}
+.lbl{font-size:13px;color:var(--muted);margin:10px 0 6px}
+.sub-group{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.hidden{display:none !important}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 12px;min-height:40px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+input[type=search]{font:inherit;font-size:16px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+input:focus-visible,button:focus-visible{outline:3px solid var(--info);outline-offset:1px}
+
+.banner{border-radius:10px;padding:10px 12px;font-size:14px;border:1px solid var(--warn);background:var(--warn-soft)}
+.banner b{display:block;font-size:13px;color:var(--warn)}
+.cand{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface);display:flex;flex-direction:column;gap:6px}
+.cand.top{border:2px solid var(--accent)}
+.cand.ng{opacity:.75;background:var(--crit-soft);border-color:var(--crit)}
+.cand .hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cand .nm{font-size:17px;font-weight:700}
+.cand .no{font-family:var(--font-num);font-size:12px;color:var(--muted)}
+.pill{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;border:1px solid currentColor}
+.pill.top{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.pill.ev{color:var(--info)}
+.pill.exp{color:var(--muted);border-style:dashed}
+.pill.ng{color:var(--crit)}
+.cand .when{font-size:14px}
+.cand .dose{font-size:13px;color:var(--muted)}
+.why{font-size:12px;color:var(--accent)}
+.flags{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.flags li{font-size:13px;border-left:4px solid var(--line);padding:3px 8px;border-radius:4px;background:var(--bg)}
+.flags li.crit{border-left-color:var(--crit);background:var(--crit-soft)}
+.flags li.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.flags li.info{border-left-color:var(--info);background:var(--info-soft)}
+.src{display:inline-flex;flex-wrap:wrap;gap:4px}
+.src a{font-size:11px;text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--muted);background:var(--surface)}
+.note{font-size:13px;color:var(--muted)}
+details.fm{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+details.fm summary{list-style:none;cursor:pointer;padding:10px 12px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+details.fm summary::-webkit-details-marker{display:none}
+details.fm summary .nm{font-weight:700}
+details.fm summary .no{font-family:var(--font-num);font-size:12px;color:var(--muted);min-width:2.6em}
+details.fm summary .tg{font-size:11px;border-radius:4px;padding:0 5px;background:var(--accent-soft);color:var(--accent)}
+details.fm .bd{padding:0 12px 12px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+dl.kv{display:grid;grid-template-columns:6.6em 1fr;gap:4px 8px;margin:0;font-size:14px}
+dl.kv dt{color:var(--muted);font-size:12px;padding-top:2px}
+dl.kv dd{margin:0}
+.tot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tot div{border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;background:var(--bg)}
+.tot .k{font-size:12px;color:var(--muted)}
+.tot .v{font-family:var(--font-num);font-size:20px;font-variant-numeric:tabular-nums}
+.tot .v.warn{color:var(--warn)} .tot .v.crit{color:var(--crit)}
+.pick{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg)}
+.pick .chips{gap:6px}
+.pick .chip span{font-size:13px;padding:5px 10px;min-height:32px}
+.prose p{margin:6px 0;font-size:14px}
+.prose ul{margin:4px 0;padding-left:20px;font-size:14px}
+.prose li{margin:2px 0}
+.prose b{color:var(--accent)}
+table.qi{border-collapse:collapse;width:100%;font-size:13px}
+table.qi th,table.qi td{border:1px solid var(--line);padding:5px 6px;vertical-align:top;text-align:left}
+table.qi th{background:var(--accent-soft);font-weight:700;white-space:nowrap}
+.refs{font-size:13px;padding-left:18px;margin:0;display:flex;flex-direction:column;gap:6px}
+.refs a{color:var(--info);word-break:break-all}
+.refs .tag{font-family:var(--font-num);font-size:11px;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 5px;margin-right:4px}
+.disclaimer{font-size:12px;color:var(--muted)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);display:flex;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+nav.tabs button{flex:1;border:0;border-radius:0;background:none;padding:6px 2px 8px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:1px;min-height:54px}
+nav.tabs button .ic{font-size:18px;line-height:1.2;font-weight:700}
+nav.tabs button.on{color:var(--accent);font-weight:700}
+.dock{position:fixed;left:0;right:0;bottom:calc(54px + env(safe-area-inset-bottom));background:var(--accent-soft);border-top:1px solid var(--line);padding:6px calc(16px + env(safe-area-inset-right)) 6px calc(16px + env(safe-area-inset-left));z-index:19}
+.dock .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.dock .s{font-size:13px;line-height:1.3;min-width:0}
+.dock .s b{font-size:15px}
+.dock button{min-height:34px;padding:4px 12px}
+body.sel{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+.toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+@media (max-width:380px){.scene{grid-template-columns:1fr}.tot{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body class="sel">
+<header>
+  <div class="row">
+    <h1>漢方ナビ</h1>
+    <div class="sub">ツムラ医療用エキス製剤基準／病棟用</div>
+  </div>
+</header>
+
+<main>
+<!-- ============ 選ぶ ============ -->
+<div class="view active" id="v-sel">
+<form id="f" autocomplete="off" onsubmit="return false" style="display:flex;flex-direction:column;gap:12px">
+<section class="card">
+  <h2><span class="num">1</span>困っている症状</h2>
+  <div class="scene" id="sceneBox"></div>
+</section>
+
+<section class="card">
+  <h2><span class="num">2</span>症状の特徴</h2>
+  <div id="redflag" class="banner"></div>
+  <div class="lbl">当てはまるものを選ぶ（複数可）</div>
+  <div class="chips" id="featBox"></div>
+</section>
+
+<section class="card">
+  <h2><span class="num">3</span>体質（証）の目安</h2>
+  <div class="lbl">体力・胃腸の強さ（虚実）</div>
+  <div class="seg">
+    <label class="chip"><input type="radio" name="kj" value="kyo"><span>虚弱</span></label>
+    <label class="chip"><input type="radio" name="kj" value="mid" checked><span>中間・不明</span></label>
+    <label class="chip"><input type="radio" name="kj" value="jitsu"><span>充実</span></label>
+  </div>
+  <p class="hint">虚弱：やせ・疲れやすい・声が小さい・食が細い・腹壁が軟らかい。充実：がっしり・声が大きい・便秘がち・腹力が強い。</p>
+  <div class="lbl">寒熱</div>
+  <div class="seg">
+    <label class="chip"><input type="radio" name="kn" value="cold"><span>冷えが目立つ</span></label>
+    <label class="chip"><input type="radio" name="kn" value="mid" checked><span>どちらでもない</span></label>
+    <label class="chip"><input type="radio" name="kn" value="heat"><span>暑がり・ほてり</span></label>
+  </div>
+  <div class="lbl">胃腸</div>
+  <div class="chips">
+    <label class="chip"><input type="checkbox" id="gi"><span>胃腸が弱い（食欲不振・胃もたれ）</span></label>
+    <label class="chip"><input type="checkbox" id="diarrh"><span>下痢しやすい</span></label>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="num">4</span>安全面で確認すること</h2>
+  <div class="chips">
+    <label class="chip"><input type="checkbox" class="sf" value="elder"><span>高齢（75歳以上）</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="lowK"><span>低K血症・アルドステロン症・ミオパチー</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="diur"><span>ループ・サイアザイド利尿薬</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="otherK"><span>他の甘草含有漢方・グリチルリチン製剤</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="cardio"><span>高血圧・虚血性心疾患・不整脈・心不全</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="thy"><span>甲状腺機能亢進症</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="urin"><span>排尿障害（前立腺肥大など）</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="liver"><span>肝機能障害・肝硬変</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="ip"><span>間質性肺炎（既往含む）</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="preg"><span>妊娠中・授乳中</span></label>
+  </div>
+</section>
+</form>
+
+<section class="card" id="result">
+  <h2>候補</h2>
+  <div id="candList" style="display:flex;flex-direction:column;gap:10px"></div>
+  <p class="note" id="sceneNote" style="margin-top:10px"></p>
+  <div class="btnrow" style="margin-top:10px">
+    <button type="button" id="copyBtn">カルテ用にコピー</button>
+    <button type="button" id="resetBtn">入力をリセット</button>
+  </div>
+</section>
+</div>
+
+<!-- ============ 併用チェック ============ -->
+<div class="view" id="v-mix">
+<section class="card">
+  <h2>内服中・追加予定の漢方</h2>
+  <input type="search" id="mixSearch" placeholder="方剤名・番号で絞り込み" aria-label="方剤の絞り込み">
+  <div class="pick" style="margin-top:8px"><div class="chips" id="mixPick"></div></div>
+  <div class="lbl">併用している西洋薬など</div>
+  <div class="chips">
+    <label class="chip"><input type="checkbox" class="mw" value="diur"><span>ループ・サイアザイド利尿薬</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="glyc"><span>グリチルリチン製剤（強力ネオミノファーゲンシー・グリチロン など）</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="ifn"><span>インターフェロン製剤</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="symp"><span>エフェドリン類・MAO阻害薬・甲状腺製剤・カテコラミン・キサンチン系</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="stim"><span>刺激性下剤（センノシド・ピコスルファート）</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="lowK"><span>低K血症がある</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="elder"><span>高齢（75歳以上）</span></label>
+  </div>
+</section>
+<section class="card">
+  <h2>1日量の合計（注意生薬）</h2>
+  <div class="tot" id="totBox"></div>
+  <ul class="flags" id="mixFlags" style="margin-top:10px"></ul>
+  <p class="hint">各製剤の通常1日量（ツムラ）で計算しています。減量投与のときは比例して少なくなります。</p>
+</section>
+</div>
+
+<!-- ============ 方剤 ============ -->
+<div class="view" id="v-db">
+<section class="card">
+  <h2>方剤早見</h2>
+  <input type="search" id="dbSearch" placeholder="名前・よみ・番号・症状で検索（例：めまい、54、よくかん）" aria-label="方剤検索">
+  <div class="chips" style="margin-top:8px">
+    <label class="chip"><input type="checkbox" class="dbf" value="k0"><span>甘草なし</span></label>
+    <label class="chip"><input type="checkbox" class="dbf" value="nomao"><span>麻黄なし</span></label>
+    <label class="chip"><input type="checkbox" class="dbf" value="nodai"><span>大黄なし</span></label>
+  </div>
+  <p class="hint" id="dbCount"></p>
+</section>
+<div id="dbList" style="display:flex;flex-direction:column;gap:8px"></div>
+</div>
+
+<!-- ============ 考え方 ============ -->
+<div class="view" id="v-way">
+<section class="card prose">
+  <h2>病棟で漢方を使うときの順番</h2>
+  <ul>
+    <li><b>先に西洋医学的な評価。</b>頭痛・めまい・しびれ・便秘などは、二次性・器質的疾患を除外してから。漢方は標準治療の代わりではなく、残る症状への上乗せ、または副作用で標準薬が使いにくいときの選択肢。</li>
+    <li><b>「症状（病名）×体質」で選ぶ。</b>まず症状で候補を2〜4剤に絞り、虚実・寒熱・随伴症状で1剤に決める。迷ったら体質を問わない方剤（五苓散・芍薬甘草湯 など）か、虚証向けを選ぶほうが副作用が少ない。</li>
+    <li><b>原則1剤から。</b>2剤併用は生薬の重複（特に甘草・麻黄・大黄）を「併用チェック」で確認。</li>
+    <li><b>期限を決める。</b>急性の症状は数回〜数日、慢性の症状は2〜4週で判定し、効かなければ漫然と続けない。</li>
+  </ul>
+</section>
+<section class="card prose">
+  <h2>証の見方（最低限）</h2>
+  <p><b>虚実</b>：体力・胃腸の強さ。虚証に実証向け（麻黄・大黄が多い方剤）を使うと、動悸・胃腸障害・下痢が出やすい。</p>
+  <p><b>寒熱</b>：冷えて悪化・温めると楽 → 温める方剤（附子・乾姜・呉茱萸を含む）。ほてり・のぼせ・暑がり → 冷ます方剤（黄連・黄芩・山梔子を含む）。</p>
+  <p><b>気・血・水</b>：症状のまとまりとして使うと、選択が速くなる。</p>
+  <table class="qi">
+    <tr><th>状態</th><th>目印</th><th>代表方剤</th></tr>
+    <tr><td>気虚</td><td>倦怠感、食欲不振、気力低下、日中の眠気</td><td>補中益気湯、六君子湯</td></tr>
+    <tr><td>気滞</td><td>のどのつかえ、腹部膨満、ゆううつ</td><td>半夏厚朴湯、香蘇散</td></tr>
+    <tr><td>気逆</td><td>のぼせ、動悸、発作的な頭痛、立ちくらみ</td><td>苓桂朮甘湯、桂枝湯類</td></tr>
+    <tr><td>血虚</td><td>皮膚乾燥、爪がもろい、こむら返り、貧血様</td><td>十全大補湯、人参養栄湯、当帰芍薬散</td></tr>
+    <tr><td>瘀血</td><td>月経異常、下腹部の圧痛、細絡、肩こり</td><td>桂枝茯苓丸、桃核承気湯、疎経活血湯</td></tr>
+    <tr><td>水滞</td><td>浮腫、めまい、頭重、天候で悪化、口渇・尿量減少</td><td>五苓散、苓桂朮甘湯、半夏白朮天麻湯</td></tr>
+  </table>
+</section>
+<section class="card prose">
+  <h2>飲ませ方</h2>
+  <ul>
+    <li>添付文書の用法は「食前または食間」。飲み忘れや食後の内服でも、続けられることを優先してよい（実臨床）。</li>
+    <li>白湯に溶かすと飲みやすく、においで飲めない人も減る。苦味が強い方剤（黄連解毒湯など）は冷水やオブラート、服薬ゼリーも可。</li>
+    <li>経管投与：約55℃の温湯に溶かして懸濁してから注入（簡易懸濁法、実臨床）。顆粒が残るとチューブが詰まりやすい。</li>
+    <li>高齢・低体重では1日2包（5g）から始め、効果と副作用を見て通常量へ（実臨床）。頓用で使う方剤（芍薬甘草湯・五苓散・呉茱萸湯）は1回1包。</li>
+  </ul>
+</section>
+<section class="card prose">
+  <h2>副作用とモニタリング</h2>
+  <table class="qi">
+    <tr><th>生薬</th><th>起こりうること</th><th>確認</th></tr>
+    <tr><td>甘草</td><td>偽アルドステロン症（低K・高血圧・浮腫・体重増加）、低Kミオパチー（四肢脱力・CK上昇・横紋筋融解）</td><td>開始2〜4週でK・血圧・浮腫。高齢・女性・低体重・利尿薬併用・長期は特に。1日量に甘草2.5g以上を含む製剤（ツムラでは半夏瀉心湯・小青竜湯・人参湯・桔梗湯・甘麦大棗湯・芍薬甘草湯）は低K血症・アルドステロン症・ミオパチーに禁忌</td></tr>
+    <tr><td>麻黄</td><td>動悸・頻脈・血圧上昇・不眠・排尿障害・胃部不快</td><td>心疾患、甲状腺機能亢進、前立腺肥大、高齢では避けるか短期</td></tr>
+    <tr><td>黄芩</td><td>間質性肺炎、肝障害</td><td>乾性咳・発熱・息切れが出たら中止し胸部画像・KL-6。肝機能</td></tr>
+    <tr><td>山梔子</td><td>長期投与（多くは5年以上）で腸間膜静脈硬化症</td><td>腹痛・下痢・便潜血・腹部膨満。長期内服者は見直す</td></tr>
+    <tr><td>大黄</td><td>下痢・腹痛、子宮収縮（妊婦）、母乳移行で乳児の下痢</td><td>虚弱者では少量から。妊娠・授乳中は避ける</td></tr>
+    <tr><td>附子</td><td>のぼせ・動悸・舌や口のしびれ・悪心</td><td>暑がり・のぼせの強い人、小児、妊婦では避ける</td></tr>
+    <tr><td>地黄・当帰・川芎</td><td>食欲不振・胃もたれ・下痢</td><td>胃腸が弱い人では六君子湯系を優先</td></tr>
+  </table>
+  <p class="hint">偽アルドステロン症の報告は芍薬甘草湯・抑肝散で多く、70歳以上・認知症・体重50kg未満・利尿薬併用・14日超の投与で起こりやすい。神経内科で見逃しやすいのは、甘草による低Kミオパチー（脱力・CK上昇）を筋疾患やギラン・バレー症候群と見誤ること。抑肝散・芍薬甘草湯の内服歴を必ず確認する。 <span class="src" id="psaSrc"></span></p>
+</section>
+<section class="card prose">
+  <h2>保険・処方のこと</h2>
+  <ul>
+    <li>効能・効果に挙げられた病名・症状に合わせてカルテに記載する。各方剤の効能・効果は「方剤」タブ。</li>
+    <li>同じ生薬を含む方剤の併用（例：抑肝散＋芍薬甘草湯で甘草7.5g/日）は、査定の対象にもなりやすく、副作用の面でも避ける。</li>
+  </ul>
+</section>
+</div>
+
+<!-- ============ 出典 ============ -->
+<div class="view" id="v-ref">
+<section class="card">
+  <h2>出典</h2>
+  <ol class="refs" id="refList"></ol>
+  <p class="hint">候補カードのラベル：「RCT」はRCTがあることを示し、結果が陰性のものも含む（カードに結果を記載）。「小規模・観察研究」は単群・非盲検の小規模試験のみ。「経験的」は、質の高い臨床試験がなく、成書・添付文書の使用目標と実臨床での使い方に基づく項目です（点線の枠）。「RCT」「GL」には出典を付けています。</p>
+  <p class="disclaimer">本ツールは医師の判断を補助するもので、診療の最終判断は担当医が行います。生薬量・効能効果はツムラ医療用エキス製剤の添付文書に基づき、他社製剤では異なることがあります。</p>
+</section>
+</div>
+</main>
+
+<div class="dock" id="dock"><div class="in"><div class="s" id="dockText">—</div><button type="button" class="primary" id="dockBtn">候補へ</button></div></div>
+<nav class="tabs" aria-label="画面切り替え">
+  <button type="button" data-v="v-sel" class="on"><span class="ic">選</span>選ぶ</button>
+  <button type="button" data-v="v-mix"><span class="ic">併</span>併用チェック</button>
+  <button type="button" data-v="v-db"><span class="ic">方</span>方剤</button>
+  <button type="button" data-v="v-way"><span class="ic">考</span>考え方</button>
+  <button type="button" data-v="v-ref"><span class="ic">典</span>出典</button>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ======================= 出典 ======================= */
+const REFS = {
+  PKG:{label:'添付文書', text:'ツムラ医療用漢方製剤 添付文書（PMDA 医療用医薬品情報検索）。各方剤のリンクは「方剤」タブ。', url:'https://www.pmda.go.jp/PmdaSearch/iyakuSearch/'},
+  YKS_IWA:{label:'抑肝散 Iwasaki2005', text:'Iwasaki K, et al. A randomized, observer-blind, controlled trial of the traditional Chinese medicine Yi-Gan San for improvement of behavioral and psychological symptoms and activities of daily living in dementia patients. J Clin Psychiatry. 2005;66:248-252.（観察者盲検RCT、N=52：NPI改善）', url:'https://pubmed.ncbi.nlm.nih.gov/15705012/'},
+  YKS_MIZU:{label:'抑肝散 Mizukami2009', text:'Mizukami K, et al. A randomized cross-over study of a traditional Japanese medicine (kampo), yokukansan, in the treatment of the behavioural and psychological symptoms of dementia. Int J Neuropsychopharmacol. 2009;12:191-199.（非盲検クロスオーバー、N=106：NPI改善）', url:'https://pubmed.ncbi.nlm.nih.gov/19079814/'},
+  YKS_FUR:{label:'抑肝散 Furukawa2017', text:'Furukawa K, et al. Randomized double-blind placebo-controlled multicenter trial of Yokukansan for neuropsychiatric symptoms in Alzheimer\'s disease. Geriatr Gerontol Int. 2017;17:211-218.（二重盲検RCT、N=145：主要評価項目は有意差なし、MMSE<20で焦燥・攻撃性が改善）', url:'https://pubmed.ncbi.nlm.nih.gov/26711658/'},
+  YKS_META:{label:'抑肝散 MA2016', text:'Matsunaga S, et al. Yokukansan in the Treatment of Behavioral and Psychological Symptoms of Dementia: An Updated Meta-Analysis of Randomized Controlled Trials. J Alzheimers Dis. 2016;54:635-643.（RCT5件・N=381：SMD −0.32、盲検化不十分な試験が中心）', url:'https://pubmed.ncbi.nlm.nih.gov/27497482/'},
+  YKS_PD:{label:'抑肝散 PD', text:'Hatano T, et al. An exploratory study of the efficacy and safety of yokukansan for neuropsychiatric symptoms in patients with Parkinson\'s disease. J Neural Transm. 2014;121:275-281.（単群、N=25：幻覚・不安が改善、UPDRS-III不変、低K 2例）', url:'https://pubmed.ncbi.nlm.nih.gov/24169925/'},
+  YKS_DLB:{label:'抑肝散 DLB', text:'Iwasaki K, et al. Open label trial to evaluate the efficacy and safety of yokukansan, a traditional Asian medicine, in dementia with Lewy bodies. J Am Geriatr Soc. 2011;59:936-938.（非盲検単群、N=63：幻覚が改善、錐体外路症状の悪化なし）', url:'https://pubmed.ncbi.nlm.nih.gov/21568966/'},
+  DEMGL:{label:'認知症GL2017', text:'日本神経学会（監修）. 認知症疾患診療ガイドライン2017. 第3章 CQ3B-2（焦燥性興奮）・CQ3B-3（幻覚・妄想）：抑肝散の使用を検討してよい（推奨グレード2C、適応外使用）。', url:'https://www.neurology-jp.org/guidelinem/degl/degl_2017_03.pdf'},
+  CHOTO:{label:'釣藤散 VaD', text:'Terasawa K, et al. Choto-san in the treatment of vascular dementia: a double-blind, placebo-controlled study. Phytomedicine. 1997;4:15-22.（二重盲検RCT、N=139：全般改善度・精神症状・ADLで優越、改訂長谷川式は差なし）', url:'https://pubmed.ncbi.nlm.nih.gov/23195240/'},
+  HKT_JAGS:{label:'半夏厚朴湯 肺炎', text:'Iwasaki K, et al. A pilot study of banxia houpu tang, a traditional Chinese medicine, for reducing pneumonia risk in older adults with dementia. J Am Geriatr Soc. 2007;55:2035-2040.（観察者盲検RCT、N=95：肺炎発症 4例 vs 14例）', url:'https://pubmed.ncbi.nlm.nih.gov/17944889/'},
+  HKT_SW:{label:'半夏厚朴湯 嚥下反射', text:'Iwasaki K, et al. The traditional Chinese medicine banxia houpo tang improves swallowing reflex. Phytomedicine. 1999;6:103-106.（プラセボ対照、N=32：嚥下反射潜時が短縮）', url:'https://pubmed.ncbi.nlm.nih.gov/10374248/'},
+  HKT_CO:{label:'半夏厚朴湯 咳反射', text:'Iwasaki K, et al. A traditional Chinese herbal medicine, banxia houpo tang, improves cough reflex of patients with aspiration pneumonia. J Am Geriatr Soc. 2002;50:1751-1752.（Letter、N=16：咳反射が改善）', url:'https://pubmed.ncbi.nlm.nih.gov/12366640/'},
+  DKT_STROKE:{label:'大建中湯 脳卒中後便秘', text:'Numata T, et al. Traditional Japanese Medicine Daikenchuto Improves Functional Constipation in Poststroke Patients. Evid Based Complement Alternat Med. 2014;2014:231258.（非盲検RCT、N=34：便秘スコア・腸管ガスが改善）', url:'https://pubmed.ncbi.nlm.nih.gov/25089144/'},
+  DKT_COL:{label:'大建中湯 大腸術後', text:'Katsuno H, et al. Clinical efficacy of Daikenchuto for gastrointestinal dysfunction following colon surgery: a randomized, double-blind, multicenter, placebo-controlled study (JFMC39-0902). Jpn J Clin Oncol. 2015;45:650-656.（二重盲検RCT、N=336：初回排便までの時間に有意差なし）', url:'https://pubmed.ncbi.nlm.nih.gov/25972515/'},
+  DKT_GAS:{label:'大建中湯 胃全摘後', text:'Yoshikawa K, et al. Effect of Daikenchuto, a Traditional Japanese Herbal Medicine, after Total Gastrectomy for Gastric Cancer: A Multicenter, Randomized, Double-Blind, Placebo-Controlled, Phase II Trial. J Am Coll Surg. 2015;221:571-578.（二重盲検RCT、N=195：主要評価項目は有意差なし、p=0.051）', url:'https://pubmed.ncbi.nlm.nih.gov/26141466/'},
+  RKT_FD:{label:'六君子湯 FD', text:'Tominaga K, et al. Rikkunshito simultaneously improves dyspepsia correlated with anxiety in patients with functional dyspepsia: A randomized clinical trial (the DREAM study). Neurogastroenterol Motil. 2018;30:e13319.（二重盲検RCT、N=128：全般改善度でプラセボに優越）', url:'https://pubmed.ncbi.nlm.nih.gov/29498457/'},
+  GOSHUYU:{label:'呉茱萸湯 頭痛', text:'Odaguchi H, et al. The efficacy of goshuyuto, a typical Kampo (Japanese herbal medicine) formula, in preventing episodes of headache. Curr Med Res Opin. 2006;22:1587-1597.（非盲検で反応者を選んだ後の二重盲検RCT、N=53：頭痛日数が減少）', url:'https://pubmed.ncbi.nlm.nih.gov/16870083/'},
+  HAGL:{label:'頭痛GL2021', text:'日本神経学会・日本頭痛学会・日本神経治療学会（監修）. 頭痛の診療ガイドライン2021. CQ I-14「頭痛診療において漢方薬は有効か」.', url:'https://neurology-jp.org/guidelinem/pdf/headache_medical_2021.pdf'},
+  SKT_HD:{label:'芍薬甘草湯 透析', text:'Hyodo T, et al. Immediate Effect of Shakuyaku-kanzo-to on Muscle Cramp in Hemodialysis Patients. Nephron Clin Pract. 2006;104:c28-c32.（単群、N=61：89%で消失、平均5.3分）', url:'https://pubmed.ncbi.nlm.nih.gov/16685141/'},
+  SKT_SR:{label:'芍薬甘草湯 SR', text:'Ota K, et al. Effect of Shakuyaku-kanzo-to in patients with muscle cramps: A systematic literature review. J Gen Fam Med. 2020;21:56-62.（RCT3件：エビデンスは不十分）', url:'https://pubmed.ncbi.nlm.nih.gov/32489757/'},
+  GJG_GONE:{label:'牛車腎気丸 GONE', text:'Kono T, et al. Goshajinkigan oxaliplatin neurotoxicity evaluation (GONE): a phase 2, multicenter, randomized, double-blind, placebo-controlled trial of goshajinkigan to prevent oxaliplatin-induced neuropathy. Cancer Chemother Pharmacol. 2013;72:1283-1290.（N=89：有意差なし）', url:'https://pubmed.ncbi.nlm.nih.gov/24121454/'},
+  GJG_GENIUS:{label:'牛車腎気丸 GENIUS', text:'Oki E, et al. Preventive effect of Goshajinkigan on peripheral neurotoxicity of FOLFOX therapy (GENIUS trial): a placebo-controlled, double-blind, randomized phase III study. Int J Clin Oncol. 2015;20:767-775.（N=182：牛車腎気丸群で神経障害が多く早期中止）', url:'https://pubmed.ncbi.nlm.nih.gov/25627820/'},
+  GRS_CSDH1:{label:'五苓散 CSDH 2018', text:'Katayama K, et al. The Effect of Goreisan on the Prevention of Chronic Subdural Hematoma Recurrence: Multi-Center Randomized Controlled Study. J Neurotrauma. 2018;35:1537-1542.（非盲検RCT、N=180：再発率に有意差なし）', url:'https://pubmed.ncbi.nlm.nih.gov/29444611/'},
+  GRS_CSDH2:{label:'五苓散 CSDH 2021', text:'Fujisawa N, et al. A Prospective Randomized Study on the Preventive Effect of Japanese Herbal Kampo Medicine Goreisan for Recurrence of Chronic Subdural Hematoma. Neurol Med Chir (Tokyo). 2021;61:12-20.（非盲検RCT、N=208：全体で有意差なし 5.8% vs 12.5%、均一型・分離型でのみ減少）', url:'https://pubmed.ncbi.nlm.nih.gov/33208583/'},
+  GRS_MA:{label:'五苓散 CSDH MA', text:'Yang Z, et al. Effectiveness of traditional herbal Kampo medicine Goreisan on chronic subdural hematoma recurrence: a meta-analysis. Front Pharmacol. 2024;15:1412190.（RCT・後ろ向き研究混在の8研究：OR 0.72、RCTのみでは有意差なし）', url:'https://pubmed.ncbi.nlm.nih.gov/39076594/'},
+  KKT:{label:'葛根湯 感冒', text:'Okabayashi S, et al. Non-superiority of Kakkonto, a Japanese Herbal Medicine, to a Representative Multiple Cold Medicine with Respect to Anti-aggravation Effects on the Common Cold: A Randomized Controlled Trial. Intern Med. 2014;53:949-956.（RCT、N=340：総合感冒薬に優越せず）', url:'https://pubmed.ncbi.nlm.nih.gov/24785885/'},
+  BMD:{label:'麦門冬湯 感染後咳', text:'Irifune K, et al. Antitussive effect of bakumondoto a fixed kampo medicine (six herbal components) for treatment of post-infectious prolonged cough: Controlled clinical pilot study with 19 patients. Phytomedicine. 2011;18:630-633.（非盲検RCT、N=19：4〜5日目のみ改善）', url:'https://pubmed.ncbi.nlm.nih.gov/21514123/'},
+  BMD_COPD:{label:'麦門冬湯 COPD', text:'Mukaida K, et al. A pilot study of the multiherb Kampo medicine bakumondoto for cough in patients with chronic obstructive pulmonary disease. Phytomedicine. 2011;18:625-629.（非盲検クロスオーバー、N=24：第1期のみ改善）', url:'https://pubmed.ncbi.nlm.nih.gov/21177084/'},
+  HST_OM:{label:'半夏瀉心湯 口内炎', text:'Matsuda C, et al. Double-blind, placebo-controlled, randomized phase II study of TJ-14 (Hangeshashinto) for infusional fluorinated-pyrimidine-based colorectal cancer chemotherapy-induced oral mucositis. Cancer Chemother Pharmacol. 2015;76:97-103.（N=90：発症率は有意差なし、持続期間は5.5日 vs 10.5日）', url:'https://pubmed.ncbi.nlm.nih.gov/25983022/'},
+  HST_OM2:{label:'半夏瀉心湯 胃癌', text:'Aoyama T, et al. Double-blind, placebo-controlled, randomized phase II study of TJ-14 (hangeshashinto) for gastric cancer chemotherapy-induced oral mucositis. Cancer Chemother Pharmacol. 2014;73:1047-1054.（N=91：有意差なし）', url:'https://pubmed.ncbi.nlm.nih.gov/24652604/'},
+  PSA_JADER:{label:'偽アルド JADER', text:'Uneda K, et al. Analysis of clinical factors associated with Kampo formula-induced pseudoaldosteronism based on self-reported information from the Japanese Adverse Drug Event Report database. PLoS One. 2024;19:e0296450.（報告オッズ比：芍薬甘草湯18.3、抑肝散8.1。危険因子：70歳以上、認知症、体重50kg未満、利尿薬、甘草高用量、14日超）', url:'https://pubmed.ncbi.nlm.nih.gov/38165850/'},
+  PSA_YKS:{label:'抑肝散 低K', text:'Hirai T, et al. Geriatric Patients Are at a High Risk of Hypokalemia Associated with Yokukansan Preparation: A Retrospective Cohort Study. Biol Pharm Bull. 2020;43:1742-1748.（N=665：K<3.0が8.3%、危険因子は75歳超・低Alb・7.5g/日以上）', url:'https://pubmed.ncbi.nlm.nih.gov/33132320/'},
+  PSA_MAN:{label:'偽アルド マニュアル', text:'厚生労働省. 重篤副作用疾患別対応マニュアル 偽アルドステロン症.', url:'https://www.mhlw.go.jp/content/11121000/000842165.pdf'},
+  MP:{label:'山梔子 腸間膜静脈硬化症', text:'Hiramatsu K, et al. Mesenteric phlebosclerosis associated with long-term oral intake of geniposide, an ingredient of herbal medicine. Aliment Pharmacol Ther. 2012;36:575-586.（N=25：全例が山梔子含有漢方を平均10年以上内服）', url:'https://pubmed.ncbi.nlm.nih.gov/22817400/'},
+  MP_PMDA:{label:'PMDA改訂2018', text:'PMDA. 使用上の注意の改訂（2018年2月13日）：サンシシ含有製剤の長期投与（多くは5年以上）による腸間膜静脈硬化症。', url:'https://www.pmda.go.jp/files/000222706.pdf'}
+};
+const REF_ORDER = Object.keys(REFS);
+
+/* ======================= 方剤データ（ツムラ医療用、1日量あたりの生薬g） =======================
+   k:甘草 mao:麻黄 dai:大黄 bushi:加工ブシ末 ogon:黄芩 sansi:山梔子 jio:地黄 */
+const FM = {
+  kakkon:{pi:'5200013D1123_1_14',no:1,name:'葛根湯',yomi:'かっこんとう',dose:'7.5g/日 分2〜3',k:2,mao:3,
+    kou:'自然発汗がなく頭痛、発熱、悪寒、肩こり等を伴う比較的体力のあるものの次の諸症：感冒、鼻かぜ、熱性疾患の初期、炎症性疾患（結膜炎、角膜炎、中耳炎、扁桃腺炎、乳腺炎、リンパ腺炎）、肩こり、上半身の神経痛、じんましん',
+    mok:'かぜの引き始め（悪寒・無汗・項背部のこわばり）、項部〜肩のこりを伴う緊張型頭痛。体力中等度以上',
+    tips:'感冒は発症早期に1〜2回で判断。高齢・心疾患では麻黄に注意'},
+  sokei:{pi:'5200089D1045_1_10',no:53,name:'疎経活血湯',yomi:'そけいかっけつとう',dose:'7.5g/日 分2〜3',k:1,jio:2,
+    kou:'関節痛、神経痛、腰痛、筋肉痛',
+    mok:'腰〜下肢の痛み・しびれ、筋肉痛。夜間や冷えで悪化、瘀血傾向',
+    tips:'甘草が少なく、こむら返りの予防目的で連用しやすい（実臨床）'},
+  hachimi:{pi:'5200121D1045_1_11',no:7,name:'八味地黄丸',yomi:'はちみじおうがん',dose:'7.5g/日 分2〜3',k:0,bushi:0.5,jio:6,
+    kou:'疲労、倦怠感著しく、尿利減少または頻数、口渇し、手足に交互的に冷感と熱感のあるものの次の諸症：腎炎、糖尿病、陰萎、坐骨神経痛、腰痛、脚気、膀胱カタル、前立腺肥大、高血圧',
+    mok:'高齢者の腰痛・下肢のしびれ・夜間頻尿・下半身の冷え。下腹部が軟弱',
+    tips:'地黄で胃もたれが出たら中止'},
+  shosaiko:{pi:'5200073D1117_1_18',no:9,name:'小柴胡湯',yomi:'しょうさいことう',dose:'7.5g/日 分2〜3',k:2,ogon:3,
+    kou:'体力中等度で上腹部がはって苦しく、舌苔を生じ、口中不快、食欲不振、時により微熱、悪心などのあるものの次の諸症：諸種の急性熱性病、肺炎、気管支炎、気管支喘息、感冒、リンパ腺炎、慢性胃腸障害、産後回復不全／慢性肝炎における肝機能障害の改善',
+    mok:'かぜがこじれた時期（数日経過・微熱・食欲不振・口の苦み）',
+    ci:'禁忌：インターフェロン製剤投与中、肝硬変・肝癌、慢性肝炎で血小板数10万/mm³以下。間質性肺炎に注意'},
+  saikokeishi:{pi:'5200051D1080_1_15',no:10,name:'柴胡桂枝湯',yomi:'さいこけいしとう',dose:'7.5g/日 分2〜3',k:2,ogon:2,
+    kou:'発熱汗出て、悪寒し、身体痛み、頭痛、はきけのあるものの次の諸症：感冒・流感・肺炎・肺結核などの熱性疾患、胃潰瘍・十二指腸潰瘍・胆のう炎・胆石・肝機能障害・膵臓炎などの心下部緊張疼痛',
+    mok:'かぜの中期（微熱・寝汗・食欲低下・関節痛）、心窩部痛を伴う心身症傾向',
+    tips:'小柴胡湯より体力が落ちた人に'},
+  saikoryukotsu:{pi:'5200050D1094_1_16',no:12,name:'柴胡加竜骨牡蛎湯',yomi:'さいこかりゅうこつぼれいとう',dose:'7.5g/日 分2〜3',k:0,ogon:2.5,
+    kou:'比較的体力があり、心悸亢進、不眠、いらだち等の精神症状のあるものの次の諸症：高血圧症、動脈硬化症、慢性腎臓病、神経衰弱症、神経性心悸亢進症、てんかん、ヒステリー、小児夜啼症、陰萎',
+    mok:'不安・不眠・動悸・驚きやすさ。体力中等度以上、便秘傾向、臍上の動悸',
+    tips:'ツムラ製剤は大黄を含まない'},
+  hangeshashin:{pi:'5200123D1079_1_17',no:14,name:'半夏瀉心湯',yomi:'はんげしゃしんとう',dose:'7.5g/日 分2〜3',k:2.5,ogon:2.5,
+    kou:'みぞおちがつかえ、ときに悪心、嘔吐があり食欲不振で腹が鳴って軟便または下痢の傾向のあるものの次の諸症：急・慢性胃腸カタル、醗酵性下痢、消化不良、胃下垂、神経性胃炎、胃弱、二日酔、げっぷ、胸やけ、口内炎、神経症',
+    mok:'心窩部のつかえ・悪心・腹鳴・下痢。口内炎（含嗽）',
+    tips:'口内炎は1包を水50mL程度に溶かし、含嗽してから吐き出すか飲む（実臨床）'},
+  oren:{pi:'5200011D1078_1_20',no:15,name:'黄連解毒湯',yomi:'おうれんげどくとう',dose:'7.5g/日 分2〜3',k:0,ogon:3,sansi:2,
+    kou:'比較的体力があり、のぼせぎみで顔色赤く、いらいらする傾向のあるものの次の諸症：鼻出血、高血圧、不眠症、ノイローゼ、胃炎、二日酔、血の道症、めまい、動悸、湿疹・皮膚炎、皮膚そう痒症',
+    mok:'のぼせ・顔面紅潮・いらいら・興奮・不眠。暑がり、体力中等度以上',
+    tips:'苦味が強い。冷ます方剤なので冷えのある人・高齢虚弱には長期にしない'},
+  hangekoboku:{pi:'5200122D1074_1_09',no:16,name:'半夏厚朴湯',yomi:'はんげこうぼくとう',dose:'7.5g/日 分2〜3',k:0,
+    kou:'気分がふさいで、咽喉、食道部に異物感があり、時に動悸、めまい、嘔気などを伴う次の諸症：不安神経症、神経性胃炎、つわり、せき、しわがれ声、神経性食道狭窄症、不眠症',
+    mok:'のどのつかえ感、不安、動悸、めまい、咳。高齢者の嚥下反射・咳反射の低下',
+    tips:'甘草を含まず高齢者に使いやすい。嚥下評価・口腔ケアと併せて'},
+  gorei:{pi:'5200048D1070_1_11',no:17,name:'五苓散',yomi:'ごれいさん',dose:'7.5g/日 分2〜3',k:0,
+    kou:'口渇、尿量減少するものの次の諸症：浮腫、ネフローゼ、二日酔、急性胃腸カタル、下痢、悪心、嘔吐、めまい、胃内停水、頭痛、尿毒症、暑気あたり、糖尿病',
+    mok:'口渇・尿量減少を伴う浮腫、めまい、頭痛、嘔吐。天候（低気圧）で悪化する頭痛',
+    tips:'体質を問わず、甘草を含まない。頭痛やめまいには頓用1包も（実臨床）'},
+  keishikajutsubu:{pi:'5200034D1044_1_08',no:18,name:'桂枝加朮附湯',yomi:'けいしかじゅつぶとう',dose:'7.5g/日 分2〜3',k:2,bushi:0.5,
+    kou:'関節痛、神経痛',
+    mok:'冷えで悪化する関節痛・神経痛・しびれ。虚弱〜中間',
+    tips:'効果不十分なら附子末（ブシ末）を追加する方法がある（実臨床）'},
+  shoseiryu:{pi:'5200075D1086_1_17',no:19,name:'小青竜湯',yomi:'しょうせいりゅうとう',dose:'9.0g/日 分2〜3',k:3,mao:3,
+    kou:'下記疾患における水様の痰、水様鼻汁、鼻閉、くしゃみ、喘鳴、咳嗽、流涙：気管支炎、気管支喘息、鼻炎、アレルギー性鼻炎、アレルギー性結膜炎、感冒',
+    mok:'水様の鼻汁・くしゃみ・薄い痰'},
+  tokishakuyaku:{pi:'5200111D1076_1_12',no:23,name:'当帰芍薬散',yomi:'とうきしゃくやくさん',dose:'7.5g/日 分2〜3',k:0,
+    kou:'筋肉が一体に軟弱で疲労しやすく、腰脚の冷えやすいものの次の諸症：貧血、倦怠感、更年期障害、月経不順、月経困難、不妊症、動悸、慢性腎炎、妊娠中の諸病、脚気、半身不随、心臓弁膜症',
+    mok:'冷え・浮腫・貧血傾向の女性、頭重・めまい・月経関連症状。虚弱'},
+  kamishoyo:{pi:'5200017D1083_1_13',no:24,name:'加味逍遙散',yomi:'かみしょうようさん',dose:'7.5g/日 分2〜3',k:1.5,sansi:2,
+    kou:'体質虚弱な婦人で肩がこり、疲れやすく、精神不安などの精神神経症状、ときに便秘の傾向のある次の諸症：冷え症、虚弱体質、月経不順、月経困難、更年期障害、血の道症',
+    mok:'更年期女性のいらいら・のぼせ・不眠・不定愁訴（訴えが多彩で変わりやすい）'},
+  keishibukuryo:{pi:'5200038D1093_1_12',no:25,name:'桂枝茯苓丸',yomi:'けいしぶくりょうがん',dose:'7.5g/日 分2〜3',k:0,oketsu:true,
+    kou:'体格はしっかりしていて赤ら顔が多く、腹部は大体充実、下腹部に抵抗のあるものの次の諸症：子宮並びにその付属器の炎症、子宮内膜炎、月経不順、月経困難、帯下、更年期障害（頭痛、めまい、のぼせ、肩こり等）、冷え症、腹膜炎、打撲症、痔疾患、睾丸炎',
+    mok:'のぼせ・肩こり・下腹部の圧痛など瘀血。体力中等度以上'},
+  mao:{pi:'5200132D1035_1_12',no:27,name:'麻黄湯',yomi:'まおうとう',dose:'7.5g/日 分2〜3',k:1.5,mao:5,
+    kou:'悪寒、発熱、頭痛、腰痛、自然に汗の出ないものの次の諸症：感冒、インフルエンザ（初期のもの）、関節リウマチ、喘息、乳児の鼻閉塞、哺乳困難',
+    mok:'高熱・悪寒・関節痛・無汗の感冒初期。体力充実',
+    tips:'発汗したら中止。高齢・心疾患には使いにくい'},
+  bakumondo:{pi:'5200119D1030_1_17',no:29,name:'麦門冬湯',yomi:'ばくもんどうとう',dose:'9.0g/日 分2〜3',k:2,
+    kou:'痰の切れにくい咳、気管支炎、気管支ぜんそく',
+    mok:'乾性咳嗽・痰が切れにくい・咽頭の乾燥感。感冒後の遷延する咳',
+    tips:'咳き込んで顔が赤くなるような咳に'},
+  shinbu:{pi:'5200083D1030_1_13',no:30,name:'真武湯',yomi:'しんぶとう',dose:'7.5g/日 分2〜3',k:0,bushi:0.5,
+    kou:'新陳代謝の沈衰しているものの次の諸症：胃腸疾患、胃腸虚弱症、慢性腸炎、消化不良、胃アトニー症、胃下垂症、ネフローゼ、腹膜炎、脳溢血、脊髄疾患による運動ならびに知覚麻痺、神経衰弱、高血圧症、心臓弁膜症、心不全で心悸亢進、半身不随、リウマチ、老人性そう痒症',
+    mok:'高齢・虚弱・冷えが強く、水様下痢、ふらつき（雲の上を歩くよう）、倦怠',
+    tips:'甘草を含まない。効能に脳溢血・脊髄疾患による麻痺が含まれる'},
+  goshuyu:{pi:'5200046D1039_1_11',no:31,name:'呉茱萸湯',yomi:'ごしゅゆとう',dose:'7.5g/日 分2〜3',k:0,
+    kou:'手足の冷えやすい中等度以下の体力のものの次の諸症：習慣性偏頭痛、習慣性頭痛、嘔吐、脚気衝心',
+    mok:'冷え・悪心嘔吐を伴う発作性の強い頭痛、項部〜肩のこり。片頭痛',
+    tips:'苦味が強い。予防は連用、発作時は頓用1包も（実臨床）'},
+  ninjin:{pi:'5200116D1060_1_09',no:32,name:'人参湯',yomi:'にんじんとう',dose:'7.5g/日 分2〜3',k:3,
+    kou:'体質虚弱の人、或いは虚弱により体力低下した人の次の諸症：急性・慢性胃腸カタル、胃アトニー症、胃拡張、悪阻（つわり）、萎縮腎',
+    mok:'冷え・胃痛・水様下痢・唾液が多い。虚弱・寒'},
+  hangebyakujutsu:{pi:'5200124D1022_1_09',no:37,name:'半夏白朮天麻湯',yomi:'はんげびゃくじゅつてんまとう',dose:'7.5g/日 分2〜3',k:0,
+    kou:'胃腸虚弱で下肢が冷え、めまい、頭痛などがある者',
+    mok:'胃腸虚弱・冷えのある人の頭重・めまい・頭痛。食後の眠気・倦怠',
+    tips:'甘草を含まない'},
+  tokishigyaku:{pi:'5200110D1047_1_09',no:38,name:'当帰四逆加呉茱萸生姜湯',yomi:'とうきしぎゃくかごしゅゆしょうきょうとう',dose:'7.5g/日 分2〜3',k:2,
+    kou:'手足の冷えを感じ、下肢が冷えると下肢又は下腹部が痛くなり易いものの次の諸症：しもやけ、頭痛、下腹部痛、腰痛',
+    mok:'手足の強い冷え（しもやけ）、冷えで悪化する下肢痛・腰痛・頭痛'},
+  ryokeijutsukan:{pi:'5200145D1059_1_09',no:39,name:'苓桂朮甘湯',yomi:'りょうけいじゅつかんとう',dose:'7.5g/日 分2〜3',k:2,
+    kou:'めまい、ふらつきがあり、または動悸があり尿量が減少するものの次の諸症：神経質、ノイローゼ、めまい、動悸、息切れ、頭痛',
+    mok:'起立時のめまい・立ちくらみ、動悸、のぼせ。中間〜虚弱'},
+  hochuekki:{pi:'5200131D1065_1_17',no:41,name:'補中益気湯',yomi:'ほちゅうえっきとう',dose:'7.5g/日 分2〜3',k:1.5,
+    kou:'消化機能が衰え、四肢倦怠感著しい虚弱体質者の次の諸症：夏やせ、病後の体力増強、結核症、食欲不振、胃下垂、感冒、痔、脱肛、子宮下垂、陰萎、半身不随、多汗症',
+    mok:'倦怠感・気力低下・食欲不振、病後・術後の回復期、微熱・寝汗'},
+  rikkunshi:{pi:'5200141D1034_1_15',no:43,name:'六君子湯',yomi:'りっくんしとう',dose:'7.5g/日 分2〜3',k:1,
+    kou:'胃腸の弱いもので、食欲がなく、みぞおちがつかえ、疲れやすく、貧血性で手足が冷えやすいものの次の諸症：胃炎、胃アトニー、胃下垂、消化不良、食欲不振、胃痛、嘔吐',
+    mok:'食欲不振・胃もたれ・早期満腹感（機能性ディスペプシア）、虚弱〜中間',
+    tips:'食欲低下のある高齢者・化学療法中にも使いやすい'},
+  shichimotsu:{pi:'5200064D1045_1_12',no:46,name:'七物降下湯',yomi:'しちもつこうかとう',dose:'7.5g/日 分2〜3',k:0,jio:3,
+    kou:'身体虚弱の傾向のあるものの次の諸症：高血圧に伴う随伴症状（のぼせ、肩こり、耳なり、頭重）',
+    mok:'虚弱者の高血圧に伴うのぼせ・肩こり・耳鳴・頭重',
+    tips:'降圧薬の代わりではない'},
+  choto:{pi:'5200101D1030_1_10',no:47,name:'釣藤散',yomi:'ちょうとうさん',dose:'7.5g/日 分2〜3',k:1,
+    kou:'慢性に続く頭痛で中年以降、または高血圧の傾向のあるもの',
+    mok:'中高年の慢性頭痛（朝の頭痛・頭重）、めまい・肩こり、高血圧傾向。脳血管障害後の易怒・不眠',
+    tips:'血管性認知症の周辺症状に使われる'},
+  juzen:{pi:'5200069D1048_1_11',no:48,name:'十全大補湯',yomi:'じゅうぜんたいほとう',dose:'7.5g/日 分2〜3',k:1.5,jio:3,
+    kou:'病後の体力低下、疲労倦怠、食欲不振、ねあせ、手足の冷え、貧血',
+    mok:'術後・化学療法後の体力低下、貧血傾向、皮膚乾燥、冷え',
+    tips:'胃もたれが出るなら補中益気湯へ'},
+  junchou:{pi:'5200071D1037_1_14',no:51,name:'潤腸湯',yomi:'じゅんちょうとう',dose:'7.5g/日 分2〜3',k:1.5,dai:2,ogon:2,jio:6,
+    kou:'便秘',
+    mok:'高齢者の硬い兎糞状便、皮膚乾燥、体力中等度以下'},
+  yokukan:{pi:'5200139D1037_1_19',no:54,name:'抑肝散',yomi:'よくかんさん',dose:'7.5g/日 分2〜3',k:1.5,
+    kou:'虚弱な体質で神経がたかぶるものの次の諸症：神経症、不眠症、小児夜なき、小児疳症',
+    mok:'易怒・興奮・攻撃性・不眠・幻視、歯ぎしり、手足のぴくつき。認知症のBPSD、DLB・PDの幻視',
+    tips:'高齢者は1日2包（5g）から（実臨床）。低K（脱力・CK上昇）に注意し、開始後2〜4週でK確認'},
+  tokaku:{pi:'5200106D1059_1_10',no:61,name:'桃核承気湯',yomi:'とうかくじょうきとう',dose:'7.5g/日 分2〜3',k:1.5,dai:3,oketsu:true,
+    kou:'比較的体力があり、のぼせて便秘しがちなものの次の諸症：月経不順、月経困難症、月経時や産後の精神不安、腰痛、便秘、高血圧の随伴症状（頭痛、めまい、肩こり）',
+    mok:'体力充実・のぼせ・便秘・月経関連の精神不安'},
+  shakuyakukanzo:{pi:'5200067D1049_1_16',no:68,name:'芍薬甘草湯',yomi:'しゃくやくかんぞうとう',dose:'7.5g/日 分2〜3（実臨床は頓用1回2.5g）',k:6,short:'甘草6g/日：原則は頓用・短期。連用は偽アルドステロン症の危険が高い',
+    kou:'急激におこる筋肉のけいれんを伴う疼痛、筋肉・関節痛、胃痛、腹痛',
+    mok:'こむら返り・有痛性筋痙攣（肝硬変・透析・糖尿病・脊柱管狭窄など）',
+    tips:'就寝前または発作時に1包。服用後数分〜十数分で効くことが多い'},
+  koso:{pi:'5200043D1027_1_09',no:70,name:'香蘇散',yomi:'こうそさん',dose:'7.5g/日 分2〜3',k:1.5,
+    kou:'胃腸虚弱で神経質の人の風邪の初期',
+    mok:'虚弱・胃腸が弱い人の感冒初期（麻黄が使えない人）、気分の落ち込み'},
+  kanbakutaiso:{pi:'5200019D1031_1_09',no:72,name:'甘麦大棗湯',yomi:'かんばくたいそうとう',dose:'7.5g/日 分2〜3',k:5,short:'甘草5g/日：短期で使い、K・血圧を確認',
+    kou:'夜泣き、ひきつけ',
+    mok:'急に泣き出す・興奮する・あくびが多いなど情動の不安定'},
+  yokukanchinpi:{pi:'5200140D1021_1_09',no:83,name:'抑肝散加陳皮半夏',yomi:'よくかんさんかちんぴはんげ',dose:'7.5g/日 分2〜3',k:1.5,
+    kou:'虚弱な体質で神経がたかぶるものの次の諸症：神経症、不眠症、小児夜なき、小児疳症',
+    mok:'抑肝散の適応で、胃腸が弱い・食欲低下がある、または長期で体力が落ちた人'},
+  daiokanzo:{pi:'5200090D1030_1_12',no:84,name:'大黄甘草湯',yomi:'だいおうかんぞうとう',dose:'7.5g/日 分2〜3',k:2,dai:4,
+    kou:'便秘症',
+    mok:'一般的な便秘。量で調整しやすい',
+    tips:'少量（1日1包）から（実臨床）'},
+  daikenchu:{pi:'5200092D1020_1_20',no:100,name:'大建中湯',yomi:'だいけんちゅうとう',dose:'15.0g/日 分2〜3',k:0,
+    kou:'腹が冷えて痛み、腹部膨満感のあるもの',
+    mok:'腹部膨満・腸管ガス・冷えると腹痛。術後の腸管麻痺、脳卒中後・PDの便秘',
+    tips:'大黄を含まず下痢になりにくい。他の下剤と併用しやすい'},
+  sansonin:{pi:'5200056D1032_1_10',no:103,name:'酸棗仁湯',yomi:'さんそうにんとう',dose:'7.5g/日 分2〜3',k:1,
+    kou:'心身がつかれ弱って眠れないもの',
+    mok:'疲れているのに眠れない、浅眠。高齢・虚弱',
+    tips:'就寝前にまとめて1〜2包も（実臨床）'},
+  goshajinki:{pi:'5200025D1029_1_16',no:107,name:'牛車腎気丸',yomi:'ごしゃじんきがん',dose:'7.5g/日 分2〜3',k:0,bushi:1,jio:5,
+    kou:'疲れやすくて、四肢が冷えやすく尿量減少または多尿で時に口渇がある次の諸症：下肢痛、腰痛、しびれ、老人のかすみ目、かゆみ、排尿困難、頻尿、むくみ',
+    mok:'高齢者の下肢のしびれ・冷え・痛み、夜間頻尿、浮腫、夜間のこむら返り',
+    tips:'化学療法による末梢神経障害の予防目的のRCTでは有効性が示されていない'},
+  ninjinyoei:{pi:'5200117D1030_1_12',no:108,name:'人参養栄湯',yomi:'にんじんようえいとう',dose:'9.0g/日 分2〜3',k:1,jio:4,
+    kou:'病後の体力低下、疲労倦怠、食欲不振、ねあせ、手足の冷え、貧血',
+    mok:'高齢者のフレイル（倦怠・食欲不振・不眠・咳・気力低下）、病後の回復'},
+  sairei:{pi:'5200055D1020_1_16',no:114,name:'柴苓湯',yomi:'さいれいとう',dose:'9.0g/日 分2〜3',k:2,ogon:3,
+    kou:'吐き気、食欲不振、のどのかわき、排尿が少ないなどの次の諸症：水瀉性下痢、急性胃腸炎、暑気あたり、むくみ',
+    mok:'浮腫・炎症を伴う水滞（小柴胡湯＋五苓散）',
+    tips:'黄芩を含む。間質性肺炎・肝障害に注意'},
+  senkyuchacho:{pi:'5200088D1032_1_08',no:124,name:'川芎茶調散',yomi:'せんきゅうちゃちょうさん',dose:'7.5g/日 分2〜3',k:1.5,
+    kou:'かぜ、血の道症、頭痛',
+    mok:'かぜの頭痛、月経に関連する頭痛。体質を問わない',ci:'販売名の表記は「川きゅう茶調散」'},
+  mashinin:{pi:'5200136D1033_1_08',no:126,name:'麻子仁丸',yomi:'ましにんがん',dose:'7.5g/日 分2〜3',k:0,dai:4,
+    kou:'便秘',
+    mok:'高齢者のコロコロ便、腸の乾燥。体力中等度以下',
+    tips:'1日1〜2包から（実臨床）'},
+  maobushisaishin:{pi:'5200133D1021_1_13',no:127,name:'麻黄附子細辛湯',yomi:'まおうぶしさいしんとう',dose:'7.5g/日 分2〜3',k:0,mao:4,bushi:1,
+    kou:'悪寒、微熱、全身倦怠、低血圧で頭痛、めまいあり、四肢に疼痛冷感あるものの次の諸症：感冒、気管支炎',
+    mok:'高齢・虚弱者の感冒（寒気が強く熱感に乏しい・倦怠）'},
+  kamikihi:{pi:'5200016D1054_1_13',no:137,name:'加味帰脾湯',yomi:'かみきひとう',dose:'7.5g/日 分2〜3',k:1,sansi:2,
+    kou:'虚弱体質で血色の悪い人の次の諸症：貧血、不眠症、精神不安、神経症',
+    mok:'不安・抑うつ・考え込み・不眠。虚弱、貧血傾向'},
+  keishikashakuyaku:{pi:'5200032D1045_1_13',no:60,name:'桂枝加芍薬湯',yomi:'けいしかしゃくやくとう',dose:'7.5g/日 分2〜3',k:2,
+    kou:'腹部膨満感のある次の諸症：しぶり腹、腹痛',
+    mok:'腹部膨満・腹痛・しぶり腹。大黄を含まない'},
+  shohangekabukuryo:{pi:'5200076D1030_1_09',no:21,name:'小半夏加茯苓湯',yomi:'しょうはんげかぶくりょうとう',dose:'7.5g/日 分2〜3',k:0,
+    kou:'体力中等度の次の諸症：妊娠嘔吐（つわり）、そのほかの諸病の嘔吐（急性胃腸炎、湿性胸膜炎、水腫性脚気、蓄膿症）',
+    mok:'悪心・嘔吐（つわり、化学療法、めまいに伴うもの）',
+    tips:'冷やして少量ずつ飲むと吐きにくい（実臨床）'},
+  kikyo:{pi:'5200020D1026_1_10',no:138,name:'桔梗湯',yomi:'ききょうとう',dose:'7.5g/日 分2〜3',k:3,
+    kou:'咽喉がはれて痛む次の諸症：扁桃炎、扁桃周囲炎',
+    mok:'咽頭痛',
+    tips:'湯に溶かしてうがいしながら飲む（実臨床）'}
+};
+
+/* ======================= 症状別の候補 =======================
+   tags: kyo(+虚弱向き/−充実向き) cold(+冷え向き/−熱向き) gi(+胃腸虚弱向き)
+   ev: 'RCT' | 'GL' | 'small'(小規模・観察) | 'exp'(経験的) */
+const SCENES = [
+ {id:'headache', label:'頭痛',
+  red:'二次性頭痛（突然発症・神経所見・発熱・50歳以降の新規発症・増悪する頭痛など）を除外。片頭痛は急性期治療薬・予防薬が基本で、漢方は併用または代替。',
+  feat:[
+   {id:'nv',label:'悪心・嘔吐を伴う',boost:{goshuyu:2,gorei:1}},
+   {id:'cold',label:'手足の冷え',boost:{goshuyu:2,hangebyakujutsu:1,tokishigyaku:1}},
+   {id:'weather',label:'天候・気圧で悪化',boost:{gorei:3}},
+   {id:'edema',label:'むくみ・口渇・尿量減少',boost:{gorei:2}},
+   {id:'neck',label:'項部〜肩のこり',boost:{kakkon:2,goshuyu:1}},
+   {id:'morning',label:'中高年・朝の頭痛・高血圧傾向',boost:{choto:3}},
+   {id:'giweak',label:'胃腸虚弱・食後の眠気・頭重',boost:{hangebyakujutsu:3}},
+   {id:'cold2',label:'かぜ・月経に伴う',boost:{senkyuchacho:3}}
+  ],
+  opts:[
+   {f:'goshuyu',when:'片頭痛・緊張型頭痛で、冷え、悪心嘔吐、項部のこりを伴う発作性の強い頭痛',tags:{kyo:0.5,cold:1},ev:'RCT',ev_note:'非盲検で反応した人だけを対象にしたプラセボ対照試験で、頭痛日数が減少。',refs:['GOSHUYU']},
+   {f:'gorei',when:'天候・低気圧や月経で悪化、むくみ・口渇・尿量減少。体質を問わない',tags:{},ev:'exp'},
+   {f:'choto',when:'中高年の慢性頭痛、朝の頭痛・頭重、めまい・肩こり、高血圧傾向',tags:{elder:1},ev:'exp'},
+   {f:'kakkon',when:'項部〜肩のこりが強い緊張型頭痛。体力中等度以上',tags:{kyo:-1},ev:'exp'},
+   {f:'hangebyakujutsu',when:'胃腸虚弱・冷えのある人の頭重感、めまいを伴う頭痛',tags:{kyo:1,gi:1,cold:0.5},ev:'exp'},
+   {f:'senkyuchacho',when:'かぜの頭痛、月経に関連する頭痛',tags:{},ev:'exp'}
+  ],
+  note:'頭痛の診療ガイドライン2021はCQ I-14で漢方薬を取り上げている（推奨文は原典で確認）。',refs:['HAGL']},
+
+ {id:'dizzy', label:'めまい・ふらつき',
+  red:'中枢性めまい（急性持続性めまいでのHINTS、神経所見、頭痛・構音障害）を除外。BPPVは頭位治療、起立性低血圧は原因薬の見直しが先。',
+  feat:[
+   {id:'ortho',label:'起立時・立ちくらみ',boost:{ryokeijutsukan:3}},
+   {id:'palp',label:'動悸・のぼせ',boost:{ryokeijutsukan:2}},
+   {id:'vert',label:'回転性・悪心嘔吐',boost:{gorei:2,hangebyakujutsu:1}},
+   {id:'edema',label:'むくみ・口渇・尿量減少',boost:{gorei:2}},
+   {id:'giweak',label:'胃腸虚弱・頭重',boost:{hangebyakujutsu:3}},
+   {id:'float',label:'雲の上を歩くような浮遊感・強い冷え・下痢',boost:{shinbu:3}},
+   {id:'htn',label:'高血圧傾向・朝の頭痛',boost:{choto:3}}
+  ],
+  opts:[
+   {f:'ryokeijutsukan',when:'起立時のめまい・立ちくらみ、動悸、のぼせ。中間〜虚弱',tags:{kyo:0.5},ev:'exp'},
+   {f:'gorei',when:'回転性めまい・悪心、むくみ・口渇・尿量減少、天候で悪化',tags:{},ev:'exp'},
+   {f:'hangebyakujutsu',when:'胃腸虚弱・冷えのある人の頭重・めまい・悪心',tags:{kyo:1,gi:1,cold:0.5},ev:'exp'},
+   {f:'shinbu',when:'高齢・虚弱・冷えが強い人の浮遊感、下痢傾向',tags:{kyo:1.5,cold:1.5,elder:1},ev:'exp'},
+   {f:'choto',when:'高血圧傾向の中高年で、頭痛・肩こりを伴う',tags:{elder:1},ev:'exp'}
+  ]},
+
+ {id:'cramp', label:'こむら返り・筋痙攣',
+  red:'低K・低Mg・低Ca、甲状腺機能低下、脱水、薬剤（利尿薬・スタチンなど）を確認。線維束性収縮・筋萎縮があれば運動ニューロン疾患を考える。',
+  feat:[
+   {id:'acute',label:'発作時・就寝前の頓用でよい',boost:{shakuyakukanzo:2}},
+   {id:'daily',label:'毎晩起こり、連用が必要',boost:{sokei:2,goshajinki:2}},
+   {id:'coldleg',label:'下肢の冷え・しびれ・夜間頻尿',boost:{goshajinki:3}},
+   {id:'pain',label:'腰〜下肢の痛み・筋肉痛',boost:{sokei:3}}
+  ],
+  opts:[
+   {f:'shakuyakukanzo',when:'こむら返りの発作時・就寝前に1包。即効性がある',dose:'1回2.5g 頓用（就寝前または発作時）',tags:{},ev:'small',ev_note:'透析中のこむら返りで単群試験では平均5分ほどで消失。系統的レビューではプラセボ対照のエビデンスは不十分。',refs:['SKT_HD','SKT_SR']},
+   {f:'sokei',when:'連用が必要な腰〜下肢の痛み・しびれ・筋痛。甘草1g/日',tags:{},ev:'exp'},
+   {f:'goshajinki',when:'高齢者の夜間こむら返りで、下肢の冷え・しびれ・夜間頻尿を伴う。甘草を含まない',tags:{kyo:0.5,cold:1,elder:1},ev:'exp'}
+  ],
+  note:'芍薬甘草湯は甘草6g/日で、偽アルドステロン症の報告オッズ比が漢方の中で最も高い。毎日の予防投与は避け、連用が必要なら甘草の少ない方剤へ切り替える。',refs:['PSA_JADER']},
+
+ {id:'bpsd', label:'BPSD・易怒・興奮・幻視',
+  red:'せん妄の誘因（感染・脱水・疼痛・便秘・尿閉・薬剤）を先に探す。抗精神病薬の前に使える選択肢だが、甘草による低Kに注意。',
+  feat:[
+   {id:'anger',label:'易怒・攻撃性・興奮',boost:{yokukan:2,yokukanchinpi:1}},
+   {id:'halluc',label:'幻視（DLB・PD）',boost:{yokukan:2,yokukanchinpi:1}},
+   {id:'giweak',label:'食欲低下・胃腸虚弱',boost:{yokukanchinpi:3}},
+   {id:'vasc',label:'血管性認知症・高血圧傾向',boost:{choto:3}},
+   {id:'flush',label:'顔面紅潮・のぼせ・強い興奮（短期）',boost:{oren:3}},
+   {id:'anx',label:'不安・抑うつ・不眠が中心',boost:{kamikihi:3}}
+  ],
+  opts:[
+   {f:'yokukan',when:'易怒・興奮・攻撃性・幻覚・不眠。認知症のBPSD、DLB・PDの幻視',dose:'7.5g/日 分2〜3（高齢者は2包/日から）',tags:{elder:0.5},ev:'RCT',ev_note:'非盲検・観察者盲検の試験では改善、ADの二重盲検RCTは主要評価項目で有意差なし（MMSE<20で焦燥・攻撃性が改善）。メタ解析で効果は小さい。認知症GL2017で焦燥・幻覚妄想に「検討してよい」（2C）。PD・DLBの幻覚は単群試験のみ。',refs:['YKS_IWA','YKS_MIZU','YKS_FUR','YKS_META','DEMGL','YKS_PD','YKS_DLB']},
+   {f:'yokukanchinpi',when:'抑肝散の適応で、食欲低下・胃腸虚弱がある',tags:{kyo:1,gi:1.5},ev:'exp'},
+   {f:'choto',when:'血管性認知症、脳血管障害後の易怒・不眠、高血圧傾向',tags:{elder:0.5},ev:'RCT',ev_note:'血管性認知症の二重盲検RCTで全般改善度・精神症状・ADLが改善（認知機能は差なし）。',refs:['CHOTO']},
+   {f:'oren',when:'顔面紅潮・のぼせ・強い興奮、暑がり。短期で',tags:{kyo:-1,cold:-1.5},ev:'exp'},
+   {f:'kamikihi',when:'不安・抑うつ・不眠が主体で、虚弱・貧血傾向',tags:{kyo:1},ev:'exp'}
+  ],
+  note:'抑肝散では高齢者の8.3%でK<3.0（75歳超・低Alb・7.5g/日以上で多い）。開始2〜4週と以後定期的にK、脱力・浮腫を確認する。',refs:['PSA_YKS','PSA_JADER']},
+
+ {id:'insomnia', label:'不眠',
+  red:'睡眠時無呼吸、RLS（鉄欠乏）、夜間頻尿、疼痛、せん妄、薬剤（ステロイド・β刺激薬）を確認。',
+  feat:[
+   {id:'tired',label:'疲れているのに眠れない',boost:{sansonin:3}},
+   {id:'irrit',label:'いらいら・興奮・歯ぎしり',boost:{yokukan:3}},
+   {id:'anx',label:'不安・考え込み・抑うつ',boost:{kamikihi:3}},
+   {id:'palp',label:'動悸・驚きやすい・便秘',boost:{saikoryukotsu:3}},
+   {id:'flush',label:'のぼせ・暑がり',boost:{oren:3}}
+  ],
+  opts:[
+   {f:'sansonin',when:'心身が疲れて眠れない・浅眠。高齢・虚弱',tags:{kyo:1,elder:1},ev:'exp'},
+   {f:'yokukan',when:'いらいら・興奮して眠れない',tags:{},ev:'exp'},
+   {f:'kamikihi',when:'不安・抑うつ・考え込みで眠れない。虚弱・貧血傾向',tags:{kyo:1},ev:'exp'},
+   {f:'saikoryukotsu',when:'不安・動悸・驚きやすく眠れない。体力中等度以上',tags:{kyo:-1},ev:'exp'},
+   {f:'oren',when:'のぼせ・いらいら・暑がり',tags:{kyo:-1,cold:-1.5},ev:'exp'}
+  ]},
+
+ {id:'anxiety', label:'不安・抑うつ・のどのつかえ',
+  red:'うつ病・不安症の重症度と希死念慮を評価。甲状腺機能・薬剤性も確認。',
+  feat:[
+   {id:'globus',label:'のどのつかえ感・異物感',boost:{hangekoboku:3}},
+   {id:'giweak',label:'胃腸虚弱・気分の落ち込み',boost:{koso:3}},
+   {id:'meno',label:'更年期・のぼせ・訴えが多彩',boost:{kamishoyo:3}},
+   {id:'palp',label:'動悸・不眠・驚きやすい',boost:{saikoryukotsu:3}},
+   {id:'emo',label:'急に泣く・興奮する（情動不安定）',boost:{kanbakutaiso:3}}
+  ],
+  opts:[
+   {f:'hangekoboku',when:'のどのつかえ感、不安、動悸、めまい',tags:{},ev:'exp'},
+   {f:'koso',when:'虚弱・胃腸が弱い人の気分の落ち込み',tags:{kyo:1,gi:1},ev:'exp'},
+   {f:'kamishoyo',when:'更年期女性のいらいら・のぼせ・不定愁訴',tags:{kyo:0.5,cold:-0.5},ev:'exp'},
+   {f:'saikoryukotsu',when:'不安・不眠・動悸。体力中等度以上',tags:{kyo:-1},ev:'exp'},
+   {f:'kanbakutaiso',when:'情動の不安定（急に泣く・興奮）。短期で',tags:{},ev:'exp'}
+  ]},
+
+ {id:'dysphagia', label:'嚥下障害・誤嚥性肺炎予防',
+  red:'嚥下評価（スクリーニング・VF/VE）、口腔ケア、姿勢・食形態の調整が基本。漢方は補助。',
+  feat:[
+   {id:'reflex',label:'むせ・嚥下反射や咳反射の低下',boost:{hangekoboku:3}},
+   {id:'appetite',label:'食欲低下・胃もたれ',boost:{rikkunshi:3}},
+   {id:'frail',label:'倦怠・体力低下',boost:{hochuekki:2,ninjinyoei:2}}
+  ],
+  opts:[
+   {f:'hangekoboku',when:'高齢者の嚥下反射・咳反射の低下、のどのつかえ感。甘草を含まない',tags:{elder:1},ev:'RCT',ev_note:'認知症高齢者の観察者盲検RCTで肺炎発症が減少（4例 vs 14例）。嚥下反射・咳反射の改善も小規模試験で報告。',refs:['HKT_JAGS','HKT_SW','HKT_CO']},
+   {f:'rikkunshi',when:'食欲低下・胃もたれを伴う',tags:{kyo:0.5,gi:1},ev:'exp'},
+   {f:'hochuekki',when:'全身の倦怠・体力低下を伴う',tags:{kyo:1},ev:'exp'},
+   {f:'ninjinyoei',when:'高齢者のフレイル（倦怠・食欲不振・咳）',tags:{kyo:1,elder:1},ev:'exp'}
+  ]},
+
+ {id:'constip', label:'便秘（PD・脳卒中後を含む）',
+  red:'腸閉塞・宿便・薬剤性（抗コリン薬・オピオイド・Ca拮抗薬など）を確認。大黄含有方剤は刺激性下剤と同じ扱い。',
+  feat:[
+   {id:'bloat',label:'腹部膨満・ガス・冷えると腹痛',boost:{daikenchu:3,keishikashakuyaku:1}},
+   {id:'hard',label:'硬いコロコロ便',boost:{mashinin:2,junchou:2}},
+   {id:'dry',label:'皮膚の乾燥（高齢）',boost:{junchou:2}},
+   {id:'nodai',label:'下痢しやすく大黄を避けたい',boost:{daikenchu:2,keishikashakuyaku:2}},
+   {id:'flush',label:'体力充実・のぼせ・月経関連',boost:{tokaku:3}}
+  ],
+  opts:[
+   {f:'daikenchu',when:'腹部膨満・腸管ガス、冷えると腹痛。大黄を含まない',tags:{kyo:0.5,cold:1},ev:'RCT',ev_note:'脳卒中後の便秘で非盲検の小規模RCTで改善。PDの便秘を対象にした試験は見当たらない。',refs:['DKT_STROKE']},
+   {f:'mashinin',when:'高齢者のコロコロ便。体力中等度以下',tags:{kyo:0.5,elder:1},ev:'exp'},
+   {f:'junchou',when:'高齢者の硬い便、皮膚乾燥',tags:{kyo:0.5,elder:1},ev:'exp'},
+   {f:'daiokanzo',when:'一般的な便秘。量で調整しやすい',tags:{},ev:'exp'},
+   {f:'keishikashakuyaku',when:'腹部膨満・腹痛・しぶり腹。大黄を含まない',tags:{kyo:0.5},ev:'exp'},
+   {f:'tokaku',when:'体力充実・のぼせ・便秘',tags:{kyo:-1.5,cold:-1},ev:'exp'}
+  ]},
+
+ {id:'ileus', label:'腹部膨満・術後の腸管麻痺',
+  red:'機械的腸閉塞（嘔吐・腹痛・画像）を除外。',
+  feat:[
+   {id:'post',label:'術後・長期臥床',boost:{daikenchu:3}},
+   {id:'pain',label:'腹痛・しぶり腹',boost:{keishikashakuyaku:3}},
+   {id:'upper',label:'上腹部の膨満・胃もたれ',boost:{rikkunshi:3}}
+  ],
+  opts:[
+   {f:'daikenchu',when:'術後の腸管運動低下、腹部膨満・ガス',tags:{},ev:'RCT',ev_note:'大腸切除後・胃全摘後の二重盲検RCTはいずれも主要評価項目で有意差なし。',refs:['DKT_COL','DKT_GAS']},
+   {f:'keishikashakuyaku',when:'腹部膨満と腹痛・しぶり腹',tags:{kyo:0.5},ev:'exp'},
+   {f:'rikkunshi',when:'上腹部膨満・胃もたれ・食欲不振',tags:{gi:1},ev:'exp'}
+  ]},
+
+ {id:'anorexia', label:'食欲不振・胃もたれ',
+  red:'悪性腫瘍・薬剤性（オピオイド・抗菌薬・ドネペジルなど）・低Na・高Ca・うつを確認。',
+  feat:[
+   {id:'fd',label:'早期満腹・胃もたれ（FD）',boost:{rikkunshi:3}},
+   {id:'fatigue',label:'全身倦怠・病後・術後',boost:{hochuekki:3}},
+   {id:'colddiar',label:'冷え・胃痛・下痢',boost:{ninjin:3}},
+   {id:'tsukae',label:'心窩部のつかえ・腹鳴・下痢',boost:{hangeshashin:3}},
+   {id:'frail',label:'高齢フレイル・不眠・咳',boost:{ninjinyoei:3}}
+  ],
+  opts:[
+   {f:'rikkunshi',when:'食欲不振・胃もたれ・早期満腹感',tags:{kyo:0.5,gi:1},ev:'RCT',ev_note:'機能性ディスペプシアの二重盲検RCTでプラセボに優越。',refs:['RKT_FD']},
+   {f:'hochuekki',when:'全身倦怠・気力低下を伴う食欲不振。病後・術後',tags:{kyo:1},ev:'exp'},
+   {f:'ninjin',when:'冷え・胃痛・水様下痢を伴う。虚弱',tags:{kyo:1,cold:1.5},ev:'exp'},
+   {f:'hangeshashin',when:'心窩部のつかえ・悪心・腹鳴・軟便',tags:{},ev:'exp'},
+   {f:'ninjinyoei',when:'高齢者のフレイル（倦怠・食欲不振・不眠・咳）',tags:{kyo:1,elder:1},ev:'exp'}
+  ]},
+
+ {id:'nausea', label:'悪心・嘔吐',
+  red:'頭蓋内圧亢進・前庭障害・腸閉塞・薬剤・電解質異常を確認。',
+  feat:[
+   {id:'thirst',label:'口渇・尿量減少',boost:{gorei:3}},
+   {id:'headache',label:'頭痛に伴う・冷え',boost:{goshuyu:3}},
+   {id:'fd',label:'胃もたれ・食欲不振',boost:{rikkunshi:3}}
+  ],
+  opts:[
+   {f:'shohangekabukuryo',when:'悪心・嘔吐全般（つわり・化学療法・めまいに伴うもの）',tags:{},ev:'exp'},
+   {f:'gorei',when:'口渇・尿量減少を伴う嘔吐、急性胃腸炎',tags:{},ev:'exp'},
+   {f:'goshuyu',when:'頭痛に伴う嘔吐、冷え',tags:{cold:1},ev:'exp'},
+   {f:'rikkunshi',when:'胃もたれ・食欲不振を伴う悪心',tags:{gi:1},ev:'exp'}
+  ]},
+
+ {id:'fatigue', label:'倦怠感・フレイル・病後',
+  red:'貧血・甲状腺・副腎不全・電解質・うつ・悪性腫瘍・睡眠障害を確認。',
+  feat:[
+   {id:'appetite',label:'食欲不振・気力低下・微熱',boost:{hochuekki:3}},
+   {id:'anemia',label:'貧血傾向・皮膚乾燥・冷え',boost:{juzen:3}},
+   {id:'frail',label:'高齢・不眠・咳・物忘れ',boost:{ninjinyoei:3}}
+  ],
+  opts:[
+   {f:'hochuekki',when:'倦怠感・気力低下・食欲不振、病後・術後の回復期',tags:{kyo:1},ev:'exp'},
+   {f:'juzen',when:'術後・化学療法後の体力低下、貧血傾向、皮膚乾燥',tags:{kyo:1,cold:0.5},ev:'exp'},
+   {f:'ninjinyoei',when:'高齢者のフレイル（倦怠・食欲不振・不眠・咳）',tags:{kyo:1,elder:1},ev:'exp'}
+  ]},
+
+ {id:'numb', label:'しびれ・冷え・神経痛',
+  red:'原因検索（糖尿病・ビタミンB12・圧迫性・CIDP・血管炎・薬剤性など）を先に。神経障害性疼痛は標準薬が基本。',
+  feat:[
+   {id:'elderleg',label:'高齢者の下肢しびれ・夜間頻尿',boost:{goshajinki:3,hachimi:2}},
+   {id:'edema',label:'下肢のむくみ',boost:{goshajinki:2}},
+   {id:'joint',label:'関節痛・冷えで悪化する神経痛',boost:{keishikajutsubu:3}},
+   {id:'lumbar',label:'腰〜下肢の痛み・夜間痛',boost:{sokei:3}},
+   {id:'handcold',label:'手足の強い冷え・しもやけ',boost:{tokishigyaku:3}}
+  ],
+  opts:[
+   {f:'goshajinki',when:'高齢者の下肢のしびれ・冷え・痛み、夜間頻尿、浮腫',tags:{kyo:0.5,cold:1,elder:1},ev:'exp',ev_note:'オキサリプラチンによる末梢神経障害の予防RCTは有効性を示せず、第III相では牛車腎気丸群で悪化し中止。',refs:['GJG_GONE','GJG_GENIUS']},
+   {f:'hachimi',when:'牛車腎気丸と同様で浮腫が目立たない',tags:{kyo:0.5,cold:1,elder:1},ev:'exp'},
+   {f:'keishikajutsubu',when:'冷えで悪化する関節痛・神経痛。虚弱〜中間',tags:{kyo:1,cold:1.5},ev:'exp'},
+   {f:'sokei',when:'腰〜下肢の痛み・しびれ、筋肉痛、夜間痛',tags:{},ev:'exp'},
+   {f:'tokishigyaku',when:'手足の強い冷え、冷えで悪化する下肢痛・腰痛',tags:{kyo:0.5,cold:2},ev:'exp'}
+  ]},
+
+ {id:'edema', label:'浮腫・慢性硬膜下血腫',
+  red:'心不全・腎障害・肝硬変・低Alb・DVT・薬剤性（Ca拮抗薬・プレガバリン）を確認。CSDHは症候性・増大なら手術。',
+  feat:[
+   {id:'csdh',label:'慢性硬膜下血腫（術後再発予防・軽症例）',boost:{gorei:3}},
+   {id:'thirst',label:'口渇・尿量減少',boost:{gorei:2}},
+   {id:'inflam',label:'炎症を伴う浮腫',boost:{sairei:3}},
+   {id:'coldleg',label:'高齢者の下肢浮腫・冷え・しびれ',boost:{goshajinki:3}}
+  ],
+  opts:[
+   {f:'gorei',when:'口渇・尿量減少を伴う浮腫。慢性硬膜下血腫で使われる。甘草を含まない',tags:{},ev:'RCT',ev_note:'CSDH術後の再発抑制は非盲検RCT2件とも全体で有意差なし（均一型・分離型ではサブ解析で減少）。観察研究を含むメタ解析では減少。',refs:['GRS_CSDH1','GRS_CSDH2','GRS_MA']},
+   {f:'sairei',when:'浮腫と炎症を伴う水滞',tags:{},ev:'exp'},
+   {f:'goshajinki',when:'高齢者の下肢浮腫・冷え・しびれ',tags:{kyo:0.5,cold:1,elder:1},ev:'exp'}
+  ]},
+
+ {id:'cold', label:'感冒・咳・咽頭痛',
+  red:'肺炎・インフルエンザ・COVID-19、細菌性咽頭炎、喘息・心不全による咳を区別。',
+  feat:[
+   {id:'early',label:'発症早期・悪寒・無汗・項部こり',boost:{kakkon:3,mao:1}},
+   {id:'highfever',label:'高熱・関節痛・体力充実',boost:{mao:3}},
+   {id:'elderchill',label:'高齢・虚弱で寒気と倦怠',boost:{maobushisaishin:3,koso:1}},
+   {id:'nomao',label:'麻黄を避けたい・胃腸虚弱',boost:{koso:3}},
+   {id:'rhin',label:'水様鼻汁・くしゃみ',boost:{shoseiryu:3}},
+   {id:'mid',label:'数日経過・微熱・食欲低下',boost:{saikokeishi:3}},
+   {id:'dry',label:'乾いた咳・痰が切れにくい',boost:{bakumondo:3}},
+   {id:'throat',label:'咽頭痛',boost:{kikyo:3}}
+  ],
+  opts:[
+   {f:'kakkon',when:'感冒初期（悪寒・無汗・項背部のこわばり）。体力中等度以上',tags:{kyo:-1},ev:'RCT',ev_note:'感冒の増悪予防で総合感冒薬に優越しなかった（RCT）。',refs:['KKT']},
+   {f:'mao',when:'高熱・悪寒・関節痛・無汗。体力充実',tags:{kyo:-1.5},ev:'exp'},
+   {f:'maobushisaishin',when:'高齢・虚弱者の感冒（寒気・倦怠が強く熱感に乏しい）',tags:{kyo:1,cold:1.5,elder:1},ev:'exp'},
+   {f:'koso',when:'虚弱・胃腸が弱く麻黄が使えない人の感冒初期',tags:{kyo:1,gi:1},ev:'exp'},
+   {f:'shoseiryu',when:'水様鼻汁・くしゃみ・薄い痰',tags:{},ev:'exp'},
+   {f:'saikokeishi',when:'感冒の中期（数日経過・微熱・食欲低下）',tags:{},ev:'exp'},
+   {f:'bakumondo',when:'乾性咳嗽・痰が切れにくい、感冒後の遷延する咳',tags:{},ev:'small',ev_note:'感染後咳嗽・COPDの小規模非盲検試験で、早期の咳スコアのみ改善。',refs:['BMD','BMD_COPD']},
+   {f:'kikyo',when:'咽頭痛（溶かしてうがいしながら飲む）',tags:{},ev:'exp'}
+  ]},
+
+ {id:'hiccup', label:'しゃっくり（吃逆）',
+  red:'持続する吃逆は延髄病変（外側延髄梗塞・NMOSDの最後野症候群）、縦隔・横隔膜病変、電解質異常、薬剤（ステロイド・ベンゾジアゼピン）を確認。',
+  feat:[
+   {id:'acute',label:'まず頓用で試したい',boost:{shakuyakukanzo:2}},
+   {id:'cold',label:'冷え・悪心を伴う',boost:{goshuyu:3}}
+  ],
+  opts:[
+   {f:'shakuyakukanzo',when:'吃逆に頓用（横隔膜の痙攣として）',dose:'1回2.5g 頓用',tags:{},ev:'exp'},
+   {f:'goshuyu',when:'冷え・悪心を伴う吃逆',tags:{cold:1},ev:'exp'}
+  ],
+  note:'吃逆に保険適応のある方剤はない。柿蒂湯（コタロー等）も用いられる。'},
+
+ {id:'stomatitis', label:'口内炎',
+  red:'ベーチェット病・ヘルペス・カンジダ・薬疹（SJS）・ビタミン欠乏を区別。',
+  feat:[],
+  opts:[
+   {f:'hangeshashin',when:'化学療法などによる口内炎。溶かして含嗽',tags:{},ev:'RCT',ev_note:'第II相RCT2件とも発症率は有意差なし。大腸癌では持続期間が短縮（5.5日 vs 10.5日）。',refs:['HST_OM','HST_OM2']}
+  ]},
+
+ {id:'diarrhea', label:'下痢',
+  red:'感染性腸炎（CD腸炎を含む）、経管栄養の速度・浸透圧、薬剤（下剤・抗菌薬・Mg）を確認。',
+  feat:[
+   {id:'coldwater',label:'冷え・水様下痢・高齢虚弱',boost:{shinbu:3}},
+   {id:'pain',label:'冷え・胃痛・唾液が多い',boost:{ninjin:3}},
+   {id:'tsukae',label:'心窩部のつかえ・腹鳴',boost:{hangeshashin:3}},
+   {id:'acute',label:'急性・口渇・尿量減少',boost:{gorei:3}}
+  ],
+  opts:[
+   {f:'shinbu',when:'冷え・虚弱の水様下痢、高齢者',tags:{kyo:1.5,cold:1.5,elder:1},ev:'exp'},
+   {f:'ninjin',when:'冷え・胃痛を伴う下痢',tags:{kyo:1,cold:1.5},ev:'exp'},
+   {f:'hangeshashin',when:'腹鳴・心窩部のつかえを伴う下痢',tags:{},ev:'exp'},
+   {f:'gorei',when:'急性胃腸炎で口渇・尿量減少',tags:{},ev:'exp'}
+  ]},
+
+ {id:'women', label:'更年期・月経関連・冷えのぼせ',
+  red:'甲状腺疾患・うつ病・婦人科疾患を確認。',
+  feat:[
+   {id:'irrit',label:'いらいら・のぼせ・訴えが多彩',boost:{kamishoyo:3}},
+   {id:'coldedema',label:'冷え・むくみ・貧血傾向・頭重',boost:{tokishakuyaku:3}},
+   {id:'oketsu',label:'のぼせ・肩こり・下腹部圧痛',boost:{keishibukuryo:3}},
+   {id:'constip',label:'体力充実・便秘・精神不安',boost:{tokaku:3}}
+  ],
+  opts:[
+   {f:'kamishoyo',when:'いらいら・のぼせ・不眠・不定愁訴',tags:{kyo:0.5},ev:'exp'},
+   {f:'tokishakuyaku',when:'冷え・浮腫・貧血傾向、頭重・めまい。虚弱',tags:{kyo:1,cold:1},ev:'exp'},
+   {f:'keishibukuryo',when:'のぼせ・肩こり・下腹部圧痛（瘀血）。体力中等度以上',tags:{kyo:-1},ev:'exp'},
+   {f:'tokaku',when:'体力充実・のぼせ・便秘・月経関連の精神不安',tags:{kyo:-1.5,cold:-1},ev:'exp'}
+  ]},
+
+ {id:'htnsx', label:'高血圧の随伴症状',
+  red:'降圧治療が先。漢方は降圧薬の代わりにならない。',
+  feat:[
+   {id:'weak',label:'虚弱・のぼせ・耳鳴・頭重',boost:{shichimotsu:3}},
+   {id:'morning',label:'朝の頭痛・めまい・肩こり',boost:{choto:3}},
+   {id:'flush',label:'顔面紅潮・いらいら・暑がり',boost:{oren:3}}
+  ],
+  opts:[
+   {f:'shichimotsu',when:'虚弱者の高血圧に伴うのぼせ・肩こり・耳鳴・頭重',tags:{kyo:1},ev:'exp'},
+   {f:'choto',when:'中高年の朝の頭痛・めまい・肩こり',tags:{elder:1},ev:'exp'},
+   {f:'oren',when:'顔面紅潮・いらいら・のぼせ、体力中等度以上',tags:{kyo:-1,cold:-1.5},ev:'exp'}
+  ]}
+];
+
+/* ======================= 共通 ======================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),2200); }
+const EVL = {RCT:'RCT', GL:'GL記載', small:'小規模・観察研究', exp:'経験的'};
+function srcLinks(keys){
+  if(!keys||!keys.length) return '';
+  return '<span class="src">'+keys.filter(k=>REFS[k]).map(k=>{const r=REFS[k]; return r.url?`<a href="${r.url}" target="_blank" rel="noopener">${esc(r.label)}</a>`:`<a>${esc(r.label)}</a>`;}).join('')+'</span>';
+}
+function g(v){ return (Math.round(v*10)/10).toString(); }
+
+/* ======================= 安全性判定 ======================= */
+function safety(fid, c){
+  const F = FM[fid]; const out=[];
+  if(!F) return out;
+  const s = c.sf;
+  if(F.k>0){
+    if(F.k>=2.5 && s.lowK) out.push({lv:'crit', t:`甘草${g(F.k)}g/日：低K血症・アルドステロン症・ミオパチーには禁忌`});
+    else if(s.lowK) out.push({lv:'warn', t:`甘草${g(F.k)}g/日：低Kを悪化させうる。Kを補正し短期で`});
+    if(s.diur) out.push({lv:'warn', soft:1, t:`甘草${g(F.k)}g/日＋利尿薬：低Kが出やすい。2〜4週でK確認`});
+    else if(s.elder && F.k>=1.5) out.push({lv:'warn', soft:1, t:`甘草${g(F.k)}g/日・高齢：K・血圧・浮腫を2〜4週で確認`});
+    else if(F.k>=2.5 && !s.lowK) out.push({lv:'info', t:`甘草${g(F.k)}g/日：連用時はK・血圧を確認`});
+    if(s.otherK) out.push({lv:'warn', t:'他の甘草・グリチルリチン製剤と合算（併用チェック）'});
+  }
+  if(F.mao>0){
+    const r=[]; if(s.cardio) r.push('心血管疾患'); if(s.thy) r.push('甲状腺機能亢進'); if(s.urin) r.push('排尿障害'); if(s.elder) r.push('高齢');
+    if(r.length) out.push({lv:'warn', t:`麻黄${g(F.mao)}g/日：${r.join('・')}では動悸・血圧上昇・尿閉に注意。避けるか短期`});
+    if(c.kj==='kyo') out.push({lv:'warn', t:'麻黄：虚弱者では発汗過多・動悸・胃腸障害が出やすい'});
+    if(c.gi) out.push({lv:'info', t:'麻黄：食欲不振・胃部不快が出ることがある'});
+  }
+  if(F.dai>0){
+    if(s.preg) out.push({lv:'warn', t:`大黄${g(F.dai)}g/日：妊娠中は子宮収縮、授乳中は乳児の下痢に注意`});
+    if(c.diarrh) out.push({lv:'warn', t:'大黄：下痢しやすい人では避けるか少量から'});
+    else if(c.kj==='kyo') out.push({lv:'info', t:'大黄：虚弱者では腹痛・下痢に注意し少量から'});
+  }
+  if(F.bushi>0){
+    if(c.kn==='heat' || c.kj==='jitsu') out.push({lv:'warn', t:'附子：暑がり・体力充実ではのぼせ・動悸・舌のしびれが出やすい'});
+    if(s.preg) out.push({lv:'warn', t:'附子：妊娠中は避ける'});
+  }
+  if(F.ogon>0){
+    if(fid==='shosaiko'){
+      if(s.ifn) out.push({lv:'crit', t:'インターフェロン併用は禁忌（間質性肺炎）'});
+      if(s.liver) out.push({lv:'crit', t:'肝硬変・肝癌、慢性肝炎で血小板10万/mm³以下は禁忌'});
+      if(s.ip) out.push({lv:'crit', t:'間質性肺炎の既往：避ける'});
+    } else {
+      if(s.ip) out.push({lv:'warn', t:'黄芩含有：間質性肺炎の既往では避ける'});
+      if(s.liver) out.push({lv:'warn', t:'黄芩含有：肝障害の報告あり。肝機能を確認'});
+    }
+  }
+  if(F.sansi>0) out.push({lv:'info', t:'山梔子：長期投与（多くは5年以上）で腸間膜静脈硬化症。長期化したら見直す'});
+  if(F.jio>0 && c.gi) out.push({lv:'warn', t:'地黄含有：胃腸が弱いと食欲不振・胃もたれが出やすい'});
+  if(F.oketsu && s.preg) out.push({lv:'warn', t:'駆瘀血剤：妊娠中は流早産の危険があり避ける'});
+  if(F.short) out.push({lv:'info', t:F.short});
+  return out;
+}
+
+/* ======================= 選ぶ：入力 ======================= */
+function buildScenes(){
+  $('#sceneBox').innerHTML = SCENES.map((s,i)=>`<label class="chip"><input type="radio" name="scene" value="${s.id}"${i===0?' checked':''}><span>${esc(s.label)}</span></label>`).join('');
+}
+function curScene(){ const v=($('input[name=scene]:checked')||{}).value; return SCENES.find(s=>s.id===v)||SCENES[0]; }
+function buildFeats(keep){
+  const S=curScene();
+  $('#featBox').innerHTML = S.feat.map(ft=>`<label class="chip"><input type="checkbox" class="ft" value="${ft.id}"${keep&&keep.includes(ft.id)?' checked':''}><span>${esc(ft.label)}</span></label>`).join('');
+  $('#redflag').innerHTML = '<b>先に確認</b>'+esc(S.red);
+}
+function readForm(){
+  const sf={}; $$('.sf').forEach(e=>sf[e.value]=e.checked);
+  return {
+    scene: curScene().id,
+    feat: $$('.ft:checked').map(e=>e.value),
+    kj: ($('input[name=kj]:checked')||{}).value||'mid',
+    kn: ($('input[name=kn]:checked')||{}).value||'mid',
+    gi: $('#gi').checked, diarrh: $('#diarrh').checked, sf
+  };
+}
+function writeForm(d){
+  if(!d) return;
+  const r=$(`input[name=scene][value="${d.scene}"]`); if(r) r.checked=true;
+  buildFeats(d.feat||[]);
+  const a=$(`input[name=kj][value="${d.kj}"]`); if(a) a.checked=true;
+  const b=$(`input[name=kn][value="${d.kn}"]`); if(b) b.checked=true;
+  $('#gi').checked=!!d.gi; $('#diarrh').checked=!!d.diarrh;
+  $$('.sf').forEach(e=>e.checked=!!(d.sf&&d.sf[e.value]));
+}
+
+/* ======================= 選ぶ：判定 ======================= */
+function rank(c){
+  const S=SCENES.find(s=>s.id===c.scene);
+  const list = S.opts.map((o,i)=>{
+    let sc = 10 - i*0.6, why=[];
+    const t=o.tags||{};
+    S.feat.forEach(ft=>{ if(c.feat.includes(ft.id) && ft.boost[o.f]){ sc+=ft.boost[o.f]*3; why.push(ft.label); } });
+    if(t.kyo){ if(c.kj==='kyo'){ sc+=t.kyo*2; if(t.kyo>0) why.push('虚弱向き'); } if(c.kj==='jitsu'){ sc-=t.kyo*2; if(t.kyo<0) why.push('体力充実向き'); } }
+    if(t.cold){ if(c.kn==='cold'){ sc+=t.cold*2; if(t.cold>0) why.push('冷えに合う'); } if(c.kn==='heat'){ sc-=t.cold*2; if(t.cold<0) why.push('熱・のぼせに合う'); } }
+    if(t.gi && c.gi){ sc+=t.gi*2; if(t.gi>0) why.push('胃腸虚弱でも使いやすい'); }
+    if(t.elder && c.sf.elder){ sc+=t.elder*1.5; if(t.elder>0) why.push('高齢者向き'); }
+    const fl = safety(o.f, c);
+    const ng = fl.some(x=>x.lv==='crit');
+    sc -= fl.filter(x=>x.lv==='warn').reduce((a,x)=>a+(x.soft?0.5:1.5),0);
+    if(ng) sc -= 100;
+    return {o, sc, why, fl, ng};
+  });
+  list.sort((a,b)=>b.sc-a.sc);
+  return {S, list};
+}
+function render(){
+  const c=readForm();
+  try{ localStorage.setItem('kampo.draft', JSON.stringify(c)); }catch(e){}
+  const {S,list}=rank(c);
+  $('#candList').innerHTML = list.map((x,i)=>{
+    const F=FM[x.o.f]; const top = i===0 && !x.ng;
+    const evp = x.o.ev==='exp' ? `<span class="pill exp">${EVL.exp}</span>` : `<span class="pill ev">${EVL[x.o.ev]}</span>`;
+    return `<div class="cand${top?' top':''}${x.ng?' ng':''}">
+      <div class="hd">${top?'<span class="pill top">第一候補</span>':''}${x.ng?'<span class="pill ng">避ける</span>':''}<span class="nm">${esc(F.name)}</span><span class="no">ツムラ${F.no}</span>${evp}</div>
+      <div class="when">${esc(x.o.when)}</div>
+      ${x.why.length?`<div class="why">合う点：${esc([...new Set(x.why)].join('、'))}</div>`:''}
+      <div class="dose">用量：${esc(x.o.dose||F.dose)}</div>
+      ${x.o.ev_note?`<div class="note">${esc(x.o.ev_note)} ${srcLinks(x.o.refs)}</div>`:(x.o.refs?srcLinks(x.o.refs):'')}
+      ${x.fl.length?'<ul class="flags">'+x.fl.map(f=>`<li class="${f.lv}">${esc(f.t)}</li>`).join('')+'</ul>':''}
+    </div>`;
+  }).join('');
+  const t0=list.find(x=>!x.ng); $('#dockText').innerHTML = t0?`${esc(S.label)}：<b>${esc(FM[t0.o.f].name)}</b>`:'候補なし';
+  $('#sceneNote').innerHTML = S.note ? esc(S.note)+' '+srcLinks(S.refs) : '';
+}
+function summaryText(){
+  const c=readForm(); const {S,list}=rank(c);
+  const ok=list.filter(x=>!x.ng).slice(0,3);
+  const feats=S.feat.filter(f=>c.feat.includes(f.id)).map(f=>f.label);
+  const kj={kyo:'虚弱',mid:'中間',jitsu:'充実'}[c.kj], kn={cold:'冷え',mid:'寒熱なし',heat:'暑がり'}[c.kn];
+  let t=`【漢方検討】${S.label}${feats.length?'（'+feats.join('、')+'）':''}／体質：${kj}・${kn}${c.gi?'・胃腸虚弱':''}\n`;
+  ok.forEach((x,i)=>{ const F=FM[x.o.f]; t+=`${i===0?'第一候補':'候補'}：ツムラ${F.name}（${F.no}）${x.o.dose||F.dose}\n`; x.fl.filter(f=>f.lv!=='info').forEach(f=>t+=`  注意：${f.t}\n`); });
+  t+='判定：急性は数日、慢性は2〜4週で効果を確認。';
+  return t;
+}
+
+/* ======================= 併用チェック ======================= */
+function buildMix(){
+  const q=($('#mixSearch').value||'').trim();
+  const sel=new Set($$('.mx:checked').map(e=>e.value));
+  const ids=Object.keys(FM).sort((a,b)=>FM[a].no-FM[b].no);
+  $('#mixPick').innerHTML = ids.filter(id=>{ const F=FM[id]; return !q || F.name.includes(q) || F.yomi.includes(q) || String(F.no)===q || sel.has(id); })
+    .map(id=>`<label class="chip"><input type="checkbox" class="mx" value="${id}"${sel.has(id)?' checked':''}><span>${FM[id].no} ${esc(FM[id].name)}</span></label>`).join('');
+}
+function renderMix(){
+  const sel=$$('.mx:checked').map(e=>e.value);
+  const w={}; $$('.mw').forEach(e=>w[e.value]=e.checked);
+  try{ localStorage.setItem('kampo.mix', JSON.stringify({sel,w})); }catch(e){}
+  const sum=k=>sel.reduce((a,id)=>a+(FM[id][k]||0),0);
+  const K=sum('k'), M=sum('mao'), D=sum('dai'), B=sum('bushi');
+  const kc = K>=5?'crit':(K>=2.5?'warn':'');
+  $('#totBox').innerHTML = `<div><div class="k">甘草</div><div class="v ${kc}">${g(K)}</div><div class="k">g/日</div></div>
+    <div><div class="k">麻黄</div><div class="v ${M>0&&sel.filter(id=>FM[id].mao>0).length>1?'warn':''}">${g(M)}</div><div class="k">g/日</div></div>
+    <div><div class="k">大黄</div><div class="v ${D>0&&(w.stim||sel.filter(id=>FM[id].dai>0).length>1)?'warn':''}">${g(D)}</div><div class="k">g/日</div></div>
+    <div><div class="k">附子</div><div class="v">${g(B)}</div><div class="k">g/日</div></div>`;
+  const fl=[];
+  if(!sel.length) fl.push({lv:'info', t:'方剤を選ぶと、注意生薬の合計と重複を表示します'});
+  if(sel.length>=3) fl.push({lv:'warn', t:`${sel.length}剤の併用：生薬の重複が増え効果判定も難しくなる。整理を検討`});
+  if(K>0){
+    if(w.lowK && K>=2.5) fl.push({lv:'crit', t:`甘草合計${g(K)}g/日：低K血症では避ける（1日2.5g以上の製剤は禁忌）`});
+    else if(K>=5) fl.push({lv:'crit', t:`甘草合計${g(K)}g/日：偽アルドステロン症の危険が高い。併用を見直す`});
+    else if(K>=2.5) fl.push({lv:'warn', t:`甘草合計${g(K)}g/日：K・血圧・浮腫を2〜4週で確認`});
+    if(w.diur) fl.push({lv:'warn', t:'甘草＋利尿薬：低Kが出やすい'});
+    if(w.glyc) fl.push({lv:'warn', t:'甘草＋グリチルリチン製剤：グリチルリチンが重複し偽アルドステロン症の危険'});
+    if(w.elder && K>=1.5) fl.push({lv:'warn', t:'高齢：甘草の副作用が出やすい'});
+  }
+  const dup=(k,label)=>{ const a=sel.filter(id=>FM[id][k]>0); if(a.length>1) fl.push({lv:'warn', t:`${label}の重複：${a.map(id=>FM[id].name).join('＋')}`}); };
+  dup('mao','麻黄'); dup('dai','大黄'); dup('bushi','附子'); dup('ogon','黄芩'); dup('sansi','山梔子');
+  if(M>0 && w.symp) fl.push({lv:'warn', t:'麻黄＋交感神経刺激作用のある薬：動悸・頻脈・血圧上昇・不眠が増強'});
+  if(D>0 && w.stim) fl.push({lv:'warn', t:'大黄＋刺激性下剤：作用が重複し下痢・腹痛'});
+  if(sel.includes('shosaiko') && w.ifn) fl.push({lv:'crit', t:'小柴胡湯＋インターフェロン：併用禁忌（間質性肺炎）'});
+  if(sel.some(id=>FM[id].ogon>0) && w.ifn && !sel.includes('shosaiko')) fl.push({lv:'warn', t:'黄芩含有＋インターフェロン：間質性肺炎に注意'});
+  if(sel.some(id=>FM[id].sansi>0)) fl.push({lv:'info', t:'山梔子含有：長期内服で腸間膜静脈硬化症'});
+  $('#mixFlags').innerHTML = fl.map(f=>`<li class="${f.lv}">${esc(f.t)}</li>`).join('');
+}
+
+/* ======================= 方剤早見 ======================= */
+function renderDB(){
+  const q=($('#dbSearch').value||'').trim();
+  const f={}; $$('.dbf').forEach(e=>f[e.value]=e.checked);
+  const ids=Object.keys(FM).sort((a,b)=>FM[a].no-FM[b].no).filter(id=>{
+    const F=FM[id];
+    if(f.k0 && F.k>0) return false; if(f.nomao && F.mao>0) return false; if(f.nodai && F.dai>0) return false;
+    if(!q) return true;
+    const hay=[F.name,F.yomi,String(F.no),F.kou,F.mok,F.tips||''].join(' ');
+    return q.split(/\s+/).every(w=>hay.includes(w));
+  });
+  $('#dbCount').textContent = `${ids.length}方剤`;
+  $('#dbList').innerHTML = ids.map(id=>{
+    const F=FM[id]; const tg=[];
+    if(F.k>0) tg.push('甘草'+g(F.k)); if(F.mao>0) tg.push('麻黄'+g(F.mao)); if(F.dai>0) tg.push('大黄'+g(F.dai)); if(F.bushi>0) tg.push('附子'+g(F.bushi)); if(F.ogon>0) tg.push('黄芩'); if(F.sansi>0) tg.push('山梔子'); if(F.jio>0) tg.push('地黄');
+    return `<details class="fm"><summary><span class="no">${F.no}</span><span class="nm">${esc(F.name)}</span>${tg.map(t=>`<span class="tg">${t}</span>`).join('')}</summary>
+      <div class="bd"><dl class="kv">
+        <dt>よみ</dt><dd>${esc(F.yomi)}</dd>
+        <dt>用量</dt><dd>${esc(F.dose)}</dd>
+        <dt>効能・効果</dt><dd>${esc(F.kou)}</dd>
+        <dt>使う目安</dt><dd>${esc(F.mok)}</dd>
+        ${F.tips?`<dt>病棟での使い方</dt><dd>${esc(F.tips)}</dd>`:''}
+        ${F.ci?`<dt>禁忌・注意</dt><dd>${esc(F.ci)}</dd>`:''}
+        ${F.pi?`<dt>添付文書</dt><dd><a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/460026_${F.pi}" target="_blank" rel="noopener">PMDA（ツムラ${F.no}）</a></dd>`:''}
+      </dl></div></details>`;
+  }).join('');
+}
+
+/* ======================= 出典 ======================= */
+function renderRefs(){
+  $('#refList').innerHTML = REF_ORDER.map(k=>{ const r=REFS[k]; return `<li><span class="tag">${esc(r.label)}</span>${esc(r.text)}${r.url?` <a href="${r.url}" target="_blank" rel="noopener">${r.url}</a>`:''}</li>`; }).join('');
+}
+
+/* ======================= イベント ======================= */
+$$('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  $$('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  $$('.view').forEach(v=>v.classList.toggle('active',v.id===b.dataset.v));
+  $('#dock').classList.toggle('hidden', b.dataset.v!=='v-sel'); document.body.classList.toggle('sel', b.dataset.v==='v-sel');
+  window.scrollTo({top:0});
+  try{ localStorage.setItem('kampo.view', b.dataset.v); }catch(e){}
+}));
+$('#f').addEventListener('change', e=>{ if(e.target.name==='scene') buildFeats([]); render(); });
+$('#dockBtn').addEventListener('click', ()=>$('#result').scrollIntoView({behavior:'smooth'}));
+$('#copyBtn').addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(summaryText()); toast('コピーしました'); }catch(e){ toast('コピーできませんでした'); } });
+$('#resetBtn').addEventListener('click', ()=>{ writeForm({scene:SCENES[0].id,feat:[],kj:'mid',kn:'mid',sf:{}}); render(); window.scrollTo({top:0}); });
+$('#mixSearch').addEventListener('input', buildMix);
+$('#v-mix').addEventListener('change', renderMix);
+$('#dbSearch').addEventListener('input', renderDB);
+$$('.dbf').forEach(e=>e.addEventListener('change', renderDB));
+
+/* init */
+buildScenes(); buildFeats([]);
+try{ const d=JSON.parse(localStorage.getItem('kampo.draft')||'null'); if(d && SCENES.some(s=>s.id===d.scene)) writeForm(d); }catch(e){}
+render();
+buildMix();
+try{ const m=JSON.parse(localStorage.getItem('kampo.mix')||'null'); if(m){ (m.sel||[]).forEach(id=>{const e=$(`.mx[value="${id}"]`); if(e) e.checked=true;}); $$('.mw').forEach(e=>e.checked=!!(m.w&&m.w[e.value])); } }catch(e){}
+renderMix(); renderDB(); renderRefs();
+$('#psaSrc').outerHTML = srcLinks(['PSA_JADER','PSA_YKS','PSA_MAN','MP','MP_PMDA']);
+try{ const v=localStorage.getItem('kampo.view'); if(v){ const b=$(`nav.tabs button[data-v="${v}"]`); if(b) b.click(); } }catch(e){}
+
+/* ======================= PWA：service worker ======================= */
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
