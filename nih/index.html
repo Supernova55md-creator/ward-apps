@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b6e79">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NIHSS">
+<title>NIHSS評価</title>
+<style>
+/* Layout: sticky score bar on top, 15 item cards in one column (two columns for paired limbs on wide screens), saved evaluations + trend below. */
+:root{
+  --bg:#f3f5f7;
+  --surface:#ffffff;
+  --ink:#17222b;
+  --muted:#5b6872;
+  --line:#d8dee3;
+  --accent:#0b6e79;
+  --accent-soft:#e1f0f1;
+  --warn:#b25e00;
+  --warn-soft:#fff1de;
+  --crit:#b3261e;
+  --crit-soft:#fde7e5;
+  --ok:#2f7d32;
+  --font-body:"BIZ UDPGothic","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --font-num:ui-monospace,"SFMono-Regular","Menlo","Roboto Mono","Consolas",monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#11171c;--surface:#1a2228;--ink:#e6ecef;--muted:#9aa8b1;--line:#2c3840;
+    --accent:#4fc1cc;--accent-soft:#163338;--warn:#f0a44b;--warn-soft:#3a2a14;
+    --crit:#ff8a80;--crit-soft:#3d1c1a;--ok:#81c784;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11171c;--surface:#1a2228;--ink:#e6ecef;--muted:#9aa8b1;--line:#2c3840;
+  --accent:#4fc1cc;--accent-soft:#163338;--warn:#f0a44b;--warn-soft:#3a2a14;
+  --crit:#ff8a80;--crit-soft:#3d1c1a;--ok:#81c784;color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:860px;margin:0 auto;padding:0 calc(16px + env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
+h1,h2,h3{text-wrap:balance;margin:0}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+
+/* score bar */
+.bar{position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:860px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.total{display:flex;align-items:baseline;gap:6px}
+.total .big{font-family:var(--font-num);font-size:40px;font-weight:700;line-height:1;color:var(--accent)}
+.total .of{color:var(--muted);font-size:13px}
+.sev{font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.sev.s3{background:var(--warn-soft);color:var(--warn)}
+.sev.s4{background:var(--crit-soft);color:var(--crit)}
+.meta{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted);margin-left:auto;text-align:right}
+.meta b{color:var(--ink)}
+.delta{font-size:12px;font-weight:700}
+.delta.up{color:var(--crit)}.delta.down{color:var(--ok)}
+
+/* controls */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:16px 0 8px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+select,input[type="datetime-local"],input[type="text"]{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px}
+.btn{font:inherit;font-size:14px;font-weight:700;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 14px;min-height:40px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn:focus-visible,.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.notice{border-left:4px solid var(--warn);background:var(--warn-soft);padding:10px 12px;border-radius:6px;font-size:14px;margin:10px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.notice[hidden]{display:none}
+
+/* items */
+.items{display:grid;gap:12px;margin-top:8px}
+.pair{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media (max-width:640px){.pair{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;border-left:5px solid var(--line)}
+.card.done{border-left-color:var(--accent)}
+.card.un{border-left-color:var(--warn)}
+.card-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.code{font-family:var(--font-num);font-weight:700;color:var(--accent);font-size:14px}
+.card-h h3{font-size:16px}
+.card-h .pts{margin-left:auto;font-family:var(--font-num);font-weight:700;font-size:18px}
+.how{font-size:13px;color:var(--muted)}
+.opts{display:grid;gap:6px}
+.opt{display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:start;text-align:left;font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;min-height:44px}
+.opt .v{font-family:var(--font-num);font-weight:700;font-size:16px;text-align:center;line-height:1.4}
+.opt[aria-checked="true"]{background:var(--accent-soft);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt.un-opt .v{font-size:13px}
+details.rules{font-size:13px;color:var(--muted)}
+details.rules summary{cursor:pointer;color:var(--accent);font-weight:700}
+details.rules ul{margin:6px 0 0;padding-left:1.2em;color:var(--ink)}
+details.rules li+li{margin-top:3px}
+.pit{margin-top:8px;border:1px dashed var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;color:var(--ink)}
+.pit-a{color:var(--accent);font-weight:700}
+.basics{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px}
+.basics summary{cursor:pointer;font-weight:700}
+.basics ul{margin:8px 0 0;padding-left:1.2em}
+.basics li+li{margin-top:3px}
+
+/* records */
+section.rec{margin-top:28px;display:flex;flex-direction:column;gap:12px}
+section.rec h2{font-size:18px}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px}
+.chart svg{display:block;width:100%;height:auto}
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:center}
+th{color:var(--muted);font-weight:700;background:var(--bg);position:sticky;top:0}
+td.l,th.l{text-align:left}
+td.tot{font-family:var(--font-num);font-weight:700;color:var(--accent)}
+td.num{font-family:var(--font-num)}
+tr.worse td.dl{color:var(--crit);font-weight:700}
+.empty{color:var(--muted);font-size:14px;padding:12px}
+.rowbtn{font:inherit;font-size:12px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:3px 8px;cursor:pointer}
+textarea{width:100%;font-family:var(--font-num);font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:96px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+footer{margin-top:28px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="bar" role="region" aria-label="合計スコア">
+  <div class="bar-in">
+    <div class="total"><span class="big num" id="total">0</span><span class="of">/ 42（実質40）</span></div>
+    <span class="sev" id="sev">症状なし</span>
+    <span class="delta" id="delta"></span>
+    <div class="meta">
+      <span>入力 <b class="num" id="done">0</b> / 15 項目</span>
+      <span id="unNote"></span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="controls">
+    <div class="field"><label for="label">評価のタイミング</label>
+      <select id="label">
+        <option>来院時</option>
+        <option>rt-PA/TNK 投与前</option>
+        <option>投与中</option>
+        <option>投与後1時間</option>
+        <option>血栓回収後</option>
+        <option>24時間後</option>
+        <option>症状変化時</option>
+        <option>退院時</option>
+        <option>その他</option>
+      </select>
+    </div>
+    <div class="field"><label for="when">評価時刻</label><input type="datetime-local" id="when"></div>
+    <div class="field"><label for="rater">評価者</label><input type="text" id="rater" placeholder="例：Dr. 一條" size="12"></div>
+    <button class="btn" id="allZero" type="button">未入力を0点で埋める</button>
+    <button class="btn" id="openTips" type="button">コツをすべて開く</button>
+  </div>
+
+  <details class="basics" id="basics">
+    <summary>評価の基本ルール</summary>
+    <ul>
+      <li>番号順に評価し、順番を変えない（1a だけは後から再評価してよい）</li>
+      <li>見たままを評価し、推測しない。「この人ならできるはず」は採らない</li>
+      <li>最良の反応ではなく最初の反応を採点する（項目9は例外）</li>
+      <li>指示されている部分以外で患者を誘導・指導しない</li>
+      <li>検査しながら、その場で記録する</li>
+      <li>麻痺の評価は視覚と聴覚の両方に働きかけて（声かけ＋パントマイム）</li>
+      <li>意識レベルの確認は日常会話の中でもよい。眼球運動は水平方向のみ</li>
+      <li>失調・無視は「あるときだけ」加点する</li>
+      <li>痛み刺激で評価してよいのは意識レベルと感覚（意識障害時は顔面も）だけ</li>
+    </ul>
+  </details>
+
+  <div class="notice" id="comaNote" hidden>
+    <span>1a＝3（昏睡）。原法の規定では 1b＝2、7＝0、8＝2、9＝3 になります。他の項目は通常どおり評価してください。</span>
+    <button class="btn" id="comaFill" type="button">規定値を入れる</button>
+  </div>
+
+  <div class="items" id="items"></div>
+
+  <div class="controls" style="margin-top:18px">
+    <button class="btn primary" id="save" type="button">この評価を保存</button>
+    <button class="btn" id="copyNow" type="button">カルテ用にコピー</button>
+    <button class="btn" id="clearForm" type="button">入力をクリア</button>
+  </div>
+
+  <section class="rec" aria-labelledby="recH">
+    <h2 id="recH">保存した評価（経時変化）</h2>
+    <div class="chart" id="chart"></div>
+    <div class="tbl-wrap"><table id="recTbl"></table></div>
+    <div class="controls" style="margin:0">
+      <button class="btn" id="copyAll" type="button">経過をまとめてコピー</button>
+      <button class="btn" id="newPt" type="button">新しい患者（記録を全消去）</button>
+    </div>
+    <div class="notice" id="confirmNew" hidden>
+      <span>保存した評価をすべて消去します。</span>
+      <button class="btn" id="confirmYes" type="button">消去する</button>
+      <button class="btn" id="confirmNo" type="button">やめる</button>
+    </div>
+    <label class="field" for="out">コピー内容（コピーできない環境ではここから選択してください）</label>
+    <textarea id="out" readonly></textarea>
+  </section>
+
+  <footer>
+    <span>記録はこの端末のブラウザ内にだけ保存されます。氏名・ID など個人を特定できる情報は入力しないでください。</span>
+    <span>重症度の区分（0／1–4／5–15／16–20／21–42）は慣用の目安です。基準評価からの4点以上の悪化を強調表示します。</span>
+    <span>出典：Brott T, et al. Measurements of acute cerebral infarction: a clinical examination scale. Stroke. 1989;20(7):864-870.
+      <a href="https://pubmed.ncbi.nlm.nih.gov/2749846/">PubMed 2749846</a></span>
+  </footer>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const ITEMS = [
+  {id:"1a", name:"意識水準", how:"どの強さの刺激で覚醒するかをみる（観察→声かけ→強い刺激の順）。",
+   opts:[[0,"完全に覚醒（声をかける前から開眼し、こちらを見る）"],[1,"簡単な刺激（声かけ）で覚醒する。「眠そう」程度でも1点"],[2,"繰り返し・強い刺激（体をゆする、痛み刺激）でようやく覚醒する"],[3,"痛み刺激にも反射以外の反応がない（除脳・除皮質硬直を含む）"]],
+   rules:["観察が先、声かけは後。「○○さん、わかりますか？」で反応をみる","この項目だけは後から再評価してよい（例：1点→0点）。他の項目は番号順に評価する","3点は痛み刺激に反射的な姿勢しか示さないときだけ（GCS の M1〜3 に相当）。昏睡では多くの項目が最重度になり合計がほぼ40点になるので、安易に3点をつけない","意識低下は脳そのものの障害（出血・浮腫による脳幹障害など）と全身要因（低酸素・感染・低血糖など）の両面から考え、すぐに原因検索する"]},
+  {id:"1b", name:"意識障害－質問", how:"「今、何月ですか？」「おいくつですか？」と尋ね、見当識と言語表出をみる。",
+   opts:[[0,"2問とも正答"],[1,"1問だけ正答"],[2,"2問とも誤答、または応答できない"]],
+   rules:["近い答えは不正解（5月に「4月」は×）。部分点はない","2〜3回聞き直すのはよいが、誘導やヒントは禁止","失語・昏迷で質問が理解できなければ2点","挿管・口腔外傷・高度の構音障害など、失語以外の理由で話せないときは1点"]},
+  {id:"1c", name:"意識障害－従命", how:"「目を閉じて／開けて」「手を握って／開いて」の1段階命令。",
+   opts:[[0,"2つとも正しく行う"],[1,"1つだけ行う"],[2,"2つともできない・理解できない・反応がない"]],
+   rules:["命令は1段階ずつ出す（「握って離して」のような2段階はNG）","握る・開く、閉じる・開けるで1セット。片方だけでは不可","必ず健側（麻痺のない手）で評価する","把握反射があるので、検者の手は握らせない","失語にはパントマイムで示す。最初の企図を採点し、やり直しは採らない"]},
+  {id:"2", name:"最良の注視", how:"指やペンを左右にゆっくり動かして追視させる。水平方向のみ評価。",
+   opts:[[0,"正常（正中を越えて左右ともスムーズに追視できる）"],[1,"部分的注視麻痺（途中で止まる・ぎこちない、偏視があっても努力や反射で正中を越えられる）"],[2,"共同偏視（強制偏視）、または頭位変換眼球反射でも克服できない完全注視麻痺"]],
+   rules:["指示が通らなければ、視線を合わせてから検者が顔を左右に動かすか、頭位変換眼球反射でみる","上下方向は評価しない","単一の末梢性眼筋麻痺（III・IV・VI）は1点","共同偏視は大血管閉塞（ELVO）を疑う重要なサイン"],
+   pit:{q:"ぼんやり右を見ているが、指示すると左右とも正中を越えて追視できる。眼振・強い共同偏視なし。",a:"0点。自然な向きぐせではなく、指示したときの可動域で判断する。"}},
+  {id:"3", name:"視野", how:"必ず視線を固定し、片眼ずつ上下左右の4象限で指の数や動きを確認（対座法）。",
+   opts:[[0,"視野欠損なし"],[1,"部分的半盲（四分盲を含む明らかな左右差）"],[2,"完全半盲（同名半盲）"],[3,"両側性半盲（皮質盲を含む全盲）"]],
+   rules:["応答できなければ、指を急に近づけたときの瞬目（visual threat）でみる","片眼失明でも、反対眼の全象限が正常なら0点。両眼とも重度の視力障害は3点","右への注視制限が強くて左を向けなくても、正面近くの視野に左右差がなければ0点（注視の異常は項目2で採る）"],
+   pit:{q:"片眼ずつの単独刺激では上下左右すべて見える。左右同時に指を動かすと、決まって左だけ「わからない」。",a:"視野は0点。両側同時刺激で片側が消えるのは消去現象で、項目11で採点する。"}},
+  {id:"4", name:"顔面麻痺", how:"「イーッと歯を見せて」に加え、眉上げ・強く閉眼も指示して「動き」の左右差をみる。",
+   opts:[[0,"正常（安静時のわずかな差があっても、動きが左右対称なら0点）"],[1,"軽度の麻痺（動くが明らかに弱い、鼻唇溝の平坦化・笑顔の非対称）"],[2,"部分的麻痺（顔面下半分がほぼ動かない、笑っても麻痺側の口角が上がらない）"],[3,"完全麻痺（額のしわ寄せ・閉眼もできず、上下とも動かない）"]],
+   rules:["安静時の見た目だけでは加点しない。原文も movement をみる項目","指示が通らなければパントマイム。意識障害では痛み刺激でのしかめ顔の左右差をみる（無反応は3点）","額・閉眼が保たれるのは中枢性麻痺の特徴","顔面の非対称は小梗塞でもよく見られ、嚥下障害の手がかりになる"],
+   pit:{q:"安静時に左口角がやや下がって見えるが、歯を見せる・眉上げ・強閉眼はどれも左右差なくできる。",a:"0点。安静時の見た目ではなく、動きで判断する。"}},
+  {id:"5a", name:"上肢の運動（左）", how:"掌を下にして坐位90°／臥位45°に検者が肢位を作り、「この位置で保ってください」と声に出して10秒数える。健側から。", un:"切断・関節癒合", group:"arm",
+   opts:[[0,"10秒間下垂なく保持"],[1,"10秒以内に下垂するが、ベッドには触れない"],[2,"重力に抗する動きはあるが、10秒以内にベッドに触れる（または挙上・保持できない）"],[3,"重力に抗する動きがない（支えを外すとすぐ落ちるが、動きはある）"],[4,"全く動かない"]],
+   rules:["一度でもベッドに触れたらその時点で2点確定。持ち直しても採点は変えない","除脳硬直などの反射的な動きは4点","失語ではパントマイムで示し、声をかけて励ます。筋力評価で痛み刺激は与えない","麻痺のある患者では頻回に評価すると症状の変化をとらえられる"],
+   pit:{q:"右腕を45°に上げて手を離すと、3秒ほどでベッドに完全に落ちた。その後少し持ち上げ直すが、またすぐ落ちる。",a:"右上肢2点。一度ベッドに触れた時点で確定し、やり直しの改善は採点しない。"}},
+  {id:"5b", name:"上肢の運動（右）", how:"掌を下にして坐位90°／臥位45°に検者が肢位を作り、「この位置で保ってください」と声に出して10秒数える。健側から。", un:"切断・関節癒合", group:"arm",
+   opts:[[0,"10秒間下垂なく保持"],[1,"10秒以内に下垂するが、ベッドには触れない"],[2,"重力に抗する動きはあるが、10秒以内にベッドに触れる（または挙上・保持できない）"],[3,"重力に抗する動きがない（支えを外すとすぐ落ちるが、動きはある）"],[4,"全く動かない"]],
+   rules:["一度でもベッドに触れたらその時点で2点確定。持ち直しても採点は変えない","除脳硬直などの反射的な動きは4点","失語ではパントマイムで示し、声をかけて励ます。筋力評価で痛み刺激は与えない","麻痺のある患者では頻回に評価すると症状の変化をとらえられる"],
+   pit:{q:"右腕を45°に上げて手を離すと、3秒ほどでベッドに完全に落ちた。その後少し持ち上げ直すが、またすぐ落ちる。",a:"右上肢2点。一度ベッドに触れた時点で確定し、やり直しの改善は採点しない。"}},
+  {id:"6a", name:"下肢の運動（左）", how:"仰臥位で膝を伸ばし、検者が30°に挙上して「この位置で保ってください」と声に出して5秒数える。健側から。", un:"切断・関節癒合", group:"leg",
+   opts:[[0,"5秒間下垂なく保持"],[1,"5秒以内に下垂するが、ベッドには触れない"],[2,"重力に抗する動きはあるが、5秒以内にベッドに触れる"],[3,"重力に抗する動きがない（ベッド上でわずかな動きはある）"],[4,"全く動かない"]],
+   rules:["一度でもベッドに触れたらその時点で2点確定","30°の角度を意識する。除脳硬直などの反射的な動きは4点","できるだけ励まし、必要ならパントマイムで示す"],
+   pit:{q:"大腿も膝もまったく持ち上がらず、踵も浮かない。足首の曲げ伸ばしや足趾の動きはわずかにある。",a:"左下肢3点。抗重力挙上なし＋わずかな運動ありは3点（全く動かない4点と区別）。"}},
+  {id:"6b", name:"下肢の運動（右）", how:"仰臥位で膝を伸ばし、検者が30°に挙上して「この位置で保ってください」と声に出して5秒数える。健側から。", un:"切断・関節癒合", group:"leg",
+   opts:[[0,"5秒間下垂なく保持"],[1,"5秒以内に下垂するが、ベッドには触れない"],[2,"重力に抗する動きはあるが、5秒以内にベッドに触れる"],[3,"重力に抗する動きがない（ベッド上でわずかな動きはある）"],[4,"全く動かない"]],
+   rules:["一度でもベッドに触れたらその時点で2点確定","30°の角度を意識する。除脳硬直などの反射的な動きは4点","できるだけ励まし、必要ならパントマイムで示す"],
+   pit:{q:"大腿も膝もまったく持ち上がらず、踵も浮かない。足首の曲げ伸ばしや足趾の動きはわずかにある。",a:"3点。抗重力挙上なし＋わずかな運動ありは3点（全く動かない4点と区別）。"}},
+  {id:"7", name:"運動失調", how:"開眼で指－鼻－指試験・踵－膝試験を左右とも、しっかり大きく。各肢2回以上。", un:"切断・関節癒合",
+   opts:[[0,"なし（滑らかに目標へ到達する）"],[1,"1肢に明らかな失調（測定障害・企図振戦・運動分解）"],[2,"2肢以上に明らかな失調"]],
+   rules:["失調は「あるとき」だけ加点。筋力低下で説明できる拙劣さは加点しない","指示が理解できない・麻痺で動かせない・昏睡（1a＝3）は0点","視野欠損があれば見える側で行う","麻痺側で失調を重複加点しないため、合計の実質最大は40点"]},
+  {id:"8", name:"感覚", how:"上腕・前腕・大腿・下腿（顔・体幹も）の左右同じ場所をピンで交互に刺激。「同じくらいチクッとしますか」。",
+   opts:[[0,"正常（左右差がない）"],[1,"軽度～中等度（鈍いが、触られているのはわかる）"],[2,"重度～完全（触られていることもわからない）"]],
+   rules:["手首・足首より先は避ける（糖尿病などの末梢神経障害の影響を除くため）","脳卒中による感覚障害だけを評価する","傾眠や指示が通らないときは、痛み刺激への表情・逃避反応で判断","昏睡（1a＝3）は2点。両側の感覚脱失を伴う脳幹梗塞も2点"]},
+  {id:"9", name:"最良の言語", how:"絵カード（説明）・呼称カード・文章カード（音読）で、理解と表出をみる。",
+   opts:[[0,"失語なし（軽い言い淀み程度はOK）"],[1,"軽度～中等度（明らかな失語はあるが、患者の言葉だけで何の絵・物のことか検者が同定できる）"],[2,"重度（断片的で、何の絵・物のことか検者が同定できない）"],[3,"無言・全失語（言語でのコミュニケーションがほぼ不能）"]],
+   rules:["1点と2点の分かれ目：患者の言葉だけで「何のことか」検者が同定できれば1点、できなければ2点","この項目だけは最初の反応でなく最良の反応で採点する","視覚障害があれば、手に置いた物の呼称・自発語・復唱で評価","挿管で話せなければ書字で評価。昏睡（1a＝3）は3点"],
+   pit:{q:"絵カードで「えっと…お母さん…洗ってて…子ども…クッキー…落ちそう…」。呼称は「飲むやつ…あ、コップ」と最後は言い当てる。",a:"1点。検者が「何のことか」同定できるので軽～中等度。"}},
+  {id:"10", name:"構音障害", how:"単語カードの音読（または復唱）で発音の明瞭さをみる。「何を」ではなく「どう」発音するか。", un:"挿管・口腔外傷などの物理的障壁",
+   opts:[[0,"正常（発音はほぼ正常）"],[1,"軽度～中等度（ろれつが回りにくいが、内容は理解できる）"],[2,"重度（発声はあるが単語として聞き取れない、またはほぼ無言）"]],
+   rules:["検査の目的は患者に伝えない（ゆっくり丁寧に話して異常が隠れるため）","重度失語でも聞こえる音の明瞭さで評価し、無言は2点","UN は挿管・口腔外傷・マウスピースなどで発声できないときに限る"],
+   pit:{q:"左MCA梗塞でほとんど言葉が出ない。「あー…うー…」と声は出るが、単語として聞き取れない。挿管なし。",a:"2点。挿管でなければ UN は使えず、意味のある発話が聞き取れない・無言は2点。"}},
+  {id:"11", name:"消去現象と注意障害（無視）", how:"まず1〜10の診察中の様子で明らかな無視・病態失認がないかをみる。なければ視覚・触覚の両側同時刺激で確認。",
+   opts:[[0,"異常なし（明らかな無視がなく、両側同時刺激でも消去なし）"],[1,"1つの感覚様式での消去現象、または視覚・触覚・聴覚・視空間・自己身体のいずれかへの不注意"],[2,"重度の半側無視、または2つ以上の感覚様式での消去現象"]],
+   rules:["明らかな無視・病態失認（腕がベッドから落ちても気づかない、自分の手を「わからない」、麻痺を否認、片側しか向かない）は2点","両側同時刺激は ①片側ずつ刺激してわかることを確認 → ②同時に刺激して片側が消えるかをみる。触覚は閉眼で行う","視野が正常なら、項目3の両側同時刺激の結果を使ってよい","異常があるときだけ加点。半側空間無視は ELVO を疑うサインで、転倒予防の観点からも重要"],
+   pit:{q:"失語で二点同時刺激テストは形式どおりできないが、左右どちらにも注意を向け、トレイの左右の料理にも手を伸ばす。",a:"0点。検査ができないだけでは加点しない。明らかな無視所見がなければ0点。"}}
+];
+
+const ORDER = ITEMS.map(i=>i.id);
+const KEY = "nihss-eval-v1";
+
+let scores = {};      // id -> number | "UN"
+let records = [];     // {t,label,rater,scores,total}
+
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(KEY)||"null"); if(d){ scores=d.scores||{}; records=d.records||[]; } }catch(e){}
+}
+function persist(){
+  try{ localStorage.setItem(KEY, JSON.stringify({scores,records})); }catch(e){}
+}
+
+function totalOf(s){ let t=0; for(const k of ORDER){ const v=s[k]; if(typeof v==="number") t+=v; } return t; }
+function doneOf(s){ return ORDER.filter(k=>s[k]!==undefined && s[k]!==null).length; }
+function unOf(s){ return ORDER.filter(k=>s[k]==="UN"); }
+function severity(t){
+  if(t===0) return ["症状なし","s1"];
+  if(t<=4) return ["軽症（1–4）","s1"];
+  if(t<=15) return ["中等症（5–15）","s2"];
+  if(t<=20) return ["中等～重症（16–20）","s3"];
+  return ["重症（21–42）","s4"];
+}
+
+function el(tag, attrs={}, ...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==="class") e.className=v; else if(k==="text") e.textContent=v; else e.setAttribute(k,v);
+  }
+  kids.forEach(c=>{ if(c) e.append(c); });
+  return e;
+}
+
+function cardFor(it){
+  const pts = el("span",{class:"pts num",id:"pts-"+it.id});
+  const card = el("div",{class:"card",id:"card-"+it.id},
+    el("div",{class:"card-h"}, el("span",{class:"code",text:it.id}), el("h3",{text:it.name}), pts),
+    el("div",{class:"how",text:it.how})
+  );
+  const opts = el("div",{class:"opts",role:"radiogroup","aria-label":it.id+" "+it.name});
+  const all = it.opts.map(o=>({v:o[0],t:o[1]}));
+  if(it.un) all.push({v:"UN",t:"評価不能："+it.un+"（合計に含めない）"});
+  all.forEach(o=>{
+    const b = el("button",{type:"button",class:"opt"+(o.v==="UN"?" un-opt":""),role:"radio","aria-checked":"false","data-id":it.id,"data-v":String(o.v),id:"o-"+it.id+"-"+o.v},
+      el("span",{class:"v",text:String(o.v)}), el("span",{text:o.t}));
+    b.addEventListener("click",()=>{
+      const val = o.v==="UN" ? "UN" : o.v;
+      scores[it.id] = (scores[it.id]===val) ? undefined : val;
+      if(scores[it.id]===undefined) delete scores[it.id];
+      update();
+    });
+    opts.append(b);
+  });
+  card.append(opts);
+  if(it.rules){
+    const d = el("details",{class:"rules"}, el("summary",{text:"採点のコツ"+(it.pit?"・間違いやすい例":"")}));
+    const ul = el("ul"); it.rules.forEach(r=>ul.append(el("li",{text:r}))); d.append(ul);
+    if(it.pit){
+      d.append(el("div",{class:"pit"},
+        el("div",{class:"pit-q"}, el("b",{text:"例題　"}), document.createTextNode(it.pit.q)),
+        el("div",{class:"pit-a"}, el("b",{text:"→ "}), document.createTextNode(it.pit.a))));
+    }
+    card.append(d);
+  }
+  return card;
+}
+
+function build(){
+  const box = document.getElementById("items");
+  let i=0;
+  while(i<ITEMS.length){
+    const it=ITEMS[i];
+    if(it.group && ITEMS[i+1] && ITEMS[i+1].group===it.group){
+      box.append(el("div",{class:"pair"}, cardFor(it), cardFor(ITEMS[i+1]))); i+=2;
+    } else { box.append(cardFor(it)); i++; }
+  }
+}
+
+function update(){
+  for(const it of ITEMS){
+    const v = scores[it.id];
+    document.querySelectorAll('[data-id="'+it.id+'"]').forEach(b=>{
+      b.setAttribute("aria-checked", String(v!==undefined && String(v)===b.dataset.v));
+    });
+    const card=document.getElementById("card-"+it.id);
+    card.classList.toggle("done", typeof v==="number");
+    card.classList.toggle("un", v==="UN");
+    document.getElementById("pts-"+it.id).textContent = v===undefined ? "–" : String(v);
+  }
+  const t = totalOf(scores);
+  document.getElementById("total").textContent = t;
+  const [sl,sc] = severity(t);
+  const sev=document.getElementById("sev"); sev.textContent=sl; sev.className="sev "+sc;
+  document.getElementById("done").textContent = doneOf(scores);
+  const un = unOf(scores);
+  document.getElementById("unNote").textContent = un.length ? "UN："+un.join("・")+"（合計外）" : "";
+  const dEl = document.getElementById("delta");
+  if(records.length){
+    const d = t - records[0].total;
+    dEl.textContent = "基準（"+records[0].label+"）比 "+(d>0?"+":"")+d;
+    dEl.className = "delta"+(d>=4?" up":d<0?" down":"");
+  } else { dEl.textContent=""; dEl.className="delta"; }
+  document.getElementById("comaNote").hidden = scores["1a"]!==3;
+  document.getElementById("save").disabled = doneOf(scores)<15;
+  persist();
+}
+
+function pad(n){return String(n).padStart(2,"0");}
+function nowLocal(){ const d=new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes()); }
+function fmt(t){ if(!t) return ""; const [d,h]=t.split("T"); const p=d.split("-"); return p[0]+"/"+p[1]+"/"+p[2]+" "+(h||""); }
+
+function lineFor(s){
+  return ORDER.map(k=>k+":"+(s[k]===undefined?"-":s[k])).join(" ");
+}
+function textFor(r){
+  const un = unOf(r.scores);
+  return "NIHSS "+r.total+"点（"+fmt(r.t)+" "+r.label+(r.rater?"、評価者 "+r.rater:"")+"）\n"+lineFor(r.scores)+(un.length?"\n※UN："+un.join("・")+"（合計に含めず）":"");
+}
+function current(){
+  return {t:document.getElementById("when").value||nowLocal(), label:document.getElementById("label").value, rater:document.getElementById("rater").value.trim(), scores:{...scores}, total:totalOf(scores)};
+}
+
+let toastTimer;
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1800); }
+function copy(text){
+  const out=document.getElementById("out"); out.value=text;
+  try{
+    navigator.clipboard.writeText(text).then(()=>toast("コピーしました"),()=>{ out.select(); toast("下の欄から選択してコピーしてください"); });
+  }catch(e){ out.select(); toast("下の欄から選択してコピーしてください"); }
+}
+
+function renderRecords(){
+  const tbl=document.getElementById("recTbl"); tbl.innerHTML="";
+  if(!records.length){
+    tbl.append(el("tbody",{}, el("tr",{}, el("td",{class:"empty l",text:"まだ保存した評価はありません。15項目を入力して「この評価を保存」を押すと、ここに経過が並びます。"}))));
+    document.getElementById("chart").innerHTML='<div class="empty">保存すると合計点の推移を表示します。</div>';
+    return;
+  }
+  const head=el("tr",{}, el("th",{class:"l",text:"時刻"}), el("th",{class:"l",text:"タイミング"}), el("th",{text:"合計"}), el("th",{text:"基準比"}));
+  ORDER.forEach(k=>head.append(el("th",{text:k})));
+  head.append(el("th",{text:""}));
+  const tb=el("tbody");
+  const base=records[0].total;
+  records.forEach((r,idx)=>{
+    const d=r.total-base;
+    const tr=el("tr",{class:d>=4?"worse":""},
+      el("td",{class:"l num",text:fmt(r.t)}), el("td",{class:"l",text:r.label}),
+      el("td",{class:"tot",text:String(r.total)}), el("td",{class:"num dl",text:idx===0?"基準":(d>0?"+":"")+d}));
+    ORDER.forEach(k=>tr.append(el("td",{class:"num",text:r.scores[k]===undefined?"-":String(r.scores[k])})));
+    const del=el("button",{type:"button",class:"rowbtn",text:"削除"});
+    del.addEventListener("click",()=>{ records.splice(idx,1); persist(); renderRecords(); update(); });
+    const ld=el("button",{type:"button",class:"rowbtn",text:"読込"});
+    ld.addEventListener("click",()=>{ scores={...r.scores}; update(); window.scrollTo({top:0}); toast("フォームに読み込みました"); });
+    const td=el("td"); td.append(ld," ",del); tr.append(td);
+    tb.append(tr);
+  });
+  tbl.append(el("thead",{},head), tb);
+  drawChart();
+}
+
+function drawChart(){
+  const W=800,H=220,L=38,R=16,T=16,B=44;
+  const n=records.length;
+  const maxV=Math.max(10, Math.ceil(Math.max(...records.map(r=>r.total))/5)*5);
+  const x=i=> n===1 ? (L+(W-L-R)/2) : L+i*(W-L-R)/(n-1);
+  const y=v=> T+(H-T-B)*(1-v/maxV);
+  let g="";
+  for(let v=0; v<=maxV; v+=5){
+    g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`;
+    g+=`<text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="ui-monospace,Menlo,monospace">${v}</text>`;
+  }
+  const base=records[0].total;
+  if(base+4<=maxV){
+    g+=`<line x1="${L}" x2="${W-R}" y1="${y(base+4)}" y2="${y(base+4)}" stroke="var(--crit)" stroke-dasharray="4 4" stroke-width="1"/>`;
+    g+=`<text x="${W-R}" y="${y(base+4)-5}" text-anchor="end" font-size="11" fill="var(--crit)">基準＋4</text>`;
+  }
+  const pts=records.map((r,i)=>`${x(i)},${y(r.total)}`).join(" ");
+  if(n>1){
+    g+=`<polygon points="${x(0)},${y(0)} ${pts} ${x(n-1)},${y(0)}" fill="var(--accent)" opacity="0.10"/>`;
+    g+=`<polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`;
+  }
+  records.forEach((r,i)=>{
+    const last=i===n-1;
+    g+=`<circle cx="${x(i)}" cy="${y(r.total)}" r="${last?6:4}" fill="${r.total-base>=4?'var(--crit)':'var(--accent)'}" stroke="var(--surface)" stroke-width="2"/>`;
+    g+=`<text x="${x(i)}" y="${y(r.total)-10}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)" font-family="ui-monospace,Menlo,monospace">${r.total}</text>`;
+    const lab=r.label.length>7?r.label.slice(0,7)+"…":r.label;
+    g+=`<text x="${x(i)}" y="${H-24}" text-anchor="middle" font-size="11" fill="var(--muted)">${lab.replace(/&/g,"&amp;").replace(/</g,"&lt;")}</text>`;
+    g+=`<text x="${x(i)}" y="${H-9}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="ui-monospace,Menlo,monospace">${(r.t.split("T")[1]||"")}</text>`;
+  });
+  document.getElementById("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="NIHSS合計点の推移">${g}</svg>`;
+}
+
+document.getElementById("comaFill").addEventListener("click",()=>{ scores["1b"]=2; scores["7"]=0; scores["8"]=2; scores["9"]=3; update(); toast("1b・7・8・9 に規定値を入れました"); });
+document.getElementById("openTips").addEventListener("click",(e)=>{
+  const ds=[...document.querySelectorAll("details.rules"), document.getElementById("basics")];
+  const open=!ds.every(d=>d.open);
+  ds.forEach(d=>d.open=open);
+  e.currentTarget.textContent = open ? "コツをすべて閉じる" : "コツをすべて開く";
+});
+document.getElementById("allZero").addEventListener("click",()=>{ ORDER.forEach(k=>{ if(scores[k]===undefined) scores[k]=0; }); update(); });
+document.getElementById("clearForm").addEventListener("click",()=>{ scores={}; update(); document.getElementById("when").value=nowLocal(); });
+document.getElementById("save").addEventListener("click",()=>{
+  const r=current(); records.push(r); records.sort((a,b)=>a.t<b.t?-1:a.t>b.t?1:0);
+  persist(); renderRecords(); update(); copy(textFor(r)); toast("保存してコピーしました");
+  document.getElementById("when").value=nowLocal();
+});
+document.getElementById("copyNow").addEventListener("click",()=>copy(textFor(current())));
+document.getElementById("copyAll").addEventListener("click",()=>{
+  if(!records.length){ toast("保存した評価がありません"); return; }
+  const base=records[0].total;
+  copy("NIHSS 経過\n"+records.map((r,i)=>fmt(r.t)+" "+r.label+"："+r.total+"点"+(i?"（基準比 "+((r.total-base)>0?"+":"")+(r.total-base)+"）":"（基準）")).join("\n"));
+});
+document.getElementById("newPt").addEventListener("click",()=>{ document.getElementById("confirmNew").hidden=false; });
+document.getElementById("confirmNo").addEventListener("click",()=>{ document.getElementById("confirmNew").hidden=true; });
+document.getElementById("confirmYes").addEventListener("click",()=>{
+  records=[]; scores={}; persist(); document.getElementById("confirmNew").hidden=true;
+  document.getElementById("out").value=""; renderRecords(); update(); toast("記録を消去しました");
+});
+
+load();
+build();
+document.getElementById("when").value=nowLocal();
+update();
+renderRecords();
+// service worker（https か localhost のときだけ。claude.ai 上では登録しない）
+(function(){
+  try{
+    const h=location.hostname;
+    const ok=(location.protocol==="https:"||h==="localhost"||h==="127.0.0.1")&&!/claude\.ai$|claudeusercontent|claude\.site/.test(h)&&"serviceWorker" in navigator;
+    if(!ok) return;
+    window.addEventListener("load",()=>{
+      navigator.serviceWorker.register("sw.js").then(reg=>{
+        reg.addEventListener("updatefound",()=>{
+          const nw=reg.installing; if(!nw) return;
+          nw.addEventListener("statechange",()=>{
+            if(nw.state==="installed" && navigator.serviceWorker.controller){ toast("新しい版を取り込みました。次に開いたときに反映されます"); }
+          });
+        });
+      }).catch(()=>{});
+    });
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
