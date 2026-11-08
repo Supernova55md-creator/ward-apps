@@ -55,3 +55,22 @@ ward-apps/
 - 写真から読み込む機能は claude.ai 上の版だけで動き、この版には表示されません。
 - 入口の index.html は複数の作業から同時に上書きすると行が消えることがあります。更新前に最新版を取得し、アップロード後に全アプリの行が残っているか確認してください。
 - MDS-UPDRS 評価ツール（updrs/）には判定基準の本文を含めていません。判定基準は手元の JSON を各端末のアプリ内で読み込み、その端末にだけ保存します。JSON はこのリポジトリに置かないでください。
+
+## 1つのPWAに統合（2026-11-08〜）
+同じドメイン（supernova55md-creator.github.io）に複数のPWAを置くと、Android の Chrome で2つ目以降が「すでにインストールされています」→「アプリを開けませんでした」となるため、ward-apps 全体を1つのPWA「病棟アプリ」にまとめた。
+
+- インストールするのは入口（/ward-apps/）の1つだけ。manifest.webmanifest・sw.js・アイコンは直下にある。
+- Android：入口を開いて Chrome のメニュー →「アプリをインストール」。アイコン長押しで各アプリへのショートカット（manifest の shortcuts）。
+- iPhone：各アプリを開いて 共有 →「ホーム画面に追加」で、アプリごとのアイコンも作れる（各アプリの apple-touch-icon を使う）。
+- 各アプリの index.html には manifest へのリンクを置かない。service worker は直下の ../sw.js を scope "../" で登録する。
+- 各アプリの sw.js は廃止用（古い登録とキャッシュを消して自分を解除するだけ）。消さずに残しておく。
+
+### 新しいアプリを足すとき
+1. <slug>/ に index.html とアイコン3つ（icon-192.png・icon-512.png・apple-touch-icon.png）を置く。manifest へのリンクは入れない。service worker は register("../sw.js",{scope:"../"}) で登録する。
+2. 直下の index.html の <ul> に1行追加。
+3. 直下の manifest.webmanifest の shortcuts に1件追加。
+4. 直下の sw.js の APPS に slug を足し、VERSION を変える。
+
+### アプリを更新したとき
+- 直下の sw.js の VERSION を必ず変える（各アプリの sw.js ではない）。
+- 入口の index.html・sw.js・manifest は1つの会話でまとめて更新する（複数の会話で同時に上書きすると行が消える）。
