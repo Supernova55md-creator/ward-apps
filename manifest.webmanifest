@@ -159,6 +159,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "神経免疫治療ナビ",
+      "short_name": "神経免疫ナビ",
+      "url": "imm/",
+      "icons": [
+        {
+          "src": "imm/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
