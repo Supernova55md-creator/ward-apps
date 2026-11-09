@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#6A4FC0">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="脳炎鑑別ナビ">
+<title>自己免疫性脳炎・脳症 鑑別ナビ</title>
+<style>
+/* Same base as 脂質異常症治療ナビ. Violet = neuroimmunology. */
+:root{
+  --bg:#F6F5F1; --surface:#FFFFFF; --ink:#1D2330; --muted:#5D6574; --line:#E3DED2;
+  --accent:#6A4FC0; --accent-strong:#4B3496; --accent-soft:#EEE9FB;
+  --ok:#2E7D4F; --ok-soft:#E5F3EA; --warn:#B45309; --warn-soft:#FDEEDC; --crit:#B42318; --crit-soft:#FDE7E5;
+  --font-display:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --font-body:"BIZ UDPGothic","Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14161B; --surface:#1D2028; --ink:#ECEAE4; --muted:#A3A9B5; --line:#30343E;
+    --accent:#B19CF2; --accent-strong:#CBBCF7; --accent-soft:#2A2340;
+    --ok:#5CC48A; --ok-soft:#173326; --warn:#F0A35A; --warn-soft:#3A2614; --crit:#F27A6E; --crit-soft:#3D1C1A;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0}
+a{color:var(--accent-strong)}
+.app{max-width:640px;margin:0 auto;min-height:100%;padding:0 calc(16px + env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));}
+.toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{flex:none}
+.brand h1{font-size:18px;font-weight:900;white-space:nowrap}
+.brand small{color:var(--muted);font-size:12px;margin-left:auto}
+@media (max-width:420px){.brand small{display:none}}
+.summary{margin-top:8px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:6px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px;min-width:0}
+.tile .k{font-size:11px;color:var(--muted);display:block}
+.tile .v{font-size:17px;font-weight:700;font-family:var(--font-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile.lv .v{font-size:14px}
+.tile.on{border-color:var(--accent);background:var(--accent-soft)}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.card h2{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.card h2 .n{font-size:12px;color:var(--accent-strong);background:var(--accent-soft);border-radius:6px;padding:0 6px}
+.card h3{font-size:14px;font-family:var(--font-body);font-weight:700;margin:12px 0 6px;color:var(--accent-strong)}
+.card h3:first-of-type{margin-top:0}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+select,input[type=number]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;min-height:44px}
+select:focus,input:focus,button:focus-visible,.chk:focus-within{outline:3px solid var(--accent);outline-offset:1px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:380px){.grid2{grid-template-columns:1fr}}
+.chks{display:flex;flex-direction:column;gap:6px}
+.chk{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);cursor:pointer;min-height:44px}
+.chk input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+.chk span{font-size:15px;line-height:1.45}
+.chk em{font-style:normal;color:var(--muted);font-size:12px;display:block}
+.chk .pt{margin-left:auto;font-size:12px;font-weight:700;color:var(--accent-strong);white-space:nowrap;padding-left:6px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.row-btn{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:10px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs button{font:inherit;font-size:12px;border:0;background:none;color:var(--muted);padding:9px 0 11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+nav.tabs button b{font-size:15px;font-family:var(--font-display)}
+nav.tabs button[aria-selected="true"]{color:var(--accent-strong)}
+nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;border:1px solid currentColor;white-space:nowrap}
+.pill.met{color:var(--ok)} .pill.no{color:var(--muted)} .pill.part{color:var(--warn)} .pill.hi{color:var(--crit)}
+.crit{border-top:1px solid var(--line);padding:10px 0}
+.crit:first-of-type{border-top:0;padding-top:0}
+.crit .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.crit .hd b{font-size:15px}
+.crit ul{margin:6px 0 0;padding-left:0;list-style:none;font-size:14px}
+.crit li{display:flex;gap:6px;align-items:flex-start;margin:2px 0}
+.crit li i{font-style:normal;flex:none;width:18px;text-align:center;font-weight:700}
+.crit li.y i{color:var(--ok)} .crit li.n i{color:var(--muted)}
+.crit li.n{color:var(--muted)}
+.alert{border-left:5px solid var(--warn);background:var(--warn-soft);border-radius:9px;padding:10px 12px;margin:8px 0;font-size:14px}
+.alert.crit2{border-color:var(--crit);background:var(--crit-soft)}
+.alert.ok{border-color:var(--ok);background:var(--ok-soft)}
+.alert.info{border-color:var(--accent);background:var(--accent-soft)}
+.alert b{display:block;margin-bottom:2px}
+.alert ul{margin:4px 0 0;padding-left:18px}
+.score{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:14px;margin-top:6px}
+.score .t{font-weight:700;border-top:1px solid var(--line);padding-top:4px}
+.score .z{color:var(--muted)}
+.meter{height:10px;border-radius:5px;background:var(--bg);border:1px solid var(--line);position:relative;margin:8px 0 18px}
+.meter .fill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--accent)}
+.meter .cut{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--ink)}
+.meter .cl{position:absolute;top:12px;font-size:11px;color:var(--muted);transform:translateX(-50%);white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 12px;cursor:pointer;min-height:38px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.ab{border-top:1px solid var(--line);padding:9px 0;display:grid;grid-template-columns:1fr auto;gap:2px 8px}
+.ab:first-child{border-top:0}
+.ab b{font-size:15px}
+.ab .sp{font-size:12px;font-weight:700;white-space:nowrap;align-self:start;border-radius:6px;padding:1px 7px;background:var(--accent-soft);color:var(--accent-strong)}
+.ab .d{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.ab .w{grid-column:1/-1;font-size:13px;color:var(--warn)}
+.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp th,.cmp td{border-top:1px solid var(--line);padding:7px 4px;text-align:left;vertical-align:top}
+.cmp th{font-weight:700;color:var(--muted);font-size:12px;position:sticky;top:0;background:var(--surface)}
+.cmp td:first-child{font-weight:700;white-space:nowrap}
+.tblwrap{overflow-x:auto}
+.grp{font-size:12px;font-weight:700;color:var(--accent-strong);background:var(--accent-soft)}
+.refs{padding-left:20px;font-size:14px}
+.refs li{margin:7px 0}
+.src{font-size:11px;color:var(--muted);margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
+details{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--bg);margin-top:8px}
+details summary{cursor:pointer;font-weight:700;font-size:14px}
+details p,details li{font-size:14px}
+.empty{color:var(--muted);font-size:14px}
+ul.plain{margin:4px 0;padding-left:18px;font-size:14px}
+ul.plain li{margin:3px 0}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 24V14M13 14L5 6M13 14l8-8M5 6L2 3M5 6L8 3M21 6l3-3M21 6l-3-3" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
+    <h1>自己免疫性脳炎・脳症 鑑別ナビ</h1><small>Graus 2016／APE2・RITE2／irAE</small>
+  </div>
+  <div class="summary" aria-live="polite">
+    <div class="tile lv" id="tLv"><span class="k">Graus 判定</span><span class="v" id="sumLv">—</span></div>
+    <div class="tile" id="tApe"><span class="k">APE2（≥4）</span><span class="v" id="sumApe">—</span></div>
+    <div class="tile" id="tRite"><span class="k">RITE2（≥7）</span><span class="v" id="sumRite">—</span></div>
+  </div>
+</header>
+
+<!-- ===================== INPUT ===================== -->
+<section class="view active" id="v-in">
+  <div class="card">
+    <h2><span class="n">1</span>経過と中核症状</h2>
+    <div class="chks">
+      <label class="chk"><input type="checkbox" data-k="subacute"><span>3カ月未満で急速に進行<em>Graus：subacute onset（rapid progression of less than 3 months）</em></span></label>
+      <label class="chk"><input type="checkbox" data-k="wm"><span>作業記憶障害（短期記憶の喪失）</span></label>
+      <label class="chk"><input type="checkbox" data-k="loc"><span>意識レベル低下・嗜眠</span></label>
+      <label class="chk"><input type="checkbox" data-k="pers"><span>人格変化</span></label>
+      <label class="chk"><input type="checkbox" data-k="psych"><span>精神症状（幻覚・妄想・興奮・緊張病など）</span></label>
+      <label class="chk"><input type="checkbox" data-k="focal"><span>新規の局所CNS所見</span></label>
+      <label class="chk"><input type="checkbox" data-k="seizure"><span>既知のてんかんで説明できない痙攣発作</span></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">2</span>症候の特徴（APE2・NMDAR基準）</h2>
+    <div class="chks">
+      <label class="chk"><input type="checkbox" data-k="apeOnset"><span>1〜6週で進行する精神状態の変化、または1年以内の新規発作<em>APE2の項目</em></span><span class="pt">+1</span></label>
+      <label class="chk"><input type="checkbox" data-k="neuropsy"><span>焦燥・攻撃性・情動不安定</span><span class="pt">+1</span></label>
+      <label class="chk"><input type="checkbox" data-k="auto"><span>自律神経障害<em>持続する頻脈・徐脈、起立性低血圧、多汗、血圧の乱高下、心室頻拍、心停止、消化管運動障害</em></span><span class="pt">+1</span></label>
+      <label class="chk"><input type="checkbox" data-k="hypovent"><span>中枢性低換気</span></label>
+      <label class="chk"><input type="checkbox" data-k="prodrome"><span>ウイルス感染様の前駆症状（鼻汁・咽頭痛・微熱）<em>5年以内の全身性悪性腫瘍がある場合は加点しない</em></span><span class="pt">+2</span></label>
+      <label class="chk"><input type="checkbox" data-k="fbds"><span>FBDS（顔面上肢ジストニア発作）<em>一側顔面と同側上肢の短い同期性の発作。LGI1抗体を強く示唆</em></span><span class="pt">+3</span></label>
+      <label class="chk"><input type="checkbox" data-k="facedysk"><span>顔面のジスキネジア（FBDSがない場合）<em>口・舌・顔面の不随意運動</em></span><span class="pt">+2</span></label>
+      <label class="chk"><input type="checkbox" data-k="refractory"><span>2剤以上の抗てんかん薬に抵抗性の発作</span><span class="pt">+2</span></label>
+      <label class="chk"><input type="checkbox" data-k="speech"><span>言語障害（多弁・発語減少・無言）</span></label>
+      <label class="chk"><input type="checkbox" data-k="movt"><span>運動異常（ジスキネジア以外の舞踏運動・固縮・異常姿勢など）</span></label>
+      <label class="chk"><input type="checkbox" data-k="cancer5"><span>5年以内に診断された全身性悪性腫瘍<em>皮膚の扁平上皮癌・基底細胞癌、脳腫瘍、脳転移のある癌は除く</em></span><span class="pt">+2</span></label>
+      <label class="chk"><input type="checkbox" data-k="teratoma"><span>奇形腫（卵巣など）あり</span></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">3</span>検査</h2>
+    <h3>頭部MRI（T2/FLAIR）</h3>
+    <select data-k="mri" aria-label="頭部MRI所見">
+      <option value="">未施行</option>
+      <option value="none">正常／非特異的な所見のみ</option>
+      <option value="mtlBi">両側内側側頭葉にほぼ限局した高信号</option>
+      <option value="mtlUni">片側内側側頭葉の高信号</option>
+      <option value="multi">灰白質・白質の多巣性病変（脱髄・炎症に合致）</option>
+    </select>
+    <h3>髄液</h3>
+    <div class="chks">
+      <label class="chk"><input type="checkbox" data-k="csfCell"><span>細胞数 &gt;5/μL</span></label>
+      <label class="chk"><input type="checkbox" data-k="csfProt"><span>蛋白 &gt;50 mg/dL</span></label>
+      <label class="chk"><input type="checkbox" data-k="csfRbcHi"><span>髄液赤血球 ≥1,000/μL（外傷性穿刺）<em>APE2の髄液項目は赤血球&lt;1,000/μLのときだけ加点</em></span></label>
+      <label class="chk"><input type="checkbox" data-k="ocb"><span>髄液特異的オリゴクローナルバンド、またはIgG index上昇</span></label>
+    </div>
+    <h3>脳波</h3>
+    <div class="chks">
+      <label class="chk"><input type="checkbox" data-k="eegTemp"><span>側頭葉のてんかん性放電または徐波</span></label>
+      <label class="chk"><input type="checkbox" data-k="eegAbn"><span>その他の異常（局所・びまん性徐波、律動の乱れ、てんかん性活動、extreme delta brush）</span></label>
+    </div>
+    <h3>その他</h3>
+    <div class="chks">
+      <label class="chk"><input type="checkbox" data-k="biopsy"><span>脳生検で炎症細胞浸潤（他疾患を除外）</span></label>
+      <label class="chk"><input type="checkbox" data-k="heSx"><span>痙攣・ミオクローヌス・幻覚・脳卒中様発作のいずれかを伴う脳症<em>橋本脳症の基準の項目</em></span></label>
+      <label class="chk"><input type="checkbox" data-k="thyAb"><span>血清 抗TPO抗体または抗Tg抗体 陽性</span></label>
+      <label class="chk"><input type="checkbox" data-k="thyFx"><span>甲状腺機能は正常〜軽度異常（多くは潜在性〜軽度の低下）</span></label>
+      <label class="chk"><input type="checkbox" data-k="nae"><span>抗NAE抗体 陽性<em>橋本脳症の補助診断（本邦）。基準の必須項目ではない</em></span></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">4</span>抗体と除外診断</h2>
+    <label class="f">神経抗体の結果
+      <select data-k="ab">
+        <option value="">未提出・結果待ち</option>
+        <option value="neg">血清・髄液とも陰性（十分な範囲で検索）</option>
+        <option value="nmdar">抗NMDAR（GluN1）IgG 陽性（髄液CBA）</option>
+        <option value="surface">他の細胞表面・シナプス抗体 陽性（LGI1, CASPR2, GABABR, AMPARなど）</option>
+        <option value="gad">抗GAD65抗体 高力価</option>
+        <option value="onco">細胞内抗原抗体 陽性（Hu, Ma2, CV2/CRMP5など）</option>
+      </select>
+    </label>
+    <div class="chks" style="margin-top:10px">
+      <label class="chk"><input type="checkbox" data-k="excl"><span>他の原因を合理的に除外した<em>感染（HSV・VZV・ほか）、代謝・中毒、てんかん重積、腫瘍浸潤、血管炎、プリオン病など。「資料」の鑑別リスト参照</em></span></label>
+      <label class="chk"><input type="checkbox" data-k="exclDef"><span>ビッカースタッフ脳幹脳炎・ADEMの基準を満たさない</span></label>
+      <label class="chk"><input type="checkbox" data-k="immuno6"><span>発症6カ月以内に免疫療法を開始（予定を含む）<em>RITE2の項目</em></span><span class="pt">+2</span></label>
+    </div>
+  </div>
+
+  <div class="row-btn">
+    <button class="btn primary" id="btnGo">判定を見る →</button>
+    <button class="btn" id="btnEx">例：LGI1疑い</button>
+    <button class="btn" id="btnEx2">例：NMDAR疑い</button>
+    <button class="btn" id="btnClr">クリア</button>
+  </div>
+  <p class="hint">入力は端末内にだけ保存されます。患者の氏名・IDは入力しないでください。</p>
+</section>
+
+<!-- ===================== RESULT ===================== -->
+<section class="view" id="v-res"><div id="resArea"></div></section>
+
+<!-- ===================== irAE ===================== -->
+<section class="view" id="v-ir">
+  <div class="card">
+    <h2>ICI関連脳炎（irAE）の分岐</h2>
+    <div class="grid2">
+      <label class="f">免疫チェックポイント阻害薬
+        <select data-k="ici">
+          <option value="">使用なし</option>
+          <option value="pd1">抗PD-1（ニボルマブ・ペムブロリズマブなど）</option>
+          <option value="pdl1">抗PD-L1（アテゾリズマブ・デュルバルマブなど）</option>
+          <option value="ctla4">抗CTLA-4（イピリムマブなど）</option>
+          <option value="combo">併用（抗PD-1＋抗CTLA-4など）</option>
+        </select>
+      </label>
+      <label class="f">ICI開始からの期間（週）
+        <input type="number" inputmode="decimal" min="0" step="1" data-k="iciWk" placeholder="例 8">
+      </label>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <label class="f">臨床病型
+        <select data-k="irPh">
+          <option value="">未選択</option>
+          <option value="mening">髄膜脳炎型（頭痛・発熱・髄膜刺激、髄液細胞増多）</option>
+          <option value="limbic">辺縁系脳炎</option>
+          <option value="cereb">小脳炎・小脳失調</option>
+          <option value="brainstem">脳幹脳炎</option>
+          <option value="em">脳脊髄炎・多巣性</option>
+          <option value="diffuse">局所所見に乏しいびまん性脳症</option>
+        </select>
+      </label>
+      <label class="f">重症度（CTCAE）
+        <select data-k="grade">
+          <option value="">未選択</option>
+          <option value="1">Grade 1：軽度、日常生活に支障なし</option>
+          <option value="2">Grade 2：中等度、手段的ADLを制限</option>
+          <option value="3">Grade 3：高度、身の回りのADLを制限</option>
+          <option value="4">Grade 4：生命を脅かす</option>
+        </select>
+      </label>
+    </div>
+    <label class="f" style="margin-top:10px">がん種
+      <select data-k="tumor">
+        <option value="">未選択</option>
+        <option value="sclc">小細胞肺癌</option>
+        <option value="nsclc">非小細胞肺癌</option>
+        <option value="thymoma">胸腺腫・胸腺癌</option>
+        <option value="mel">悪性黒色腫</option>
+        <option value="breast">乳癌</option>
+        <option value="gyn">卵巣癌・婦人科癌</option>
+        <option value="testis">精巣胚細胞腫瘍</option>
+        <option value="hl">ホジキンリンパ腫</option>
+        <option value="rcc">腎細胞癌・尿路上皮癌</option>
+        <option value="other">その他</option>
+      </select>
+    </label>
+
+    <h3 style="margin-top:14px">除外（ICI治療中の脳症で先に否定するもの）</h3>
+    <div class="chks" id="irExclBox"></div>
+    <h3>同時に起きやすいirAEの確認</h3>
+    <div class="chks" id="irConcBox"></div>
+  </div>
+  <div id="irArea"></div>
+</section>
+
+<!-- ===================== ANTIBODY ===================== -->
+<section class="view" id="v-ab">
+  <div class="card">
+    <h2>提出すべき抗体の組み合わせ</h2>
+    <p class="hint" style="margin-top:0">当てはまる病型を選ぶ（複数可）。がん種は irAE タブの選択も使います。</p>
+    <div class="chips" id="phChips"></div>
+    <label class="f" style="margin-top:12px">がん種（既知・疑い）
+      <select data-k="tumor2" id="tumor2">
+        <option value="">なし・不明</option>
+        <option value="sclc">小細胞肺癌</option>
+        <option value="nsclc">非小細胞肺癌</option>
+        <option value="thymoma">胸腺腫・胸腺癌</option>
+        <option value="breast">乳癌</option>
+        <option value="gyn">卵巣癌・婦人科癌</option>
+        <option value="teratoma">卵巣奇形腫</option>
+        <option value="testis">精巣胚細胞腫瘍</option>
+        <option value="hl">ホジキンリンパ腫</option>
+        <option value="nb">神経芽腫（小児）</option>
+      </select>
+    </label>
+  </div>
+  <div id="abArea"></div>
+</section>
+
+<!-- ===================== REFERENCE ===================== -->
+<section class="view" id="v-ref">
+  <div class="card">
+    <h2>抗体早見表</h2>
+    <div class="tblwrap"><table class="cmp" id="abTable"></table></div>
+    <p class="src">出典：Graus 2016、Graus 2021（PNS-Care）、BRAIN and NERVE 70(4) 特集 Antibody Update 2018（田中・渡邊・米田・河内・鈴木）、BRAIN and NERVE 69(12)（田代・髙嶋）</p>
+  </div>
+  <div class="card">
+    <h2>鑑別すべき疾患（mimics）</h2>
+    <ul class="plain">
+      <li><b>感染性脳炎</b>：HSV（PCR陰性でも早期は再検）、VZV、エンテロウイルス、日本脳炎、梅毒、結核、クリプトコッカス、リステリア（脳幹脳炎）、PML</li>
+      <li><b>HSV脳炎後の自己免疫性脳炎</b>：2〜6週後の再燃は抗NMDAR抗体などを測定（抗ウイルス薬ではなく免疫療法）</li>
+      <li><b>代謝・中毒</b>：ウェルニッケ脳症、低Na・高Ca・低血糖、高アンモニア、尿毒症、薬剤（リチウム、セフェピム、メトロニダゾール、悪性症候群・セロトニン症候群）、アルコール離脱</li>
+      <li><b>てんかん</b>：非痙攣性てんかん重積（必ず脳波）</li>
+      <li><b>腫瘍</b>：中枢神経リンパ腫、神経膠腫（神経膠腫症）、髄膜癌腫症、血管内リンパ腫</li>
+      <li><b>血管・炎症</b>：中枢神経原発血管炎、SLE（NPSLE）、神経ベーチェット病、神経サルコイドーシス、Susac症候群、PRES</li>
+      <li><b>プリオン病</b>：CJD（DWI皮質リボン・基底核、RT-QuIC）。VGKC-LE・橋本脳症はCJD類似を呈しうる</li>
+      <li><b>精神疾患</b>：統合失調症、悪性緊張病。若年の急性精神病では髄液の抗NMDAR抗体を測定</li>
+      <li><b>機能性神経障害</b>：自己免疫性脳症でも give-way weakness や解剖学的に説明しにくい所見が出うる（田代・髙嶋 2017）。除外前に心因性と決めない</li>
+    </ul>
+    <p class="src">出典：Graus 2016 Table・Panel、BRAIN and NERVE 特集（渡邊、米田、田中、田代・髙嶋）</p>
+  </div>
+  <div class="card">
+    <h2>特集から押さえどころ</h2>
+    <ul class="plain">
+      <li><b>抗NMDAR</b>：診断は髄液のCBA。血清のみ陽性は偽陽性がありうる。精神症状主体の例は低力価で、血清では過半数が偽陰性（田中）。</li>
+      <li><b>VGKC複合体抗体（RIA）</b>：LGI1・CASPR2とも陰性の「ダブルネガティブ」は細胞内ドメインへの抗体が多く、病態とは関連しない。CJD・ALSでも低力価陽性になる（渡邊）。Graus 2016もVGKC抗体単独の測定を推奨していない。</li>
+      <li><b>LGI1</b>：FBDS（1日に10〜360回）、低Na血症、発作期徐脈、立毛発作。FBDSの段階で治療すると認知障害への進展を防げる可能性。</li>
+      <li><b>CASPR2</b>：ニューロミオトニア・疼痛・自律神経障害（モルヴァン症候群）。男性、胸腺腫。</li>
+      <li><b>橋本脳症</b>：抗NAE抗体は特異度約90%・感度約50%の目安。MRI異常は少なく（約38%）、脳波の徐波化（約80%）・SPECT血流低下（約76%）が多い。小脳失調型（眼振が少ない）、CJD類似型、辺縁系脳炎型あり。PSL 10〜15mmへの減量時に再発が多い（米田）。</li>
+      <li><b>傍腫瘍性</b>：細胞内抗原抗体（Hu, Yo, Ma2など）は腫瘍随伴率が高く免疫療法の反応が乏しい。初回検索で腫瘍がなければ3〜6カ月後に再検し、以後6カ月ごとに4年（河内／EFNS）。</li>
+      <li><b>ICI</b>：神経・筋irAEは1〜2%。MG・筋炎・心筋炎は同時発症しうるのでCK・トロポニン・心電図を確認（鈴木）。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>初期治療の目安（抗体結果を待たない）</h2>
+    <ul class="plain">
+      <li>Possible以上で感染を除外（またはHSV PCRの結果までアシクロビル併用）できれば、一次治療を開始：メチルプレドニゾロン 1 g/日×3〜5日、IVIg 0.4 g/kg/日×5日、血漿交換。重症例は併用。</li>
+      <li>一次治療で反応が乏しければ二次治療：リツキシマブ、シクロホスファミド。</li>
+      <li>腫瘍検索：胸腹骨盤CT、婦人科は経腟超音波・骨盤MRI、精巣超音波、陰性なら全身FDG-PET。</li>
+      <li>抗NMDAR脳炎の予後不良因子は治療開始の遅れと初診時の重症度（Titulaer 2013）。</li>
+    </ul>
+    <p class="src">出典：Graus 2016、Titulaer 2013（田中 2018に引用）、EFNS 2011（河内 2018に引用）。本邦では保険適用・用量を院内で確認</p>
+  </div>
+  <div class="card">
+    <h2>文献</h2>
+    <ol class="refs" id="refList"></ol>
+    <h3>Dropboxの素材（BRAIN and NERVE 70巻4号 特集 Antibody Update 2018 ほか）</h3>
+    <ul class="plain" style="font-size:13px">
+      <li>田中惠子：グルタミン酸受容体抗体―抗NMDAR抗体を中心に（70:287-295）</li>
+      <li>米田 誠：橋本脳症と自己抗体（70:305-314）</li>
+      <li>渡邊 修：VGKC複合体抗体関連疾患 up to date（70:315-328）</li>
+      <li>河内 泉：傍腫瘍性神経症候群と自己抗体（70:329-339）</li>
+      <li>鈴木重明：免疫チェックポイント阻害薬による神経・筋障害（70:461-466）</li>
+      <li>田代雄一・髙嶋 博：自己免疫性脳炎・脳症における運動異常症（69:1387-1399）</li>
+    </ul>
+    <p class="hint">特集は2018年の内容です。PNSの診断基準（2004→2021）、irAEの定義（2021）、APE2/RITE2は原著で更新・確認しました。</p>
+  </div>
+</section>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<nav class="tabs" aria-label="画面切替"><div class="in">
+  <button data-view="v-in" aria-selected="true"><b>入力</b>所見</button>
+  <button data-view="v-res" aria-selected="false"><b>判定</b>スコア</button>
+  <button data-view="v-ir" aria-selected="false"><b>irAE</b>ICI分岐</button>
+  <button data-view="v-ab" aria-selected="false"><b>抗体</b>組み合わせ</button>
+  <button data-view="v-ref" aria-selected="false"><b>資料</b>早見表</button>
+</div></nav>
+
+<script>
+(function(){
+"use strict";
+var KEY="aeNav.v1";
+function $(id){return document.getElementById(id);}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+
+/* ---------- irAE checklists ---------- */
+var IR_EXCL=[
+  ["xMet","脳転移・髄膜癌腫症","造影MRI、髄液細胞診（必要なら複数回）"],
+  ["xInf","感染症","HSV/VZV PCR、細菌・真菌培養、クリプトコッカス抗原、JCV（PML）。ステロイド使用中・リンパ球減少時は日和見感染も"],
+  ["xMeta","代謝・電解質","Na・Ca・血糖・アンモニア・腎肝機能。低Naは下垂体炎・副腎不全も考える"],
+  ["xEndo","内分泌irAE","ACTH・コルチゾール、TSH・FT4（下垂体炎・甲状腺炎は意識障害・頭痛の原因になる）"],
+  ["xEeg","非痙攣性てんかん重積","脳波"],
+  ["xDrug","薬剤・治療の影響","PRES、化学療法・抗菌薬の脳症、オピオイド、放射線壊死"],
+  ["xVasc","脳血管障害","トルソー症候群、腫瘍内出血"]
+];
+var IR_CONC=[
+  ["cMyo","心筋炎","トロポニン・心電図・心エコー。疑えば循環器へ"],
+  ["cMus","筋炎・横紋筋融解","CK、近位筋力低下、筋痛"],
+  ["cMg","重症筋無力症","眼瞼下垂・複視・球症状・呼吸筋。抗AChR抗体（陽性率は60〜70%程度）"],
+  ["cNeu","ニューロパチー","GBS様・CIDP様。髄液、神経伝導検査"],
+  ["cOther","他臓器のirAE","肝炎・大腸炎・肺臓炎・皮疹"]
+];
+
+/* ---------- phenotypes -> antibodies ---------- */
+var PH=[
+  {k:"le",t:"辺縁系脳炎"},
+  {k:"nmdar",t:"若年・精神症状→ジスキネジア・自律神経障害"},
+  {k:"fbds",t:"FBDS・低Na血症"},
+  {k:"sz",t:"難治てんかん・重積（NORSE）"},
+  {k:"rpd",t:"急速進行性認知症・CJD類似"},
+  {k:"cb",t:"小脳失調"},
+  {k:"bs",t:"脳幹脳炎・間脳症状（過眠）"},
+  {k:"mening",t:"髄膜脳炎・脊髄炎"},
+  {k:"spsd",t:"固縮・ミオクローヌス・過剰驚愕（SPS/PERM）"},
+  {k:"diar",t:"下痢・体重減少を伴う脳症"},
+  {k:"sleep",t:"睡眠時異常行動・球症状・歩行障害"},
+  {k:"mvt",t:"舞踏病・不随意運動"},
+  {k:"auto",t:"自律神経障害が前景"},
+  {k:"psy",t:"精神症状のみ（初発精神病）"},
+  {k:"demy",t:"脱髄病変・視神経炎を伴う"}
+];
+/* specimen: S=serum C=CSF B=both */
+var AB={
+  NMDAR:{n:"抗NMDAR（GluN1）",sp:"髄液必須",d:"髄液CBAで判定。血清のみ陽性は偽陽性に注意",cls:"s"},
+  LGI1:{n:"抗LGI1",sp:"血清＋髄液",d:"血清の方が感度が高い（髄液陰性が多い）",cls:"s"},
+  CASPR2:{n:"抗CASPR2",sp:"血清＋髄液",d:"低力価の血清単独陽性は臨床像と合わせて解釈",cls:"s"},
+  AMPAR:{n:"抗AMPAR",sp:"血清＋髄液",d:"腫瘍（胸腺腫・肺癌・乳癌）が多い。再発しやすい",cls:"s"},
+  GABABR:{n:"抗GABABR",sp:"血清＋髄液",d:"小細胞肺癌が約半数。難治痙攣",cls:"s"},
+  GABAAR:{n:"抗GABAAR",sp:"血清＋髄液",d:"難治てんかん・重積、MRIで皮質・皮質下の多巣性病変。胸腺腫",cls:"s"},
+  DPPX:{n:"抗DPPX",sp:"血清＋髄液",d:"下痢・体重減少が先行、振戦・ミオクローヌス・過剰驚愕",cls:"s"},
+  mGluR5:{n:"抗mGluR5",sp:"血清＋髄液",d:"Ophelia症候群、ホジキンリンパ腫",cls:"s"},
+  mGluR1:{n:"抗mGluR1",sp:"血清＋髄液",d:"小脳失調、ホジキンリンパ腫（稀）",cls:"s"},
+  GlyR:{n:"抗GlyR",sp:"血清＋髄液",d:"SPS・PERM。低力価や血清単独は非特異的なことがある",cls:"s"},
+  IgLON5:{n:"抗IgLON5",sp:"血清＋髄液",d:"睡眠時異常行動・閉塞性睡眠時無呼吸・球症状。慢性経過が多く免疫療法に抵抗性",cls:"s"},
+  D2R:{n:"抗D2R",sp:"血清",d:"小児の基底核脳炎（研究機関での測定）",cls:"s"},
+  MOG:{n:"抗MOG",sp:"血清",d:"ADEM、皮質性脳炎、視神経炎。血清CBA",cls:"s"},
+  AQP4:{n:"抗AQP4",sp:"血清",d:"NMOSD（最後野・間脳病変）。血清CBA",cls:"s"},
+  GQ1b:{n:"抗GQ1b IgG",sp:"血清",d:"ビッカースタッフ脳幹脳炎",cls:"s"},
+  gAChR:{n:"抗gAChR（α3）",sp:"血清",d:"自己免疫性自律神経節障害。中枢症状を伴うことあり",cls:"s"},
+  VGCC:{n:"抗P/Q型VGCC",sp:"血清",d:"LEMS、小脳失調（小細胞肺癌）",cls:"s"},
+  Hu:{n:"抗Hu（ANNA-1）",sp:"血清＋髄液",d:"小細胞肺癌。脳脊髄炎・感覚性ニューロノパチー・消化管偽性閉塞",cls:"i"},
+  CV2:{n:"抗CV2/CRMP5",sp:"血清＋髄液",d:"小細胞肺癌・胸腺腫。舞踏病、視神経炎・網膜炎",cls:"i"},
+  Ma2:{n:"抗Ma2（Ta）",sp:"血清＋髄液",d:"若年男性は精巣腫瘍、高齢者は肺癌。辺縁系・間脳（過眠）・上部脳幹。ICI関連で増加",cls:"i"},
+  Yo:{n:"抗Yo（PCA-1）",sp:"血清＋髄液",d:"卵巣癌・乳癌。亜急性小脳変性",cls:"i"},
+  Ri:{n:"抗Ri（ANNA-2）",sp:"血清＋髄液",d:"乳癌・小細胞肺癌。脳幹脳炎・オプソクローヌス・顎ジストニア",cls:"i"},
+  Amph:{n:"抗amphiphysin",sp:"血清＋髄液",d:"乳癌・小細胞肺癌。SPS",cls:"i"},
+  SOX1:{n:"抗SOX1",sp:"血清",d:"小細胞肺癌の予測マーカー（LEMS・小脳）",cls:"i"},
+  KLHL11:{n:"抗KLHL11",sp:"血清＋髄液",d:"精巣胚細胞腫瘍。菱脳炎・小脳失調、難聴・耳鳴",cls:"i"},
+  Tr:{n:"抗Tr（DNER）",sp:"血清＋髄液",d:"ホジキンリンパ腫。小脳失調",cls:"i"},
+  PCA2:{n:"抗PCA2（MAP1B）",sp:"血清",d:"小細胞肺癌",cls:"i"},
+  GAD:{n:"抗GAD65",sp:"血清＋髄液",d:"高力価＋髄液陽性で意義あり。1型糖尿病の低力価は非特異的",cls:"i"},
+  GFAP:{n:"抗GFAP（α）",sp:"髄液優先",d:"髄膜脳脊髄炎、脳室周囲の放射状造影。奇形腫を伴うことあり",cls:"i"},
+  THY:{n:"抗TPO・抗Tg抗体",sp:"血清",d:"橋本脳症の必須項目。健常者でも陽性率が高いので単独では診断しない",cls:"o"},
+  NAE:{n:"抗NAE抗体",sp:"血清",d:"橋本脳症の補助（本邦）。特異度約90%・感度約50%",cls:"o"},
+  RTQ:{n:"RT-QuIC・14-3-3",sp:"髄液",d:"CJDとの鑑別",cls:"o"},
+  ANA:{n:"抗核抗体・抗リン脂質抗体",sp:"血清",d:"SLE・APS関連舞踏病の鑑別",cls:"o"}
+};
+var PH_AB={
+  le:["LGI1","CASPR2","NMDAR","AMPAR","GABABR","GAD","Hu","Ma2","CV2","THY"],
+  nmdar:["NMDAR","MOG","AQP4","GABAAR"],
+  fbds:["LGI1","CASPR2"],
+  sz:["GABAAR","GABABR","NMDAR","LGI1","AMPAR","GAD","mGluR5"],
+  rpd:["LGI1","CASPR2","NMDAR","GABABR","AMPAR","DPPX","IgLON5","GAD","Hu","Ma2","CV2","THY","NAE","RTQ"],
+  cb:["Yo","Hu","Ri","Tr","CV2","SOX1","KLHL11","VGCC","mGluR1","GAD","CASPR2","Ma2","THY","NAE"],
+  bs:["Ma2","Ri","Hu","KLHL11","IgLON5","GQ1b","AQP4","MOG","GFAP"],
+  mening:["GFAP","MOG","AQP4"],
+  spsd:["GlyR","GAD","Amph","DPPX"],
+  diar:["DPPX"],
+  sleep:["IgLON5","Ma2","LGI1"],
+  mvt:["NMDAR","CV2","IgLON5","LGI1","D2R","ANA"],
+  auto:["gAChR","Hu","CASPR2","NMDAR"],
+  psy:["NMDAR"],
+  demy:["MOG","AQP4","NMDAR"]
+};
+var TU_AB={
+  sclc:["Hu","SOX1","CV2","Amph","PCA2","GABABR","AMPAR","VGCC","Ri"],
+  nsclc:["Ma2","Hu","CV2"],
+  thymoma:["CV2","AMPAR","GABAAR","CASPR2","LGI1","GAD"],
+  breast:["Yo","Ri","Amph"],
+  gyn:["Yo"],
+  teratoma:["NMDAR","GFAP"],
+  testis:["Ma2","KLHL11"],
+  hl:["Tr","mGluR5","mGluR1"],
+  nb:["Hu"],
+  mel:[], rcc:[], other:[]
+};
+var TU_NAME={sclc:"小細胞肺癌",nsclc:"非小細胞肺癌",thymoma:"胸腺腫",breast:"乳癌",gyn:"卵巣癌・婦人科癌",teratoma:"卵巣奇形腫",testis:"精巣胚細胞腫瘍",hl:"ホジキンリンパ腫",nb:"神経芽腫",mel:"悪性黒色腫",rcc:"腎・尿路上皮癌",other:"その他"};
+
+/* PNS-Care antibody risk (Graus 2021) */
+var RISK_HI=["Hu","CV2","SOX1","PCA2","Amph","Ri","Yo","Ma2","Tr","KLHL11"];
+var RISK_MID=["AMPAR","GABABR","mGluR5","VGCC","NMDAR"];
+var RISK_LO=["mGluR1","GABAAR","CASPR2","GFAP","GAD","LGI1","DPPX","GlyR","AQP4","MOG"];
+
+/* ---------- state ---------- */
+function fields(){return Array.prototype.slice.call(document.querySelectorAll("[data-k]"));}
+function read(){
+  var s={};
+  fields().forEach(function(el){
+    var k=el.dataset.k;
+    if(el.type==="checkbox")s[k]=el.checked;
+    else if(el.type==="number")s[k]=el.value===""?null:Number(el.value);
+    else s[k]=el.value;
+  });
+  s.ph=PHSEL.slice();
+  return s;
+}
+function write(s){
+  fields().forEach(function(el){
+    var k=el.dataset.k,v=s[k];
+    if(el.type==="checkbox")el.checked=!!v;
+    else el.value=(v==null?"":v);
+  });
+  PHSEL=(s.ph||[]).slice();
+  paintChips();
+}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){return null;}}
+var PHSEL=[];
+
+/* ---------- Graus 2016 ---------- */
+function graus(s){
+  var mental=s.loc||s.pers;
+  var core=s.wm||mental||s.psych;
+  var mriSug=s.mri==="mtlBi"||s.mri==="mtlUni"||s.mri==="multi";
+  var R={};
+  // Possible AE
+  var pSupp=[["新規の局所CNS所見",s.focal],["説明できない痙攣",s.seizure],["髄液細胞数 >5/μL",s.csfCell],["MRIが脳炎を示唆",mriSug]];
+  var pItems=[
+    {t:"3カ月未満の急速進行",y:!!s.subacute},
+    {t:"作業記憶障害・意識変容・精神症状のいずれか",y:!!core},
+    {t:"次の1つ以上："+pSupp.map(function(x){return x[0];}).join("／"),y:pSupp.some(function(x){return x[1];})},
+    {t:"他の原因を合理的に除外",y:!!s.excl}
+  ];
+  R.possible={name:"Possible autoimmune encephalitis",items:pItems,met:pItems.every(function(i){return i.y;})};
+
+  // Definite autoimmune LE
+  var abLE=s.ab==="nmdar"||s.ab==="surface"||s.ab==="onco"||s.ab==="gad";
+  var l1=!!(s.subacute&&(s.wm||s.seizure||s.psych));
+  var l2=s.mri==="mtlBi";
+  var l3=!!(s.csfCell||s.eegTemp);
+  var l4=!!s.excl;
+  var lItems=[
+    {t:"亜急性発症の作業記憶障害・痙攣・精神症状（辺縁系を示唆）",y:l1},
+    {t:"T2/FLAIRで両側内側側頭葉にほぼ限局した異常",y:l2},
+    {t:"髄液細胞増多 または 側頭葉のてんかん性/徐波脳波",y:l3},
+    {t:"他の原因を合理的に除外",y:l4}
+  ];
+  var nFirst=[l1,l2,l3].filter(Boolean).length;
+  var leMet=(l1&&l2&&l3&&l4)||(l4&&nFirst===2&&abLE);
+  R.le={name:"Definite autoimmune limbic encephalitis",items:lItems,met:leMet,
+    note:(!leMet&&l4&&nFirst===2)?"最初の3項目のうち1つが欠ける場合は、細胞表面・シナプス・onconeural抗体が陽性なら definite。":(leMet&&nFirst===2?"抗体陽性により definite（最初の3項目の1つを欠く）。":"")};
+
+  // anti-NMDAR
+  var g=[
+    ["異常行動・精神症状・認知障害",!!(s.psych||s.wm||s.pers)],
+    ["言語障害",!!s.speech],
+    ["痙攣発作",!!s.seizure],
+    ["運動異常・ジスキネジア・固縮・異常姿勢",!!(s.movt||s.facedysk)],
+    ["意識レベル低下",!!s.loc],
+    ["自律神経障害・中枢性低換気",!!(s.auto||s.hypovent)]
+  ];
+  var ng=g.filter(function(x){return x[1];}).length;
+  var labN=!!(s.eegAbn||s.eegTemp||s.csfCell||s.ocb);
+  var pathA=ng>=4&&labN, pathB=ng>=3&&s.teratoma;
+  var nItems=[
+    {t:"急速発症（3カ月未満）",y:!!s.subacute},
+    {t:"6症状群のうち "+ng+" 群（4群以上＋検査1つ、または3群＋奇形腫）",y:pathA||pathB},
+    {t:"異常脳波 または 髄液細胞増多/OCB",y:labN||pathB},
+    {t:"他の原因を合理的に除外",y:!!s.excl}
+  ];
+  R.nmdarProb={name:"Probable anti-NMDAR encephalitis",items:nItems,met:!!(s.subacute&&(pathA||pathB)&&s.excl),groups:g};
+  R.nmdarDef={name:"Definite anti-NMDAR encephalitis",items:[
+    {t:"6症状群の1つ以上",y:ng>=1},
+    {t:"抗GluN1 IgG陽性（髄液。血清のみなら確認検査）",y:s.ab==="nmdar"},
+    {t:"他疾患の合理的除外",y:!!s.excl}],met:ng>=1&&s.ab==="nmdar"&&!!s.excl};
+
+  // seronegative probable
+  var snSupp=[mriSug,!!(s.csfCell||s.ocb),!!s.biopsy].filter(Boolean).length;
+  var snItems=[
+    {t:"3カ月未満の作業記憶障害・意識変容・精神症状",y:!!(s.subacute&&core)},
+    {t:"典型的LE・ビッカースタッフ脳幹脳炎・ADEMを除外",y:!leMet&&!!s.exclDef},
+    {t:"血清・髄液で既知の抗体が陰性",y:s.ab==="neg"},
+    {t:"MRI異常／髄液（細胞増多・OCB・IgG index）／生検の炎症 のうち2つ以上（現在 "+snSupp+"）",y:snSupp>=2},
+    {t:"他の原因を合理的に除外",y:!!s.excl}
+  ];
+  R.sero={name:"Autoantibody-negative but probable AE",items:snItems,met:snItems.every(function(i){return i.y;})};
+
+  // Hashimoto
+  var hItems=[
+    {t:"痙攣・ミオクローヌス・幻覚・脳卒中様発作を伴う脳症",y:!!s.heSx},
+    {t:"潜在性〜軽度の甲状腺疾患",y:!!s.thyFx},
+    {t:"MRIは正常または非特異的",y:s.mri==="none"},
+    {t:"血清 甲状腺抗体（TPO・Tg）陽性",y:!!s.thyAb},
+    {t:"血清・髄液で既知の神経抗体が陰性",y:s.ab==="neg"},
+    {t:"他の原因を合理的に除外",y:!!s.excl}
+  ];
+  R.he={name:"Hashimoto encephalopathy",items:hItems,met:hItems.every(function(i){return i.y;}),
+    note:s.nae?"抗NAE抗体陽性：基準外の補助所見として支持的。":""};
+
+  // best level
+  var lv="未達",cls="";
+  if(R.nmdarDef.met){lv="Definite 抗NMDAR";cls="on";}
+  else if(R.le.met){lv="Definite 辺縁系脳炎";cls="on";}
+  else if(R.nmdarProb.met){lv="Probable 抗NMDAR";cls="on";}
+  else if(R.sero.met){lv="Probable 抗体陰性AE";cls="on";}
+  else if(R.he.met){lv="橋本脳症 基準合致";cls="on";}
+  else if(R.possible.met){lv="Possible AE";cls="on";}
+  R.level=lv;R.cls=cls;
+  return R;
+}
+
+/* ---------- APE2 / RITE2 ---------- */
+function ape2(s){
+  var mriSug=s.mri==="mtlBi"||s.mri==="mtlUni"||s.mri==="multi";
+  var csfInfl=!!((s.csfCell||s.csfProt)&&!s.csfRbcHi);
+  var it=[
+    ["急速な精神状態変化（1〜6週）／1年以内の新規発作",1,!!s.apeOnset],
+    ["焦燥・攻撃性・情動不安定",1,!!s.neuropsy],
+    ["自律神経障害",1,!!s.auto],
+    ["ウイルス様前駆症状（悪性腫瘍なし）",2,!!(s.prodrome&&!s.cancer5)],
+    ["FBDS",3,!!s.fbds],
+    ["顔面ジスキネジア（FBDSなし）",2,!!(s.facedysk&&!s.fbds)],
+    ["2剤以上に抵抗性の発作",2,!!s.refractory],
+    ["髄液の炎症所見（蛋白>50 and/or 細胞>5、RBC<1000）",2,csfInfl],
+    ["MRIが脳炎を示唆",2,mriSug],
+    ["5年以内の全身性悪性腫瘍",2,!!s.cancer5]
+  ];
+  var a=it.reduce(function(t,x){return t+(x[2]?x[1]:0);},0);
+  var memb=s.ab==="nmdar"||s.ab==="surface";
+  var r2=[["発症6カ月以内に免疫療法開始",2,!!s.immuno6],["神経細胞膜抗体の検出",2,memb]];
+  var r=a+r2.reduce(function(t,x){return t+(x[2]?x[1]:0);},0);
+  var flags=[];
+  if(s.prodrome&&s.cancer5)flags.push("前駆症状は悪性腫瘍があるため加点していません。");
+  if(s.facedysk&&s.fbds)flags.push("顔面ジスキネジアはFBDSと重複するため加点していません。");
+  if((s.csfCell||s.csfProt)&&s.csfRbcHi)flags.push("髄液赤血球 ≥1,000/μL のため髄液項目は加点していません。");
+  return {items:it,ape:a,rite2:r2,rite:r,flags:flags};
+}
+
+/* ---------- render: result ---------- */
+function critHTML(c){
+  var pill=c.met?'<span class="pill met">満たす</span>':'<span class="pill no">未達</span>';
+  var h='<div class="crit"><div class="hd"><b>'+esc(c.name)+'</b>'+pill+'</div><ul>';
+  c.items.forEach(function(i){h+='<li class="'+(i.y?"y":"n")+'"><i>'+(i.y?"✓":"・")+'</i><span>'+esc(i.t)+'</span></li>';});
+  h+='</ul>';
+  if(c.note)h+='<p class="hint">'+esc(c.note)+'</p>';
+  return h+'</div>';
+}
+function meter(v,max,cut){
+  var p=Math.min(100,v/max*100),c=cut/max*100;
+  return '<div class="meter" role="img" aria-label="スコア '+v+'"><div class="fill" style="width:'+p+'%"></div><div class="cut" style="left:'+c+'%"></div><span class="cl" style="left:'+c+'%">カットオフ '+cut+'</span></div>';
+}
+function hasAny(s){
+  return fields().some(function(el){var k=el.dataset.k;if(["ici","iciWk","irPh","grade","tumor","tumor2"].indexOf(k)>=0||/^[xc][A-Z]/.test(k))return false;return el.type==="checkbox"?el.checked:el.value!=="";});
+}
+function renderRes(s,G,A){
+  if(!hasAny(s)){$("resArea").innerHTML='<p class="empty">「入力」で所見を選ぶと、ここに判定が出ます。</p>';return;}
+  var h=[];
+  // advice
+  var adv=[];
+  if(!s.excl)adv.push({c:"",h:"除外が未完了",b:"Graus基準はどの段階でも「他の原因の合理的除外」が必要。HSV PCRの結果まではアシクロビル併用を。"});
+  if(G.possible.met&&!G.le.met&&!G.nmdarProb.met&&!G.nmdarDef.met&&s.ab==="")adv.push({c:"info",h:"Possible AE：抗体提出と一次治療の検討",b:"「抗体」タブで病型に合う抗体を血清・髄液のペアで提出。感染を除外できれば結果を待たずに一次治療を検討。"});
+  if(G.le.met||G.nmdarProb.met||G.nmdarDef.met)adv.push({c:"ok",h:"免疫療法の開始を優先",b:"抗体の種類が確定する前でも一次治療を開始してよい段階。腫瘍検索を並行（NMDARなら卵巣奇形腫、LEなら肺・胸腺・精巣）。"});
+  if(s.ab==="onco")adv.push({c:"crit2",h:"細胞内抗原抗体陽性",b:"高リスク抗体（Hu, Ma2, CV2など）は腫瘍随伴率が高い。腫瘍治療を最優先し、初回陰性なら3〜6カ月後に再検索。免疫療法の反応は乏しいことが多い。"});
+  if(s.ici)adv.push({c:"info",h:"ICI使用中",b:"irAEタブで除外と同時irAEを確認。APE2は悪性腫瘍の項目で加点されるため、ICI患者での判別能は検証されていない。"});
+  if(s.ab===""&&s.mri===""&&!s.csfCell&&!s.csfProt)adv.push({c:"",h:"MRI・髄液・脳波が未入力",b:"判定にはMRI（FLAIR・DWI・造影）、髄液（細胞数・蛋白・OCB・IgG index）、脳波が必要。"});
+  if(adv.length){h.push('<div class="card"><h2>いまの段階</h2>');adv.forEach(function(a){h.push('<div class="alert '+a.c+'"><b>'+esc(a.h)+'</b>'+esc(a.b)+'</div>');});h.push('</div>');}
+
+  // Graus
+  h.push('<div class="card"><h2>Graus 2016 基準 <span class="pill '+(G.cls?"met":"no")+'">'+esc(G.level)+'</span></h2>');
+  [G.possible,G.le,G.nmdarProb,G.nmdarDef,G.sero,G.he].forEach(function(c){h.push(critHTML(c));});
+  h.push('<details><summary>抗NMDAR 6症状群の内訳</summary><ul class="plain">'+G.nmdarProb.groups.map(function(x){return '<li>'+(x[1]?"✓ ":"・ ")+esc(x[0])+'</li>';}).join("")+'</ul><p class="hint">16歳未満は症状群の数の解釈に注意（原典）。奇形腫ありなら3群で probable。</p></details>');
+  h.push('<details><summary>ビッカースタッフ脳幹脳炎・ADEM（本アプリは判定しない）</summary><p><b>BBE（probable）</b>：4週以内に発症し12週以内にピーク、意識低下または腱反射亢進と、両側外眼筋麻痺・運動失調、他疾患の除外。抗GQ1b IgG陽性なら外眼筋麻痺が不完全でも definite。</p><p><b>ADEM</b>：初回の多巣性CNS事象で脳症を伴い、急性期MRIで1〜2cm超の境界不明瞭な白質病変を主体とする。発症3カ月以降に新病変なし。抗MOG抗体を測定。</p></details>');
+  h.push('<p class="src">出典：Graus F, et al. Lancet Neurol 2016;15:391-404（Panel 1–6）</p></div>');
+
+  // APE2
+  h.push('<div class="card"><h2>APE2 <span class="pill '+(A.ape>=4?"hi":"no")+'">'+A.ape+' 点</span></h2>');
+  h.push(meter(A.ape,18,4));
+  h.push('<div class="score">'+A.items.map(function(x){return '<span class="'+(x[2]?"":"z")+'">'+esc(x[0])+'</span><span class="'+(x[2]?"":"z")+'">'+(x[2]?"+"+x[1]:"0")+'</span>';}).join("")+'<span class="t">合計</span><span class="t">'+A.ape+'</span></div>');
+  h.push('<p class="hint">'+(A.ape>=4?"≥4：神経特異的抗体の存在が疑われる。血清・髄液の抗体パネルを提出。":"<4：神経特異的抗体の可能性は低い（ただし臨床的疑いが強ければ提出）。")+' 認知機能障害の集団で ≥4 は感度99%・特異度93%（Dubey 2018）。外部コホートでは特異度が大きく下がる報告あり。</p>');
+  A.flags.forEach(function(f){h.push('<p class="hint">※ '+esc(f)+'</p>');});
+  h.push('</div>');
+
+  // RITE2
+  h.push('<div class="card"><h2>RITE2 <span class="pill '+(A.rite>=7?"met":"no")+'">'+A.rite+' 点</span></h2>');
+  h.push(meter(A.rite,22,7));
+  h.push('<div class="score"><span>APE2</span><span>'+A.ape+'</span>'+A.rite2.map(function(x){return '<span class="'+(x[2]?"":"z")+'">'+esc(x[0])+'</span><span class="'+(x[2]?"":"z")+'">'+(x[2]?"+"+x[1]:"0")+'</span>';}).join("")+'<span class="t">合計</span><span class="t">'+A.rite+'</span></div>');
+  h.push('<p class="hint">'+(A.rite>=7?"≥7：初回免疫療法への良好な反応が予測される。":"<7：初回免疫療法への反応が乏しい可能性。抗体陽性・APE2高値なのに低い場合は二次治療を早めに検討。")+' ≥7 は感度96%・特異度86%（Dubey 2018）。「神経細胞膜抗体」はNMDAR, GABAAR, GABABR, AMPAR, DPPX, mGluR1, mGluR5, LGI1, CASPR2, neurexin-3α, MOGなど。</p>');
+  h.push('<p class="src">出典：Dubey D, et al. J Neuroimmunol 2018;323:62-72／Epilepsia 2017;58:1181-1189</p></div>');
+  $("resArea").innerHTML=h.join("");
+}
+
+/* ---------- render: irAE ---------- */
+function renderIr(s){
+  var h=[];
+  if(!s.ici){$("irArea").innerHTML='<div class="card"><p class="empty">ICIを選ぶとirAEとしての評価が出ます。</p></div>';return;}
+  var mriSug=s.mri==="mtlBi"||s.mri==="mtlUni"||s.mri==="multi";
+  var infl=[];
+  if(s.csfCell)infl.push("髄液細胞増多");
+  if(s.ocb)infl.push("OCB/IgG index");
+  if(mriSug)infl.push("MRI炎症所見");
+  if(s.ab==="nmdar"||s.ab==="surface"||s.ab==="onco"||s.ab==="gad")infl.push("神経抗体陽性");
+  var exLeft=IR_EXCL.filter(function(x){return !s[x[0]];});
+  var conc=IR_CONC.filter(function(x){return s[x[0]];});
+
+  // 1 classification
+  h.push('<div class="card"><h2>irEncephalitis としての位置づけ</h2>');
+  if(exLeft.length){
+    h.push('<div class="alert"><b>除外が残っています（'+exLeft.length+'項目）</b><ul>'+exLeft.map(function(x){return '<li>'+esc(x[1])+'：'+esc(x[2])+'</li>';}).join("")+'</ul></div>');
+  } else h.push('<div class="alert ok"><b>主な除外は完了</b>脳転移・感染・代謝・内分泌・NCSE・薬剤・血管障害を確認済み。</div>');
+  if(infl.length)h.push('<div class="alert info"><b>CNS炎症の客観的裏付けあり：'+esc(infl.join("・"))+'</b>除外が完了していれば、ICI関連脳炎として確度が高い（Guidon 2021の確実度分類の考え方。正式な判定は原典の各項目で）。</div>');
+  else h.push('<div class="alert"><b>炎症の客観的裏付けなし</b>MRI・髄液・抗体がすべて陰性なら確度は低い（possible相当）。脳症の他原因を再検討。</div>');
+  if(s.iciWk!=null){
+    if(s.iciWk<=12)h.push('<p class="hint">ICI開始 '+s.iciWk+' 週：神経irAEの多くが出る時期（開始後数カ月以内）。</p>');
+    else h.push('<p class="hint">ICI開始 '+s.iciWk+' 週：遅発例や中止後の発症もあるため時期だけで否定しない。</p>');
+  }
+  if(s.ici==="combo")h.push('<p class="hint">抗PD-1＋抗CTLA-4の併用は単剤より神経irAEが多い。</p>');
+  h.push('<p class="src">出典：Guidon AC, et al. J Immunother Cancer 2021;9:e002890、鈴木 2018</p></div>');
+
+  // 2 phenotype
+  var phTxt={
+    mening:["髄膜脳炎型","髄液細胞増多が目立ち、抗体は陰性が多い。ステロイドへの反応は良好なことが多い。抗GFAP抗体も確認。"],
+    limbic:["辺縁系脳炎","抗Ma2・抗Hu（肺癌）など高リスク抗体を伴う傍腫瘍性の病型がICIで顕在化しうる。高リスク抗体陽性例は免疫療法への反応が乏しく予後不良とする報告が多い。"],
+    cereb:["小脳炎・小脳失調","抗Yo・Hu・KLHL11・Ma2など。小脳転移・髄膜癌腫症の除外を先に。"],
+    brainstem:["脳幹脳炎","抗Ma2・Ri・KLHL11。リステリアなどの感染を除外。"],
+    em:["脳脊髄炎・多巣性","脱髄（MOG/AQP4）、抗Hu。脊髄MRIも撮像。"],
+    diffuse:["びまん性脳症","局所所見がなければ代謝・内分泌（下垂体炎・副腎不全）、NCSE、PRESをまず否定。"]
+  };
+  if(s.irPh&&phTxt[s.irPh]){
+    h.push('<div class="card"><h2>病型：'+esc(phTxt[s.irPh][0])+'</h2><p style="margin:0;font-size:14px">'+esc(phTxt[s.irPh][1])+'</p>');
+    var tu=s.tumor&&TU_AB[s.tumor]?TU_AB[s.tumor]:[];
+    var base=["NMDAR","LGI1","CASPR2","GABABR","AMPAR","Hu","Ma2","CV2","Yo","Ri","Amph","SOX1","KLHL11","GFAP"];
+    var list=base.slice();tu.forEach(function(a){if(list.indexOf(a)<0)list.push(a);});
+    h.push('<h3>提出する抗体（血清＋髄液）</h3><p style="margin:0;font-size:14px">'+list.map(function(k){var hi=tu.indexOf(k)>=0;return (hi?"<b>":"")+esc(AB[k].n)+(hi?"</b>":"");}).join("、")+'</p>');
+    if(tu.length)h.push('<p class="hint">太字：'+esc(TU_NAME[s.tumor])+'と関連しやすい抗体。</p>');
+    if(s.tumor==="mel"||s.tumor==="rcc")h.push('<p class="hint">悪性黒色腫・腎癌などでは抗体陰性のICI脳炎が多い。</p>');
+    h.push('<p class="src">出典：Graus 2021（ICI関連PNSの推奨）、Guidon 2021</p></div>');
+  }
+
+  // 3 management
+  var g=s.grade;
+  h.push('<div class="card"><h2>重症度別の対応（ASCO 2021）'+(g?' <span class="pill hi">Grade '+esc(g)+'</span>':'')+'</h2>');
+  if(!g)h.push('<p class="empty">重症度を選ぶと対応が出ます。</p>');
+  else{
+    var m=[];
+    m.push("全Grade：ICIを休薬して評価。HSV PCRの結果までアシクロビル静注を併用。");
+    if(g==="1")m.push("Grade 1：神経irAEは軽症でも休薬して評価する（脳炎は進行が速いことがある）。");
+    if(g==="2")m.push("Grade 2：メチルプレドニゾロン 1〜2 mg/kg/日。進行性・重症化ならパルスへ。");
+    if(g==="3"||g==="4"){
+      m.push("Grade "+g+"：ICIは中止を原則とし、メチルプレドニゾロン 1 g/日×3〜5日。");
+      m.push("重症・進行性、OCB陽性ではIVIg（2 g/kgを5日に分割）または血漿交換を追加。");
+      m.push("自己免疫性脳炎の抗体陽性で改善が乏しければリツキシマブを検討。");
+    }
+    m.push("ステロイドは少なくとも4〜6週かけて漸減。再開の可否は腫瘍内科と協議。");
+    h.push('<ul class="plain">'+m.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+'</ul>');
+  }
+  h.push('<p class="src">出典：Schneider BJ, et al. J Clin Oncol 2021;39:4073-4126。用量・保険適用は院内で確認</p></div>');
+
+  // 4 concurrent
+  h.push('<div class="card"><h2>同時irAE</h2>');
+  if(conc.length)h.push('<div class="alert crit2"><b>合併あり：'+esc(conc.map(function(x){return x[1];}).join("・"))+'</b>心筋炎を伴えば致死的不整脈・心不全のリスク。循環器と同時に管理。</div>');
+  else h.push('<p class="empty">チェックなし。脳炎があってもCK・トロポニン・心電図は一度確認（MG・筋炎・心筋炎は同時発症しうる）。</p>');
+  h.push('</div>');
+  $("irArea").innerHTML=h.join("");
+}
+
+/* ---------- render: antibody ---------- */
+function paintChips(){
+  document.querySelectorAll("#phChips .chip").forEach(function(b){b.setAttribute("aria-pressed",PHSEL.indexOf(b.dataset.k)>=0?"true":"false");});
+}
+function riskTag(k){
+  if(RISK_HI.indexOf(k)>=0)return "腫瘍高リスク";
+  if(RISK_MID.indexOf(k)>=0)return "腫瘍中リスク";
+  if(RISK_LO.indexOf(k)>=0)return "腫瘍低リスク";
+  return "";
+}
+function renderAb(s){
+  var tu=s.tumor2||s.tumor||"";
+  var set=[],why={};
+  PHSEL.forEach(function(p){(PH_AB[p]||[]).forEach(function(a){if(set.indexOf(a)<0)set.push(a);(why[a]=why[a]||[]).push(p);});});
+  var tuList=tu&&TU_AB[tu]?TU_AB[tu]:[];
+  tuList.forEach(function(a){if(set.indexOf(a)<0)set.push(a);(why[a]=why[a]||[]).push("tu");});
+  // auto from inputs
+  if(s.fbds&&set.indexOf("LGI1")<0){set.unshift("LGI1");why.LGI1=["fbds"];}
+  if(!PHSEL.length&&!tuList.length){
+    $("abArea").innerHTML='<div class="card"><p class="empty">病型を選ぶと、提出する抗体と検体が出ます。</p>'+baseCard()+'</div>';return;
+  }
+  var surf=set.filter(function(k){return AB[k].cls==="s";}),intra=set.filter(function(k){return AB[k].cls==="i";}),oth=set.filter(function(k){return AB[k].cls==="o";});
+  var h=['<div class="card"><h2>提出リスト <span class="n">'+set.length+' 項目</span></h2>'];
+  function block(title,arr,method){
+    if(!arr.length)return;
+    h.push('<h3>'+esc(title)+'</h3>');
+    if(method)h.push('<p class="hint" style="margin-top:0">'+esc(method)+'</p>');
+    h.push('<div>');
+    arr.forEach(function(k){
+      var a=AB[k],rt=riskTag(k),isTu=(why[k]||[]).indexOf("tu")>=0;
+      h.push('<div class="ab"><b>'+esc(a.n)+(rt?' <span class="pill '+(rt==="腫瘍高リスク"?"hi":rt==="腫瘍中リスク"?"part":"no")+'">'+rt+'</span>':'')+'</b><span class="sp">'+esc(a.sp)+'</span><span class="d">'+esc(a.d)+(isTu?"（"+esc(TU_NAME[tu])+"と関連）":"")+'</span></div>');
+    });
+    h.push('</div>');
+  }
+  block("細胞表面・シナプス抗体",surf,"CBA（立体構造を保つ抗原）で測定。ラット脳組織の免疫染色（TBA）で確認できると確実。");
+  block("細胞内抗原抗体",intra,"免疫組織化学とイムノブロット（ラインブロット）の両方で確認。ラインブロットの弱い単独陽性は偽陽性がある。");
+  block("その他・鑑別用",oth,"");
+  h.push(baseCard());
+  if(intra.some(function(k){return RISK_HI.indexOf(k)>=0;}))h.push('<div class="alert"><b>腫瘍検索</b>胸腹骨盤CT → 陰性なら全身FDG-PET。女性は経腟超音波・骨盤MRI・マンモグラフィ、若年男性は精巣超音波。初回陰性なら3〜6カ月後、以後6カ月ごとに4年。</div>');
+  h.push('<p class="src">出典：Graus 2016 Table 1、Graus 2021（PNS-Care の抗体リスク分類）、BRAIN and NERVE 70(4) 特集。測定先・保険適用は院内の運用に従う</p></div>');
+  $("abArea").innerHTML=h.join("");
+}
+function baseCard(){
+  return '<div class="alert info"><b>共通の原則</b><ul><li>血清と髄液をペアで提出（抗体ごとに感度の高い検体が違う）</li><li>VGKC複合体抗体（RIA）単独ではなく、LGI1・CASPR2を個別に測定</li><li>免疫療法・IVIg・血漿交換の前に採取（IVIg後の血清は偽陽性になりうる）</li><li>甲状腺抗体（TPO・Tg）は同時に提出してよいが、陽性だけで橋本脳症とはしない</li></ul></div>';
+}
+
+/* ---------- reference table & refs ---------- */
+function buildTable(){
+  var rows=[
+    ["g","細胞表面・シナプス抗体（免疫療法の反応が良い）"],
+    ["NMDAR","若年女性・小児","精神症状→痙攣・口顔面ジスキネジア・意識低下・自律神経・低換気","女性で約半数（卵巣奇形腫）、男性・小児は少ない","髄液"],
+    ["LGI1","中高年男性","辺縁系脳炎、FBDS、低Na血症（約6割）、発作期徐脈","<10%（胸腺腫）","血清"],
+    ["CASPR2","高齢男性","モルヴァン症候群、ニューロミオトニア、疼痛、辺縁系脳炎、小脳失調","胸腺腫（モルヴァンで多い）","血清"],
+    ["AMPAR","中高年","辺縁系脳炎、精神症状のみもあり。再発多い","約65〜70%（胸腺腫・肺癌・乳癌）","両方"],
+    ["GABABR","高齢","辺縁系脳炎＋難治痙攣・重積","約50%（小細胞肺癌）","両方"],
+    ["GABAAR","小児〜成人","難治てんかん・重積、多巣性皮質・皮質下病変","成人で胸腺腫","両方"],
+    ["DPPX","成人","下痢・体重減少→脳症、振戦・ミオクローヌス・過剰驚愕","<10%（B細胞腫瘍）","両方"],
+    ["IgLON5","高齢","睡眠時異常行動、閉塞性睡眠時無呼吸、球症状、歩行障害","なし（免疫療法に抵抗性）","両方"],
+    ["mGluR5","若年成人","Ophelia症候群（記憶障害・精神症状）","ホジキンリンパ腫","両方"],
+    ["GlyR","成人","SPS、PERM","稀（胸腺腫など）","両方"],
+    ["MOG","小児〜成人","ADEM、皮質性脳炎、視神経炎","なし","血清"],
+    ["g","細胞内抗原抗体（腫瘍随伴が多く、反応が乏しい）"],
+    ["Hu","高齢・喫煙","脳脊髄炎、感覚性ニューロノパチー、辺縁系脳炎",">80%（小細胞肺癌）","両方"],
+    ["Ma2","若年男性／高齢","辺縁系・間脳（過眠）・上部脳幹（垂直注視麻痺）","精巣腫瘍、肺癌。ICI関連","両方"],
+    ["CV2/CRMP5","高齢","舞踏病、視神経炎・網膜炎、脳脊髄炎、ニューロパチー","小細胞肺癌、胸腺腫","両方"],
+    ["Yo","女性","亜急性小脳変性","卵巣癌、乳癌","両方"],
+    ["Ri","女性>男性","脳幹脳炎、オプソクローヌス・ミオクローヌス","乳癌、小細胞肺癌","両方"],
+    ["KLHL11","男性","菱脳炎・小脳失調、難聴・耳鳴","精巣胚細胞腫瘍","両方"],
+    ["GAD65","女性","SPS、小脳失調、辺縁系脳炎・側頭葉てんかん","稀","両方（高力価）"],
+    ["GFAP","成人","髄膜脳脊髄炎、脳室周囲の放射状造影","奇形腫など","髄液"],
+    ["g","その他"],
+    ["NAE","二峰性（若年・高齢）","橋本脳症：意識障害、精神症状、認知症、不随意運動、小脳失調","なし","血清"],
+    ["gAChR","若年〜中年","自己免疫性自律神経節障害、中枢症状・感覚障害を伴うことあり","稀","血清"]
+  ];
+  var h='<thead><tr><th>抗体</th><th>好発</th><th>主な症候</th><th>腫瘍</th><th>検体</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    if(r[0]==="g")h+='<tr><td colspan="5" class="grp">'+esc(r[1])+'</td></tr>';
+    else h+='<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td>'+esc(r[3])+'</td><td>'+esc(r[4])+'</td></tr>';
+  });
+  $("abTable").innerHTML=h+'</tbody>';
+  var refs=[
+    ["Graus F, et al. A clinical approach to diagnosis of autoimmune encephalitis. Lancet Neurol 2016;15:391-404.","https://pubmed.ncbi.nlm.nih.gov/26906964/"],
+    ["Dubey D, et al. Predictors of neural-specific autoantibodies and immunotherapy response in patients with cognitive dysfunction. J Neuroimmunol 2018;323:62-72.","https://pubmed.ncbi.nlm.nih.gov/30196836/"],
+    ["Dubey D, et al. Predictive models in the diagnosis and treatment of autoimmune epilepsy. Epilepsia 2017;58:1181-1189.","https://doi.org/10.1111/epi.13797"],
+    ["Guidon AC, et al. Consensus disease definitions for neurologic immune-related adverse events of immune checkpoint inhibitors. J Immunother Cancer 2021;9:e002890.","https://pubmed.ncbi.nlm.nih.gov/34281989/"],
+    ["Graus F, et al. Updated diagnostic criteria for paraneoplastic neurologic syndromes. Neurol Neuroimmunol Neuroinflamm 2021;8:e1014.","https://pubmed.ncbi.nlm.nih.gov/34006622/"],
+    ["Schneider BJ, et al. Management of immune-related adverse events in patients treated with immune checkpoint inhibitor therapy: ASCO guideline update. J Clin Oncol 2021;39:4073-4126.","https://pubmed.ncbi.nlm.nih.gov/34724392/"]
+  ];
+  $("refList").innerHTML=refs.map(function(r){return '<li>'+esc(r[0])+' <a href="'+r[1]+'" target="_blank" rel="noopener">'+(r[1].indexOf("pubmed")>=0?"PubMed":"DOI")+'</a></li>';}).join("");
+}
+
+/* ---------- build dynamic inputs ---------- */
+function chkHTML(arr){return arr.map(function(x){return '<label class="chk"><input type="checkbox" data-k="'+x[0]+'"><span>'+esc(x[1])+'<em>'+esc(x[2])+'</em></span></label>';}).join("");}
+$("irExclBox").innerHTML=chkHTML(IR_EXCL);
+$("irConcBox").innerHTML=chkHTML(IR_CONC);
+$("phChips").innerHTML=PH.map(function(p){return '<button type="button" class="chip" data-k="'+p.k+'" aria-pressed="false">'+esc(p.t)+'</button>';}).join("");
+buildTable();
+
+/* ---------- main render ---------- */
+function render(){
+  var s=read();save(s);
+  var G=graus(s),A=ape2(s);
+  var any=hasAny(s);
+  $("sumLv").textContent=any?G.level:"—";
+  $("tLv").classList.toggle("on",any&&!!G.cls);
+  $("sumApe").textContent=any?A.ape+(A.ape>=4?" ↑":""):"—";
+  $("tApe").classList.toggle("on",any&&A.ape>=4);
+  $("sumRite").textContent=any?String(A.rite):"—";
+  $("tRite").classList.toggle("on",any&&A.rite>=7);
+  renderRes(s,G,A);renderIr(s);renderAb(s);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("change",function(e){if(e.target.matches("[data-k]"))render();});
+document.addEventListener("input",function(e){if(e.target.matches("input[type=number][data-k]"))render();});
+$("phChips").addEventListener("click",function(e){
+  var b=e.target.closest(".chip");if(!b)return;
+  var k=b.dataset.k,i=PHSEL.indexOf(k);
+  if(i>=0)PHSEL.splice(i,1);else PHSEL.push(k);
+  paintChips();render();
+});
+function show(id){
+  document.querySelectorAll("section.view").forEach(function(v){v.classList.toggle("active",v.id===id);});
+  document.querySelectorAll("nav.tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.view===id?"true":"false");});
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){show(b.dataset.view);});});
+$("btnGo").addEventListener("click",function(){show("v-res");});
+var EX1={subacute:true,wm:true,seizure:true,pers:true,apeOnset:true,neuropsy:true,fbds:true,mri:"mtlBi",eegTemp:true,excl:true,exclDef:true,ph:["le","fbds"]};
+var EX2={subacute:true,psych:true,speech:true,seizure:true,facedysk:true,loc:true,auto:true,hypovent:true,prodrome:true,apeOnset:true,neuropsy:true,refractory:true,csfCell:true,ocb:true,eegAbn:true,mri:"none",teratoma:true,excl:true,exclDef:true,ph:["nmdar"],tumor2:"teratoma"};
+$("btnEx").addEventListener("click",function(){write(EX1);render();});
+$("btnEx2").addEventListener("click",function(){write(EX2);render();});
+$("btnClr").addEventListener("click",function(){write({});render();});
+
+write(load()||{});
+render();
+window.__ae={graus:graus,ape2:ape2,read:read,write:write,render:render};
+})();
+
+/* ---------- PWA：service worker（ward-apps 共通） ---------- */
+(function(){
+  function toast(m){var t=document.getElementById("toast");if(!t)return;t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on");},2200);}
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    var onClaude=/(^|\.)claude\.ai$/.test(h)||/claudeusercontent|claude\.site/.test(h)||!!window.claude;
+    if(!("serviceWorker" in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller)toast("新しい版を取り込みました。次に開いたときに反映されます");
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
