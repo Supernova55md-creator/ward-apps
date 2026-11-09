@@ -183,6 +183,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "抗血栓薬ナビ（脳卒中二次予防）",
+      "short_name": "抗血栓薬ナビ",
+      "url": "atn/",
+      "icons": [
+        {
+          "src": "atn/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

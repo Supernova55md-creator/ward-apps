@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#4b3aa0">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="抗血栓薬ナビ">
+<title>抗血栓薬ナビ（脳卒中二次予防）</title>
+<style>
+:root{
+  /* 抗血栓＝藍紫。DAPT（橙）・抗凝固（青）で薬効群を色分け。縦1カラム、上部タブで4場面を切替 */
+  --accent:#4b3aa0; --accent-ink:#fff; --accent-soft:#ece9f8;
+  --bg:#f5f4f9; --surface:#fff; --ink:#1d1b26; --muted:#635f73; --line:#dedbea;
+  --ap:#9a4f0c; --ap-soft:#fbefe2; --ac:#1f5aa6; --ac-soft:#e6eef9;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --info:#2b5b9a; --info-soft:#e7eef8;
+  --sec:#8a6414; --sec-soft:#faf2df; --na:#6a6f73; --na-soft:#eeeeec;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#a99bff; --accent-ink:#14102a; --accent-soft:#29233f;
+  --bg:#131218; --surface:#1d1b24; --ink:#eeecf4; --muted:#aaa5bb; --line:#363244;
+  --ap:#f0b46e; --ap-soft:#33261a; --ac:#8db7f2; --ac-soft:#18263a;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  --sec:#e2c27a; --sec-soft:#30291a; --na:#b3b8bb; --na-soft:#2a2d2f; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:19px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.18)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:16px;margin:0 0 10px;line-height:1.4}
+h3{font-size:14px;margin:12px 0 6px}
+.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.q{margin:0 0 12px}
+.q:last-child{margin-bottom:0}
+.q>.lb{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:14px;line-height:1.3;cursor:pointer;user-select:none;min-height:36px}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chip input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=number],input[type=date],select{font:inherit;font-size:17px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
+select{font-size:15px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;padding:6px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.abcd{border:1px dashed var(--line);border-radius:10px;padding:10px;margin-top:8px}
+.abcd .row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:4px 0;font-size:14px;border-bottom:1px dotted var(--line)}
+.abcd .row:last-child{border-bottom:0}
+.abcd select{width:auto;max-width:62%;font-size:14px;padding:6px}
+.score{font-family:var(--num);font-size:20px;font-weight:700}
+.hidden{display:none!important}
+.verdict{border-radius:12px;padding:14px;border:1.5px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.verdict.ok{background:var(--ok-soft);border-color:var(--ok)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.crit{background:var(--crit-soft);border-color:var(--crit)}
+.verdict.info{background:var(--info-soft);border-color:var(--info)}
+.pill{align-self:flex-start;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:#fff;background:var(--muted)}
+.verdict.ok .pill{background:var(--ok)}.verdict.warn .pill{background:var(--warn)}.verdict.crit .pill{background:var(--crit)}.verdict.info .pill{background:var(--info)}
+@media (prefers-color-scheme: dark){.pill{color:#111}}
+.big{font-size:18px;font-weight:700;line-height:1.45}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.item{border-left:4px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 11px}
+.item.do{border-left-color:var(--ok)}.item.avoid{border-left-color:var(--crit)}.item.caution{border-left-color:var(--warn)}.item.note{border-left-color:var(--info)}
+.item .t{font-weight:700;font-size:15px}
+.item .d{font-size:14px;margin-top:2px}
+.src{display:inline-flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.src a,.src span{font-size:11.5px;text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:0 6px;color:var(--info);background:var(--surface)}
+.st{font-size:11px;font-weight:700;border-radius:4px;padding:0 6px}
+.st.ok{background:var(--ok-soft);color:var(--ok)}.st.sec{background:var(--sec-soft);color:var(--sec)}.st.na{background:var(--na-soft);color:var(--na)}
+table.tl{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.tl th,table.tl td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+table.tl th{font-size:12px;color:var(--muted);font-weight:700}
+table.tl tr.hl td{background:var(--accent-soft);font-weight:700}
+table.tl td.day{font-family:var(--num);white-space:nowrap}
+.wrapx{overflow-x:auto}
+.dose{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.dose .bx{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.dose .k{font-size:12px;color:var(--muted)}
+.dose .v{font-size:16px;font-weight:700;line-height:1.35}
+.dose .v small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.drugs{display:flex;flex-wrap:wrap;gap:6px}
+.drugs button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:36px}
+.drugs button.ap[aria-pressed="true"]{background:var(--ap);border-color:var(--ap);color:#fff;font-weight:700}
+.drugs button.ac[aria-pressed="true"]{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700}
+.drugs button.oth[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.sheet .row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.sheet .row:last-child{border-bottom:0}
+.sheet .k{font-weight:700;font-size:13.5px}
+.sheet .k small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.sheet .v{font-size:14px;min-width:0;overflow-wrap:anywhere}
+.sheet .row.hl{background:var(--accent-soft);border-radius:8px;padding:10px 8px;margin:4px -8px}
+@media (max-width:520px){.sheet .row{grid-template-columns:minmax(0,1fr)}.sheet .k small{display:inline;margin-left:6px}}
+.ev{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.ev .hd{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.ev .nm{font-weight:800;font-size:15.5px}
+.ev .yr{font-family:var(--num);font-size:12px;color:var(--muted)}
+.ev .tag{font-size:11px;font-weight:700;border-radius:4px;padding:0 6px}
+.tag.dapt{background:var(--ap-soft);color:var(--ap)}.tag.af{background:var(--ac-soft);color:var(--ac)}.tag.peri{background:var(--accent-soft);color:var(--accent)}.tag.bleed{background:var(--crit-soft);color:var(--crit)}.tag.gl{background:var(--ok-soft);color:var(--ok)}
+.ev dl{display:grid;grid-template-columns:52px minmax(0,1fr);gap:2px 8px;margin:6px 0 0;font-size:13.5px}
+.ev dt{color:var(--muted);font-size:12px;padding-top:1px}
+.ev dd{margin:0}
+.ev .take{margin-top:6px;font-size:14px;font-weight:700}
+.news{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.news div{border-left:3px solid var(--accent);padding-left:8px}
+.news b{font-family:var(--num);font-size:12px;color:var(--accent);margin-right:6px}
+.fine{font-size:12px;color:var(--muted);line-height:1.7}
+.fine p{margin:0 0 6px}
+.calc{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:14px}
+.calc .out{font-family:var(--num);font-size:20px;font-weight:700;color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+a{color:var(--info)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>抗血栓薬ナビ</h1><small>脳卒中二次予防</small></div>
+  <nav class="tabs" role="tablist" aria-label="場面">
+    <button type="button" role="tab" data-v="dapt" aria-selected="true">DAPT</button>
+    <button type="button" role="tab" data-v="doac" aria-selected="false">DOAC<br>開始</button>
+    <button type="button" role="tab" data-v="peri" aria-selected="false">周術期</button>
+    <button type="button" role="tab" data-v="bleed" aria-selected="false">出血<br>中和</button>
+    <button type="button" role="tab" data-v="ev" aria-selected="false">根拠</button>
+  </nav>
+</header>
+
+<main>
+<!-- ===================== DAPT ===================== -->
+<div id="v-dapt" class="view">
+  <section class="card">
+    <h2>非心原性の脳梗塞・TIA：DAPTの適応と期間</h2>
+    <div class="q"><span class="lb">病型</span><div class="chips" id="d-type">
+      <label class="chip"><input type="radio" name="d-type" value="athero" checked><span>アテローム血栓性</span></label>
+      <label class="chip"><input type="radio" name="d-type" value="lacunar"><span>ラクナ・BAD</span></label>
+      <label class="chip"><input type="radio" name="d-type" value="other"><span>その他・原因不明</span></label>
+      <label class="chip"><input type="radio" name="d-type" value="ce"><span>心原性（AFなど）</span></label>
+    </div></div>
+    <div class="q"><span class="lb">発作</span><div class="chips">
+      <label class="chip"><input type="radio" name="d-ev" value="is" checked><span>脳梗塞</span></label>
+      <label class="chip"><input type="radio" name="d-ev" value="tia"><span>TIA</span></label>
+    </div></div>
+    <div class="q" id="d-nihss-q"><label class="f">NIHSS<input type="number" id="d-nihss" inputmode="numeric" min="0" max="42" placeholder="例 3"></label></div>
+    <div class="q hidden" id="d-abcd-q">
+      <span class="lb">ABCD²スコア</span>
+      <div class="abcd">
+        <div class="row"><span>A 年齢 60歳以上</span><select id="a-age"><option value="0">いいえ 0</option><option value="1">はい 1</option></select></div>
+        <div class="row"><span>B 初診時血圧 ≥140/90</span><select id="a-bp"><option value="0">いいえ 0</option><option value="1">はい 1</option></select></div>
+        <div class="row"><span>C 臨床症状</span><select id="a-cl"><option value="0">その他 0</option><option value="1">麻痺なしの言語障害 1</option><option value="2">片側の脱力 2</option></select></div>
+        <div class="row"><span>D 持続時間</span><select id="a-du"><option value="0">10分未満 0</option><option value="1">10〜59分 1</option><option value="2">60分以上 2</option></select></div>
+        <div class="row"><span>D 糖尿病</span><select id="a-dm"><option value="0">なし 0</option><option value="1">あり 1</option></select></div>
+        <div class="row"><b>合計</b><span class="score" id="a-sum">0</span></div>
+      </div>
+    </div>
+    <div class="q"><span class="lb">発症から</span><div class="chips">
+      <label class="chip"><input type="radio" name="d-time" value="24" checked><span>24時間以内</span></label>
+      <label class="chip"><input type="radio" name="d-time" value="72"><span>24〜72時間</span></label>
+      <label class="chip"><input type="radio" name="d-time" value="30d"><span>72時間〜30日</span></label>
+      <label class="chip"><input type="radio" name="d-time" value="late"><span>30日以降</span></label>
+    </div></div>
+    <div class="q"><span class="lb">責任血管の症候性狭窄</span><div class="chips">
+      <label class="chip"><input type="radio" name="d-sten" value="none" checked><span>なし・不明</span></label>
+      <label class="chip"><input type="radio" name="d-sten" value="50"><span>頭蓋内外 50〜69%</span></label>
+      <label class="chip"><input type="radio" name="d-sten" value="70ic"><span>頭蓋内 70〜99%</span></label>
+      <label class="chip"><input type="radio" name="d-sten" value="70ec"><span>頸動脈 70%以上</span></label>
+    </div></div>
+    <div class="q"><span class="lb">状況</span>
+      <label class="chk"><input type="checkbox" id="d-nd">発症4.5時間以内・非障害性の軽症で、静注血栓溶解を検討している</label>
+      <label class="chk"><input type="checkbox" id="d-ivt">静注血栓溶解を行った</label>
+      <label class="chk"><input type="checkbox" id="d-stent">血栓回収・ステント留置を行った</label>
+      <label class="chk"><input type="checkbox" id="d-oac">抗凝固薬を内服中・開始予定</label>
+      <label class="chk"><input type="checkbox" id="d-hbr">出血リスクが高い（脳出血既往、多発微小出血、消化管出血既往など）</label>
+    </div>
+  </section>
+  <div id="d-out" aria-live="polite"></div>
+</div>
+
+<!-- ===================== DOAC ===================== -->
+<div id="v-doac" class="view hidden">
+  <section class="card">
+    <h2>心房細動を伴う脳梗塞：DOACを始める日</h2>
+    <div class="grid">
+      <label class="f">発症日<input type="date" id="c-onset"></label>
+      <label class="f">NIHSS（入院時）<input type="number" id="c-nihss" inputmode="numeric" min="0" max="42" placeholder="例 6"></label>
+    </div>
+    <div class="q" style="margin-top:12px"><span class="lb">TIAか</span><div class="chips">
+      <label class="chip"><input type="radio" name="c-tia" value="0" checked><span>脳梗塞</span></label>
+      <label class="chip"><input type="radio" name="c-tia" value="1"><span>TIA（画像で梗塞なし）</span></label>
+    </div></div>
+    <div class="q"><span class="lb">梗塞の大きさ（画像、ELANの定義）</span><div class="chips">
+      <label class="chip"><input type="radio" name="c-size" value="minor"><span>軽度（1.5cm以下）</span></label>
+      <label class="chip"><input type="radio" name="c-size" value="moderate"><span>中等度</span></label>
+      <label class="chip"><input type="radio" name="c-size" value="major"><span>重度</span></label>
+      <label class="chip"><input type="radio" name="c-size" value="" checked><span>未評価</span></label>
+    </div>
+    <p class="hint">軽度＝前方・後方循環とも1.5cm以下。中等度＝MCA・ACA・PCAの皮質枝1本の領域、MCA深部枝、内境界領域。重度＝MCA・ACA・PCAの全域、MCA皮質枝2本以上、MCA皮質枝＋深部枝、複数の血管領域にまたがる梗塞、脳幹・小脳で1.5cm以上。</p></div>
+    <div class="q"><span class="lb">出血性変化</span><div class="chips">
+      <label class="chip"><input type="radio" name="c-ht" value="none" checked><span>なし</span></label>
+      <label class="chip"><input type="radio" name="c-ht" value="hi"><span>HI1・HI2（点状）</span></label>
+      <label class="chip"><input type="radio" name="c-ht" value="ph1"><span>PH1</span></label>
+      <label class="chip"><input type="radio" name="c-ht" value="ph2"><span>PH2・症候性</span></label>
+    </div></div>
+    <div class="q"><span class="lb">状況</span>
+      <label class="chk"><input type="checkbox" id="c-rep">静注血栓溶解・血栓回収を行った</label>
+      <label class="chk"><input type="checkbox" id="c-bp">血圧が管理できていない</label>
+      <label class="chk"><input type="checkbox" id="c-ap">抗血小板薬を内服中（冠動脈ステントなどの理由なし）</label>
+    </div>
+  </section>
+  <div id="c-out" aria-live="polite"></div>
+</div>
+
+<!-- ===================== 周術期 ===================== -->
+<div id="v-peri" class="view hidden">
+  <section class="card">
+    <h2>手術・内視鏡の前の休薬と再開</h2>
+    <div class="q"><span class="lb">抗血小板薬</span><div class="drugs" id="p-ap"></div></div>
+    <div class="q"><span class="lb">抗凝固薬</span><div class="drugs" id="p-ac"></div></div>
+    <div class="q"><span class="lb">処置</span><div class="chips" id="p-proc">
+      <label class="chip"><input type="radio" name="p-proc" value="endo_low"><span>内視鏡 生検・低危険度</span></label>
+      <label class="chip"><input type="radio" name="p-proc" value="endo_high"><span>内視鏡 高危険度</span></label>
+      <label class="chip"><input type="radio" name="p-proc" value="ra"><span>脊髄幹麻酔・深部ブロック</span></label>
+      <label class="chip"><input type="radio" name="p-proc" value="surg" checked><span>手術一般</span></label>
+    </div></div>
+    <div class="q hidden" id="p-crcl-q">
+      <span class="lb">CrCl（Cockcroft-Gault）</span>
+      <div class="grid">
+        <label class="f">年齢<input type="number" id="p-age" inputmode="numeric" placeholder="歳"></label>
+        <label class="f">体重<input type="number" id="p-wt" inputmode="decimal" placeholder="kg"></label>
+        <label class="f">血清Cr<input type="number" id="p-cr" inputmode="decimal" step="0.01" placeholder="mg/dL"></label>
+        <label class="f">性別<select id="p-sex"><option value="m">男性</option><option value="f">女性</option></select></label>
+      </div>
+      <div class="calc" style="margin-top:8px">CrCl <span class="out" id="p-crcl">—</span> mL/分</div>
+    </div>
+  </section>
+  <div id="p-out" aria-live="polite"></div>
+</div>
+
+<!-- ===================== 出血・中和 ===================== -->
+<div id="v-bleed" class="view hidden">
+  <section class="card">
+    <h2>抗血栓薬内服中の出血：中和</h2>
+    <div class="q"><span class="lb">内服中の薬</span><div class="drugs" id="b-drug">
+      <button type="button" class="oth" data-b="vka" aria-pressed="false">ワルファリン</button>
+      <button type="button" class="oth" data-b="dab" aria-pressed="false">ダビガトラン</button>
+      <button type="button" class="oth" data-b="xa" aria-pressed="false">Xa阻害薬</button>
+      <button type="button" class="oth" data-b="hep" aria-pressed="false">ヘパリン</button>
+      <button type="button" class="oth" data-b="ap" aria-pressed="false">抗血小板薬</button>
+    </div></div>
+    <div class="grid" id="b-inputs">
+      <label class="f" id="b-wt-l">体重<input type="number" id="b-wt" inputmode="decimal" placeholder="kg"></label>
+      <label class="f" id="b-inr-l">PT-INR<input type="number" id="b-inr" inputmode="decimal" step="0.1" placeholder="例 3.2"></label>
+      <label class="f" id="b-hep-l">直近のヘパリン量<input type="number" id="b-hep" inputmode="numeric" placeholder="単位"></label>
+    </div>
+    <p class="hint" id="b-hep-h">持続投与なら直近2〜3時間の投与量の合計を目安に入れます（ヘパリンの半減期は約1時間）。</p>
+  </section>
+  <div id="b-out" aria-live="polite"></div>
+</div>
+
+<!-- ===================== 根拠 ===================== -->
+<div id="v-ev" class="view hidden">
+  <section class="card">
+    <h2>この1年ほどの主な更新</h2>
+    <div class="news" id="e-news"></div>
+  </section>
+  <section class="card">
+    <div class="chips" id="e-filter">
+      <label class="chip"><input type="radio" name="e-f" value="all" checked><span>すべて</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="dapt"><span>DAPT</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="af"><span>AF・DOAC</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="bleed"><span>出血・中和</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="peri"><span>周術期</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="gl"><span>ガイドライン</span></label>
+    </div>
+  </section>
+  <div id="e-list" style="display:flex;flex-direction:column;gap:8px"></div>
+  <section class="card fine">
+    <p><span class="st ok">原本で確認</span> PubMed抄録・PMDA添付文書・学会GL原本で記載を直接確認。<span class="st sec">二次資料のみ</span> 原本に当たれず、解説記事・総説による。<span class="st na">未確認</span> 確認できず値を入れていない。</p>
+    <p>周術期の値は「抗血栓薬 休薬早見」（2026年11月5日作成、原本と別担当で照合済み）から、脳卒中診療でよく使う9剤を抜き出したものです。</p>
+    <p>判断の参考資料です。最終判断は患者の血栓・出血リスクを踏まえて主治医・処置医が行い、院内の取り決めがあればそちらを優先してください。データ作成：Claude（2026年11月9日）。</p>
+  </section>
+</div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 文献 ============ */
+const PM=id=>"https://pubmed.ncbi.nlm.nih.gov/"+id+"/";
+const R={
+ CHANCE:{s:"CHANCE",t:"Wang Y, et al. N Engl J Med 2013;369:11-19",u:PM(23803136)},
+ POINT:{s:"POINT",t:"Johnston SC, et al. N Engl J Med 2018;379:215-225",u:PM(29766750)},
+ POOL:{s:"CHANCE+POINT統合",t:"Pan Y, et al. JAMA Neurol 2019;76:1466-1473",u:PM(31424481)},
+ THALES:{s:"THALES",t:"Johnston SC, et al. N Engl J Med 2020;383:207-217",u:PM(32668111)},
+ CHANCE2:{s:"CHANCE-2",t:"Wang Y, et al. N Engl J Med 2021;385:2520-2530",u:PM(34708996)},
+ INSPIRES:{s:"INSPIRES",t:"Gao Y, et al. N Engl J Med 2023;389:2413-2424",u:PM(38157499)},
+ INSP_T:{s:"INSPIRES時間別",t:"Liu Y, et al. JAMA Netw Open 2024;7:e2431938",u:PM(39240565)},
+ ARAMIS:{s:"ARAMIS",t:"Chen HS, et al. JAMA 2023;329:2135-2144",u:PM(37367978)},
+ SAMMPRIS:{s:"SAMMPRIS",t:"Chimowitz MI, et al. N Engl J Med 2011;365:993-1003",u:PM(21899409)},
+ CSPS:{s:"CSPS.com",t:"Toyoda K, et al. Lancet Neurol 2019;18:539-548",u:PM(31122494)},
+ MATCH:{s:"MATCH",t:"Diener HC, et al. Lancet 2004;364:331-337",u:PM(15276392)},
+ SPS3:{s:"SPS3",t:"SPS3 Investigators. N Engl J Med 2012;367:817-825",u:PM(22931315)},
+ AHA26:{s:"AHA/ASA 2026",t:"Prabhakaran S, et al. 2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke. Stroke 2026;57:e316-e436",u:PM(41582814)},
+ AHA21:{s:"AHA/ASA 2021",t:"Kleindorfer DO, et al. 2021 Guideline for the Prevention of Stroke in Patients With Stroke and TIA. Stroke 2021;52:e364-e467",u:PM(34024117)},
+ JSS25:{s:"脳卒中治療GL 改訂2025",t:"日本脳卒中学会 脳卒中ガイドライン委員会 編. 脳卒中治療ガイドライン2021〔改訂2025〕（2025年6月30日公開、改訂52項目）",u:"https://www.jsts.gr.jp/img/guideline2021_kaitei2025_kaiteikoumoku.pdf"},
+ TIMING:{s:"TIMING",t:"Oldgren J, et al. Circulation 2022;146:1056-1066",u:PM(36065821)},
+ ELAN:{s:"ELAN",t:"Fischer U, et al. N Engl J Med 2023;388:2411-2421",u:PM(37222476)},
+ OPTIMAS:{s:"OPTIMAS",t:"Werring DJ, et al. Lancet 2024;404:1731-1741",u:PM(39491870)},
+ CATALYST:{s:"CATALYST",t:"Dehbi HM, et al. Lancet 2025;406:43-51",u:PM(40570866)},
+ R1234:{s:"1-2-3-4日ルール",t:"Kimura S, et al. Stroke 2022;53:1540-1549",u:PM(35105180)},
+ R1234EVT:{s:"1-2-3-4 血栓回収後",t:"Kimura S, et al. Cerebrovasc Dis 2026 (online Jan 21). doi:10.1159/000549656",u:PM(41563934)},
+ ANNEXAI:{s:"ANNEXA-I",t:"Connolly SJ, et al. N Engl J Med 2024;390:1745-1755",u:PM(38749032)},
+ REVERSE:{s:"RE-VERSE AD",t:"Pollack CV Jr, et al. N Engl J Med 2017;377:431-441",u:PM(28693366)},
+ PATCH:{s:"PATCH",t:"Baharoglu MI, et al. Lancet 2016;387:2605-2613",u:PM(27178479)},
+ AHA22ICH:{s:"AHA/ASA 2022 脳出血",t:"Greenberg SM, et al. 2022 Guideline for the Management of Patients With Spontaneous Intracerebral Hemorrhage. Stroke 2022;53:e282-e361",u:PM(35579034)},
+ FDA25:{s:"FDA 2025/12",t:"FDA Safety Communication: Update on the Safety of Andexxa（2025年12月18日）",u:"https://www.fda.gov/vaccines-blood-biologics/safety-availability-biologics/update-safety-andexxa"},
+ JORG:{s:"Jørgensen 2014",t:"Jørgensen ME, et al. JAMA 2014;312:269-277",u:PM(25027142)},
+ L_ondexxya:{s:"オンデキサ添付文書",t:"オンデキサ静注用200mg 2025年11月改訂 第6版",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/670227_3399414D1022_2_05"},
+ L_prizbind:{s:"プリズバインド添付文書",t:"プリズバインド静注液2.5g 2025年12月改訂 第6版",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/650168_3399412A1027_1_08"},
+ L_kcentra:{s:"ケイセントラ添付文書",t:"ケイセントラ静注用500/1000 2025年5月改訂 第3版",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/100806_6343449D1024_1_06"},
+ L_protamine:{s:"プロタミン添付文書",t:"プロタミン硫酸塩静注100mg「モチダ」 2023年3月改訂 第1版",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/790005_3329403A1058_1_04"},
+ L_clopidogrel:{s:"プラビックス添付文書",t:"プラビックス錠 2023年1月改訂 第5版",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/780069_3399008F1025_1_31"},
+ L_prasugrel:{s:"エフィエント添付文書",t:"エフィエント錠 2026年2月改訂 第4版",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/430574_3399009F1020_1_22"},
+ JGES2012:{s:"JGES 2012",t:"抗血栓薬服用者に対する消化器内視鏡診療ガイドライン（2012）",u:"https://www.jstage.jst.go.jp/article/gee/54/7/54_2075/_pdf/-char/ja"},
+ JGES2017:{s:"JGES 2017追補",t:"同 直接経口抗凝固薬（DOAC）を含めた抗凝固薬に関する追補2017",u:"https://www.jstage.jst.go.jp/article/gee/59/7/59_1547/_html/-char/ja"},
+ RA2026:{s:"区域麻酔GL 第2版",t:"抗血栓療法中の区域麻酔・神経ブロックガイドライン 改訂第2版（2026年7月）",u:"https://anesth.or.jp/files/pdf/guideline_kouketsusen_shinkeiblock.pdf"},
+ JCS2020:{s:"JCS 2020",t:"2020年改訂版 不整脈薬物治療ガイドライン（JCS/JHRS）",u:"https://www.j-circ.or.jp/cms/wp-content/uploads/2020/01/JCS2020_Ono.pdf"},
+ ACCP2022:{s:"ACCP 2022",t:"Douketis JD, et al. Perioperative Management of Antithrombotic Therapy. CHEST 2022;162:e207-e243",u:PM(35964704)},
+ PAUSE:{s:"PAUSE",t:"Douketis JD, et al. JAMA Intern Med 2019;179:1469-1478",u:PM(31380891)},
+ KYUYAKU:{s:"休薬早見",t:"抗血栓薬 休薬早見（2026年11月5日、原本照合済み）",u:"https://claude.ai/artifact/HFTbq8sfLyrvEn6SSeEeHy"}
+};
+const STL={ok:"原本で確認",sec:"二次資料のみ",na:"未確認"};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function src(keys,st){
+  const a=(keys||[]).filter(k=>R[k]).map(k=>`<a href="${esc(R[k].u)}" target="_blank" rel="noopener" title="${esc(R[k].t)}">${esc(R[k].s)}</a>`).join("");
+  return `<div class="src">${st?`<span class="st ${st}">${STL[st]}</span>`:""}${a}</div>`;
+}
+function item(cls,t,d,keys,st){return `<li class="item ${cls}"><div class="t">${t}</div>${d?`<div class="d">${d}</div>`:""}${keys||st?src(keys,st):""}</li>`}
+function verdict(cls,pill,big,body){return `<section class="verdict ${cls}"><span class="pill">${pill}</span><div class="big">${big}</div>${body||""}</section>`}
+const $=id=>document.getElementById(id);
+const val=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:""};
+const num=id=>{const v=parseFloat($(id).value);return isNaN(v)?null:v};
+
+/* ============ 保存 ============ */
+const KEY="atn-nav-v1";
+function save(){
+  try{
+    const o={tab:curTab,pdrug:pDrug,bdrug:bDrug,f:{}};
+    document.querySelectorAll("main input,main select").forEach(el=>{
+      if(!el.id&&!el.name)return;
+      if(el.type==="radio"){if(el.checked)o.f["r:"+el.name]=el.value}
+      else if(el.type==="checkbox")o.f["c:"+el.id]=el.checked;
+      else if(el.id)o.f["v:"+el.id]=el.value;
+    });
+    localStorage.setItem(KEY,JSON.stringify(o));
+  }catch(e){}
+}
+function load(){
+  try{
+    const o=JSON.parse(localStorage.getItem(KEY)||"null");if(!o)return;
+    for(const [k,v] of Object.entries(o.f||{})){
+      const [t,n]=[k.slice(0,1),k.slice(2)];
+      if(t==="r"){const e=document.querySelector(`input[name="${n}"][value="${v}"]`);if(e)e.checked=true}
+      else if(t==="c"){const e=$(n);if(e)e.checked=!!v}
+      else{const e=$(n);if(e)e.value=v}
+    }
+    if(o.pdrug)pDrug=o.pdrug; if(o.bdrug)bDrug=o.bdrug; if(o.tab)curTab=o.tab;
+  }catch(e){}
+}
+
+/* ============ タブ ============ */
+let curTab="dapt";
+function setTab(v){
+  curTab=v;
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v));
+  document.querySelectorAll(".view").forEach(x=>x.classList.toggle("hidden",x.id!=="v-"+v));
+}
+document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;setTab(b.dataset.v);save();window.scrollTo({top:0})});
+
+/* ============ DAPT ============ */
+function abcd(){return ["a-age","a-bp","a-cl","a-du","a-dm"].reduce((s,id)=>s+(+$(id).value||0),0)}
+function renderDapt(){
+  const type=val("d-type"),ev=val("d-ev"),time=val("d-time"),sten=val("d-sten");
+  const tia=ev==="tia";
+  $("d-nihss-q").classList.toggle("hidden",tia);
+  $("d-abcd-q").classList.toggle("hidden",!tia);
+  const sc=abcd(); $("a-sum").textContent=sc;
+  const n=num("d-nihss");
+  const nd=$("d-nd").checked,ivt=$("d-ivt").checked,stent=$("d-stent").checked,oac=$("d-oac").checked,hbr=$("d-hbr").checked;
+  let h="";
+
+  if(type==="ce"){
+    h+=verdict("info","心原性","DAPTの対象ではありません。DOAC開始時期のタブへ",
+      `<ul class="list">${item("avoid","抗凝固薬に抗血小板薬を上乗せしない","冠動脈疾患の活動期や最近のステント留置がなければ、出血が増えるだけで推奨されない（AHA 2026：3: Harm）。",["AHA26"],"sec")}</ul>
+       <div style="margin-top:8px"><button type="button" class="go" data-go="doac" style="font:inherit;border-radius:8px;border:1px solid var(--info);background:var(--surface);color:var(--info);padding:8px 12px;font-weight:700">DOAC開始のタブを開く</button></div>`);
+    $("d-out").innerHTML=h;return;
+  }
+  if(!tia&&n===null){$("d-out").innerHTML=`<section class="card"><p class="hint" style="margin:0">NIHSSを入れると判定します。</p></section>`;return}
+
+  const minor = tia ? sc>=4 : n<=3;
+  const mild5 = !tia && n<=5;
+  const atheroLike = type==="athero" || sten!=="none";
+  const ic70 = sten==="70ic";
+  let cls,pill,big,why=[],reg="",dur="";
+
+  if(time==="24" && minor){
+    cls="ok";pill="DAPTの適応";big="クロピドグレル＋アスピリンを24時間以内に開始し、21日間 → 単剤へ";
+    why.push(item("do",tia?`TIA・ABCD² ${sc}点（4点以上）・24時間以内`:`軽症脳梗塞 NIHSS ${n}（3以下）・24時間以内`,
+      "CHANCE・POINTの対象。統合解析では再発抑制の利益は最初の21日に集中していた。AHA 2026 は24時間以内に開始して21日間（推奨クラス1、LOE A）。",["CHANCE","POINT","POOL","AHA26"],"ok"));
+    dur="21日";
+  }else if((time==="24"||time==="72") && (minor||mild5) && (tia?sc>=4:true)){
+    if(atheroLike){
+      cls="ok";pill="DAPTを考慮";big="72時間以内ならクロピドグレル＋アスピリン 21日 → 単剤";
+      why.push(item("do",`${tia?`TIA・ABCD² ${sc}点`:`NIHSS ${n}`}・${time==="24"?"24時間以内":"24〜72時間"}・アテローム性を推定`,
+        "INSPIRES（NIHSS 5以下 または ABCD² 4以上、推定アテローム性、72時間以内）で90日の新規脳卒中が減少（7.3% vs 9.2%）。中等度〜重度出血は増加（0.9% vs 0.4%）。開始が24〜48時間、48〜72時間でも効果は同様。AHA 2026 はNIHSS 4〜5と72時間までに対象を広げた（クラス2a）。",["INSPIRES","INSP_T","AHA26"],"ok"));
+    }else{
+      cls="warn";pill="根拠が限られる";big="DAPTは考慮可。ただし試験の対象（アテローム性推定）から外れる";
+      why.push(item("caution",`${tia?`TIA・ABCD² ${sc}点`:`NIHSS ${n}`}・${time==="24"?"24時間以内":"24〜72時間"}・狭窄なし`,
+        "INSPIRESは頭蓋内外の狭窄50%以上、または同じ血管領域の多発梗塞など、アテローム性が推定される例が対象。ラクナ・BADではこの条件に当たるかを確認する。",["INSPIRES"],"ok"));
+      if(type==="lacunar") why.push(item("note","ラクナ・BADのDAPT","BADの進行抑制に対するDAPT・シロスタゾール併用は国内で広く行われているが、RCTの根拠はない。",[],"sec"));
+    }
+    dur="21日";
+  }else if(ic70 && time!=="late"){
+    cls="ok";pill="DAPTの適応";big="症候性頭蓋内狭窄70〜99%：アスピリン＋クロピドグレル 90日";
+    why.push(item("do","頭蓋内主幹動脈 70〜99%・発症30日以内","SAMMPRIS の内科治療群（アスピリン325mg＋クロピドグレル75mg 90日＋強化した危険因子管理）。ステント群より30日の脳卒中・死亡が少なかった。AHA 2021 は90日のDAPTを妥当とする（クラス2a）。",["SAMMPRIS","AHA21"],"ok"));
+    dur="90日";
+  }else if(time==="30d"||time==="late"){
+    cls="info";pill="単剤が基本";big="急性期DAPTの時期は過ぎています。単剤で二次予防";
+    why.push(item("note","72時間を過ぎてからDAPTを始める根拠はない","CHANCE・POINT・INSPIRESはいずれも72時間以内の開始。",["INSPIRES"],"ok"));
+    if(atheroLike) why.push(item("do","高リスク例ではシロスタゾール併用を検討","CSPS.com（日本、発症8〜180日、主幹動脈50%以上の狭窄か血管危険因子2つ以上）：アスピリンまたはクロピドグレルにシロスタゾールを加えると、虚血性脳卒中が約半分に減り、重い出血は増えなかった。",["CSPS"],"ok"));
+  }else{
+    cls="info";pill="単剤が基本";
+    big = !tia && n>=6 ? `NIHSS ${n}：DAPTの試験の対象外。単剤で開始` : tia ? `ABCD² ${sc}点：単剤で開始` : "単剤で開始";
+    why.push(item("note","DAPTのRCTは軽症（NIHSS 5以下）と高リスクTIAが対象",!tia&&n>=6?"中等症以上ではDAPTの上乗せ効果と出血の釣り合いが分かっていない。":"ABCD² 4点未満のTIAはCHANCE・POINT・INSPIRESの対象外。",["CHANCE","POINT","INSPIRES"],"ok"));
+    if(sten==="50"||sten==="70ec") why.push(item("caution","症候性狭窄がある","THALES（チカグレロル＋アスピリン30日）は同側の症候性狭窄50%以上を対象に含めたが、チカグレロルは国内で脳梗塞の適応がない。頸動脈70%以上は血行再建（CEA・CAS）の適応を先に検討する。",["THALES"],"ok"));
+  }
+
+  // 修飾
+  const mods=[];
+  if(nd) mods.push(item("do","非障害性の軽症は、静注血栓溶解よりDAPTを優先","ARAMIS（発症4.5時間以内、NIHSS 5以下の非障害性）でDAPTはアルテプラーゼに非劣性。AHA 2026：非障害性ではIVTを行わずDAPTを推奨。国内GL改訂2025：アルテプラーゼの代わりに抗血小板薬の投与を考慮しうる。",["ARAMIS","AHA26","JSS25"],"sec"));
+  if(ivt) mods.push(item("avoid","静注血栓溶解後24時間は抗血小板薬を始めない","24時間後の画像で出血がないことを確認してから開始する。CHANCE・POINT・INSPIRESは血栓溶解例を除外しており、DAPTの根拠は外挿になる。",["INSPIRES","AHA26"],"sec"));
+  if(stent) mods.push(item("caution","ステントを留置した場合は術者の方針（通常DAPT）に従う","期間は留置部位とデバイスで異なる。",[],null));
+  if(oac) mods.push(item("avoid","抗凝固薬と併用する場合","DAPTの試験は抗凝固薬内服例を除外。抗凝固＋抗血小板は出血が増えるため、併用の理由（ステント等）がなければ抗凝固単独を基本にする。",["AHA26"],"sec"));
+  if(hbr) mods.push(item("caution","出血リスクが高い","DAPTは21日を超えて延ばさない（統合解析で利益は最初の21日に集中）。プロトンポンプ阻害薬の併用を検討。",["POOL"],"ok"));
+
+  let doses="";
+  if(dur){
+    doses=`<h3>処方の目安</h3><div class="dose">
+      <div class="bx"><div class="k">アスピリン</div><div class="v">初日 160〜300 mg<small>2日目以降 100 mg/日</small></div></div>
+      <div class="bx"><div class="k">クロピドグレル</div><div class="v">初日 300 mg<small>2日目以降 75 mg/日（POINTは初日600 mg）</small></div></div>
+      <div class="bx"><div class="k">DAPTの期間</div><div class="v">${dur}<small>以後は単剤</small></div></div>
+    </div>
+    <ul class="list" style="margin-top:8px">${item("caution","国内の添付文書","脳梗塞・TIAでのクロピドグレル300 mgの負荷は添付文書の用法外（試験の用量）。維持は75 mg（年齢・体重・症状により50 mg）。",["L_clopidogrel"],"sec")}</ul>`;
+  }
+  const after=`<h3>DAPTの後・慢性期</h3><ul class="list">
+    ${item("avoid","アスピリン＋クロピドグレルを長期に続けない","MATCH・SPS3：長期の2剤併用は再発を減らさず、出血（SPS3では死亡も）が増えた。",["MATCH","SPS3"],"ok")}
+    ${item("do","単剤の選択肢","アスピリン、クロピドグレル、シロスタゾール、プラスグレル 3.75 mg（国内で虚血性脳血管障害の適応あり）。",["L_prasugrel"],"sec")}
+    ${item("note","チカグレロル・CYP2C19","CHANCE-2：CYP2C19機能低下型保因者ではチカグレロル＋アスピリンがクロピドグレル＋アスピリンより再発が少ない。チカグレロルは国内で脳梗塞の適応がないため、日本では使えない。",["CHANCE2","THALES"],"ok")}
+  </ul>`;
+
+  h+=verdict(cls,pill,big,`<ul class="list">${why.join("")}</ul>`);
+  if(mods.length) h+=`<section class="card"><h2>この患者で注意すること</h2><ul class="list">${mods.join("")}</ul></section>`;
+  h+=`<section class="card">${doses}${after}</section>`;
+  $("d-out").innerHTML=h;
+}
+
+/* ============ DOAC 開始 ============ */
+function addDays(d,k){const x=new Date(d+"T00:00:00");x.setDate(x.getDate()+k);return x}
+function fmtD(x){const w="日月火水木金土"[x.getDay()];return `${x.getMonth()+1}/${x.getDate()}（${w}）`}
+function renderDoac(){
+  const onset=$("c-onset").value,n=num("c-nihss"),tia=val("c-tia")==="1",size=val("c-size"),ht=val("c-ht");
+  const rep=$("c-rep").checked,bp=$("c-bp").checked,ap=$("c-ap").checked;
+  const sev = tia?"tia": n===null?null : n<=7?"mild": n<=15?"mod":"sev";
+  const sevTx={tia:"TIA",mild:"軽症（NIHSS 0〜7）",mod:"中等症（8〜15）",sev:"重症（16以上）"};
+  const d1234={tia:1,mild:2,mod:3,sev:4}, d13612={tia:1,mild:3,mod:6,sev:12};
+  const span=(a,b)=>!onset?(a===b?`${a}日目`:`${a}〜${b}日目`):(a===b?`${a}日目 ${fmtD(addDays(onset,a))}`:`${a}〜${b}日目 ${fmtD(addDays(onset,a))}〜${fmtD(addDays(onset,b))}`);
+  let rows=[];
+  // ELAN
+  if(tia||size==="minor"||size==="moderate") rows.push({k:"ELAN 早期群",d:span(0,2),n:"軽度・中等度梗塞は48時間以内",ref:["ELAN"],main:true});
+  else if(size==="major") rows.push({k:"ELAN 早期群",d:span(6,7),n:"重度梗塞は6〜7日目",ref:["ELAN"],main:true});
+  else rows.push({k:"ELAN 早期群",d:"梗塞の大きさで決まる",n:"軽度・中等度：48時間以内／重度：6〜7日目",ref:["ELAN"]});
+  rows.push({k:"CATALYST（4試験統合）",d:span(0,4),n:"4日以内の開始で30日の再発＋症候性出血が減少。重症例・出血性変化例は少数",ref:["CATALYST","OPTIMAS","TIMING"],main:!size||size==="minor"||size==="moderate"});
+  if(sev) rows.push({k:"1-2-3-4日ルール",d:span(d1234[sev],d1234[sev]),n:`${sevTx[sev]}。日本の観察研究（血栓回収後の報告もあり）`,ref:["R1234","R1234EVT"]});
+  if(sev) rows.push({k:"1-3-6-12日ルール（旧来）",d:span(d13612[sev],d13612[sev]),n:"専門家意見。RCTで早期開始が支持され、より早い開始へ移行",ref:[]});
+
+  let pill,cls,big;
+  if(ht==="ph2"){cls="crit";pill="個別判断";big="PH2・症候性の出血性変化：早期開始の根拠なし。再画像で安定を確認してから"}
+  else if(!sev&&!size){cls="info";pill="入力待ち";big="NIHSSか梗塞の大きさを入れると目安日を出します"}
+  else if(size==="major"||sev==="sev"){cls="warn";pill="早期開始を検討";big=size==="major"?"重度梗塞：ELANでは6〜7日目。4日以内も選択肢（重症例のデータは少ない）":"重症：4日以内も選択肢。梗塞の大きさで調整（ELANの重度なら6〜7日目）"}
+  else{cls="ok";pill="早期開始";big="発症4日以内（軽度・中等度梗塞なら48時間以内）にDOACを開始"}
+
+  const tbl=`<p class="hint" style="margin:0 0 6px">発症日＝0日として数えます。</p><div class="sheet">${rows.map(r=>`<div class="row ${r.main&&ht!=="ph2"?"hl":""}"><div class="k">${r.k}</div><div class="v"><b style="font-size:16px">${r.d}</b><br>${r.n}${r.ref.length?src(r.ref):""}</div></div>`).join("")}</div>`;
+  const cau=[];
+  if(ht==="hi"||ht==="ph1") cau.push(item("caution","出血性変化がある","試験に含まれた出血性変化の例は少なく、CATALYSTでも代表性が低いとされる。小さな点状出血（HI）なら早期開始の妨げにはなりにくいが、PH1は大きさ・症状で個別に判断する。",["CATALYST"],"sec"));
+  if(ht==="ph2") cau.push(item("avoid","PH2・症候性出血","早期開始の試験ではほぼ対象外。出血の安定を確認するまで延期し、開始時期は個別に決める。",[],"sec"));
+  if(rep) cau.push(item("note","再開通療法の後","OPTIMASでは再開通療法の有無で早期開始の効果に違いはなかった。血栓回収後に1-2-3-4日ルールで開始した国内の観察研究もある。開始前に出血性変化の有無を画像で確認する。",["OPTIMAS","R1234EVT"],"sec"));
+  if(bp) cau.push(item("caution","血圧が管理できていない","出血性変化のリスクを上げる。降圧を先に整える。",[],null));
+  if(ap) cau.push(item("avoid","抗血小板薬は原則中止して抗凝固単独へ","冠動脈疾患の活動期・最近のステントがなければ、上乗せは出血を増やす（AHA 2026：3: Harm）。",["AHA26"],"sec"));
+  cau.push(item("note","ヘパリンでつながない","ELAN・OPTIMASはDOACを直接開始した試験。DOACは腎機能・年齢・体重の基準どおりの用量で（不適切な減量は再発を増やす）。",["ELAN","OPTIMAS"],"sec"));
+  cau.push(item("note","国内ガイドライン","脳卒中治療GL改訂2025で、発症早期（4日以内）のDOAC開始を妥当とする方向に改訂された（推奨文・推奨度は原本で確認）。",["JSS25"],"sec"));
+  $("c-out").innerHTML=verdict(cls,pill,big,"")+`<section class="card"><h2>開始日の比較</h2>${tbl}</section><section class="card"><h2>注意すること</h2><ul class="list">${cau.join("")}</ul></section>`;
+}
+
+/* ============ 周術期（休薬早見から抜粋） ============ */
+const PD=[
+ {id:"asa",n:"アスピリン",b:"バイアスピリン・バファリンA81",c:"ap",
+  endo_low:["単剤なら休薬なしで可（ステートメント3・4）。2剤以上は症例に応じて慎重に。",["JGES2012"],"ok"],
+  endo_high:["血栓塞栓症の発症リスクが高い単独服用者は休薬なしで可。リスクが低ければ3〜5日の休薬を考慮（ステートメント5）。",["JGES2012"],"ok"],
+  ra:["低用量（200 mg/日未満）は休薬なし。高用量は3〜7日休薬、抜去後6時間で再開（表9）。",["RA2026"],"ok"],
+  surg:["非心臓手術では継続を提案。中断するなら術前7日以内とし、7〜10日にはしない。術後24時間以内に再開。",["ACCP2022"],"ok"],
+  resume:["内視鏡的に止血を確認した時点で再開（ステートメント12）。",["JGES2012"],"ok"]},
+ {id:"clo",n:"クロピドグレル",b:"プラビックス",c:"ap",
+  endo_low:["単剤なら休薬なしで可（ステートメント3・4）。",["JGES2012"],"ok"],
+  endo_high:["原則休薬、チエノピリジンは5〜7日。血栓塞栓症の高リスク例はアスピリンかシロスタゾールへの置換を考慮（ステートメント6）。",["JGES2012"],"ok"],
+  ra:["7日休薬、抜去後0時間で再開（表9）。",["RA2026"],"ok"],
+  surg:["術前5日で中止、術後24時間以内に再開（ACCP）。添付文書は「14日以上前に中止が望ましい」。",["ACCP2022","L_clopidogrel"],"ok"],
+  resume:["止血確認後に再開（添付文書・JGES）。",["JGES2012","L_clopidogrel"],"ok"]},
+ {id:"pra",n:"プラスグレル",b:"エフィエント",c:"ap",
+  endo_low:["JGES2012の時点で未承認。抗血小板薬全般のステートメント3・4の適用は解釈による。",["JGES2012"],"sec"],
+  endo_high:["JGESに明記なし。総説は「P2Y12拮抗薬5〜7日」とまとめている。",[],"sec"],
+  ra:["7日休薬（脳梗塞・虚血性心疾患の二次予防では5日への短縮も許容：血小板数・可能なら凝集能の回復を確認）、抜去後24時間で再開。",["RA2026"],"ok"],
+  surg:["術前7日で中止（ACCP）。添付文書は「14日以上前に中止が望ましい」。",["ACCP2022","L_prasugrel"],"ok"],
+  resume:["止血確認後（添付文書）／区域麻酔は抜去24時間後。",["L_prasugrel","RA2026"],"ok"]},
+ {id:"cil",n:"シロスタゾール",b:"プレタール",c:"ap",
+  endo_low:["単剤なら休薬なしで可（ステートメント3・4）。",["JGES2012"],"ok"],
+  endo_high:["チエノピリジン以外は原則1日休薬（ステートメント6）。",["JGES2012"],"ok"],
+  ra:["休薬は必須でない。出血リスクが高い例で休薬するなら2日が目安（本文）。",["RA2026"],"ok"],
+  surg:["JCS・ACCPに固有の推奨なし。添付文書に手術時休薬の記載なし。",[],"na"],
+  resume:["止血確認後に再開（ステートメント12）。",["JGES2012"],"ok"]},
+ {id:"vka",n:"ワルファリン",b:"ワーファリン",c:"ac",
+  endo_low:["休薬なしで可。PT-INRが治療域にあることを確認（INR>3.0なら生検を避ける）。",["JGES2017"],"ok"],
+  endo_high:["INRが治療域なら継続下で施行、または非弁膜症性AFに限り一時的にDOACへ変更を考慮。ヘパリン置換は後出血を増やす可能性（追補ステートメント2）。",["JGES2017"],"ok"],
+  ra:["5日休薬、穿刺前にPT-INR≦1.2を確認、抜去後0時間で再開（表9）。",["RA2026"],"ok"],
+  surg:["出血高リスク手技で休薬（JCS IIa）、低リスクは継続（I）。ACCP：5日以上前に休薬、術後24時間以内に通常量で再開。AFでのヘパリン置換に反対。機械弁・リウマチ性MS・脳梗塞既往などの高リスク例では置換を考慮（JCS本文）。",["JCS2020","ACCP2022"],"ok"],
+  resume:["止血確認後。置換例は経口開始と同時に再開し、INRが治療域でヘパリン中止。",["JGES2012","ACCP2022"],"ok"]},
+ {id:"dab",n:"ダビガトラン",b:"プラザキサ",c:"ac",renal:true,
+  endo_low:["休薬なしで可。血中濃度のピークは避ける（追補ステートメント5）。",["JGES2017"],"ok"],
+  endo_high:["前日まで内服、当日朝から中止、翌朝から再開（追補ステートメント6）。処置前に腎機能を確認。",["JGES2017"],"ok"],
+  ra:["110 mg×2：48時間休薬・抜去後6時間で再開。150 mg×2：72時間休薬・抜去後24時間。CCr<30は延長（72時間）か神経ブロック中止を考慮。",["RA2026"],"ok"],
+  surg:["出血高リスクの大手術：CCr≧80は48時間以上、50〜79は72時間以上、30〜49は96時間以上前に休薬（JCS）。ACCP：CrCl≧50は低・中リスク1日／高リスク2日、CrCl<50は2日／4日。ヘパリン置換は不要。",["JCS2020","ACCP2022","PAUSE"],"ok"],
+  resume:["内視鏡は翌朝から。手術は止血確認後、低・中リスク24時間以上、高リスク48〜72時間後（ACCP）。",["JGES2017","ACCP2022"],"ok"]},
+ {id:"riv",n:"リバーロキサバン",b:"イグザレルト",c:"ac",
+  endo_low:["休薬なしで可。ピークは避ける（追補ステートメント5）。",["JGES2017"],"ok"],
+  endo_high:["前日まで内服、当日朝から中止、翌朝から再開（追補ステートメント6）。",["JGES2017"],"ok"],
+  ra:["10 mg（低用量）は24時間休薬・抜去後6時間。15 mg（標準）は72時間・抜去後24時間。CCr<15は延長か中止を考慮。",["RA2026"],"ok"],
+  surg:["出血高リスクの大手術は48時間以上前から休薬（JCS）。ACCP：低・中リスク1日、高リスク2日。ヘパリン置換は不要。",["JCS2020","ACCP2022"],"ok"],
+  resume:["内視鏡は翌朝。手術は出血がないことを確認後、低・中リスク24時間以上、高リスク48〜72時間後。",["JGES2017","ACCP2022"],"ok"]},
+ {id:"api",n:"アピキサバン",b:"エリキュース",c:"ac",
+  endo_low:["休薬なしで可。ピークは避ける（追補ステートメント5）。",["JGES2017"],"ok"],
+  endo_high:["前日まで内服、当日朝から中止、翌朝から再開（追補ステートメント6）。",["JGES2017"],"ok"],
+  ra:["2.5 mg×2（低用量）は24時間休薬・抜去後6時間。5 mg×2（標準）は72時間・抜去後24時間。CCr<15は延長か中止を考慮。",["RA2026"],"ok"],
+  surg:["添付文書：低リスク24時間以上、中〜高リスク48時間以上あける。ACCP：低・中リスク1日、高リスク2日。",["ACCP2022"],"ok"],
+  resume:["内視鏡は翌朝。手術は出血がないことを確認後、可及的速やかに（低・中リスク24時間以上、高リスク48〜72時間後）。",["JGES2017","ACCP2022"],"ok"]},
+ {id:"edo",n:"エドキサバン",b:"リクシアナ",c:"ac",
+  endo_low:["休薬なしで可。ピークは避ける（追補ステートメント5）。",["JGES2017"],"ok"],
+  endo_high:["前日まで内服、当日朝から中止、翌朝から再開（追補ステートメント6）。",["JGES2017"],"ok"],
+  ra:["15 mgのみ低用量（24時間休薬・抜去後6時間）。日本の減量用量30 mgは標準用量に入り72時間・抜去後24時間。CCr<30は延長か中止を考慮。",["RA2026"],"ok"],
+  surg:["出血高リスクの大手術は48時間以上前から休薬（JCS）。ACCP：低・中リスク1日、高リスク2日。",["JCS2020","ACCP2022"],"ok"],
+  resume:["内視鏡は翌朝。手術は可及的速やかに（低・中リスク24時間以上、高リスク48〜72時間後）。",["JGES2017","ACCP2022"],"ok"]}
+];
+let pDrug="clo";
+const PROC={endo_low:"内視鏡 生検・低危険度",endo_high:"内視鏡 高危険度",ra:"脊髄幹麻酔・深部ブロック",surg:"手術一般"};
+function crcl(){
+  const a=num("p-age"),w=num("p-wt"),c=num("p-cr");if(a===null||w===null||!c)return null;
+  let v=(140-a)*w/(72*c); if($("p-sex").value==="f")v*=0.85; return Math.round(v);
+}
+function renderPeri(){
+  const mk=c=>PD.filter(d=>d.c===c).map(d=>`<button type="button" class="${c}" data-p="${d.id}" aria-pressed="${d.id===pDrug}">${esc(d.n)}</button>`).join("");
+  $("p-ap").innerHTML=mk("ap"); $("p-ac").innerHTML=mk("ac");
+  const d=PD.find(x=>x.id===pDrug)||PD[1]; const proc=val("p-proc")||"surg";
+  $("p-crcl-q").classList.toggle("hidden",!d.renal);
+  const cc=crcl(); $("p-crcl").textContent=cc===null?"—":cc;
+  const row=(k,lab,sub)=>{const [t,s,st]=d[k];return `<div class="row ${k===proc?"hl":""}"><div class="k">${lab}<small>${sub||""}</small></div><div class="v">${esc(t)}${src(s,st)}</div></div>`};
+  let renal="";
+  if(d.renal&&cc!==null){
+    let jcs = cc>=80?"48時間以上前": cc>=50?"72時間以上前": cc>=30?"96時間以上前":"CCr<30はダビガトラン禁忌";
+    let accp = cc>=50?"低・中リスク1日／高リスク2日":"低・中リスク2日／高リスク4日";
+    renal=`<div class="row hl"><div class="k">CrCl ${cc}<small>ダビガトラン</small></div><div class="v">出血高リスクの大手術：<b>${jcs}</b>（JCS 2020）<br>ACCP 2022：<b>${accp}</b>${src(["JCS2020","ACCP2022"],"ok")}</div></div>`;
+  }
+  const head=`<div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><h2 style="margin:0">${esc(d.n)}</h2><span class="hint" style="margin:0">${esc(d.b)}</span></div>`;
+  $("p-out").innerHTML=`<section class="card sheet">${head}
+    ${row("endo_low","内視鏡","生検・低危険度")}${row("endo_high","内視鏡","高危険度")}${row("ra","脊髄幹麻酔","深部ブロックを含む")}${row("surg","手術一般","JCS・ACCP")}${renal}${row("resume","再開","")}
+  </section>
+  <section class="card"><h2>脳卒中の患者で加えて考えること</h2><ul class="list">
+    ${item("caution","脳梗塞後の待機手術はできれば延期","デンマークの登録研究：脳梗塞から3か月未満の待機的非心臓手術は重大心血管イベントが大きく増え（OR 14.2）、3〜6か月 4.9、6〜12か月 3.0。リスクはおよそ9か月で横ばいになる。",["JORG"],"sec")}
+    ${item("note","DAPT期間中・症候性狭窄・ステント留置後","休薬せずに処置を延期できないかを先に検討する。延期できなければアスピリンかシロスタゾール単剤を残す（JGESのステートメント6・8）。",["JGES2012"],"ok")}
+    ${item("note","全20剤と旧版との比較","休薬早見（2026年11月5日、原本と別担当で照合済み）に全20剤と出典をまとめています。",["KYUYAKU"],null)}
+  </ul></section>`;
+}
+
+/* ============ 出血・中和 ============ */
+let bDrug="";
+function renderBleed(){
+  document.querySelectorAll("#b-drug button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.b===bDrug));
+  $("b-inr-l").classList.toggle("hidden",bDrug!=="vka");
+  $("b-wt-l").classList.toggle("hidden",bDrug!=="vka");
+  $("b-hep-l").classList.toggle("hidden",bDrug!=="hep");
+  $("b-hep-h").classList.toggle("hidden",bDrug!=="hep");
+  $("b-inputs").classList.toggle("hidden",!["vka","hep"].includes(bDrug));
+  const common=`<section class="card"><h2>共通の初期対応</h2><ul class="list">
+    ${item("do","抗血栓薬を止め、最終内服時刻・用量・腎機能・PT-INR・APTT・血小板数を確認","中和薬の要否と選択は、最終内服からの時間と腎機能で変わる。",[],null)}
+    ${item("do","脳出血は血圧を早く下げる","収縮期140 mmHg前後を目標とし、130 mmHg未満への過降圧は避ける。",["AHA22ICH"],"sec")}
+    ${item("note","止血後は再開を考える","中和で血栓リスクが上がる。止血を確認したら、再出血と血栓塞栓症の釣り合いを見て、できるだけ早い抗凝固療法の再開を考慮する（オンデキサ添付文書8.2）。",["L_ondexxya"],"ok")}
+  </ul></section>`;
+  let h="";
+  if(!bDrug){$("b-out").innerHTML=`<section class="card"><p class="hint" style="margin:0">内服中の薬を選ぶと中和の手順を出します。</p></section>`+common;return}
+  if(bDrug==="vka"){
+    const inr=num("b-inr"),w=num("b-wt");let dose="INRと体重を入れると量を計算します";
+    if(inr!==null){
+      if(inr<2) dose="INR 2未満：添付文書の用量表の対象外";
+      else{
+        const per=inr<4?25:inr<=6?35:50, cap=inr<4?2500:inr<=6?3500:5000;
+        dose = w? `<b>${Math.min(Math.round(per*w),cap)} IU</b>（${per} IU/kg${w>100?`、100kg超は${cap} IU`:""}）` : `${per} IU/kg（100kg超は${cap} IU）`;
+      }
+    }
+    h=verdict("crit","ワルファリン","4因子プロトロンビン複合体（ケイセントラ）＋ビタミンK",
+      `<div class="dose"><div class="bx"><div class="k">ケイセントラ（単回静注）</div><div class="v">${dose}<small>INR 2〜4未満 25 IU/kg、4〜6 35 IU/kg、6超 50 IU/kg</small></div></div>
+       <div class="bx"><div class="k">ビタミンK</div><div class="v">静注を併用<small>PCCの効果は一時的。ビタミンKで効果を維持</small></div></div></div>
+       <ul class="list" style="margin-top:8px">${item("note","投与後にINRを再検","試験では多くの例で30分以内にINR 1.3以下。新鮮凍結血漿は量が多く時間がかかるため、PCCが使えない場合の代替。",["L_kcentra","AHA22ICH"],"sec")}</ul>`+src(["L_kcentra"],"ok"));
+  }else if(bDrug==="dab"){
+    h=verdict("crit","ダビガトラン","イダルシズマブ（プリズバインド）5 g",
+      `<div class="dose"><div class="bx"><div class="k">プリズバインド</div><div class="v">1回 5 g<small>2.5 g/50 mL を2バイアル。点滴静注（1バイアル5〜10分）か急速静注</small></div></div></div>
+       <ul class="list" style="margin-top:8px">${item("note","RE-VERSE AD","5 gでダビガトランの作用は数分で中和された（最大中和率の中央値100%）。",["REVERSE"],"sec")}
+       ${item("note","使うのは作用が残っている時期","最終内服からの時間と腎機能から、抗凝固作用が残っていると推定される場合に使う（添付文書5.1）。透析でも除去できる。",["L_prizbind"],"sec")}</ul>`+src(["L_prizbind"],"ok"));
+  }else if(bDrug==="xa"){
+    h=verdict("crit","Xa阻害薬","アンデキサネット アルファ（オンデキサ）。血栓性イベントの増加に注意",
+      `<div class="dose"><div class="bx"><div class="k">A法</div><div class="v">400 mg（30 mg/分）<small>続けて480 mgを4 mg/分で2時間</small></div></div>
+       <div class="bx"><div class="k">B法</div><div class="v">800 mg（30 mg/分）<small>続けて960 mgを8 mg/分で2時間</small></div></div></div>
+       <p class="hint">A法とB法は、薬剤・最終投与時の1回量・最終投与からの時間（8時間未満または不明／8時間以上）で選ぶ。添付文書7.1の表で確認する。</p>
+       <ul class="list" style="margin-top:8px">
+       ${item("caution","ANNEXA-I（脳出血、2024）","通常治療（主にPCC）と比べ止血効果は高い（67.0% vs 53.1%）が、血栓性イベント（10.3% vs 5.6%）と虚血性脳卒中（6.5% vs 1.5%）が増えた。",["ANNEXAI"],"sec")}
+       ${item("caution","米国では2025年12月に販売終了","FDAが安全性の懸念を示し、2025年12月22日で米国の製造・販売が終わった。日本では販売継続中（2025年11月に使用上の注意を改訂、2026年5月にリスク管理計画へANNEXA-Iの結果を追記）。",["FDA25","L_ondexxya"],"sec")}
+       ${item("note","代替：4因子PCC","海外では25〜50 IU/kgが使われる。国内のケイセントラの効能はビタミンK拮抗薬だけで、Xa阻害薬への使用は適応外。",["AHA22ICH","L_kcentra"],"sec")}
+       ${item("note","投与終了4時間後には抗凝固作用が戻る","再開や低分子ヘパリン使用のタイミングの目安（添付文書8.2）。ヘパリンの作用も弱めるため、ヘパリンが必要な手術では慎重に（8.3）。",["L_ondexxya"],"ok")}
+       </ul>`+src(["L_ondexxya"],"ok"));
+  }else if(bDrug==="hep"){
+    const u=num("b-hep");let dose="直近のヘパリン量を入れると計算します";
+    if(u!==null){const lo=Math.round(u/1000*10),hi=Math.round(u/1000*15);dose=`<b>${lo}〜${hi} mg</b>${hi>50?"（1回50 mgまで）":""}`}
+    h=verdict("crit","未分画ヘパリン","プロタミン硫酸塩",
+      `<div class="dose"><div class="bx"><div class="k">プロタミン</div><div class="v">${dose}<small>ヘパリン1,000単位に10〜15 mg。1回50 mgを超えず、生食か5%ブドウ糖100〜200 mLで薄めて10分以上かけて</small></div></div></div>
+       <ul class="list" style="margin-top:8px">${item("caution","急速投与で血圧低下・徐脈・呼吸困難","プロタミン含有インスリンや心カテ・心臓手術の既往があると過敏反応が起きやすい。投与後にAPTTで効果を確認。",["L_protamine"],"ok")}</ul>`+src(["L_protamine"],"ok"));
+  }else if(bDrug==="ap"){
+    h=verdict("warn","抗血小板薬","手術をしない脳出血では血小板輸血をしない",
+      `<ul class="list">
+       ${item("avoid","PATCH（2016）","抗血小板薬内服中の脳出血で、血小板輸血は3か月の死亡・要介助を増やした。",["PATCH"],"sec")}
+       ${item("avoid","AHA 2022","緊急手術を行わない場合、血小板輸血は有害の可能性がある（3: Harm）。",["AHA22ICH"],"sec")}
+       ${item("note","緊急手術をする場合","血小板輸血を検討する。デスモプレシンは考慮してよい程度（2b）。",["AHA22ICH"],"sec")}
+       </ul>`);
+  }
+  $("b-out").innerHTML=h+common;
+}
+
+/* ============ 根拠 ============ */
+const NEWS=[
+ ["2026/1","AHA/ASA 2026（急性期脳梗塞）：DAPTの対象をNIHSS 4〜5・発症72時間までに拡大。非障害性の軽症はIVTよりDAPT。"],
+ ["2025/12","米国でアンデキサネット（Andexxa）販売終了。日本ではオンデキサとして販売継続。"],
+ ["2025/7","CATALYST（Lancet）：AF脳梗塞でDOACを4日以内に始めると、30日の再発＋症候性出血が減少。"],
+ ["2025/6","脳卒中治療GL2021〔改訂2025〕公開：DOACの早期開始、軽症例でアルテプラーゼの代わりに抗血小板薬を考慮しうる、などを改訂。"],
+ ["2024","OPTIMAS・ANNEXA-I・INSPIRES時間別解析。"]
+];
+const EV=[
+ {c:"gl",nm:"AHA/ASA 2026 急性期脳梗塞GL",y:2026,r:"AHA26",st:"sec",ds:"ガイドライン",pop:"急性期脳梗塞",res:"軽症非心原性（NIHSS≤3）・高リスクTIAに24時間以内のDAPT 21日（クラス1、LOE A）。NIHSS 4〜5・72時間以内に拡大（クラス2a）。AFでOACに抗血小板薬を足すのは有害（3: Harm）。",tk:"DAPTの対象と時間窓が広がった"},
+ {c:"af",nm:"CATALYST",y:2025,r:"CATALYST",st:"ok",ds:"4試験の個別データ統合（n=5441）",pop:"AF脳梗塞、DOAC 4日以内 vs 5日以降",res:"30日の再発脳梗塞＋症候性出血＋分類不能脳卒中 2.1% vs 3.0%（OR 0.70）。虚血性脳卒中 1.7% vs 2.6%（OR 0.66）。症候性頭蓋内出血 0.4% vs 0.4%。",tk:"4日以内の開始が標準。重症例・出血性変化例は少数"},
+ {c:"gl",nm:"脳卒中治療GL2021〔改訂2025〕",y:2025,r:"JSS25",st:"sec",ds:"国内ガイドライン（52項目改訂）",pop:"—",res:"AF脳梗塞のDOAC早期開始、軽症脳梗塞でアルテプラーゼの代わりに抗血小板薬投与を考慮しうる、シロスタゾールの位置づけ、などを改訂。",tk:"推奨文・推奨度は原本で確認"},
+ {c:"af",nm:"OPTIMAS",y:2024,r:"OPTIMAS",st:"sec",ds:"RCT（n=3621、英国100施設）",pop:"AF脳梗塞、4日以内 vs 7〜14日",res:"90日の複合エンドポイント 3.3% vs 3.3%（非劣性）。中等症〜重症、再開通療法後でも効果の差なし。",tk:"重めの例でも早期開始は劣らない"},
+ {c:"bleed",nm:"ANNEXA-I",y:2024,r:"ANNEXAI",st:"sec",ds:"RCT（n=530）",pop:"Xa阻害薬内服中の脳出血、アンデキサネット vs 通常治療（主にPCC）",res:"止血効果 67.0% vs 53.1%。血栓性イベント 10.3% vs 5.6%、虚血性脳卒中 6.5% vs 1.5%。",tk:"止血は良いが血栓が増える"},
+ {c:"dapt",nm:"INSPIRES",y:2023,r:"INSPIRES",st:"sec",ds:"RCT（n=6100、中国）",pop:"NIHSS≤5 またはABCD²≥4、推定アテローム性、72時間以内",res:"クロピドグレル90日＋アスピリン21日。90日の新規脳卒中 7.3% vs 9.2%（HR 0.79）。中等度〜重度出血 0.9% vs 0.4%。24〜72時間の開始でも効果は同様（時間別解析）。",tk:"72時間まで、NIHSS 5まで"},
+ {c:"af",nm:"ELAN",y:2023,r:"ELAN",st:"sec",ds:"RCT（n=2032）",pop:"AF脳梗塞、梗塞の大きさで早期・後期を割付",res:"早期＝軽度・中等度48時間以内、重度6〜7日目。30日の複合 2.9% vs 4.1%（差 −1.18%、95%CI −2.84〜0.47）。",tk:"大きさ別の早期開始日の基準"},
+ {c:"dapt",nm:"ARAMIS",y:2023,r:"ARAMIS",st:"sec",ds:"RCT（n=760、中国）",pop:"発症4.5時間以内、NIHSS≤5の非障害性軽症",res:"DAPTはアルテプラーゼに非劣性（90日 mRS 0〜1 93.8% vs 91.4%）。",tk:"非障害性の軽症はIVTよりDAPT"},
+ {c:"af",nm:"1-2-3-4日ルール",y:2022,r:"R1234",st:"sec",ds:"国内の観察研究",pop:"AF脳梗塞",res:"TIA 1日、軽症（NIHSS 0〜7）2日、中等症（8〜15）3日、重症（16以上）4日での開始が安全に行えた。2026年に血栓回収後の報告も。",tk:"日本の実臨床の目安"},
+ {c:"af",nm:"TIMING",y:2022,r:"TIMING",st:"sec",ds:"登録研究ベースRCT（n=888、スウェーデン）",pop:"AF脳梗塞、4日以内 vs 5〜10日",res:"早期開始は非劣性。",tk:"最初の早期開始RCT"},
+ {c:"dapt",nm:"CHANCE-2",y:2021,r:"CHANCE2",st:"sec",ds:"RCT（n=6412）",pop:"CYP2C19機能低下型保因者の軽症脳梗塞・TIA",res:"チカグレロル＋アスピリンがクロピドグレル＋アスピリンより90日の脳卒中が少ない（6.0% vs 7.6%）。",tk:"国内ではチカグレロルに脳梗塞の適応なし"},
+ {c:"gl",nm:"AHA/ASA 2021 二次予防GL",y:2021,r:"AHA21",st:"sec",ds:"ガイドライン",pop:"脳梗塞・TIA",res:"症候性頭蓋内狭窄70〜99%にアスピリン＋クロピドグレル90日（クラス2a）。",tk:"頭蓋内狭窄の90日DAPT"},
+ {c:"dapt",nm:"THALES",y:2020,r:"THALES",st:"sec",ds:"RCT（n=11016）",pop:"NIHSS≤5、ABCD²≥6 または同側の症候性狭窄≥50%、24時間以内",res:"チカグレロル＋アスピリン30日。脳卒中・死亡 5.5% vs 6.6%（HR 0.83）。重度出血 0.5% vs 0.1%。",tk:"国内では使えない"},
+ {c:"dapt",nm:"CSPS.com",y:2019,r:"CSPS",st:"sec",ds:"RCT（n=1879、日本）",pop:"発症8〜180日の高リスク非心原性脳梗塞",res:"アスピリンかクロピドグレルにシロスタゾールを追加。虚血性脳卒中 HR 0.49、重い出血は増えず。",tk:"慢性期の併用で唯一の国内RCT"},
+ {c:"dapt",nm:"CHANCE＋POINT 統合解析",y:2019,r:"POOL",st:"sec",ds:"個別データ統合",pop:"軽症脳梗塞・高リスクTIA",res:"DAPTの再発抑制の利益は最初の21日に集中。90日の大出血は0.6% vs 0.4%（有意差なし）。",tk:"DAPTは21日"},
+ {c:"dapt",nm:"POINT",y:2018,r:"POINT",st:"sec",ds:"RCT（n=4881）",pop:"NIHSS≤3またはABCD²≥4、12時間以内",res:"クロピドグレル600 mg負荷＋アスピリン90日。主要虚血イベント 5.0% vs 6.5%（HR 0.75）。大出血 0.9% vs 0.4%。",tk:"90日は長すぎる"},
+ {c:"bleed",nm:"RE-VERSE AD",y:2017,r:"REVERSE",st:"sec",ds:"単群前向き（n=503）",pop:"ダビガトラン内服中の重篤出血・緊急手術",res:"イダルシズマブ5 gで最大中和率の中央値100%。",tk:"ダビガトランは特異的中和薬"},
+ {c:"bleed",nm:"PATCH",y:2016,r:"PATCH",st:"sec",ds:"RCT（n=190）",pop:"抗血小板薬内服中の脳出血",res:"血小板輸血で3か月の死亡・要介助が増加。",tk:"手術しないなら輸血しない"},
+ {c:"peri",nm:"Jørgensen（デンマーク）",y:2014,r:"JORG",st:"sec",ds:"登録研究",pop:"脳梗塞後の待機的非心臓手術",res:"重大心血管イベント：3か月未満 OR 14.2、3〜6か月 4.9、6〜12か月 3.0。約9か月で横ばい。",tk:"待機手術は可能なら延期"},
+ {c:"dapt",nm:"CHANCE",y:2013,r:"CHANCE",st:"sec",ds:"RCT（n=5170、中国）",pop:"NIHSS≤3またはABCD²≥4、24時間以内",res:"クロピドグレル300 mg負荷＋アスピリン21日→クロピドグレル。90日の脳卒中 8.2% vs 11.7%（HR 0.68）。中等度〜重度出血 各0.3%。",tk:"21日DAPTの原型"},
+ {c:"dapt",nm:"SPS3",y:2012,r:"SPS3",st:"sec",ds:"RCT",pop:"ラクナ梗塞の慢性期",res:"アスピリン＋クロピドグレルの長期併用は再発を減らさず、出血と死亡が増えた。",tk:"長期DAPTはしない"},
+ {c:"dapt",nm:"SAMMPRIS",y:2011,r:"SAMMPRIS",st:"sec",ds:"RCT（n=451）",pop:"症候性頭蓋内狭窄70〜99%",res:"30日の脳卒中・死亡はステント14.7% vs 内科治療5.8%。内科群はDAPT 90日＋強化管理。",tk:"頭蓋内狭窄はまず内科治療"},
+ {c:"dapt",nm:"MATCH",y:2004,r:"MATCH",st:"sec",ds:"RCT",pop:"高リスクの脳梗塞・TIA",res:"クロピドグレルへのアスピリン追加（長期）は再発を有意に減らさず、重い出血が増えた。",tk:"長期DAPTはしない"}
+];
+function renderEv(){
+  $("e-news").innerHTML=NEWS.map(([d,t])=>`<div><b>${d}</b>${esc(t)}</div>`).join("");
+  const f=val("e-f")||"all";
+  const tagTx={dapt:"DAPT",af:"AF・DOAC",bleed:"出血",peri:"周術期",gl:"GL"};
+  $("e-list").innerHTML=EV.filter(e=>f==="all"||e.c===f).sort((a,b)=>b.y-a.y).map(e=>`<article class="ev">
+    <div class="hd"><span class="nm">${esc(e.nm)}</span><span class="yr">${e.y}</span><span class="tag ${e.c}">${tagTx[e.c]}</span></div>
+    <dl><dt>形式</dt><dd>${esc(e.ds)}</dd><dt>対象</dt><dd>${esc(e.pop)}</dd><dt>結果</dt><dd>${esc(e.res)}</dd></dl>
+    <div class="take">→ ${esc(e.tk)}</div>${src([e.r],e.st)}
+    <div class="hint" style="font-size:11.5px">${esc(R[e.r].t)}</div>
+  </article>`).join("");
+}
+
+/* ============ 共通 ============ */
+function renderAll(){renderDapt();renderDoac();renderPeri();renderBleed();renderEv()}
+document.addEventListener("input",e=>{if(e.target.closest("main")){renderAll();save()}});
+document.addEventListener("change",e=>{if(e.target.closest("main")){renderAll();save()}});
+document.addEventListener("click",e=>{
+  const p=e.target.closest("[data-p]");if(p){pDrug=p.dataset.p;renderPeri();save();return}
+  const b=e.target.closest("[data-b]");if(b){bDrug=b.dataset.b;renderBleed();save();return}
+  const g=e.target.closest("[data-go]");if(g){setTab(g.dataset.go);save();window.scrollTo({top:0});return}
+});
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),3500)}
+load(); setTab(curTab); renderAll();
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["atn-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+</body>
+</html>
