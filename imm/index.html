@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#5b3f9e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="神経免疫ナビ">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>神経免疫治療ナビ</title>
+<style>
+:root{
+  --c:#5b3f9e; --c2:#ece6f7; --bg:#f6f5f9; --card:#fff; --tx:#1d1b22; --mut:#6a6676; --bd:#dedbe6;
+  --ok:#1f7a4d; --okb:#e3f4ea; --cd:#9a6a00; --cdb:#fbf1d9; --ng:#b3261e; --ngb:#fbe4e2; --info:#2b5d9e; --infob:#e4edf8;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --c:#9d85dd; --c2:#2c2540; --bg:#131218; --card:#1d1b24; --tx:#ecebf1; --mut:#a8a4b4; --bd:#34303f;
+    --ok:#6fd39e; --okb:#173326; --cd:#e6bd5c; --cdb:#352a12; --ng:#f08a82; --ngb:#3a1c1a; --info:#8db6ef; --infob:#18253a; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%}
+header{position:fixed;top:0;left:0;right:0;z-index:10;background:var(--c);color:#fff;
+  padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left))}
+header h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.02em}
+header .sub{font-size:11.5px;opacity:.85}
+main{padding:calc(78px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));max-width:760px;margin:0 auto}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;border:0;background:none;color:var(--mut);padding:8px 2px 9px;font-size:11px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:1px}
+nav.tabs button b{font-size:17px;line-height:1.2;font-weight:700}
+nav.tabs button.on{color:var(--c)}
+.page{display:none}.page.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 13px;margin:0 0 12px}
+h2{font-size:16px;margin:2px 0 8px;color:var(--c)}
+h3{font-size:14.5px;margin:12px 0 6px}
+.mut{color:var(--mut);font-size:12.5px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.seg button,.chip{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px;padding:6px 11px;font-size:13.5px;font-family:inherit}
+.seg button.on,.chip.on{background:var(--c);border-color:var(--c);color:#fff}
+label.q{display:block;font-weight:600;font-size:13.5px;margin:10px 0 2px}
+select,input[type=date],input[type=number]{font-size:15px;font-family:inherit;padding:7px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);width:100%}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{display:inline-block;border:0;background:var(--c);color:#fff;border-radius:9px;padding:9px 14px;font-size:14.5px;font-family:inherit;font-weight:600}
+.btn.sec{background:var(--c2);color:var(--c)}
+.res{margin-top:8px}
+.drug{border:1px solid var(--bd);border-radius:10px;padding:9px 11px;margin:8px 0;background:var(--card)}
+.drug .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.drug .nm{font-weight:700}
+.drug .br{color:var(--mut);font-size:12.5px}
+.badge{font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.b-ok{background:var(--okb);color:var(--ok)}.b-cd{background:var(--cdb);color:var(--cd)}.b-ng{background:var(--ngb);color:var(--ng)}.b-in{background:var(--infob);color:var(--info)}
+.cls{font-size:11px;border:1px solid var(--bd);border-radius:6px;padding:1px 6px;color:var(--mut)}
+ul{margin:4px 0 4px 1.1em;padding:0}li{margin:2px 0}
+.note{border-left:4px solid var(--c);background:var(--c2);padding:8px 10px;border-radius:0 8px 8px 0;font-size:13.5px;margin:8px 0}
+.warn{border-left:4px solid var(--ng);background:var(--ngb);padding:8px 10px;border-radius:0 8px 8px 0;font-size:13.5px;margin:8px 0}
+.fit{display:inline-block;font-size:11.5px;background:var(--infob);color:var(--info);border-radius:6px;padding:1px 6px;margin:2px 3px 0 0}
+details{border:1px solid var(--bd);border-radius:10px;padding:8px 11px;margin:8px 0;background:var(--card)}
+details summary{font-weight:700;cursor:pointer}
+table.kv{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
+table.kv th{text-align:left;color:var(--mut);font-weight:600;width:6.2em;vertical-align:top;padding:4px 6px 4px 0;border-top:1px solid var(--bd)}
+table.kv td{padding:4px 0;border-top:1px solid var(--bd)}
+.ck{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-top:1px solid var(--bd);font-size:14px}
+.ck:first-of-type{border-top:0}
+.ck input{width:19px;height:19px;flex:0 0 auto;margin-top:2px;accent-color:var(--c)}
+.score{font-size:28px;font-weight:800;color:var(--c)}
+.tl{border-left:3px solid var(--c);margin:6px 0 6px 6px;padding-left:12px}
+.tl div{margin:6px 0;display:flex;gap:8px}.tl b{flex:0 0 7.2em}
+.search{margin-bottom:8px}
+.ref{font-size:13px;margin:6px 0}
+.ref a{color:var(--info);word-break:break-all}
+.upd{position:fixed;left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom));background:#222;color:#fff;padding:10px 12px;border-radius:10px;font-size:13px;display:none;z-index:20}
+.hide{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>神経免疫治療ナビ</h1>
+  <div class="sub">MG・NMOSD・CIDP｜国内承認 2026年11月時点</div>
+</header>
+
+<main>
+<!-- ====== 選択ナビ ====== -->
+<section class="page on" id="p-nav">
+  <div class="card">
+    <h2>適格性と使い分け</h2>
+    <div class="seg" id="dzSeg">
+      <button data-v="mg" class="on">全身型MG</button>
+      <button data-v="nmo">NMOSD</button>
+      <button data-v="cidp">CIDP</button>
+      <button data-v="mog">MOGAD</button>
+    </div>
+
+    <div id="f-mg">
+      <label class="q">自己抗体</label>
+      <div class="seg" data-k="mg_ab"><button data-v="achr" class="on">AChR</button><button data-v="musk">MuSK</button><button data-v="lrp4">LRP4</button><button data-v="sn">抗体陰性</button></div>
+      <label class="q">年齢</label>
+      <div class="seg" data-k="mg_age"><button data-v="ad" class="on">18歳以上</button><button data-v="ado">12〜17歳</button><button data-v="ch">12歳未満</button></div>
+      <label class="q">ステロイド・免疫抑制薬で十分な効果なし（保険上の前提）</label>
+      <div class="seg" data-k="mg_ref"><button data-v="y" class="on">はい</button><button data-v="n">いいえ／未治療</button></div>
+      <label class="q">胸腺腫</label>
+      <div class="seg" data-k="mg_thy"><button data-v="n" class="on">なし</button><button data-v="y">あり・既往</button></div>
+    </div>
+
+    <div id="f-nmo" class="hide">
+      <label class="q">抗体</label>
+      <div class="seg" data-k="nmo_ab"><button data-v="aqp4" class="on">AQP4抗体陽性</button><button data-v="neg">AQP4陰性</button></div>
+      <label class="q">年齢</label>
+      <div class="seg" data-k="nmo_age"><button data-v="ad" class="on">18歳以上</button><button data-v="ch">18歳未満</button></div>
+    </div>
+
+    <div id="f-cidp" class="hide">
+      <label class="q">診断（EAN/PNS 2021）</label>
+      <div class="seg" data-k="ci_dx"><button data-v="cidp" class="on">CIDP</button><button data-v="pos">possible CIDP</button><button data-v="no">基準を満たさない</button></div>
+      <label class="q">病型</label>
+      <div class="seg" data-k="ci_type"><button data-v="typ" class="on">典型的</button><button data-v="var">遠位・多巣性・局所・感覚型</button><button data-v="mot">運動型</button></div>
+      <label class="q">ノード/パラノード抗体（NF155・CNTN1・Caspr1・NF186）</label>
+      <div class="seg" data-k="ci_ab"><button data-v="unk" class="on">未検</button><button data-v="neg">陰性</button><button data-v="pos">陽性</button></div>
+      <label class="q">病期</label>
+      <div class="seg" data-k="ci_ph"><button data-v="ind" class="on">寛解導入</button><button data-v="mnt">維持（IVIg依存など）</button><button data-v="ref">効果不十分</button></div>
+      <label class="q">併存・希望（複数可）</label>
+      <div class="seg" data-k="ci_flag" data-multi="1">
+        <button data-v="iga">IgA欠損</button><button data-v="thr">血栓リスク</button><button data-v="ren">腎機能低下</button><button data-v="dmop">糖尿病・骨粗鬆症</button><button data-v="home">在宅で投与したい</button><button data-v="vein">静脈確保困難</button>
+      </div>
+    </div>
+
+    <div id="f-mog" class="hide">
+      <p class="mut">MOGADは2026年11月時点で国内承認の再発予防薬なし。サトラリズマブ（エンスプリング）がMOGAD再発予防で2026年7月に国内申請中。</p>
+    </div>
+
+    <div id="f-common">
+      <label class="q">共通の条件（複数可）</label>
+      <div class="seg" data-k="flags" data-multi="1">
+        <button data-v="inf">活動性の重い感染症</button>
+        <button data-v="nomen">髄膜炎菌ワクチン管理が困難</button>
+        <button data-v="hbc">HBc/HBs抗体陽性（既往感染）</button>
+        <button data-v="hbs">HBs抗原陽性</button>
+        <button data-v="tb">潜在性結核未治療</button>
+        <button data-v="preg">妊娠中・妊娠希望</button>
+      </div>
+      <label class="q">重視すること（複数可）</label>
+      <div class="seg" data-k="needs" data-multi="1">
+        <button data-v="fast">早く効かせたい</button>
+        <button data-v="rare">投与回数を少なく</button>
+        <button data-v="self">自己注射・在宅</button>
+        <button data-v="noiv">点滴を避けたい</button>
+        <button data-v="steroid">ステロイドを減らしたい</button>
+      </div>
+    </div>
+  </div>
+  <div id="navOut"></div>
+</section>
+
+<!-- ====== 薬剤一覧 ====== -->
+<section class="page" id="p-drug">
+  <div class="card">
+    <h2>薬剤カード</h2>
+    <div class="seg" id="clsSeg">
+      <button data-v="all" class="on">すべて</button><button data-v="C5">補体C5</button><button data-v="FcRn">FcRn</button><button data-v="IL6R">IL-6R</button><button data-v="CD19">CD19/20</button><button data-v="IG">IVIg等</button>
+    </div>
+    <input class="search" id="q" type="search" placeholder="一般名・商品名で検索" style="font-size:15px;padding:7px 9px;border:1px solid var(--bd);border-radius:8px;width:100%;background:var(--card);color:var(--tx)">
+    <p class="mut">用量は要約です。投与前に必ず最新の電子添文を確認してください。</p>
+  </div>
+  <div id="drugList"></div>
+</section>
+
+<!-- ====== 髄膜炎菌 ====== -->
+<section class="page" id="p-men">
+  <div class="card">
+    <h2>髄膜炎菌ワクチン スケジュール</h2>
+    <p class="mut">対象：エクリズマブ・ラブリズマブ・ジルコプラン。国内承認は4価結合型（メンクアッドフィ筋注 0.5 mL 筋注）のみ。</p>
+    <label class="q">補体阻害薬</label>
+    <select id="m_drug">
+      <option value="ecu">エクリズマブ（ソリリス）</option>
+      <option value="ravu">ラブリズマブ（ユルトミリス）</option>
+      <option value="zilu">ジルコプラン（ジルビスク）</option>
+    </select>
+    <div class="row2">
+      <div><label class="q">1回目接種日</label><input type="date" id="m_d1"></div>
+      <div><label class="q">投与開始予定日</label><input type="date" id="m_st"></div>
+    </div>
+    <label class="q">免疫抑制状態（ステロイド・免疫抑制薬使用中など）</label>
+    <div class="seg" data-k="m_imm"><button data-v="y" class="on">あり（2回接種）</button><button data-v="n">なし</button></div>
+    <div id="menOut" class="res"></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">補体阻害薬 開始前チェック</h3>
+    <div id="ck-men"></div>
+    <button class="btn sec" data-reset="ck-men" style="margin-top:8px">チェックをリセット</button>
+  </div>
+  <details class="card"><summary>髄膜炎菌感染症を疑ったら（緊急時）</summary>
+    <ul>
+      <li>発熱・頭痛・項部硬直・皮疹（点状出血）・意識障害など。初期は感冒と区別がつかない</li>
+      <li>血液培養2セット採取後、原因菌判明を待たずに抗菌薬開始</li>
+      <li>成人：セフトリアキソン 2 g 12時間毎、またはセフォタキシム 2 g 4〜6時間毎（静注／点滴静注）</li>
+      <li>補体阻害薬は中止し、処方医へ連絡</li>
+      <li>早期受診が困難な患者では、キノロン系を手元に持たせる方法も手引きで言及（緊急時対応であり予防投与ではない）</li>
+    </ul>
+    <p class="mut">出典：髄膜炎菌感染症リスク管理の手引き（2024年9月作成、日本神経学会サイト掲載）。用量は最新の電子添文で確認。</p>
+  </details>
+</section>
+
+<!-- ====== ステロイド ====== -->
+<section class="page" id="p-ster">
+  <div class="card">
+    <h2>骨（GIOP スコア）</h2>
+    <p class="mut">対象：経口ステロイドを3ヵ月以上使用中または使用予定。日本骨代謝学会GL（2014年改訂版のスコア法、2023年版でも変更なし）</p>
+    <div class="row2">
+      <div><label class="q">年齢</label><input type="number" id="g_age" inputmode="numeric" placeholder="例 62"></div>
+      <div><label class="q">PSL換算 mg/日</label><input type="number" id="g_psl" inputmode="decimal" step="0.5" placeholder="例 10"></div>
+    </div>
+    <label class="q">既存骨折（脆弱性骨折）</label>
+    <div class="seg" data-k="g_fx"><button data-v="n" class="on">なし</button><button data-v="y">あり</button></div>
+    <label class="q">腰椎骨密度 %YAM</label>
+    <div class="seg" data-k="g_bmd"><button data-v="80" class="on">80%以上</button><button data-v="70">70〜80%未満</button><button data-v="0">70%未満</button><button data-v="u">未測定</button></div>
+    <div id="giopOut" class="res"></div>
+  </div>
+
+  <div class="card">
+    <h2>感染（PJP・HBV・結核）</h2>
+    <h3 style="margin-top:4px">ニューモシスチス肺炎 予防</h3>
+    <div class="row2">
+      <div><label class="q">PSL換算 mg/日</label><input type="number" id="p_psl" inputmode="decimal" step="0.5" placeholder="例 30"></div>
+      <div><label class="q">予定期間（週）</label><input type="number" id="p_wk" inputmode="numeric" placeholder="例 8"></div>
+    </div>
+    <label class="q">他の免疫抑制薬・生物学的製剤の併用</label>
+    <div class="seg" data-k="p_is"><button data-v="n" class="on">なし</button><button data-v="y">あり</button></div>
+    <label class="q">腎機能（eGFR / CCr）</label>
+    <div class="seg" data-k="p_ren"><button data-v="n" class="on">30以上</button><button data-v="l">15〜30</button><button data-v="vl">15未満</button></div>
+    <div id="pjpOut" class="res"></div>
+
+    <h3>B型肝炎 再活性化（日本肝臓学会GLの流れ）</h3>
+    <div class="row2">
+      <div><label class="q">HBs抗原</label><select id="h_s"><option value="">未検</option><option value="n">陰性</option><option value="p">陽性</option></select></div>
+      <div><label class="q">HBc抗体</label><select id="h_c"><option value="">未検</option><option value="n">陰性</option><option value="p">陽性</option></select></div>
+      <div><label class="q">HBs抗体</label><select id="h_sab"><option value="">未検</option><option value="n">陰性</option><option value="p">陽性</option><option value="v">陽性（ワクチン歴が明らか）</option></select></div>
+      <div><label class="q">HBV-DNA</label><select id="h_dna"><option value="">未検</option><option value="lo">20 IU/mL未満（検出せず含む）</option><option value="hi">20 IU/mL以上</option></select></div>
+    </div>
+    <div id="hbvOut" class="res"></div>
+
+    <h3>結核</h3>
+    <ul>
+      <li>開始前にIGRA（T-SPOT／QFT）と胸部画像。結核の既往・接触歴を問診</li>
+      <li>潜在性結核ならLTBI治療（イソニアジド6〜9ヵ月など）。生物学的製剤はLTBI治療開始後3週を目安に開始</li>
+      <li>PSL 15 mg/日以上の長期使用で発症リスクが上がる</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>血糖</h2>
+    <ul>
+      <li>開始前にHbA1c・空腹時血糖。朝1回投与のPSLは昼〜夕に血糖が上がる → <b>昼食後〜夕食前</b>の血糖を測る</li>
+      <li>随時血糖 200 mg/dL以上が続く場合は、朝のNPH（中間型）や昼食前の速効型追加を検討（詳細は糖尿病治療ナビ）</li>
+      <li>減量・中止時は低血糖に注意してインスリンも並行して減らす</li>
+      <li>ステロイドパルス中は1日4回測定を基本に</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">ステロイド長期投与 チェックリスト</h3>
+    <div id="ck-ster"></div>
+    <button class="btn sec" data-reset="ck-ster" style="margin-top:8px">チェックをリセット</button>
+  </div>
+</section>
+
+<!-- ====== 文献 ====== -->
+<section class="page" id="p-ref">
+  <div class="card">
+    <h2>根拠・参考</h2>
+    <div id="refList"></div>
+    <p class="mut" style="margin-top:10px">入力内容はこの端末内（localStorage）にのみ保存され、送信されません。患者氏名・IDは入力しないでください。本アプリは自分用の診療補助メモであり、適応・用量の最終判断は最新の電子添文・ガイドラインで行ってください。</p>
+    <button class="btn sec" id="resetAll">入力をすべて消去</button>
+  </div>
+</section>
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-p="p-nav" class="on"><b>選</b>選択ナビ</button>
+  <button data-p="p-drug"><b>薬</b>薬剤</button>
+  <button data-p="p-men"><b>髄</b>髄膜炎菌</button>
+  <button data-p="p-ster"><b>ス</b>ステロイド</button>
+  <button data-p="p-ref"><b>文</b>文献</button>
+</nav>
+<div class="upd" id="upd">新しい版を取り込みました。次に開いたときに反映されます。</div>
+
+<script>
+"use strict";
+/* ---------- 保存 ---------- */
+const KEY="immnav_v1";
+let S={};
+try{S=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){S={};}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- 薬剤データ ---------- */
+const DRUGS=[
+{id:"ecu",cls:"C5",g:"エクリズマブ",b:"ソリリス点滴静注300mg",route:"点滴静注",
+ ind:"gMG：抗AChR抗体陽性（ステロイド剤又はステロイド剤以外の免疫抑制剤が十分に奏効しない場合に限る、2025年4月〜）。小児用量あり。NMOSD：抗AQP4抗体陽性の再発予防",
+ dose:"成人：900 mg を週1回×4 → 5週目 1,200 mg → 以降 1,200 mg を2週毎",
+ pre:["髄膜炎菌ワクチン（原則開始2週前まで）","患者安全性カード（中止後も最低3ヵ月携帯）","肺炎球菌などワクチン状況"],
+ caut:["髄膜炎菌感染症（警告）","投与間隔の遅れで効果減弱","血漿交換・IVIg施行日は補充投与（電子添文で確認）"],
+ tip:"妊娠中の使用経験が比較的多い補体阻害薬。2週毎の点滴が負担"},
+{id:"ravu",cls:"C5",g:"ラブリズマブ",b:"ユルトミリスHI点滴静注",route:"点滴静注",
+ ind:"gMG：抗AChR抗体陽性（ステロイド・免疫抑制剤で効果不十分、2025年4月〜）。NMOSD：抗AQP4抗体陽性の再発予防",
+ dose:"体重別：負荷投与 → 2週後から8週毎維持。40〜60 kg未満 2,400/3,000 mg、60〜100 kg未満 2,700/3,300 mg、100 kg以上 3,000/3,600 mg（負荷/維持）",
+ pre:["髄膜炎菌ワクチン","患者安全性カード（中止後も最低8ヵ月携帯）","エクリズマブからの切替は最終投与2週後に負荷投与"],
+ caut:["髄膜炎菌感染症（警告）","作用が長く、中止後もリスクが長く続く"],
+ tip:"8週毎で通院回数が少ない。CHAMPION-MG／CHAMPION-NMOSD"},
+{id:"zilu",cls:"C5",g:"ジルコプラン",b:"ジルビスク皮下注シリンジ",route:"皮下注（連日・自己注射可）",
+ ind:"gMG：抗AChR抗体陽性（ステロイド・免疫抑制剤で効果不十分）。成人",
+ dose:"1日1回皮下注。56 kg未満 16.6 mg、56〜77 kg未満 23.0 mg、77 kg以上 32.4 mg。12週までに改善がなければ継続を再検討",
+ pre:["髄膜炎菌ワクチン（開始の少なくとも2週前まで）","自己注射トレーニング","患者安全性カード（最終投与後2ヵ月は携帯）"],
+ caut:["髄膜炎菌感染症（警告）","膵炎（アミラーゼ・リパーゼ上昇）","注射部位反応"],
+ tip:"点滴不要の補体阻害薬。毎日の自己注射が守れるかが鍵"},
+{id:"efg",cls:"FcRn",g:"エフガルチギモド アルファ",b:"ウィフガート点滴静注400mg",route:"点滴静注（サイクル投与）",
+ ind:"gMG（ステロイド剤又はステロイド剤以外の免疫抑制剤が十分に奏効しない場合に限る）",
+ dose:"10 mg/kg を週1回×4回で1サイクル。次サイクルは症状に応じて判断",
+ pre:["総IgG（ベースライン）","不活化ワクチンはサイクル前に済ませる","生ワクチンは治療中避ける"],
+ caut:["感染症（IgG低下）","IVIg・血漿交換と時期をずらす（効果が相殺）"],
+ tip:"ADAPTはAChR抗体陰性例も組入れ（主要評価はAChR陽性例）。抗体陰性への使用は電子添文の記載を確認"},
+{id:"efgsc",cls:"FcRn",g:"エフガルチギモド アルファ・ボルヒアルロニダーゼ アルファ",b:"ヒフデュラ配合皮下注／同シリンジ",route:"皮下注（自己注射可）",
+ ind:"gMG（ステロイド・免疫抑制剤で効果不十分）、CIDP（2024年12月追加）",
+ dose:"gMG：1回1,000 mg（5.0 mL）を週1回×4回で1サイクル。CIDP：1回1,000 mg を週1回",
+ pre:["総IgG","ワクチンは事前に","自己注射トレーニング（シリンジ製剤 2025年12月発売）"],
+ caut:["感染症","注射部位反応","IVIgとの併用・切替時期"],
+ tip:"CIDPで初のFcRn阻害薬（ADHERE）。IVIgからの在宅移行の選択肢"},
+{id:"roza",cls:"FcRn",g:"ロザノリキシズマブ",b:"リスティーゴ皮下注280mg",route:"皮下注（週1回×6でサイクル）",
+ ind:"gMG（ステロイド・免疫抑制剤で効果不十分）。抗AChR抗体・抗MuSK抗体を問わない",
+ dose:"週1回×6回で1サイクル。50 kg未満 280 mg、50〜70 kg未満 420 mg、70〜100 kg未満 560 mg、100 kg以上 840 mg",
+ pre:["総IgG","ワクチンは事前に（生ワクチンは治療中避ける）"],
+ caut:["頭痛が多い（MycarinGで約4割）","下痢・発熱","IVIgはサイクル最終投与2週後以降が望ましい","血液浄化療法との併用は避ける"],
+ tip:"MuSK陽性でもエビデンスのあるFcRn阻害薬"},
+{id:"nipo",cls:"FcRn",g:"ニポカリマブ",b:"アイマービー点滴静注",route:"点滴静注（2週毎・継続）",
+ ind:"gMG（ステロイド・免疫抑制剤で効果不十分）。成人および12歳以上の小児（2025年9月承認）",
+ dose:"初回 30 mg/kg、以降 15 mg/kg を2週毎に点滴静注",
+ pre:["総IgG","ワクチンは事前に"],
+ caut:["感染症","継続投与のため通院負担"],
+ tip:"サイクルではなく持続投与で症状を一定に保つ設計。12歳以上で使える。AChR・MuSK・LRP4陽性を対象に試験（Vivacity-MG3）"},
+{id:"sat",cls:"IL6R",g:"サトラリズマブ",b:"エンスプリング皮下注120mgシリンジ",route:"皮下注（4週毎・自己注射可）",
+ ind:"NMOSD（抗AQP4抗体陽性）の再発予防。MOGADは2026年7月に国内申請中。gMGは国内適応なし",
+ dose:"120 mg を0・2・4週に皮下注、以降4週毎",
+ pre:["HBV・結核スクリーニング","好中球数・肝機能・脂質","生ワクチンは避ける"],
+ caut:["CRP・発熱が出にくく感染症が隠れる","好中球減少","肝機能障害"],
+ tip:"4週毎の在宅自己注射。単剤でも併用でも使える（SAkuraStar／SAkuraSky）"},
+{id:"ine",cls:"CD19",g:"イネビリズマブ",b:"ユプリズナ点滴静注100mg",route:"点滴静注（6ヵ月毎）",
+ ind:"NMOSD（抗AQP4抗体陽性）の再発予防。gMG（ステロイド・免疫抑制剤で効果不十分）は2026年に追加承認（部会了承 2026年8月26日）",
+ dose:"300 mg を初回と2週後に点滴静注、以降は初回から6ヵ月後を起点に6ヵ月毎",
+ pre:["HBs抗原・HBc抗体・HBs抗体（必要ならHBV-DNA）","IGRA","IgG（低γグロブリン血症）","前投薬：ステロイド・抗ヒスタミン薬・解熱鎮痛薬","生ワクチンは投与4週以上前、不活化は2週以上前"],
+ caut:["infusion reaction","HBV再活性化（MINTで1例が中止）","低γグロブリン血症・感染症","PML（理論上）"],
+ tip:"年2回の点滴で済む。MINTはAChR・MuSK陽性例が対象で、ステロイド漸減（5 mg/日以下）を組み込んだ試験"},
+{id:"rtx",cls:"CD19",g:"リツキシマブ（抗CD20）",b:"リツキサン点滴静注",route:"点滴静注",
+ ind:"NMOSD（視神経脊髄炎を含む）の再発予防（2022年追加、RIN-1）。MG・CIDPは国内適応外",
+ dose:"375 mg/m² を週1回×4回、以降は初回から6ヵ月毎に 1,000 mg/body を2週間隔で2回（電子添文で確認）",
+ pre:["HBVスクリーニング（高リスク群）","前投薬","IgG"],
+ caut:["infusion reaction","HBV再活性化（高リスク：HBc抗体陽性でも要モニタリング）","低γグロブリン血症"],
+ tip:"MuSK-MG・ノード/パラノード抗体陽性CIDPでは有効性の報告が多い（適応外）"},
+{id:"ivig",cls:"IG",g:"免疫グロブリン静注（IVIg）",b:"献血ヴェノグロブリンIH・献血グロベニン-I・ピリヴィジェン など",route:"点滴静注",
+ ind:"gMG（ステロイド・免疫抑制剤で効果不十分）、CIDP（導入・維持）。製剤ごとに適応が違う",
+ dose:"導入：400 mg/kg/日×5日（計2 g/kg）。CIDP維持：1 g/kg を3週毎（製剤により1日または2日で）",
+ pre:["IgA欠損（ショック）","腎機能・血栓リスク","心不全（容量負荷）"],
+ caut:["血栓症","無菌性髄膜炎・頭痛","急性腎障害","溶血"],
+ tip:"MGのEFT（早期速効性治療）の柱。FcRn阻害薬投与中は時期をずらす"},
+{id:"scig",cls:"IG",g:"免疫グロブリン皮下注（SCIg）",b:"ハイゼントラ20%皮下注",route:"皮下注（週1回・在宅可）",
+ ind:"CIDPの運動機能低下の進行抑制（IVIgで改善した患者の維持）",
+ dose:"0.2〜0.4 g/kg を週1回（IVIg最終投与の1週後から）",
+ pre:["IVIgで効果を確認済み","自己注射トレーニング"],
+ caut:["注射部位反応","血栓症"],
+ tip:"IVIg維持のピークトラフ変動を減らせる"},
+{id:"pe",cls:"IG",g:"血液浄化療法",b:"単純血漿交換・二重膜濾過・免疫吸着",route:"体外循環",
+ ind:"MG（増悪・クリーゼ）、NMOSD急性期（IVMP不応）、CIDP（導入）",
+ dose:"施設プロトコールに従う（例：隔日で5〜7回）",
+ pre:["バスキュラーアクセス","凝固・血圧"],
+ caut:["抗体製剤（エクリズマブ・FcRn阻害薬など）を除去する → 投与時期を調整"],
+ tip:"NMOSD急性期は早期のPLEX追加が転帰を改善"}
+];
+const CLSNAME={C5:"補体C5阻害",FcRn:"FcRn阻害",IL6R:"抗IL-6受容体",CD19:"B細胞除去",IG:"IVIg・SCIg・血漿交換"};
+
+/* ---------- 選択UI共通 ---------- */
+function initSeg(el){
+  const k=el.dataset.k, multi=el.dataset.multi==="1";
+  if(!k) return;
+  const btns=Array.from(el.querySelectorAll("button"));
+  if(S[k]===undefined){ S[k]= multi? [] : (btns.find(b=>b.classList.contains("on"))||btns[0]).dataset.v; }
+  const paint=()=>btns.forEach(b=>b.classList.toggle("on", multi? S[k].includes(b.dataset.v) : S[k]===b.dataset.v));
+  paint();
+  btns.forEach(b=>b.addEventListener("click",()=>{
+    if(multi){ const i=S[k].indexOf(b.dataset.v); if(i>=0) S[k].splice(i,1); else S[k].push(b.dataset.v); }
+    else S[k]=b.dataset.v;
+    paint(); save(); renderAll();
+  }));
+}
+$$(".seg[data-k]").forEach(initSeg);
+
+/* 疾患切替 */
+if(!S.dz) S.dz="mg";
+function paintDz(){
+  $$("#dzSeg button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.dz));
+  ["mg","nmo","cidp","mog"].forEach(d=>$("#f-"+d).classList.toggle("hide",d!==S.dz));
+}
+$$("#dzSeg button").forEach(b=>b.addEventListener("click",()=>{S.dz=b.dataset.v;save();paintDz();renderNav();}));
+paintDz();
+
+/* タブ */
+$$("#tabs button").forEach(b=>b.addEventListener("click",()=>{
+  $$("#tabs button").forEach(x=>x.classList.toggle("on",x===b));
+  $$(".page").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
+  S.tab=b.dataset.p; save(); window.scrollTo(0,0);
+}));
+if(S.tab && $("#"+S.tab)){ const b=$$("#tabs button").find(x=>x.dataset.p===S.tab); if(b) b.click(); }
+
+const has=(k,v)=>(S[k]||[]).includes(v);
+const badge=st=>st==="ok"?'<span class="badge b-ok">適格</span>':st==="cd"?'<span class="badge b-cd">条件付き</span>':st==="ng"?'<span class="badge b-ng">対象外</span>':'<span class="badge b-in">参考</span>';
+const D=id=>DRUGS.find(d=>d.id===id);
+
+function drugRow(id,st,why,fits){
+  const d=D(id);
+  return `<div class="drug"><div class="hd">${badge(st)}<span class="nm">${esc(d.g)}</span><span class="cls">${CLSNAME[d.cls]}</span></div>
+  <div class="br">${esc(d.b)}｜${esc(d.route)}</div>
+  ${why.length?`<ul>${why.map(w=>`<li>${w}</li>`).join("")}</ul>`:""}
+  ${st!=="ng"&&fits&&fits.length?`<div>${fits.map(f=>`<span class="fit">${f}</span>`).join("")}</div>`:""}</div>`;
+}
+function commonFlags(id, why){
+  const d=D(id); let st="ok";
+  if(has("flags","inf")){ why.push("活動性の重い感染症 → 治療を優先し開始を延期"); st="cd"; }
+  if(d.cls==="C5" && has("flags","nomen")){ why.push("髄膜炎菌ワクチン・緊急時対応の管理が困難 → 補体阻害薬は避ける"); st="ng"; }
+  if(d.cls==="CD19"){
+    if(has("flags","hbs")){ why.push("HBs抗原陽性 → 肝臓専門医と相談し核酸アナログ予防投与を先行"); st= st==="ng"?"ng":"cd"; }
+    else if(has("flags","hbc")){ why.push("HBV既往感染 → HBV-DNAを月1回モニタリング（B細胞除去は高リスク）"); if(st==="ok") st="cd"; }
+    if(has("flags","tb")){ why.push("潜在性結核 → LTBI治療を先行"); if(st==="ok") st="cd"; }
+  }
+  if(d.cls==="IL6R"){
+    if(has("flags","hbs")||has("flags","hbc")){ why.push("HBV陽性所見 → 肝臓学会GLに沿って対応"); if(st==="ok") st="cd"; }
+    if(has("flags","tb")){ why.push("潜在性結核 → LTBI治療を先行"); if(st==="ok") st="cd"; }
+  }
+  if(has("flags","preg")){
+    const pm={C5:"エクリズマブは妊娠中の使用報告が比較的多い。ラブリズマブ・ジルコプランはデータが限られる",
+      FcRn:"胎盤のIgG移行も抑えるため、新生児の移行抗体が低下しうる",
+      IL6R:"妊娠中のデータは限られる",CD19:"新生児のB細胞減少の可能性。計画妊娠なら投与時期を調整",IG:"IVIg・血漿交換は妊娠中も使いやすい"};
+    why.push("妊娠：" + pm[d.cls]); if(st==="ok") st="cd";
+  }
+  return st;
+}
+const worse=(a,b)=>{const r={ok:0,cd:1,ng:2};return r[a]>=r[b]?a:b;};
+
+/* ---------- MG ---------- */
+function navMG(){
+  const ab=S.mg_ab, age=S.mg_age, ref=S.mg_ref==="y";
+  let h="";
+  if(!ref){
+    h+=`<div class="warn">分子標的薬（補体・FcRn・CD19）はいずれも保険上「ステロイド剤又はステロイド剤以外の免疫抑制剤が十分に奏効しない場合」に限られる。</div>
+    <div class="card"><h3 style="margin-top:0">まず行う治療（MG/LEMS診療ガイドライン2022の考え方）</h3><ul>
+    <li>治療目標：<b>MM-5mg</b>（PSL 5 mg/日以下で軽微症状）を早く達成する</li>
+    <li>経口ステロイドは少量から（高用量・長期を避ける）。カルシニューリン阻害薬（タクロリムス・シクロスポリン）を早期に併用</li>
+    <li>EFT（早期速効性治療）：IVIg・血漿交換・ステロイドパルスを組み合わせる</li>
+    <li>胸腺腫あり → 胸腺摘除。胸腺腫なしでも早期発症のAChR陽性では胸腺摘除を検討</li>
+    <li>抗コリンエステラーゼ薬は最小限に（MuSK陽性では過敏・効果不良が多い）</li></ul></div>`;
+  }
+  const rows=[];
+  const fitsOf=id=>{
+    const f=[]; const n=k=>has("needs",k);
+    if(n("fast")&&["efg","efgsc","roza","nipo","ravu","zilu","ecu"].includes(id)) f.push(["efg","efgsc","roza","nipo"].includes(id)?"速効（1〜2週）":"比較的速効");
+    if(n("rare")&&["ravu","ine"].includes(id)) f.push(id==="ravu"?"8週毎":"6ヵ月毎");
+    if(n("rare")&&["efg","efgsc","roza"].includes(id)) f.push("サイクル間は休薬");
+    if(n("self")&&["zilu","efgsc","roza"].includes(id)) f.push(id==="roza"?"皮下注（自己注射は電子添文で確認）":"自己注射可");
+    if(n("noiv")&&["zilu","efgsc","roza"].includes(id)) f.push("点滴不要");
+    if(n("steroid")&&["ine","ravu","ecu","zilu","nipo"].includes(id)) f.push("持続的な効果で減量しやすい");
+    return f;
+  };
+  // C5
+  ["ecu","ravu","zilu"].forEach(id=>{
+    const why=[]; let st="ok";
+    if(ab!=="achr"){ why.push("抗AChR抗体陽性が対象（MuSK・LRP4・陰性は対象外）"); st="ng"; }
+    if(age==="ado"||age==="ch"){ if(id==="ecu"){ why.push("小児の用法・用量あり（体重別）"); st=worse(st,"cd"); } else { why.push("成人が対象"); st="ng"; } }
+    if(S.mg_thy==="y") { why.push("胸腺腫：REGAINでは胸腺腫既往が除外。胸腺腫治療を優先"); st=worse(st,"cd"); }
+    st=worse(st,commonFlags(id,why)); rows.push([id,st,why]);
+  });
+  // FcRn
+  [["efg"],["efgsc"],["roza"],["nipo"]].forEach(([id])=>{
+    const why=[]; let st="ok";
+    if(age==="ch"){ why.push("12歳未満は対象外"); st="ng"; }
+    else if(age==="ado"){ if(id==="nipo"){ why.push("12歳以上の小児に適応あり"); } else { why.push("成人が対象"); st="ng"; } }
+    if(ab==="sn"){
+      if(id==="efg"||id==="efgsc") { why.push("抗体陰性：ADAPTは陰性例も組入れたが有効性の主評価はAChR陽性。電子添文の記載を確認"); st=worse(st,"cd"); }
+      else { why.push("抗体陰性は試験の対象外"); st=worse(st,"cd"); }
+    }
+    if(ab==="lrp4" && id!=="nipo"){ why.push("LRP4陽性のデータは乏しい"); st=worse(st,"cd"); }
+    if(ab==="musk" && (id==="efg"||id==="efgsc")){ why.push("MuSK陽性は症例数が少ない"); st=worse(st,"cd"); }
+    if(ab==="musk" && (id==="roza"||id==="nipo")){ why.push("MuSK陽性も試験に組入れ"); }
+    st=worse(st,commonFlags(id,why)); rows.push([id,st,why]);
+  });
+  // CD19
+  { const id="ine",why=[]; let st="ok";
+    if(age!=="ad"){ why.push("成人が対象"); st="ng"; }
+    if(ab==="lrp4"||ab==="sn"){ why.push("MINTはAChR・MuSK陽性が対象。電子添文上の抗体の限定はないが根拠は乏しい"); st=worse(st,"cd"); }
+    if(ab==="musk") why.push("MuSK陽性も試験に組入れ（26週評価）");
+    why.push("効果発現は数ヵ月単位 → 増悪期はEFTを併用");
+    st=worse(st,commonFlags(id,why)); rows.push([id,st,why]); }
+  if(!ref) rows.forEach(r=>{ r[1]="ng"; r[2].unshift("保険上の前提（ステロイド・免疫抑制剤で効果不十分）を満たさない"); });
+
+  const order={ok:0,cd:1,ng:2};
+  rows.sort((a,b)=>order[a[1]]-order[b[1]]);
+  h+=`<div class="card"><h3 style="margin-top:0">分子標的薬の適格性</h3>${rows.map(r=>drugRow(r[0],r[1],r[2],fitsOf(r[0]))).join("")}</div>`;
+  h+=`<div class="card"><h3 style="margin-top:0">使い分けの目安</h3><ul>
+   <li><b>速く効かせたい・増悪を繰り返す</b>：FcRn阻害薬（1〜2週で効果）。補体阻害薬も数週で効く</li>
+   <li><b>MuSK陽性</b>：補体阻害薬は対象外。FcRn阻害薬（ロザノリキシズマブ・ニポカリマブなど）、イネビリズマブ、リツキシマブ（適応外）</li>
+   <li><b>症状を一定に保ちたい</b>：補体阻害薬・ニポカリマブ・イネビリズマブ（持続投与型）。FcRnのサイクル投与はサイクル末期の症状変動に注意</li>
+   <li><b>通院回数を減らしたい</b>：ラブリズマブ（8週毎）、イネビリズマブ（6ヵ月毎）、在宅自己注射（ジルコプラン・ヒフデュラ）</li>
+   <li><b>感染リスクが高い・IgG低値</b>：FcRn・CD19は感染とIgG低下に注意。補体阻害薬は髄膜炎菌など莢膜菌に注意</li>
+   <li><b>クリーゼ・急性増悪</b>：まず血漿交換・IVIg・呼吸管理。抗体製剤は血漿交換で除去されるので時期を調整</li>
+  </ul><p class="mut">サトラリズマブはgMGで国際第Ⅲ相（LUMINESCE）を行ったが、2026年11月時点でgMGの国内適応はない。</p></div>`;
+  return h;
+}
+
+/* ---------- NMOSD ---------- */
+function navNMO(){
+  let h=""; const pos=S.nmo_ab==="aqp4";
+  if(!pos){
+    h+=`<div class="warn">国内承認の再発予防薬（エクリズマブ・ラブリズマブ・サトラリズマブ・イネビリズマブ・リツキシマブ）は、いずれも抗AQP4抗体陽性が対象。</div>
+    <div class="card"><ul><li>抗AQP4抗体はcell-based assayで再検を考える</li><li>MOG抗体（cell-based assay）を測定 → MOGADなら別の扱い</li><li>陰性NMOSDの再発予防は経口ステロイド＋免疫抑制薬（アザチオプリンなど）が中心（適応・保険は個別に確認）</li></ul></div>`;
+  }
+  const rows=[];
+  [["ecu"],["ravu"],["sat"],["ine"],["rtx"]].forEach(([id])=>{
+    const why=[]; let st="ok";
+    if(!pos){ why.push("抗AQP4抗体陽性が対象"); st="ng"; }
+    if(S.nmo_age==="ch"){ why.push(id==="sat"?"SAkuraSkyは12歳以上を組入れ。小児の用法は電子添文で確認":"成人が対象（小児は電子添文で確認）"); st=worse(st,"cd"); }
+    st=worse(st,commonFlags(id,why)); rows.push([id,st,why]);
+  });
+  const fitsOf=id=>{const f=[];const n=k=>has("needs",k);
+    if(n("fast")&&["ecu","ravu"].includes(id)) f.push("再発抑制が最も強力（年間再発率ほぼ0）");
+    if(n("rare")&&id==="ravu") f.push("8週毎"); if(n("rare")&&(id==="ine"||id==="rtx")) f.push("6ヵ月毎");
+    if((n("self")||n("noiv"))&&id==="sat") f.push("4週毎の自己注射");
+    if(n("steroid")&&["ecu","ravu","sat","ine"].includes(id)) f.push("単剤試験あり（ステロイド離脱を目指せる）");
+    return f;};
+  const order={ok:0,cd:1,ng:2}; rows.sort((a,b)=>order[a[1]]-order[b[1]]);
+  h+=`<div class="card"><h3 style="margin-top:0">再発予防薬の適格性</h3>${rows.map(r=>drugRow(r[0],r[1],r[2],fitsOf(r[0]))).join("")}</div>`;
+  h+=`<div class="card"><h3 style="margin-top:0">使い分けの目安</h3><ul>
+   <li><b>重い発作・高い再発活動性</b>：補体阻害薬（PREVENT：年間再発率 0.02 vs 0.35）。髄膜炎菌の管理が前提</li>
+   <li><b>在宅で続けたい</b>：サトラリズマブ（4週毎の皮下注）。CRPが上がりにくく感染が見えにくい点を患者にも説明</li>
+   <li><b>投与回数を最小に</b>：イネビリズマブ・リツキシマブ（6ヵ月毎）、ラブリズマブ（8週毎）</li>
+   <li><b>HBV既往・低γグロブリン血症</b>：B細胞除去は慎重に。補体・IL-6Rを優先して検討</li>
+   <li><b>妊娠希望</b>：計画的に薬剤を選ぶ（産科と連携）。発作予防を最優先</li>
+   <li><b>急性期</b>：ステロイドパルス → 効果不十分なら早期に血漿交換</li></ul></div>`;
+  return h;
+}
+
+/* ---------- CIDP ---------- */
+function navCIDP(){
+  const dx=S.ci_dx, ty=S.ci_type, ab=S.ci_ab, ph=S.ci_ph, f=k=>has("ci_flag",k);
+  let h="";
+  if(dx==="no"){
+    h+=`<div class="warn">EAN/PNS 2021基準を満たさない → 治療前に診断を見直す。</div><div class="card"><h3 style="margin-top:0">見直すべき鑑別</h3><ul>
+    <li>POEMS症候群（VEGF・M蛋白λ）、抗MAG抗体ニューロパチー（IgM-M蛋白）</li><li>遺伝性（CMT）、トランスサイレチン型アミロイドーシス</li>
+    <li>糖尿病性・中毒性・血管炎性ニューロパチー、悪性リンパ腫浸潤</li><li>ノード/パラノード抗体陽性例（自己免疫性ノドパチー）は別の扱い</li></ul></div>`;
+    return h;
+  }
+  const L=[]; // [status, title, bullets]
+  if(ab==="pos"){
+    L.push(["in","ノード/パラノード抗体陽性（自己免疫性ノドパチー）",["IVIgの効果が乏しいことが多い（IgG4主体）","リツキシマブ（適応外）を早めに検討","ステロイド・血漿交換は一部有効"]]);
+  }
+  if(ph==="ind"){
+    const iv=[]; let st="ok";
+    if(f("iga")){iv.push("IgA欠損 → ショックの危険。製剤選択・投与可否を慎重に"); st="cd";}
+    if(f("thr")){iv.push("血栓リスク → 速度を落とす・分割投与・十分な補液"); st="cd";}
+    if(f("ren")){iv.push("腎機能低下 → 低速投与・腎機能を確認"); st="cd";}
+    L.push([st,"IVIg 400 mg/kg/日×5日（2 g/kg）",iv.concat(["2〜6週で効果判定。効果があれば維持療法へ"])]);
+    const sw=[]; let ss="ok";
+    if(ty==="mot"){sw.push("運動型CIDPはステロイドで悪化しうる → 避ける"); ss="ng";}
+    if(f("dmop")){sw.push("糖尿病・骨粗鬆症 → ステロイドは副作用対策を前提に（ステロイドタブ）"); ss=worse(ss,"cd");}
+    L.push([ss,"副腎皮質ステロイド（経口PSL または パルス）",sw.concat(["効果発現はIVIgより遅いが、寛解が持続しやすい"])]);
+    L.push([f("vein")?"cd":"ok","血漿交換",[ "IVIg・ステロイドが使いにくいときの導入","効果は短く、維持には不向き"].concat(f("vein")?["静脈確保困難 → バスキュラーアクセスが必要"]:[])]);
+  }
+  if(ph==="mnt"||ph==="ref"){
+    const iv=["1 g/kg を3週毎（製剤の適応を確認）。漸減・間隔延長で最小有効量を探る"];
+    if(f("iga")) iv.push("IgA欠損 → 慎重に");
+    L.push([f("iga")||f("thr")||f("ren")?"cd":"ok","IVIg維持",iv]);
+    L.push(["ok","SCIg（ハイゼントラ）0.2〜0.4 g/kg 週1回",["IVIgで改善した患者の維持","在宅で自己注射。ピーク・トラフの変動が少ない"]]);
+    const e=["1,000 mg を週1回皮下注（ADHERE：再発 27.9% vs 53.6%）","IVIgの副作用・通院負担がある場合の選択肢","総IgGが下がる → 感染症・ワクチン時期に注意"];
+    if(ab==="pos") e.push("ノード/パラノード抗体陽性例のデータは乏しい");
+    L.push(["ok","エフガルチギモド皮下注（ヒフデュラ）",e]);
+    if(ty!=="mot") L.push([f("dmop")?"cd":"ok","ステロイド（パルス間欠 または 経口）",["長期では骨・感染・血糖の対策が必須"]]);
+    if(ph==="ref"){
+      L.push(["in","効果不十分のとき",["まず診断を再確認（基準・鑑別・ノード/パラノード抗体）","用量不足の確認（IVIgの量と間隔）","治療の切替：IVIg↔ステロイド↔FcRn","免疫抑制薬・リツキシマブ（いずれも適応外）"]]);
+    }
+  }
+  const bdg=s=>s==="ok"?badge("ok"):s==="cd"?badge("cd"):s==="ng"?badge("ng"):badge("in");
+  h+=`<div class="card"><h3 style="margin-top:0">${ph==="ind"?"寛解導入":"維持・切替"}の選択肢</h3>${L.map(x=>`<div class="drug"><div class="hd">${bdg(x[0])}<span class="nm">${x[1]}</span></div><ul>${x[2].map(b=>`<li>${b}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  h+=`<div class="card"><h3 style="margin-top:0">評価</h3><ul><li>効果判定はINCAT・I-RODS・握力（客観的指標で）</li><li>possible CIDPでも、客観的な治療反応は診断を支持する所見になる</li><li>日本神経学会 CIDP・MMN診療ガイドライン2024も参照</li></ul></div>`;
+  return h;
+}
+
+/* ---------- MOGAD ---------- */
+function navMOG(){
+  return `<div class="card"><h3 style="margin-top:0">MOGAD（参考）</h3><ul>
+  <li>急性期：ステロイドパルス → 不十分なら血漿交換・IVIg</li>
+  <li>単相性が多く、初回発作後に一律の長期再発予防は行わないことが多い</li>
+  <li>再発例：経口ステロイド漸減、IVIg維持、アザチオプリン・MMF・トシリズマブ（いずれも適応外）</li>
+  <li>サトラリズマブ：MOGADの再発予防で2026年7月31日に国内申請（METEOROID試験）。承認後に更新予定</li>
+  <li>リツキシマブはNMOSDほど有効でないとの報告が多い</li></ul></div>`;
+}
+
+function renderNav(){
+  const f={mg:navMG,nmo:navNMO,cidp:navCIDP,mog:navMOG}[S.dz];
+  $("#navOut").innerHTML=f();
+  $("#f-common").classList.toggle("hide",S.dz==="cidp"||S.dz==="mog");
+}
+
+/* ---------- 薬剤カード ---------- */
+if(!S.cls) S.cls="all";
+function renderDrugs(){
+  $$("#clsSeg button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.cls));
+  const q=($("#q").value||"").trim();
+  const L=DRUGS.filter(d=>(S.cls==="all"||d.cls===S.cls)&&(!q||(d.g+d.b).includes(q)));
+  $("#drugList").innerHTML=L.map(d=>`<details class="card"><summary>${esc(d.g)} <span class="br" style="font-weight:400;color:var(--mut);font-size:12.5px">${esc(d.b)}</span></summary>
+  <table class="kv"><tr><th>分類</th><td>${CLSNAME[d.cls]}｜${esc(d.route)}</td></tr>
+  <tr><th>国内適応</th><td>${esc(d.ind)}</td></tr><tr><th>用法</th><td>${esc(d.dose)}</td></tr>
+  <tr><th>投与前</th><td><ul>${d.pre.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></td></tr>
+  <tr><th>注意</th><td><ul>${d.caut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></td></tr>
+  <tr><th>使いどころ</th><td>${esc(d.tip)}</td></tr></table></details>`).join("") || '<p class="mut">該当なし</p>';
+}
+$$("#clsSeg button").forEach(b=>b.addEventListener("click",()=>{S.cls=b.dataset.v;save();renderDrugs();}));
+$("#q").addEventListener("input",renderDrugs);
+
+/* ---------- チェックリスト ---------- */
+const CK={
+ "ck-men":["4価髄膜炎菌ワクチン1回目（開始の少なくとも2週前）","2回目（1回目から8週以上あけて）を予約","2週前に間に合わない → 接種後2週間は抗菌薬予防を併用","追加接種（5年毎）の日付をカルテに記載","B群ワクチン（国内未承認・輸入、保険外）の説明","肺炎球菌ワクチンの接種状況確認","患者安全性カードを交付し、常に携帯するよう指導","発熱時はすぐ受診・カード提示することを本人と家族に説明","緊急時の受診先（夜間・休日）を決めてカードに記載","同意書の取得"],
+ "ck-ster":["GIOPスコア評価（3ヵ月以上の予定なら開始時に）","骨粗鬆症薬（スコア3以上）＋カルシウム・ビタミンD","ビスホスホネート・デノスマブ前の歯科チェック（顎骨壊死）","骨密度・胸腰椎X線（ベースライン）","PJP予防（PSL 20 mg/日以上を4週以上 など）","HBV：HBs抗原・HBc抗体・HBs抗体","結核：IGRA・胸部画像","HbA1c・昼食後〜夕食前の血糖","血圧・脂質・体重","眼科（白内障・緑内障・中心性漿液性網脈絡膜症）","胃粘膜保護（NSAIDs併用・潰瘍既往ならPPI）","不活化ワクチン：インフルエンザ・肺炎球菌・COVID-19・組換え帯状疱疹（シングリックス）","生ワクチンは避ける（PSL 20 mg/日以上を2週以上は特に）","不眠・抑うつ・せん妄の確認","MG：開始時の初期増悪（少量から漸増）","減量・中止時の副腎不全（シックデイの説明）"]
+};
+function renderCK(id){
+  S.ck=S.ck||{}; S.ck[id]=S.ck[id]||{};
+  $("#"+id).innerHTML=CK[id].map((t,i)=>`<label class="ck"><input type="checkbox" data-ck="${id}" data-i="${i}" ${S.ck[id][i]?"checked":""}><span>${esc(t)}</span></label>`).join("");
+}
+document.addEventListener("change",e=>{const t=e.target; if(t.dataset&&t.dataset.ck){S.ck[t.dataset.ck][t.dataset.i]=t.checked;save();}});
+$$("[data-reset]").forEach(b=>b.addEventListener("click",()=>{S.ck[b.dataset.reset]={};save();renderCK(b.dataset.reset);}));
+
+/* ---------- 髄膜炎菌 ---------- */
+const addD=(d,n)=>{const x=new Date(d.getTime());x.setDate(x.getDate()+n);return x;};
+const fmt=d=>`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${"日月火水木金土"[d.getDay()]}）`;
+const parseD=v=>{if(!v)return null;const [y,m,dd]=v.split("-").map(Number);return new Date(y,m-1,dd);};
+["m_drug","m_d1","m_st"].forEach(id=>{const el=$("#"+id); if(S[id]) el.value=S[id]; el.addEventListener("change",()=>{S[id]=el.value;save();renderMen();});});
+function renderMen(){
+  const drug=$("#m_drug").value, d1=parseD($("#m_d1").value), st=parseD($("#m_st").value), imm=S.m_imm==="y";
+  const card={ecu:"中止後も最低3ヵ月",ravu:"中止後も最低8ヵ月",zilu:"最終投与後2ヵ月"}[drug];
+  let h="";
+  if(!d1){ h+=`<p class="mut">1回目接種日を入れると日程を計算します。</p>`; }
+  else{
+    const safe=addD(d1,14), d2=addD(d1,56), boost=addD(imm?d2:d1,365*5+1);
+    h+=`<div class="tl"><div><b>1回目</b>${fmt(d1)}</div>
+      <div><b>予防なしで開始可</b>${fmt(safe)} 以降</div>
+      ${imm?`<div><b>2回目</b>${fmt(d2)} 以降（8週以上あける）</div>`:""}
+      <div><b>追加接種</b>${fmt(boost)} 頃（5年毎が目安）</div></div>`;
+    if(st){
+      if(st<safe){
+        const days=Math.round((safe-st)/864e5);
+        h+=`<div class="warn">開始予定日はワクチン接種から2週未満（あと${days}日）。<b>接種後2週間（${fmt(safe)}まで）は抗菌薬を予防投与</b>する（臨床試験ではセフトリアキソン・セフォタキシム等が使われた。施設の方針で選択）。</div>`;
+      } else h+=`<div class="note">開始予定日 ${fmt(st)} は接種から2週以上経過しており予防投与は不要。</div>`;
+      if(st<d1) h+=`<div class="warn">開始予定日が1回目接種より前。緊急開始の場合は抗菌薬予防を併用し、速やかに接種する。</div>`;
+    }
+  }
+  h+=`<div class="note">患者安全性カード：${card}は携帯を続ける。B群ワクチン（Bexsero・Trumenba）は国内未承認（輸入ワクチン・保険外）。入手できれば推奨。</div>`;
+  $("#menOut").innerHTML=h;
+}
+
+/* ---------- GIOP ---------- */
+["g_age","g_psl","p_psl","p_wk","h_s","h_c","h_sab","h_dna"].forEach(id=>{const el=$("#"+id); if(S[id]!==undefined) el.value=S[id]; el.addEventListener("input",()=>{S[id]=el.value;save();renderSter();}); el.addEventListener("change",()=>{S[id]=el.value;save();renderSter();});});
+function renderSter(){
+  // GIOP
+  const age=parseFloat($("#g_age").value), psl=parseFloat($("#g_psl").value);
+  let h="";
+  if(isNaN(age)||isNaN(psl)){ h=`<p class="mut">年齢とPSL換算量を入れるとスコアを計算します。</p>`; }
+  else{
+    let sc=0, det=[];
+    const fx=S.g_fx==="y"?7:0; sc+=fx; det.push(`既存骨折 ${fx}`);
+    const a=age<50?0:age<65?2:4; sc+=a; det.push(`年齢 ${a}`);
+    const p=psl<5?0:psl<7.5?1:4; sc+=p; det.push(`PSL ${p}`);
+    let b=0; if(S.g_bmd==="70") b=2; else if(S.g_bmd==="0") b=4; sc+=b; det.push(`%YAM ${S.g_bmd==="u"?"未測定(0で計算)":b}`);
+    const tx=sc>=3;
+    h=`<div><span class="score">${sc}</span> 点 <span class="mut">（${det.join("・")}）</span></div>
+    ${tx?`<div class="warn"><b>3点以上 → 薬物療法を開始</b>。ガイドラインではアレンドロン酸・リセドロン酸が中心（他の候補・2023年版の推奨は本文で確認）。カルシウム・ビタミンDの摂取も確保。投与前に歯科チェック。</div>`
+       :`<div class="note">3点未満 → 生活指導と経過観察。スコアを定期的に再評価。${S.g_bmd==="u"?"<br>骨密度未測定のため、測定すると点数が上がる可能性あり。":""}</div>`}
+    <p class="mut">単独で3点以上になる因子：既存骨折・65歳以上・PSL 7.5 mg/日以上・%YAM 70%未満。開始3ヵ月以内の介入が骨折抑制に有効。</p>`;
+  }
+  $("#giopOut").innerHTML=h;
+
+  // PJP
+  const pp=parseFloat($("#p_psl").value), wk=parseFloat($("#p_wk").value), is=S.p_is==="y", ren=S.p_ren;
+  let j="";
+  if(isNaN(pp)){ j=`<p class="mut">PSL換算量を入れると判定します。</p>`; }
+  else{
+    let lvl="no";
+    if(pp>=20 && (isNaN(wk)||wk>=4)) lvl="yes";
+    else if(pp>=20 && wk<4) lvl="short";
+    else if(pp>=15 && is) lvl="consider";
+    else if(is && pp>0) lvl="consider2";
+    const stDose = ren==="vl" ? "ST合剤は原則避け、アトバコン（サムチレール）1,500 mg/日 などを検討"
+      : ren==="l" ? "バクタ配合錠 1錠 を週3回 など減量（腎機能に応じ調整）"
+      : "バクタ配合錠 1錠/日 連日、または 2錠/日 週3回";
+    if(lvl==="yes") j=`<div class="warn"><b>予防投与を推奨</b>（PSL 20 mg/日以上を4週以上${is?"＋免疫抑制薬併用":""}）。${stDose}。高K血症・血球減少・肝障害・皮疹をモニタリング。ST不耐ならアトバコン、ペンタミジン吸入。</div>`;
+    else if(lvl==="short") j=`<div class="note">PSL 20 mg/日以上だが4週未満の予定。延長・パルス反復なら予防を開始。</div>`;
+    else if(lvl==="consider") j=`<div class="note"><b>予防を考慮</b>（PSL 15〜20 mg/日＋免疫抑制薬・生物学的製剤）。リンパ球減少・高齢・肺疾患があれば積極的に。${stDose}。</div>`;
+    else if(lvl==="consider2") j=`<div class="note">PSL量は少ないが免疫抑制薬併用あり。リンパ球数・高齢・肺疾患を加味して個別に判断。</div>`;
+    else j=`<div class="note">通常は予防不要。量・期間・併用薬が変わったら再評価。</div>`;
+  }
+  $("#pjpOut").innerHTML=j;
+
+  // HBV
+  const s=$("#h_s").value, c=$("#h_c").value, sab=$("#h_sab").value, dna=$("#h_dna").value;
+  let k="";
+  if(!s) k=`<div class="note">まずHBs抗原を測定。</div>`;
+  else if(s==="p") k=`<div class="warn"><b>HBs抗原陽性</b> → HBe抗原・HBe抗体・HBV-DNAを測定し、肝臓専門医と相談。免疫抑制開始前に核酸アナログ（エンテカビル等）を開始。</div>`;
+  else{
+    if(!c||!sab) k=`<div class="note">HBs抗原陰性 → HBc抗体・HBs抗体を測定。</div>`;
+    else if(c==="n" && (sab==="n"||sab==="v")) k=`<div class="note">HBc抗体・HBs抗体ともに陰性（またはワクチン接種によるHBs抗体単独陽性）→ 通常の対応。必要に応じてHBワクチンを検討。</div>`;
+    else{
+      if(!dna) k=`<div class="warn">既往感染（HBc抗体 and/or HBs抗体陽性）→ <b>HBV-DNAを測定</b>。</div>`;
+      else if(dna==="hi") k=`<div class="warn"><b>HBV-DNA 20 IU/mL以上</b> → 核酸アナログを開始（肝臓専門医と相談）。</div>`;
+      else k=`<div class="note"><b>HBV-DNA 20 IU/mL未満</b> → 治療中と終了後少なくとも12ヵ月は、月1回を目安にHBV-DNAとAST/ALTをモニタリング。20 IU/mL以上になったら直ちに核酸アナログ。B細胞除去薬（リツキシマブ・イネビリズマブ）や高用量ステロイドでは特に厳格に。</div>`;
+    }
+  }
+  $("#hbvOut").innerHTML=k;
+}
+
+/* ---------- 文献 ---------- */
+const REFS=[
+ ["MG","Howard JF Jr, et al. Safety and efficacy of eculizumab in anti-acetylcholine receptor antibody-positive refractory generalised myasthenia gravis (REGAIN). Lancet Neurol. 2017;16(12):976-986.","https://pubmed.ncbi.nlm.nih.gov/29066163/"],
+ ["MG","Vu T, et al. Terminal complement inhibitor ravulizumab in generalized myasthenia gravis (CHAMPION MG). NEJM Evid. 2022;1(5):EVIDoa2100066.","https://doi.org/10.1056/EVIDoa2100066"],
+ ["MG","Howard JF Jr, et al. Safety and efficacy of zilucoplan in patients with generalised myasthenia gravis (RAISE). Lancet Neurol. 2023;22(5):395-406.","https://pubmed.ncbi.nlm.nih.gov/37059508/"],
+ ["MG","Howard JF Jr, et al. Safety, efficacy, and tolerability of efgartigimod in patients with generalised myasthenia gravis (ADAPT). Lancet Neurol. 2021;20(7):526-536.","https://pubmed.ncbi.nlm.nih.gov/34146511/"],
+ ["MG","Bril V, et al. Safety and efficacy of rozanolixizumab in patients with generalised myasthenia gravis (MycarinG). Lancet Neurol. 2023;22(5):383-394.","https://pubmed.ncbi.nlm.nih.gov/37059507/"],
+ ["MG","Antozzi C, et al. Safety and efficacy of nipocalimab in adults with generalised myasthenia gravis (Vivacity-MG3). Lancet Neurol. 2025;24(2):105-116.","https://pubmed.ncbi.nlm.nih.gov/39862879/"],
+ ["MG","Nowak RJ, et al. A Phase 3 Trial of Inebilizumab in Generalized Myasthenia Gravis (MINT). N Engl J Med. 2025;392(23):2309-2320.","https://pubmed.ncbi.nlm.nih.gov/40202593/"],
+ ["NMOSD","Pittock SJ, et al. Eculizumab in Aquaporin-4-Positive Neuromyelitis Optica Spectrum Disorder (PREVENT). N Engl J Med. 2019;381(7):614-625.","https://pubmed.ncbi.nlm.nih.gov/31050279/"],
+ ["NMOSD","Yamamura T, et al. Trial of Satralizumab in Neuromyelitis Optica Spectrum Disorder (SAkuraSky). N Engl J Med. 2019;381(22):2114-2124.","https://pubmed.ncbi.nlm.nih.gov/31774956/"],
+ ["NMOSD","Cree BAC, et al. Inebilizumab for the treatment of neuromyelitis optica spectrum disorder (N-MOmentum). Lancet. 2019;394(10206):1352-1363.","https://pubmed.ncbi.nlm.nih.gov/31495497/"],
+ ["CIDP","Allen JA, et al. Safety, tolerability, and efficacy of subcutaneous efgartigimod in patients with CIDP (ADHERE). Lancet Neurol. 2024;23(10):1013-1024.","https://pubmed.ncbi.nlm.nih.gov/39304241/"],
+ ["国内","PMDA 審査報告書：ユプリズナ点滴静注100mg（全身型重症筋無力症の効能追加、2026年8月）","https://www.pmda.go.jp/drugs/2026/P20261005002/400315000_30300AMX00255_A100_1.pdf"],
+ ["国内","髄膜炎菌感染症リスク管理の手引き（抗補体薬、2024年9月作成）— 日本神経学会サイト","https://neurology-jp.org/news/pdf/news_20251119_01_01.pdf"],
+ ["国内","ジルビスク 適正使用ガイド（RMP資材、PMDA）","https://www.pmda.go.jp/RMP/www/820110/c050cb26-c6a1-4dfe-9cea-d65280e55cc2/820110_39994F3G1025_01_001RMPm.pdf"],
+ ["国内","PMDA 医療用医薬品 情報検索（電子添文の最新版）","https://www.pmda.go.jp/PmdaSearch/iyakuSearch/"],
+ ["GL","日本神経学会 重症筋無力症/ランバート・イートン筋無力症候群診療ガイドライン2022（南江堂）",""],
+ ["GL","日本神経学会 多発性硬化症・視神経脊髄炎スペクトラム障害診療ガイドライン2023（医学書院）",""],
+ ["GL","日本神経学会 慢性炎症性脱髄性多発根ニューロパチー，多巣性運動ニューロパチー診療ガイドライン2024（南江堂）",""],
+ ["GL","日本骨代謝学会 グルココルチコイド誘発性骨粗鬆症の管理と治療のガイドライン2023",""],
+ ["GL","日本肝臓学会 B型肝炎治療ガイドライン（免疫抑制・化学療法により発症するB型肝炎対策ガイドライン）",""]
+];
+$("#refList").innerHTML=REFS.map(r=>`<div class="ref"><span class="cls">${r[0]}</span> ${esc(r[1])}${r[2]?`<br><a href="${r[2]}" target="_blank" rel="noopener">${r[2]}</a>`:""}</div>`).join("");
+
+$("#resetAll").addEventListener("click",()=>{ if(confirm("入力をすべて消去しますか？")){ try{localStorage.removeItem(KEY);}catch(e){} location.reload(); } });
+
+function renderAll(){ renderNav(); renderMen(); renderSter(); }
+renderCK("ck-men"); renderCK("ck-ster"); renderDrugs(); renderAll();
+
+/* ---------- Service Worker（ward-apps 共通） ---------- */
+try{
+  const okProto = location.protocol==="https:" || location.hostname==="localhost" || location.hostname==="127.0.0.1";
+  const onClaude = /claude\.(ai|site)|claudeusercontent/.test(location.hostname);
+  if("serviceWorker" in navigator && okProto && !onClaude){
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(reg=>{
+      reg.addEventListener("updatefound",()=>{
+        const nw=reg.installing; if(!nw) return;
+        nw.addEventListener("statechange",()=>{
+          if(nw.state==="installed" && navigator.serviceWorker.controller){
+            const u=$("#upd"); u.style.display="block"; setTimeout(()=>u.style.display="none",5000);
+          }
+        });
+      });
+    }).catch(()=>{});
+  }
+}catch(e){}
+</script>
+</body>
+</html>
