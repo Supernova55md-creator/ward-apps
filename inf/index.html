@@ -98,6 +98,7 @@ tr.hit td,tr.hit th{background:var(--accent-soft);font-weight:700}
 .pg{font-size:11px;color:var(--muted);margin-top:8px}
 .alert{border-left:5px solid var(--warn);background:var(--warn-soft);border-radius:9px;padding:9px 12px;margin:8px 0;font-size:13.5px}
 .alert.info{border-color:var(--accent);background:var(--accent-soft)}
+.alert>b:first-child{display:block;margin-bottom:2px}
 .empty{color:var(--muted);font-size:14px;padding:8px 2px}
 .count{font-size:12px;color:var(--muted);margin:4px 2px}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
@@ -121,6 +122,8 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
 .route .why{font-size:12px;color:var(--muted);margin-bottom:4px}
 .route li.hl{background:#FFF3C4;border-radius:5px;padding:1px 4px}
 @media (prefers-color-scheme: dark){.route li.hl{background:#4A3D12}}
+.pillk{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:0 7px;margin-right:6px;border:1px solid var(--muted);color:var(--muted);vertical-align:2px}
+.pillk.em{border-color:var(--accent);color:var(--accent-strong);background:var(--accent-soft)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -159,6 +162,7 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
     <div class="row-btn" style="margin-top:8px">
       <button class="btn" id="btnClear" type="button">入力をクリア</button>
       <button class="btn primary" type="button" data-go="v-focus">Focusを選ぶ →</button>
+      <button class="btn" type="button" data-go="v-flow">起因菌不明フロー →</button>
     </div>
     <p class="hint">入力はこの端末のブラウザ内にのみ保存されます。患者氏名・IDは入力しないでください。</p>
   </div>
@@ -210,6 +214,11 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
 <section class="view" id="v-focus" aria-label="感染Focus">
   <div class="sticky-search"><input type="search" id="qFocus" placeholder="病名・菌名・薬剤で検索（例：髄膜炎、胆管炎、MRSA）" aria-label="Focusを検索"></div>
   <div class="chips" id="focusGroups" role="group" aria-label="臓器"></div>
+  <div id="focusUnknown"></div>
+  <div class="chips" id="focusKind" role="group" aria-label="種類">
+    <button type="button" class="chip" data-v="empiric" aria-pressed="true">経験的治療（菌不明）</button>
+    <button type="button" class="chip" data-v="all" aria-pressed="false">菌判明後も含めすべて</button>
+  </div>
   <div class="count" id="focusCount"></div>
   <div id="focusList"></div>
 </section>
@@ -427,15 +436,29 @@ function focusBody(f){
   const n=list(f.notes);if(n){parts.push(`<h4>注記</h4>`+n.html);n.f.forEach(x=>ids.add(x));}
   if(f.duration)parts.push(`<h4>治療期間</h4><p>${linkify(f.duration)}</p>`);
   parts.push(`<div data-rd="${esc(f.id)}">${rdoseBlock(ids)}</div>`);
+  if(f.__spec)parts.push(`<p class="hint">この項目は起因菌が判明した後の治療です。菌が未確定なら上の「起因菌がはっきりしないとき」から。</p>`);
   parts.push(pages(f.pages));
   f.__ids=ids;
   return parts.join("");
 }
+const SPECIFIC_RE=/起因菌判明|グラム染色|特異的治療|予防|（MSSA|（MRSA|MSSA\/|MRSA\/|S\. aureus|S\. epidermidis|Enterococcus|Streptococcus 属|Viridans|腸球菌|HACEK|Bartonella|Q熱|Candida|カンジダ|Cutibacterium|グラム陰性腸内桿菌|P\. aeruginosa|Acinetobacter|Klebsiella|Legionella|Mycoplasma|C\. pneumoniae|H\. influenzae|M\. catarrhalis|S\. pneumoniae|Stenotrophomonas|Nocardia|放線菌|トキソプラズマ|レンサ球菌|黄色ブドウ球菌|グラム陰性桿菌：|真菌性|Clostridium|Vibrio/;
+const SPEC_FORCE={ie_mssa_tricuspid:1,ie_mrsa_tricuspid:1,ie_pv_gnr:1,crbsi_gnr:1,tss_strep:0,tss_csordellii:0,vibrio_vulnificus:0};
+FOCUS.forEach(f=>{f.__spec=(f.id in SPEC_FORCE)?!!SPEC_FORCE[f.id]:(SPECIFIC_RE.test(f.name)&&!/経験的治療/.test(f.name));});
+const G2SITE={"中枢神経":[["mening","髄膜炎疑い"],["brainabs","脳膿瘍"],["encephalitis","脳炎疑い"]],"呼吸器":[["cap","市中肺炎"],["hap","院内肺炎・VAP"],["aspir","誤嚥性肺炎"]],"尿路":[["uti","尿路感染"]],"腹部・消化器":[["biliary","胆道感染"],["abd","腹腔内感染"]],"骨・関節":[["spine","骨髄炎・脊椎炎"],["joint","化膿性関節炎"]],"皮膚・軟部組織":[["cell","蜂窩織炎"],["nec","壊死性軟部組織感染"],["dfi","糖尿病足"]],"心血管・血流":[["crbsi","カテーテル関連"],["ie","心内膜炎"]],"全身・その他":[["unknown","感染巣不明"]]};
+st.focusKind=st.focusKind||"empiric";
+$("#focusKind").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;st.focusKind=b.dataset.v;save();renderFocus();});
+$("#focusUnknown").addEventListener("click",e=>{const b=e.target.closest("button[data-site]");if(!b)return;
+  st.flow=st.flow||{sev:null,host:"normal",site:null,mods:{}};st.flow.site=b.dataset.site;save();show("v-flow");
+  setTimeout(()=>{const t=st.flow.sev?$("#fResult"):$("#fSev").closest(".card");window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-130});},30);});
 function renderFocus(){
+  $$("#focusKind .chip").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===st.focusKind)));
+  const sites=st.group==="all"?Object.values(G2SITE).flat():(G2SITE[st.group]||[]);
+  $("#focusUnknown").innerHTML=`<div class="alert info" style="margin:4px 0 8px"><b>起因菌がはっきりしないとき</b>重症度・宿主・耐性菌リスクを入れて、経験的治療と腎機能別の用量まで出します：<div class="chips" style="margin:6px 0 0">${sites.map(([v,l])=>`<button type="button" class="chip" data-site="${v}">${esc(l)} →</button>`).join("")}</div></div>`;
   const q=$("#qFocus").value.trim();
-  const arr=FOCUS.filter(f=>(st.group==="all"||f.group===st.group)&&matchQ(f,q));
-  $("#focusCount").textContent=arr.length+"件";
-  $("#focusList").innerHTML=arr.length?arr.map(f=>`<details class="item" data-id="${esc(f.id)}"${st.focusOpen===f.id?" open":""}><summary><span class="t">${esc(f.name)}</span><span class="s">${esc(f.group)}${f.context?"｜"+esc(f.context):""}</span></summary><div class="body">${st.focusOpen===f.id?focusBody(f):""}</div></details>`).join(""):`<p class="empty">該当なし</p>`;
+  let arr=FOCUS.filter(f=>(st.group==="all"||f.group===st.group)&&matchQ(f,q)&&(st.focusKind==="all"||q||!f.__spec));
+  arr=arr.filter(f=>!f.__spec).concat(arr.filter(f=>f.__spec));
+  $("#focusCount").textContent=arr.length+"件"+(st.focusKind==="empiric"&&!q?"（菌判明後の項目は「すべて」で表示）":"");
+  $("#focusList").innerHTML=arr.length?arr.map(f=>`<details class="item" data-id="${esc(f.id)}"${st.focusOpen===f.id?" open":""}><summary><span class="t">${f.__spec?'<span class="pillk">菌判明後</span>':'<span class="pillk em">経験的</span>'}${esc(f.name)}</span><span class="s">${esc(f.group)}${f.context?"｜"+esc(f.context):""}</span></summary><div class="body">${st.focusOpen===f.id?focusBody(f):""}</div></details>`).join(""):`<p class="empty">該当なし</p>`;
 }
 $("#focusList").addEventListener("toggle",e=>{
   const d=e.target;if(!d.matches||!d.matches("details.item"))return;
@@ -646,6 +669,7 @@ function renderFlow(){
   const box=$("#fResult");
   if(!F.sev&&!F.site&&(F.host||"normal")==="normal"){box.innerHTML=`<div class="card"><p class="empty" style="margin:0">1〜4を選ぶと、サンフォードの該当項目（経験的治療）を表示します。</p></div>`;return;}
   const ids=new Set();let h="";
+  if(!F.sev)h+=`<div class="alert">全身状態（1）が未選択のため「安定」として表示しています。敗血症・ショックなら1を選んでください（項目と最初にやることが変わります）。</div>`;
   // 最初の1時間
   if(F.sev==="shock"||F.sev==="sepsis"){
     const ss=FX.septic_shock||{};const b=(ss.notes||[]).filter(x=>x.includes("治療バンドル")||x.includes("ヒドロコルチゾン"));
@@ -653,7 +677,7 @@ function renderFlow(){
   }
   const R=routes();
   h+=`<div class="card"><h2>推奨される経験的治療</h2>`;
-  if(!R.length)h+=`<p class="empty">感染巣（3）を選ぶと表示します。</p>`;
+  if(!R.length)h+=`<p class="empty">${F.site==="unknown"||!F.site?"全身状態（1）と感染巣（3）を選ぶと表示します。":"全身状態（1）を選ぶと表示します。"}</p>`;
   R.forEach(r=>{const f=FX[r.id];
     h+=`<div class="route"><h3>${esc(f.name)}</h3><div class="why">根拠の分岐：${esc(r.why)}${f.context?"｜"+esc(f.context):""}</div>`+
       ((f.organisms||[]).length?`<div class="orgs" style="margin:4px 0">${f.organisms.map(o=>`<span>${esc(o)}</span>`).join("")}</div>`:"")+
