@@ -14,7 +14,7 @@ ward-apps/
 │  ├─ icon-192.png / icon-512.png / apple-touch-icon.png
 ├─ dementia/             … 認知症外来ナビ
 ├─ enc/                  … 自己免疫性脳炎・脳症 鑑別ナビ（Graus 2016・APE2/RITE2・irAE・提出抗体）
-├─ atn/                  … 抗血栓薬ナビ（DAPTの適応・期間、AF脳梗塞のDOAC開始日、周術期の休薬・再開、出血時の中和、根拠一覧）
+├─ atn/                  … 抗血栓薬ナビ（rt-PA禁忌チェック、DAPTの適応・期間、AF脳梗塞のDOAC開始日、周術期の休薬・再開、出血時の中和、根拠一覧）
 ├─ htn/                  … 高血圧治療ナビ
 ├─ kampo/                … 漢方ナビ
 ├─ inf/                  … 感染症治療ナビ（サンフォード2026準拠）

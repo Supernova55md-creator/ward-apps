@@ -37,8 +37,8 @@ header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + 
 header.top .brand{max-width:760px;margin:0 auto}
 header.top h1{font-size:19px;margin:0;line-height:1.3}
 header.top small{font-size:12px;opacity:.9}
-nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-nav.tabs button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:12.5px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
 nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
 @media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.18)}}
 main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
@@ -118,6 +118,24 @@ table.tl td.day{font-family:var(--num);white-space:nowrap}
 .ev dt{color:var(--muted);font-size:12px;padding-top:1px}
 .ev dd{margin:0}
 .ev .take{margin-top:6px;font-size:14px;font-weight:700}
+.ck{display:flex;flex-direction:column;gap:0}
+.ck .it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.ck .it:last-child{border-bottom:0}
+.ck .it .tx{font-size:14px;line-height:1.45}
+.ck .it .tx small{display:block;color:var(--muted);font-size:12px}
+.ck .it.auto .tx::after{content:"自動判定";font-size:10.5px;font-weight:700;color:var(--info);background:var(--info-soft);border-radius:4px;padding:0 5px;margin-left:6px}
+.yn{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex:none}
+.yn button{font:inherit;font-size:13px;border:0;background:var(--bg);color:var(--muted);padding:6px 12px;min-height:34px;cursor:pointer}
+.yn button[aria-pressed="true"].n{background:var(--ok);color:#fff;font-weight:700}
+.yn button[aria-pressed="true"].y{background:var(--crit);color:#fff;font-weight:700}
+.ck.care .yn button[aria-pressed="true"].y{background:var(--warn)}
+.ck .it.hit{background:var(--crit-soft);margin:0 -8px;padding:8px}
+.ck.care .it.hit{background:var(--warn-soft)}
+.ck .it.un .tx{color:var(--ink)}
+.sec-h{font-size:12.5px;font-weight:800;color:var(--muted);margin:12px 0 2px;letter-spacing:.04em}
+.sec-h:first-child{margin-top:0}
+.bulk{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.bulk button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:8px;padding:5px 10px;cursor:pointer}
 .evcat{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
 .cat-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 0;position:sticky;top:var(--hh,108px);z-index:3;background:var(--bg);padding:6px 0}
 .cat-h .tag{font-size:15px;padding:4px 10px;border-radius:8px}
@@ -141,8 +159,9 @@ a{color:var(--info)}
 </head>
 <body>
 <header class="top">
-  <div class="brand"><h1>抗血栓薬ナビ</h1><small>脳卒中二次予防</small></div>
+  <div class="brand"><h1>抗血栓薬ナビ</h1><small>脳卒中の急性期治療と二次予防</small></div>
   <nav class="tabs" role="tablist" aria-label="場面">
+    <button type="button" role="tab" data-v="tpa" aria-selected="false">rt-PA<br>禁忌</button>
     <button type="button" role="tab" data-v="dapt" aria-selected="true">DAPT</button>
     <button type="button" role="tab" data-v="doac" aria-selected="false">DOAC<br>開始</button>
     <button type="button" role="tab" data-v="peri" aria-selected="false">周術期</button>
@@ -152,6 +171,42 @@ a{color:var(--info)}
 </header>
 
 <main>
+<!-- ===================== rt-PA ===================== -->
+<div id="v-tpa" class="view hidden">
+  <section class="card">
+    <h2>アルテプラーゼ静注：適応外（禁忌）・慎重投与チェック</h2>
+    <p class="hint" style="margin:-4px 0 10px">静注血栓溶解（rt-PA）療法 適正治療指針 第三版（2019）＋2023年9月追補のチェックリストに準拠。各項目に「なし／あり」を付けます。数値を入れた項目は自動で判定します。</p>
+    <div class="q"><span class="lb">発症時刻</span><div class="chips">
+      <label class="chip"><input type="radio" name="t-on" value="known" checked><span>確定</span></label>
+      <label class="chip"><input type="radio" name="t-on" value="unk"><span>不明（睡眠中など）</span></label>
+    </div></div>
+    <div class="grid">
+      <label class="f" id="t-h1-l">発症から治療開始まで（時間）<input type="number" id="t-h1" inputmode="decimal" step="0.1" placeholder="例 2.5"></label>
+      <label class="f" id="t-h2-l">発見から治療開始まで（時間）<input type="number" id="t-h2" inputmode="decimal" step="0.1" placeholder="例 1.5"></label>
+    </div>
+    <div class="q hidden" id="t-mm-q" style="margin-top:10px"><span class="lb">DWI/FLAIRミスマッチ</span><div class="chips">
+      <label class="chip"><input type="radio" name="t-mm" value="yes"><span>あり（FLAIRで明らかな高信号なし）</span></label>
+      <label class="chip"><input type="radio" name="t-mm" value="no"><span>なし</span></label>
+      <label class="chip"><input type="radio" name="t-mm" value="" checked><span>未評価</span></label>
+    </div></div>
+    <h3>数値</h3>
+    <div class="grid">
+      <label class="f">年齢<input type="number" id="t-age" inputmode="numeric" placeholder="歳"></label>
+      <label class="f">NIHSS<input type="number" id="t-nihss" inputmode="numeric" placeholder="点"></label>
+      <label class="f">収縮期血圧（降圧後）<input type="number" id="t-sbp" inputmode="numeric" placeholder="mmHg"></label>
+      <label class="f">拡張期血圧（降圧後）<input type="number" id="t-dbp" inputmode="numeric" placeholder="mmHg"></label>
+      <label class="f">血糖（補正後）<input type="number" id="t-glu" inputmode="numeric" placeholder="mg/dL"></label>
+      <label class="f">血小板<input type="number" id="t-plt" inputmode="decimal" step="0.1" placeholder="万/μL"></label>
+      <label class="f">PT-INR<input type="number" id="t-inr" inputmode="decimal" step="0.01" placeholder="例 1.1"></label>
+      <label class="f">DOAC最終服用から<input type="number" id="t-doac" inputmode="decimal" step="0.5" placeholder="時間（服用なしは空欄）"></label>
+      <label class="f">体重<input type="number" id="t-wt" inputmode="decimal" placeholder="kg"></label>
+    </div>
+  </section>
+  <div id="t-sum" aria-live="polite"></div>
+  <div id="t-list"></div>
+  <div id="t-after"></div>
+</div>
+
 <!-- ===================== DAPT ===================== -->
 <div id="v-dapt" class="view">
   <section class="card">
@@ -351,6 +406,9 @@ const R={
  JCS2020:{s:"JCS 2020",t:"2020年改訂版 不整脈薬物治療ガイドライン（JCS/JHRS）",u:"https://www.j-circ.or.jp/cms/wp-content/uploads/2020/01/JCS2020_Ono.pdf"},
  ACCP2022:{s:"ACCP 2022",t:"Douketis JD, et al. Perioperative Management of Antithrombotic Therapy. CHEST 2022;162:e207-e243",u:PM(35964704)},
  PAUSE:{s:"PAUSE",t:"Douketis JD, et al. JAMA Intern Med 2019;179:1469-1478",u:PM(31380891)},
+ TPA3:{s:"rt-PA指針 第三版",t:"日本脳卒中学会 脳卒中医療向上・社会保険委員会. 静注血栓溶解（rt-PA）療法 適正治療指針 第三版（2019年3月）. 脳卒中 2019;41:205-246",u:"https://cir.nii.ac.jp/crid/1390564238094194432"},
+ TPA23:{s:"rt-PA指針 2023追補",t:"静注血栓溶解（rt-PA）療法 適正治療指針 第三版 2023年9月追補（抗アミロイド抗体薬・ARIA）",u:"https://dementia-japan.org/wp-content/uploads/2024/05/rt_pa.pdf"},
+ L_alteplase:{s:"グルトパ添付文書",t:"グルトパ注600万/1200万/2400万 添付文書（用法・用量、併用禁忌）",u:"https://www.pmda.go.jp/PmdaSearch/bookSearch/01/04987128911660"},
  KYUYAKU:{s:"休薬早見",t:"抗血栓薬 休薬早見（2026年11月5日、原本照合済み）",u:"https://claude.ai/artifact/HFTbq8sfLyrvEn6SSeEeHy"}
 };
 const STL={ok:"原本で確認",sec:"二次資料のみ",na:"未確認"};
@@ -369,7 +427,7 @@ const num=id=>{const v=parseFloat($(id).value);return isNaN(v)?null:v};
 const KEY="atn-nav-v1";
 function save(){
   try{
-    const o={tab:curTab,pdrug:pDrug,bdrug:bDrug,f:{}};
+    const o={tab:curTab,pdrug:pDrug,bdrug:bDrug,rt:RT,f:{}};
     document.querySelectorAll("main input,main select").forEach(el=>{
       if(!el.id&&!el.name)return;
       if(el.type==="radio"){if(el.checked)o.f["r:"+el.name]=el.value}
@@ -388,7 +446,7 @@ function load(){
       else if(t==="c"){const e=$(n);if(e)e.checked=!!v}
       else{const e=$(n);if(e)e.value=v}
     }
-    if(o.pdrug)pDrug=o.pdrug; if(o.bdrug)bDrug=o.bdrug; if(o.tab)curTab=o.tab;
+    if(o.rt)RT=o.rt; if(o.pdrug)pDrug=o.pdrug; if(o.bdrug)bDrug=o.bdrug; if(o.tab)curTab=o.tab;
   }catch(e){}
 }
 
@@ -400,6 +458,127 @@ function setTab(v){
   document.querySelectorAll(".view").forEach(x=>x.classList.toggle("hidden",x.id!=="v-"+v));
 }
 document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;setTab(b.dataset.v);save();window.scrollTo({top:0})});
+
+/* ============ rt-PA 禁忌チェック ============ */
+const TS=[
+ {k:"ng",h:"既往歴",it:[
+  ["h_ich","非外傷性頭蓋内出血"],
+  ["h_inf","1か月以内の脳梗塞","症状が短時間に消失した例（TIA）は含まない"],
+  ["h_tr","3か月以内の重篤な頭部・脊髄の外傷あるいは手術"],
+  ["h_gi","21日以内の消化管あるいは尿路出血"],
+  ["h_op","14日以内の大手術あるいは頭部以外の重篤な外傷"],
+  ["h_al","治療薬の過敏症"]]},
+ {k:"ng",h:"臨床所見",it:[
+  ["c_sah","くも膜下出血（疑い）"],
+  ["c_dis","急性大動脈解離の合併"],
+  ["c_bl","出血の合併","頭蓋内、消化管、尿路、後腹膜、喀血"],
+  ["c_sbp","収縮期血圧 185 mmHg以上（降圧療法後も）",null,"auto"],
+  ["c_dbp","拡張期血圧 110 mmHg以上（降圧療法後も）",null,"auto"],
+  ["c_liv","重篤な肝障害"],
+  ["c_pan","急性膵炎"],
+  ["c_ie","感染性心内膜炎（診断が確定した患者）"]]},
+ {k:"ng",h:"血液所見",it:[
+  ["b_glu","血糖異常（補正後も50 mg/dL未満、または400 mg/dL超）",null,"auto"],
+  ["b_plt","血小板 10万/μL以下（肝硬変・血液疾患の病歴がある患者）","病歴がなければ結果を待たずに開始してよいが、10万以下と分かったら速やかに中止",
+   "auto"],
+  ["b_inr","PT-INR 1.7超（抗凝固療法中・凝固異常症）",null,"auto"],
+  ["b_apt","aPTTの延長（前値の1.5倍超、目安として約40秒超）"],
+  ["b_doac","DOACの最終服用から4時間以内","ダビガトランをイダルシズマブで中和してから行う場合は適応外項目にならない","auto"]]},
+ {k:"ng",h:"CT・MR所見",it:[
+  ["i_eic","広汎な早期虚血性変化"],
+  ["i_mass","圧排所見（正中構造偏位）"],
+  ["i_aria","抗アミロイド抗体薬（レカネマブなど）投与中で、MRIでARIAあり"]]},
+ {k:"care",h:"年齢・その他",it:[
+  ["k_age","81歳以上",null,"auto"],
+  ["k_ab","抗アミロイド抗体薬（レカネマブなど）投与中で、MRIでARIAなし","T2*強調画像・SWI・FLAIRでARIAがないことを確認。十分な説明と同意のもとで"]]},
+ {k:"care",h:"既往歴",it:[
+  ["k_bx","10日以内の生検・外傷"],
+  ["k_bir","10日以内の分娩・流早産"],
+  ["k_old","1か月以上経過した脳梗塞（特に糖尿病合併例）"],
+  ["k_pro","蛋白製剤アレルギー"]]},
+ {k:"care",h:"神経症候",it:[
+  ["k_ni","NIHSS 26以上",null,"auto"],
+  ["k_mild","軽症","非障害性の軽症はDAPTを優先（DAPTタブ）"],
+  ["k_imp","症候の急速な軽症化"],
+  ["k_sz","痙攣","既往歴などからてんかんの可能性が高ければ適応外"]]},
+ {k:"care",h:"臨床所見",it:[
+  ["k_an","脳動脈瘤・頭蓋内腫瘍・脳動静脈奇形・もやもや病"],
+  ["k_aaa","胸部大動脈瘤"],
+  ["k_gi","消化管潰瘍・憩室炎・大腸炎"],
+  ["k_tb","活動性結核"],
+  ["k_ret","糖尿病性出血性網膜症・出血性眼症"],
+  ["k_at","血栓溶解薬・抗血栓薬投与中（特に経口抗凝固薬）"],
+  ["k_men","月経期間中"],
+  ["k_ren","重篤な腎障害"],
+  ["k_dm","コントロール不良の糖尿病"]]}
+];
+let RT={};
+function autoRT(){
+  const a={},n=id=>num(id);
+  const sbp=n("t-sbp"),dbp=n("t-dbp"),glu=n("t-glu"),plt=n("t-plt"),inr=n("t-inr"),doac=n("t-doac"),age=n("t-age"),ni=n("t-nihss");
+  if(sbp!==null)a.c_sbp=sbp>=185?1:0;
+  if(dbp!==null)a.c_dbp=dbp>=110?1:0;
+  if(glu!==null)a.b_glu=(glu<50||glu>400)?1:0;
+  if(plt!==null)a.b_plt=plt<=10?1:0;
+  if(inr!==null)a.b_inr=inr>1.7?1:0;
+  if(doac!==null)a.b_doac=doac<4?1:0;
+  if(age!==null)a.k_age=age>=81?1:0;
+  if(ni!==null)a.k_ni=ni>=26?1:0;
+  return a;
+}
+function timeRT(){
+  const on=val("t-on"),h1=num("t-h1"),h2=num("t-h2"),mm=val("t-mm");
+  $("t-mm-q").classList.toggle("hidden",on!=="unk");
+  $("t-h1-l").firstChild.textContent = on==="unk"?"最終健常確認から治療開始まで（時間）":"発症から治療開始まで（時間）";
+  $("t-h2-l").classList.toggle("hidden",on!=="unk");
+  if(h1===null) return {st:"un",tx:"発症（最終健常確認）からの時間が未入力"};
+  if(h1<=4.5) return {st:"ok",tx:`${on==="unk"?"最終健常確認":"発症"}から ${h1} 時間（4.5時間以内）`};
+  if(on==="known") return {st:"ng",tx:`発症から ${h1} 時間：4.5時間超`};
+  if(h2===null) return {st:"un",tx:"最終健常確認から4.5時間超。発見からの時間を入力"};
+  if(h2>4.5) return {st:"ng",tx:`発見から ${h2} 時間：4.5時間超`};
+  if(mm==="yes") return {st:"care",tx:`最終健常確認から4.5時間超・発見から4.5時間以内・DWI/FLAIRミスマッチあり（慎重投与）`};
+  return {st:"ng",tx:`最終健常確認から4.5時間超で、DWI/FLAIRミスマッチ${mm==="no"?"なし":"が未評価"}`};
+}
+function renderTpa(){
+  const au=autoRT(), tm=timeRT();
+  const ans=id=> id in au ? au[id] : (id in RT ? RT[id] : null);
+  let ng=[],care=[],un=0;
+  if(tm.st==="ng")ng.push(tm.tx); else if(tm.st==="care")care.push(tm.tx); else if(tm.st==="un")un++;
+  const blocks={ng:"",care:""};
+  for(const sec of TS){
+    let h=`<div class="sec-h">${sec.h}</div>`;
+    for(const [id,t,sub,auto] of sec.it){
+      const v=ans(id); const isAuto=id in au;
+      if(v===1)(sec.k==="ng"?ng:care).push(t); if(v===null)un++;
+      h+=`<div class="it ${v===1?"hit":""} ${isAuto?"auto":""}"><div class="tx">${esc(t)}${sub?`<small>${esc(sub)}</small>`:""}</div>
+        <div class="yn">${isAuto?`<button type="button" class="${v?"y":"n"}" aria-pressed="true" disabled>${v?"あり":"なし"}</button>`:
+        `<button type="button" class="n" data-rt="${id}" data-a="0" aria-pressed="${v===0}">なし</button><button type="button" class="y" data-rt="${id}" data-a="1" aria-pressed="${v===1}">あり</button>`}</div></div>`;
+    }
+    blocks[sec.k]+=h;
+  }
+  $("t-list").innerHTML=`<section class="card"><h2 style="color:var(--crit)">適応外（禁忌）：1つでも「あり」なら投与しない</h2><div class="ck">${blocks.ng}</div></section>
+   <section class="card"><h2 style="color:var(--warn)">慎重投与：「あり」なら適応を慎重に検討</h2><div class="ck care">${blocks.care}</div></section>`;
+  let v;
+  const li=a=>`<ul class="list" style="margin-top:4px">${a.map(x=>`<li class="item ${ng.includes(x)?"avoid":"caution"}"><div class="t">${esc(x)}</div></li>`).join("")}</ul>`;
+  if(ng.length) v=verdict("crit",`適応外 ${ng.length}項目`,"アルテプラーゼは投与しない",li(ng)+(care.length?`<p class="hint">慎重投与にも ${care.length} 項目該当</p>`:"")+`<p class="hint">主幹動脈閉塞があれば血栓回収療法の適応を別に検討する。</p>`);
+  else if(un) v=verdict("info",`未確認 ${un}項目`,"未確認の項目があります",care.length?`<p class="hint">ここまでで慎重投与 ${care.length} 項目</p>`+li(care):"");
+  else if(care.length) v=verdict("warn",`慎重投与 ${care.length}項目`,"適応外項目はなし。慎重投与の項目を踏まえて判断",li(care));
+  else v=verdict("ok","チェック完了","適応外・慎重投与の項目はありません","");
+  const w=num("t-wt"); let dose="";
+  if(w&&!ng.length){const tot=Math.min(Math.round(w*0.6*10)/10,60), iu=Math.min(Math.round(w*34.8),3480);
+    dose=`<section class="card"><h2>投与量（アルテプラーゼ 0.6 mg/kg、上限 60 mg）</h2><div class="dose">
+      <div class="bx"><div class="k">総量</div><div class="v">${tot} mg<small>${iu.toLocaleString()} 万国際単位${w*0.6>60?"（上限）":""}</small></div></div>
+      <div class="bx"><div class="k">急速投与（10%、1〜2分）</div><div class="v">${(Math.round(tot)/10).toFixed(1)} mg</div></div>
+      <div class="bx"><div class="k">持続（残り90%、1時間）</div><div class="v">${(Math.round(tot*9)/10).toFixed(1)} mg</div></div></div>${src(["L_alteplase"],"ok")}</section>`;}
+  $("t-sum").innerHTML=`<section class="card" style="padding:10px 14px"><div class="calc">時間：<b style="color:var(--${tm.st==="ng"?"crit":tm.st==="care"?"warn":tm.st==="ok"?"ok":"muted"})">${esc(tm.tx)}</b></div></section>`+v+dose;
+  $("t-after").innerHTML=`<section class="card"><h2>あわせて確認すること</h2><ul class="list">
+    ${item("do","非障害性の軽症ならDAPTを優先","ARAMIS：NIHSS 5以下の非障害性軽症でDAPTはアルテプラーゼに非劣性。国内GL改訂2025も「アルテプラーゼの代わりに抗血小板薬投与を考慮しうる」。",["ARAMIS","AHA26","JSS25"],"sec")}
+    ${item("note","ダビガトラン内服中","イダルシズマブ5 gで中和した後なら、最終服用4時間以内でも適応外項目にならない（出血・中和タブ）。",["TPA3","L_prizbind"],"sec")}
+    ${item("avoid","併用禁忌：デフィブロチド（デファイテリオ）","アルテプラーゼの添付文書で併用禁忌。",["L_alteplase"],"ok")}
+    ${item("caution","抗アミロイド抗体薬の投与歴を確認","治療が大きく遅れない範囲で確認し、投与中ならMRI（T2*・SWI・FLAIR）でARIAの有無を見る（2023年追補）。",["TPA23"],"sec")}
+    ${item("note","投与後","24時間は抗血栓薬を始めない（24時間後の画像で出血がないことを確認）。血圧は180/105 mmHg未満に保つ。",["TPA3"],"sec")}
+  </ul></section>`;
+}
 
 /* ============ DAPT ============ */
 function abcd(){return ["a-age","a-bp","a-cl","a-du","a-dm"].reduce((s,id)=>s+(+$(id).value||0),0)}
@@ -676,6 +855,7 @@ function renderBleed(){
 
 /* ============ 根拠 ============ */
 const NEWS=[
+ ["2026/6","テネクテプラーゼは国内未承認（T-FLAVOR：アルテプラーゼより再開通率が高い、JAMA Neurol）。国内の静注血栓溶解はアルテプラーゼのみ。"],
  ["2026/1","AHA/ASA 2026（急性期脳梗塞）：DAPTの対象をNIHSS 4〜5・発症72時間までに拡大。非障害性の軽症はIVTよりDAPT。"],
  ["2025/12","米国でアンデキサネット（Andexxa）販売終了。日本ではオンデキサとして販売継続。"],
  ["2025/7","CATALYST（Lancet）：AF脳梗塞でDOACを4日以内に始めると、30日の再発＋症候性出血が減少。"],
@@ -694,6 +874,7 @@ const EV=[
  {c:"af",nm:"1-2-3-4日ルール",y:2022,r:"R1234",st:"ok",ds:"国内の観察研究",pop:"AF脳梗塞",res:"TIA 1日、軽症（NIHSS 0〜7）2日、中等症（8〜15）3日、重症（16以上）4日での開始が安全に行えた。2026年に血栓回収後の報告も。",tk:"日本の実臨床の目安"},
  {c:"af",nm:"TIMING",y:2022,r:"TIMING",st:"ok",ds:"登録研究ベースRCT（n=888、スウェーデン）",pop:"AF脳梗塞、4日以内 vs 5〜10日",res:"早期開始は非劣性。",tk:"最初の早期開始RCT"},
  {c:"dapt",nm:"CHANCE-2",y:2021,r:"CHANCE2",st:"ok",ds:"RCT（n=6412）",pop:"CYP2C19機能低下型保因者の軽症脳梗塞・TIA",res:"チカグレロル＋アスピリンがクロピドグレル＋アスピリンより90日の脳卒中が少ない（6.0% vs 7.6%）。",tk:"国内ではチカグレロルに脳梗塞の適応なし"},
+ {c:"gl",nm:"rt-PA適正治療指針 第三版＋2023追補",y:2023,r:"TPA3",st:"sec",ds:"国内指針",pop:"アルテプラーゼ静注療法",res:"適応外・慎重投与のチェックリスト。発症時刻不明でもDWI/FLAIRミスマッチがあれば慎重投与。2023年追補で抗アミロイド抗体薬投与中のARIAを適応外（ARIAなしは慎重投与）に追加。",tk:"rt-PA禁忌チェックの基準"},
  {c:"gl",nm:"AHA/ASA 2021 二次予防GL",y:2021,r:"AHA21",st:"sec",ds:"ガイドライン",pop:"脳梗塞・TIA",res:"症候性頭蓋内狭窄70〜99%にアスピリン＋クロピドグレル90日（クラス2a）。",tk:"頭蓋内狭窄の90日DAPT"},
  {c:"dapt",nm:"THALES",y:2020,r:"THALES",st:"ok",ds:"RCT（n=11016）",pop:"NIHSS≤5、ABCD²≥6 または同側の症候性狭窄≥50%、24時間以内",res:"チカグレロル＋アスピリン30日。脳卒中・死亡 5.5% vs 6.6%（HR 0.83）。重度出血 0.5% vs 0.1%。",tk:"国内では使えない"},
  {c:"dapt",nm:"CSPS.com",y:2019,r:"CSPS",st:"ok",ds:"RCT（n=1879、日本）",pop:"発症8〜180日の高リスク非心原性脳梗塞",res:"アスピリンかクロピドグレルにシロスタゾールを追加。虚血性脳卒中 HR 0.49、重い出血は増えず。",tk:"慢性期の併用で唯一の国内RCT"},
@@ -731,7 +912,8 @@ const TOPIC=[
  {c:"peri",t:"脳梗塞後の待機手術の時期",q:"発症後いつまで手術を待つべきか",ids:["JORG"]},
  {c:"gl",t:"急性期の抗血栓療法（米国）",q:"DAPTの対象・時間窓、AFでの抗血小板薬の上乗せ",ids:["AHA26"]},
  {c:"gl",t:"二次予防全般（米国）",q:"頭蓋内狭窄のDAPTなど",ids:["AHA21"]},
- {c:"gl",t:"国内ガイドライン",q:"DOACの早期開始、軽症例での抗血小板薬など",ids:["JSS25"]}
+ {c:"gl",t:"国内ガイドライン",q:"DOACの早期開始、軽症例での抗血小板薬など",ids:["JSS25"]},
+ {c:"gl",t:"静注血栓溶解の適応（国内）",q:"アルテプラーゼの適応外・慎重投与",ids:["TPA3"]}
 ];
 function evCard(e){return `<article class="ev">
     <div class="hd"><span class="nm">${esc(e.nm)}</span><span class="yr">${e.y}</span><span class="hint" style="margin:0;font-size:12px">${esc(e.ds)}</span></div>
@@ -754,10 +936,11 @@ function renderEv(){
 }
 
 /* ============ 共通 ============ */
-function renderAll(){renderDapt();renderDoac();renderPeri();renderBleed();renderEv()}
+function renderAll(){renderTpa();renderDapt();renderDoac();renderPeri();renderBleed();renderEv()}
 document.addEventListener("input",e=>{if(e.target.closest("main")){renderAll();save()}});
 document.addEventListener("change",e=>{if(e.target.closest("main")){renderAll();save()}});
 document.addEventListener("click",e=>{
+  const r=e.target.closest("[data-rt]");if(r){const k=r.dataset.rt,a=+r.dataset.a;if(RT[k]===a)delete RT[k];else RT[k]=a;renderTpa();save();return}
   const p=e.target.closest("[data-p]");if(p){pDrug=p.dataset.p;renderPeri();save();return}
   const b=e.target.closest("[data-b]");if(b){bDrug=b.dataset.b;renderBleed();save();return}
   const g=e.target.closest("[data-go]");if(g){setTab(g.dataset.go);save();window.scrollTo({top:0});return}
