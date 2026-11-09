@@ -518,5 +518,67 @@ renderRecords();
   }catch(e){}
 })();
 </script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[{"k": "nihss-eval-v1", "keep": ["records"]}];
+  try{document.querySelectorAll(".bar-in").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
 </body>
 </html>
