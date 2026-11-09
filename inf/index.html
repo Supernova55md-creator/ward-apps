@@ -101,13 +101,26 @@ tr.hit td,tr.hit th{background:var(--accent-soft);font-weight:700}
 .empty{color:var(--muted);font-size:14px;padding:8px 2px}
 .count{font-size:12px;color:var(--muted);margin:4px 2px}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-nav.tabs .in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs .in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
 nav.tabs button{font:inherit;font-size:11.5px;border:0;background:none;color:var(--muted);padding:9px 0 11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
 nav.tabs button b{font-size:15px;font-family:var(--font-display)}
 nav.tabs button[aria-selected="true"]{color:var(--accent-strong)}
 nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
 .sticky-search{position:sticky;top:var(--hh,120px);z-index:4;background:var(--bg);padding:2px 0 4px}
 mark{background:#FFE58F;color:inherit;border-radius:2px}
+ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
+.opt{display:flex;flex-direction:column;gap:6px}
+.opt button{font:inherit;font-size:14.5px;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:9px 11px;cursor:pointer;min-height:44px}
+.opt button small{display:block;color:var(--muted);font-size:12px}
+.opt button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.opt.grid{display:grid;grid-template-columns:1fr 1fr}
+.chkl{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);margin-bottom:6px;font-size:14px;cursor:pointer}
+.chkl input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:1px}
+.route{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;background:var(--surface)}
+.route h3{font-size:15px;margin:0 0 4px}
+.route .why{font-size:12px;color:var(--muted);margin-bottom:4px}
+.route li.hl{background:#FFF3C4;border-radius:5px;padding:1px 4px}
+@media (prefers-color-scheme: dark){.route li.hl{background:#4A3D12}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -152,12 +165,45 @@ mark{background:#FFE58F;color:inherit;border-radius:2px}
   <div class="card">
     <h2>使い方</h2>
     <ul class="hint" style="font-size:13.5px;padding-left:18px;margin:0">
+      <li><b>フロー</b>：起因菌が不明なとき、全身状態・宿主・推定感染巣・追加条件から、サンフォードの経験的治療の項目を出します。</li>
       <li><b>Focus</b>：感染巣から、想定起因菌・第一選択・代替・注記・期間。処方中の薬剤名をタップすると、この患者の腎機能での用量へ。</li>
       <li><b>起因菌</b>：菌ごとに効く薬（表4A/B の活性）と耐性菌の治療（表5・6）。原本の表2は本文がWeb版参照のため、菌別の第一選択はFocusの「起因菌判明後」項目（例：髄膜炎・肺炎・人工関節感染の菌別）を検索してください。</li>
       <li><b>抗菌薬</b>：通常量・腎機能別用量（表17A、該当行を強調）・透析・副作用・商品名。</li>
       <li><b>期間・出典</b>：治療期間（表3）、AG・持続投与、出典ページ。</li>
     </ul>
   </div>
+</section>
+
+<!-- ============ 起因菌不明フロー ============ -->
+<section class="view" id="v-flow" aria-label="起因菌不明時のフロー">
+  <div class="card">
+    <h2><span class="n">1</span>全身状態</h2>
+    <div class="opt" id="fSev">
+      <button type="button" data-v="shock">敗血症性ショック<small>輸液に反応しない低血圧・昇圧薬が必要</small></button>
+      <button type="button" data-v="sepsis">敗血症（ショックなし）<small>血圧は保たれるが生命の危険あり</small></button>
+      <button type="button" data-v="stable">全身状態は安定</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2><span class="n">2</span>宿主</h2>
+    <div class="opt" id="fHost">
+      <button type="button" data-v="normal">特記なし</button>
+      <button type="button" data-v="fnh">発熱性好中球減少：高リスク<small>好中球&lt;500/μL、重度の好中球減少が7日超、活動性の合併症あり</small></button>
+      <button type="button" data-v="fnl">発熱性好中球減少：低リスク<small>好中球減少が7日未満、合併症なし、経口治療可能</small></button>
+      <button type="button" data-v="asplenia">脾摘後・機能的無脾</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2><span class="n">3</span>推定される感染巣</h2>
+    <div class="opt grid" id="fSite"></div>
+  </div>
+  <div class="card">
+    <h2><span class="n">4</span>追加の条件</h2>
+    <div id="fMods"></div>
+    <p class="hint">年齢は患者タブの入力を使います（髄膜炎の分岐：50歳超）。</p>
+  </div>
+  <div id="fResult"></div>
+  <div class="row-btn" style="margin:4px 0 12px"><button class="btn" type="button" id="fReset">フローをやり直す</button></div>
 </section>
 
 <!-- ============ Focus ============ -->
@@ -209,6 +255,7 @@ mark{background:#FFE58F;color:inherit;border-radius:2px}
 <nav class="tabs" aria-label="画面切替">
   <div class="in" role="tablist">
     <button role="tab" data-view="v-pt" aria-selected="true"><b>患者</b>腎機能</button>
+    <button role="tab" data-view="v-flow" aria-selected="false"><b>フロー</b>菌不明時</button>
     <button role="tab" data-view="v-focus" aria-selected="false"><b>Focus</b>感染巣</button>
     <button role="tab" data-view="v-org" aria-selected="false"><b>起因菌</b>菌・耐性</button>
     <button role="tab" data-view="v-drug" aria-selected="false"><b>抗菌薬</b>用量</button>
@@ -498,6 +545,7 @@ function openFocus(id){
   window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-170});
 }
 function renderAllDrugDeps(){
+  if(typeof renderFlow==='function'&&$('#v-flow').classList.contains('active'))renderFlow();
   if($("#v-drug").classList.contains("active"))renderDrugs();
   $$("[data-rd]").forEach(el=>{const det=el.closest("details.item");if(!det)return;
     if(det.closest("#focusList")){const f=FOCUS.find(x=>x.id===det.dataset.id);if(f&&f.__ids)el.innerHTML=rdoseBlock(f.__ids);}
@@ -520,19 +568,122 @@ simpleCard("#extCard","長時間・持続静注（表10D）",DATA.ext);
 simpleCard("#prefaceCard","腎障害時の用量の前提（表17A）",{rows:DATA.preface,notes:DATA.noAdjust&&DATA.noAdjust.length?["腎機能による用量調整が不要とされる薬剤："+DATA.noAdjust.join("、")]:[],pages:DATA.prefacePages});
 $("#dataVer").textContent=DATA.version;
 
+
+/* ---------- 起因菌不明フロー ---------- */
+const FX=Object.fromEntries(FOCUS.map(f=>[f.id,f]));
+const SITES=[["unknown","不明"],["mening","髄膜炎疑い"],["brainabs","脳膿瘍"],["encephalitis","脳炎疑い"],["cap","市中肺炎"],["hap","院内肺炎・VAP"],["aspir","誤嚥性肺炎・肺膿瘍"],["uti","尿路（腎盂腎炎等）"],["biliary","胆道（胆嚢炎・胆管炎）"],["abd","腹腔内（腹膜炎・憩室炎）"],["cell","蜂窩織炎"],["nec","壊死性軟部組織感染"],["dfi","糖尿病足"],["crbsi","カテーテル関連"],["ie","心内膜炎疑い"],["spine","骨髄炎・化膿性脊椎炎"],["joint","化膿性関節炎"]];
+const MODS=[["mdr","多剤耐性グラム陰性菌（ESBL・カルバペネマーゼ）の検出率が高い／保菌歴"],["allergy","重症βラクタムアレルギー（IgE介在）"],["candida","カンジダ血症リスク（長期抗菌薬・高カロリー輸液・移植後好中球減少）"],["petechiae","点状出血・紫斑（髄膜炎菌菌血症を疑う）"],["ivdu","静注薬の不法使用"],["immuno","免疫低下・アルコール依存・衰弱性疾患（髄膜炎の分岐）"],["neurosurg","脳外科術後・シャント・脳室ドレーン（髄膜炎・脳膿瘍）"],["pv","人工弁（心内膜炎）"],["dm","糖尿病（蜂窩織炎）"],["abdsrc","腹腔内が原発巣の可能性（ショック時）"]];
+st.flow=st.flow||{sev:null,host:"normal",site:null,mods:{}};
+$("#fSite").innerHTML=SITES.map(([v,l])=>`<button type="button" data-v="${v}">${l}</button>`).join("");
+$("#fMods").innerHTML=MODS.map(([v,l])=>`<label class="chkl"><input type="checkbox" data-v="${v}"><span>${l}</span></label>`).join("");
+function bindOpt(sel,key){$(sel).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.flow[key]=st.flow[key]===b.dataset.v&&key!=="host"?null:b.dataset.v;save();renderFlow();});}
+bindOpt("#fSev","sev");bindOpt("#fHost","host");bindOpt("#fSite","site");
+$("#fSite").addEventListener("click",e=>{if(e.target.closest("button")&&st.flow.site)setTimeout(()=>{const r=$("#fResult");window.scrollTo({top:r.getBoundingClientRect().top+window.scrollY-130,behavior:"smooth"});},50);});
+$("#fMods").addEventListener("change",e=>{const c=e.target.closest("input");if(!c)return;st.flow.mods[c.dataset.v]=c.checked;save();renderFlow();});
+$("#fReset").addEventListener("click",()=>{st.flow={sev:null,host:"normal",site:null,mods:{}};save();renderFlow();window.scrollTo({top:0});});
+function routes(){
+  const F=st.flow,m=F.mods||{},R=[];const sev=F.sev,ill=sev==="shock"||sev==="sepsis";
+  const add=(id,why,hl)=>{if(FX[id]&&!R.some(r=>r.id===id))R.push({id,why,hl:hl||[]});};
+  const mdrHl=m.mdr?["検出率が高","耐性菌","MEPM","カルバペネム"]:["検出率が低"];
+  const alHl=m.allergy?["アレルギー","AZT"]:[];
+  if(F.host==="fnh")add("fn_high","宿主：発熱性好中球減少（高リスク）",(sev==="shock"?["重症敗血症/ショック","併用治療"]:[]).concat(alHl,["VCM を追加"]));
+  if(F.host==="fnl")add("fn_low","宿主：発熱性好中球減少（低リスク）",alHl);
+  if(F.host==="asplenia")add("septic_shock_asplenia","宿主：脾摘後・機能的無脾",[]);
+  const site=F.site;
+  const age=num(st.age);
+  if(site==="mening"){
+    if(m.neurosurg)add("bm_postneurosurg_shunt","髄膜炎疑い＋脳外科術後・シャント・ドレーン");
+    else if((age!=null&&age>50)||m.immuno)add("bm_empiric_50plus","髄膜炎疑い＋50歳超または免疫低下等");
+    else add("bm_empiric_18_50","髄膜炎疑い（50歳未満・免疫正常）"+(age==null?"：年齢未入力":""));
+  }
+  if(site==="encephalitis"){add("encephalitis_empiric","脳炎疑い");add("hsv_encephalitis","HSV脳炎の処方");}
+  if(site==="brainabs")add(m.neurosurg?"brain_abscess_postop":"brain_abscess_primary",m.neurosurg?"脳膿瘍（術後・外傷後）":"脳膿瘍");
+  if(site==="cap")add(ill?"cap_severe":"cap_inpt",ill?"市中肺炎（重症）":"市中肺炎（入院・非重症）");
+  if(site==="hap")add("hap_vap","院内肺炎・VAP");
+  if(site==="aspir")add("aspiration_abscess","誤嚥性肺炎・肺膿瘍");
+  if(site==="uti"){add("cuti_upper","尿路（上部尿路・重症化リスク）",mdrHl);}
+  if(site==="biliary")add("biliary","胆道感染");
+  if(site==="abd"){add(ill?"iai_severe":"iai_inpt_mild_mod",ill?"腹腔内感染（重症・ICU）":"腹腔内感染（軽症〜中等症）");add("secondary_peritonitis","二次性腹膜炎");}
+  if(site==="cell")add(m.dm?"cellulitis_diabetic":"cellulitis_limb",m.dm?"蜂窩織炎（糖尿病）":"蜂窩織炎（四肢）");
+  if(site==="nec")add("nec_fasciitis","壊死性軟部組織感染");
+  if(site==="dfi")add(ill?"dfi_severe":"dfi_moderate",ill?"糖尿病足（重度）":"糖尿病足（中等度）");
+  if(site==="crbsi")add("crbsi_empiric","カテーテル関連血流感染",(m.candida?["カンジダ"]:[]).concat(sev==="shock"?["生命の危険あり"]:["生命の危険なし"]));
+  if(site==="ie")add(m.pv?"ie_pv_empiric":"ie_nv_empiric",m.pv?"心内膜炎疑い（人工弁）":"心内膜炎疑い（自己弁）");
+  if(site==="spine")add("osteo_hemat_adult","血行性骨髄炎・化膿性脊椎炎");
+  if(site==="joint")add("septic_arthritis_adult","化膿性関節炎");
+  if(F.host==="normal"||!F.host){
+    if(sev==="shock")add("septic_shock",site&&site!=="unknown"?"敗血症性ショック（感染巣別の処方と併せて確認）":"敗血症性ショック・感染源不明",mdrHl.concat(m.abdsrc?["MNZ"]:[]));
+    if(sev==="sepsis"&&(!site||site==="unknown"))add("sepsis_unknown","敗血症・感染源不明",mdrHl);
+    if(sev==="stable"&&site==="unknown")add("sepsis_unknown","感染源不明（原本の『感染源不明の敗血症』項目を参照表示）",mdrHl);
+  }
+  if(m.candida&&site!=="crbsi")add("crbsi_empiric","カンジダ血症リスク（カテーテル関連の経験的治療を参照）",["カンジダ"]);
+  if(m.candida)add("candidemia_nonneutro","カンジダ血症の治療");
+  return R;
+}
+function sepsisNotes(){
+  const F=st.flow,m=F.mods||{},out=[];const n=(FX.sepsis_unknown||{}).notes||[];
+  const pick=k=>n.filter(x=>x.includes(k));
+  if(F.sev==="shock"||F.sev==="sepsis"){
+    if(F.site==="uti")out.push(...pick("ESBL 産生菌をカバー"));
+    if(F.site==="cap")out.push(...pick("市中肺炎"));
+    if(F.site==="biliary"||F.site==="abd")out.push(...pick("胆道系感染"));
+  }
+  if(m.petechiae)out.push(...pick("点状出血"));
+  if(m.ivdu)out.push(...pick("不法使用"));
+  if(m.mdr)out.push(...pick("MEPM より劣る"));
+  return [...new Set(out)];
+}
+function hlList(arr,keys,ids){
+  arr=(arr||[]).filter(Boolean);if(!arr.length)return "";
+  return `<ul>${arr.map(x=>{const h=keys.length&&keys.some(k=>x.includes(k));return `<li class="${h?"hl":""}">${linkify(x,ids)}</li>`;}).join("")}</ul>`;
+}
+function renderFlow(){
+  const F=st.flow;
+  $$("#fSev button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===F.sev)));
+  $$("#fHost button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===(F.host||"normal"))));
+  $$("#fSite button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===F.site)));
+  $$("#fMods input").forEach(c=>c.checked=!!(F.mods||{})[c.dataset.v]);
+  const box=$("#fResult");
+  if(!F.sev&&!F.site&&(F.host||"normal")==="normal"){box.innerHTML=`<div class="card"><p class="empty" style="margin:0">1〜4を選ぶと、サンフォードの該当項目（経験的治療）を表示します。</p></div>`;return;}
+  const ids=new Set();let h="";
+  // 最初の1時間
+  if(F.sev==="shock"||F.sev==="sepsis"){
+    const ss=FX.septic_shock||{};const b=(ss.notes||[]).filter(x=>x.includes("治療バンドル")||x.includes("ヒドロコルチゾン"));
+    h+=`<div class="card"><h2>最初にやること</h2>${F.sev==="shock"?`<p style="font-size:14px;margin:0 0 4px">${esc(ss.context||"")}</p>`:""}${hlList(F.sev==="shock"?b:b.slice(0,1),[],ids)}${pages(ss.pages)}</div>`;
+  }
+  const R=routes();
+  h+=`<div class="card"><h2>推奨される経験的治療</h2>`;
+  if(!R.length)h+=`<p class="empty">感染巣（3）を選ぶと表示します。</p>`;
+  R.forEach(r=>{const f=FX[r.id];
+    h+=`<div class="route"><h3>${esc(f.name)}</h3><div class="why">根拠の分岐：${esc(r.why)}${f.context?"｜"+esc(f.context):""}</div>`+
+      ((f.organisms||[]).length?`<div class="orgs" style="margin:4px 0">${f.organisms.map(o=>`<span>${esc(o)}</span>`).join("")}</div>`:"")+
+      `<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">第一選択</h4>${hlList(f.primary,r.hl,ids)}`+
+      ((f.alternative||[]).length?`<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">代替</h4>${hlList(f.alternative,r.hl,ids)}`:"")+
+      (f.duration?`<p style="font-size:13.5px;margin:6px 0 0"><b>期間：</b>${esc(f.duration)}</p>`:"")+
+      `<div class="row-btn" style="margin-top:6px"><button type="button" class="dl" data-focus="${esc(f.id)}">注記を含めてFocusで見る →</button></div>${pages(f.pages)}</div>`;});
+  const sn=sepsisNotes();
+  if(sn.length)h+=`<h4 style="font-size:12px;color:var(--muted);margin:8px 0 2px">条件に関係する注記（敗血症・感染源不明の項より）</h4>${hlList(sn,[],ids)}${pages((FX.sepsis_unknown||{}).pages)}`;
+  if((F.mods||{}).mdr)h+=`<div class="alert info">耐性菌の検出率が高い・保菌歴あり：起因菌タブの「耐性菌（表5・6）」でESBL・CRE・DTR-PAの選択肢を確認してください。</div>`;
+  h+=`<p class="hint">黄色の行は選んだ条件に該当する行です。分岐（どの項目を出すか）はアプリ側の整理で、処方内容は各項目の原本ページのとおりです。</p></div>`;
+  h+=`<div class="card"><h2>この患者の腎機能での用量</h2>${rdoseBlock(ids)}</div>`;
+  h+=`<div class="card"><h2>次の一手</h2><ul style="padding-left:18px;margin:0;font-size:14px"><li>培養・グラム染色が出たら：起因菌タブ（表4Aの活性・耐性菌）と、Focusの「起因菌判明後」「菌別」項目で狭域化を検討（アプリの整理）。</li><li>治療期間：期間タブ（表3）。</li></ul></div>`;
+  box.innerHTML=h;
+}
+
 /* ---------- タブ ---------- */
 function show(id){
   $$("section.view").forEach(s=>s.classList.toggle("active",s.id===id));
   $$("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.view===id)));
   window.scrollTo({top:0});
   if(id==="v-drug")renderDrugs();
+  if(id==="v-flow")renderFlow();
 }
 $$("nav.tabs button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
 $$("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
 
 function setHH(){document.documentElement.style.setProperty("--hh",($("header.top").getBoundingClientRect().height-1)+"px");}
 setHH();window.addEventListener("resize",setHH);
-renderPt();renderFocus();renderOrg();renderDrugs();renderDur();
+renderPt();renderFocus();renderOrg();renderDrugs();renderDur();renderFlow();
 const f0=FOCUS.find(x=>x.id===st.focusOpen);if(f0)$("#sumFocus").textContent=f0.name;
 window.__inf={calc,parseRange,inRange,renalPick,st};
 })();
