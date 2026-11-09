@@ -118,6 +118,15 @@ table.tl td.day{font-family:var(--num);white-space:nowrap}
 .ev dt{color:var(--muted);font-size:12px;padding-top:1px}
 .ev dd{margin:0}
 .ev .take{margin-top:6px;font-size:14px;font-weight:700}
+.evcat{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+.cat-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 0;position:sticky;top:var(--hh,108px);z-index:3;background:var(--bg);padding:6px 0}
+.cat-h .tag{font-size:15px;padding:4px 10px;border-radius:8px}
+.tp-go{white-space:nowrap;flex:none;font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:999px;padding:4px 10px;cursor:pointer}
+.topic{display:flex;flex-direction:column;gap:6px;border-left:3px solid var(--line);padding-left:10px}
+.evcat.dapt .topic{border-left-color:var(--ap)}.evcat.af .topic{border-left-color:var(--ac)}.evcat.bleed .topic{border-left-color:var(--crit)}.evcat.peri .topic{border-left-color:var(--accent)}.evcat.gl .topic{border-left-color:var(--ok)}
+.tp-h{display:flex;flex-direction:column;line-height:1.4}
+.tp-h b{font-size:14.5px}
+.tp-h span{font-size:12.5px;color:var(--muted)}
 .news{display:flex;flex-direction:column;gap:6px;font-size:14px}
 .news div{border-left:3px solid var(--accent);padding-left:8px}
 .news b{font-family:var(--num);font-size:12px;color:var(--accent);margin-right:6px}
@@ -677,37 +686,71 @@ const EV=[
  {c:"gl",nm:"AHA/ASA 2026 急性期脳梗塞GL",y:2026,r:"AHA26",st:"sec",ds:"ガイドライン",pop:"急性期脳梗塞",res:"軽症非心原性（NIHSS≤3）・高リスクTIAに24時間以内のDAPT 21日（クラス1、LOE A）。NIHSS 4〜5・72時間以内に拡大（クラス2a）。AFでOACに抗血小板薬を足すのは有害（3: Harm）。",tk:"DAPTの対象と時間窓が広がった"},
  {c:"af",nm:"CATALYST",y:2025,r:"CATALYST",st:"ok",ds:"4試験の個別データ統合（n=5441）",pop:"AF脳梗塞、DOAC 4日以内 vs 5日以降",res:"30日の再発脳梗塞＋症候性出血＋分類不能脳卒中 2.1% vs 3.0%（OR 0.70）。虚血性脳卒中 1.7% vs 2.6%（OR 0.66）。症候性頭蓋内出血 0.4% vs 0.4%。",tk:"4日以内の開始が標準。重症例・出血性変化例は少数"},
  {c:"gl",nm:"脳卒中治療GL2021〔改訂2025〕",y:2025,r:"JSS25",st:"sec",ds:"国内ガイドライン（52項目改訂）",pop:"—",res:"AF脳梗塞のDOAC早期開始、軽症脳梗塞でアルテプラーゼの代わりに抗血小板薬投与を考慮しうる、シロスタゾールの位置づけ、などを改訂。",tk:"推奨文・推奨度は原本で確認"},
- {c:"af",nm:"OPTIMAS",y:2024,r:"OPTIMAS",st:"sec",ds:"RCT（n=3621、英国100施設）",pop:"AF脳梗塞、4日以内 vs 7〜14日",res:"90日の複合エンドポイント 3.3% vs 3.3%（非劣性）。中等症〜重症、再開通療法後でも効果の差なし。",tk:"重めの例でも早期開始は劣らない"},
- {c:"bleed",nm:"ANNEXA-I",y:2024,r:"ANNEXAI",st:"sec",ds:"RCT（n=530）",pop:"Xa阻害薬内服中の脳出血、アンデキサネット vs 通常治療（主にPCC）",res:"止血効果 67.0% vs 53.1%。血栓性イベント 10.3% vs 5.6%、虚血性脳卒中 6.5% vs 1.5%。",tk:"止血は良いが血栓が増える"},
- {c:"dapt",nm:"INSPIRES",y:2023,r:"INSPIRES",st:"sec",ds:"RCT（n=6100、中国）",pop:"NIHSS≤5 またはABCD²≥4、推定アテローム性、72時間以内",res:"クロピドグレル90日＋アスピリン21日。90日の新規脳卒中 7.3% vs 9.2%（HR 0.79）。中等度〜重度出血 0.9% vs 0.4%。24〜72時間の開始でも効果は同様（時間別解析）。",tk:"72時間まで、NIHSS 5まで"},
- {c:"af",nm:"ELAN",y:2023,r:"ELAN",st:"sec",ds:"RCT（n=2032）",pop:"AF脳梗塞、梗塞の大きさで早期・後期を割付",res:"早期＝軽度・中等度48時間以内、重度6〜7日目。30日の複合 2.9% vs 4.1%（差 −1.18%、95%CI −2.84〜0.47）。",tk:"大きさ別の早期開始日の基準"},
- {c:"dapt",nm:"ARAMIS",y:2023,r:"ARAMIS",st:"sec",ds:"RCT（n=760、中国）",pop:"発症4.5時間以内、NIHSS≤5の非障害性軽症",res:"DAPTはアルテプラーゼに非劣性（90日 mRS 0〜1 93.8% vs 91.4%）。",tk:"非障害性の軽症はIVTよりDAPT"},
- {c:"af",nm:"1-2-3-4日ルール",y:2022,r:"R1234",st:"sec",ds:"国内の観察研究",pop:"AF脳梗塞",res:"TIA 1日、軽症（NIHSS 0〜7）2日、中等症（8〜15）3日、重症（16以上）4日での開始が安全に行えた。2026年に血栓回収後の報告も。",tk:"日本の実臨床の目安"},
- {c:"af",nm:"TIMING",y:2022,r:"TIMING",st:"sec",ds:"登録研究ベースRCT（n=888、スウェーデン）",pop:"AF脳梗塞、4日以内 vs 5〜10日",res:"早期開始は非劣性。",tk:"最初の早期開始RCT"},
- {c:"dapt",nm:"CHANCE-2",y:2021,r:"CHANCE2",st:"sec",ds:"RCT（n=6412）",pop:"CYP2C19機能低下型保因者の軽症脳梗塞・TIA",res:"チカグレロル＋アスピリンがクロピドグレル＋アスピリンより90日の脳卒中が少ない（6.0% vs 7.6%）。",tk:"国内ではチカグレロルに脳梗塞の適応なし"},
+ {c:"af",nm:"OPTIMAS",y:2024,r:"OPTIMAS",st:"ok",ds:"RCT（n=3621、英国100施設）",pop:"AF脳梗塞、4日以内 vs 7〜14日",res:"90日の複合エンドポイント 3.3% vs 3.3%（非劣性）。中等症〜重症、再開通療法後でも効果の差なし。",tk:"重めの例でも早期開始は劣らない"},
+ {c:"bleed",nm:"ANNEXA-I",y:2024,r:"ANNEXAI",st:"ok",ds:"RCT（n=530）",pop:"Xa阻害薬内服中の脳出血、アンデキサネット vs 通常治療（主にPCC）",res:"止血効果 67.0% vs 53.1%。血栓性イベント 10.3% vs 5.6%、虚血性脳卒中 6.5% vs 1.5%。",tk:"止血は良いが血栓が増える"},
+ {c:"dapt",nm:"INSPIRES",y:2023,r:"INSPIRES",st:"ok",ds:"RCT（n=6100、中国）",pop:"NIHSS≤5 またはABCD²≥4、推定アテローム性、72時間以内",res:"クロピドグレル90日＋アスピリン21日。90日の新規脳卒中 7.3% vs 9.2%（HR 0.79）。中等度〜重度出血 0.9% vs 0.4%。24〜72時間の開始でも効果は同様（時間別解析）。",tk:"72時間まで、NIHSS 5まで"},
+ {c:"af",nm:"ELAN",y:2023,r:"ELAN",st:"ok",ds:"RCT（n=2032）",pop:"AF脳梗塞、梗塞の大きさで早期・後期を割付",res:"早期＝軽度・中等度48時間以内、重度6〜7日目。30日の複合 2.9% vs 4.1%（差 −1.18%、95%CI −2.84〜0.47）。",tk:"大きさ別の早期開始日の基準"},
+ {c:"dapt",nm:"ARAMIS",y:2023,r:"ARAMIS",st:"ok",ds:"RCT（n=760、中国）",pop:"発症4.5時間以内、NIHSS≤5の非障害性軽症",res:"DAPTはアルテプラーゼに非劣性（90日 mRS 0〜1 93.8% vs 91.4%）。",tk:"非障害性の軽症はIVTよりDAPT"},
+ {c:"af",nm:"1-2-3-4日ルール",y:2022,r:"R1234",st:"ok",ds:"国内の観察研究",pop:"AF脳梗塞",res:"TIA 1日、軽症（NIHSS 0〜7）2日、中等症（8〜15）3日、重症（16以上）4日での開始が安全に行えた。2026年に血栓回収後の報告も。",tk:"日本の実臨床の目安"},
+ {c:"af",nm:"TIMING",y:2022,r:"TIMING",st:"ok",ds:"登録研究ベースRCT（n=888、スウェーデン）",pop:"AF脳梗塞、4日以内 vs 5〜10日",res:"早期開始は非劣性。",tk:"最初の早期開始RCT"},
+ {c:"dapt",nm:"CHANCE-2",y:2021,r:"CHANCE2",st:"ok",ds:"RCT（n=6412）",pop:"CYP2C19機能低下型保因者の軽症脳梗塞・TIA",res:"チカグレロル＋アスピリンがクロピドグレル＋アスピリンより90日の脳卒中が少ない（6.0% vs 7.6%）。",tk:"国内ではチカグレロルに脳梗塞の適応なし"},
  {c:"gl",nm:"AHA/ASA 2021 二次予防GL",y:2021,r:"AHA21",st:"sec",ds:"ガイドライン",pop:"脳梗塞・TIA",res:"症候性頭蓋内狭窄70〜99%にアスピリン＋クロピドグレル90日（クラス2a）。",tk:"頭蓋内狭窄の90日DAPT"},
- {c:"dapt",nm:"THALES",y:2020,r:"THALES",st:"sec",ds:"RCT（n=11016）",pop:"NIHSS≤5、ABCD²≥6 または同側の症候性狭窄≥50%、24時間以内",res:"チカグレロル＋アスピリン30日。脳卒中・死亡 5.5% vs 6.6%（HR 0.83）。重度出血 0.5% vs 0.1%。",tk:"国内では使えない"},
- {c:"dapt",nm:"CSPS.com",y:2019,r:"CSPS",st:"sec",ds:"RCT（n=1879、日本）",pop:"発症8〜180日の高リスク非心原性脳梗塞",res:"アスピリンかクロピドグレルにシロスタゾールを追加。虚血性脳卒中 HR 0.49、重い出血は増えず。",tk:"慢性期の併用で唯一の国内RCT"},
- {c:"dapt",nm:"CHANCE＋POINT 統合解析",y:2019,r:"POOL",st:"sec",ds:"個別データ統合",pop:"軽症脳梗塞・高リスクTIA",res:"DAPTの再発抑制の利益は最初の21日に集中。90日の大出血は0.6% vs 0.4%（有意差なし）。",tk:"DAPTは21日"},
- {c:"dapt",nm:"POINT",y:2018,r:"POINT",st:"sec",ds:"RCT（n=4881）",pop:"NIHSS≤3またはABCD²≥4、12時間以内",res:"クロピドグレル600 mg負荷＋アスピリン90日。主要虚血イベント 5.0% vs 6.5%（HR 0.75）。大出血 0.9% vs 0.4%。",tk:"90日は長すぎる"},
- {c:"bleed",nm:"RE-VERSE AD",y:2017,r:"REVERSE",st:"sec",ds:"単群前向き（n=503）",pop:"ダビガトラン内服中の重篤出血・緊急手術",res:"イダルシズマブ5 gで最大中和率の中央値100%。",tk:"ダビガトランは特異的中和薬"},
- {c:"bleed",nm:"PATCH",y:2016,r:"PATCH",st:"sec",ds:"RCT（n=190）",pop:"抗血小板薬内服中の脳出血",res:"血小板輸血で3か月の死亡・要介助が増加。",tk:"手術しないなら輸血しない"},
- {c:"peri",nm:"Jørgensen（デンマーク）",y:2014,r:"JORG",st:"sec",ds:"登録研究",pop:"脳梗塞後の待機的非心臓手術",res:"重大心血管イベント：3か月未満 OR 14.2、3〜6か月 4.9、6〜12か月 3.0。約9か月で横ばい。",tk:"待機手術は可能なら延期"},
- {c:"dapt",nm:"CHANCE",y:2013,r:"CHANCE",st:"sec",ds:"RCT（n=5170、中国）",pop:"NIHSS≤3またはABCD²≥4、24時間以内",res:"クロピドグレル300 mg負荷＋アスピリン21日→クロピドグレル。90日の脳卒中 8.2% vs 11.7%（HR 0.68）。中等度〜重度出血 各0.3%。",tk:"21日DAPTの原型"},
+ {c:"dapt",nm:"THALES",y:2020,r:"THALES",st:"ok",ds:"RCT（n=11016）",pop:"NIHSS≤5、ABCD²≥6 または同側の症候性狭窄≥50%、24時間以内",res:"チカグレロル＋アスピリン30日。脳卒中・死亡 5.5% vs 6.6%（HR 0.83）。重度出血 0.5% vs 0.1%。",tk:"国内では使えない"},
+ {c:"dapt",nm:"CSPS.com",y:2019,r:"CSPS",st:"ok",ds:"RCT（n=1879、日本）",pop:"発症8〜180日の高リスク非心原性脳梗塞",res:"アスピリンかクロピドグレルにシロスタゾールを追加。虚血性脳卒中 HR 0.49、重い出血は増えず。",tk:"慢性期の併用で唯一の国内RCT"},
+ {c:"dapt",nm:"CHANCE＋POINT 統合解析",y:2019,r:"POOL",st:"ok",ds:"個別データ統合",pop:"軽症脳梗塞・高リスクTIA",res:"DAPTの再発抑制の利益は最初の21日に集中。90日の大出血は0.6% vs 0.4%（有意差なし）。",tk:"DAPTは21日"},
+ {c:"dapt",nm:"POINT",y:2018,r:"POINT",st:"ok",ds:"RCT（n=4881）",pop:"NIHSS≤3またはABCD²≥4、12時間以内",res:"クロピドグレル600 mg負荷＋アスピリン90日。主要虚血イベント 5.0% vs 6.5%（HR 0.75）。大出血 0.9% vs 0.4%。",tk:"90日は長すぎる"},
+ {c:"bleed",nm:"RE-VERSE AD",y:2017,r:"REVERSE",st:"ok",ds:"単群前向き（n=503）",pop:"ダビガトラン内服中の重篤出血・緊急手術",res:"イダルシズマブ5 gで最大中和率の中央値100%。",tk:"ダビガトランは特異的中和薬"},
+ {c:"bleed",nm:"PATCH",y:2016,r:"PATCH",st:"ok",ds:"RCT（n=190）",pop:"抗血小板薬内服中の脳出血",res:"血小板輸血で3か月の死亡・要介助が増加。",tk:"手術しないなら輸血しない"},
+ {c:"peri",nm:"Jørgensen（デンマーク）",y:2014,r:"JORG",st:"ok",ds:"登録研究",pop:"脳梗塞後の待機的非心臓手術",res:"重大心血管イベント：3か月未満 OR 14.2、3〜6か月 4.9、6〜12か月 3.0。約9か月で横ばい。",tk:"待機手術は可能なら延期"},
+ {c:"dapt",nm:"CHANCE",y:2013,r:"CHANCE",st:"ok",ds:"RCT（n=5170、中国）",pop:"NIHSS≤3またはABCD²≥4、24時間以内",res:"クロピドグレル300 mg負荷＋アスピリン21日→クロピドグレル。90日の脳卒中 8.2% vs 11.7%（HR 0.68）。中等度〜重度出血 各0.3%。",tk:"21日DAPTの原型"},
  {c:"dapt",nm:"SPS3",y:2012,r:"SPS3",st:"sec",ds:"RCT",pop:"ラクナ梗塞の慢性期",res:"アスピリン＋クロピドグレルの長期併用は再発を減らさず、出血と死亡が増えた。",tk:"長期DAPTはしない"},
- {c:"dapt",nm:"SAMMPRIS",y:2011,r:"SAMMPRIS",st:"sec",ds:"RCT（n=451）",pop:"症候性頭蓋内狭窄70〜99%",res:"30日の脳卒中・死亡はステント14.7% vs 内科治療5.8%。内科群はDAPT 90日＋強化管理。",tk:"頭蓋内狭窄はまず内科治療"},
+ {c:"dapt",nm:"SAMMPRIS",y:2011,r:"SAMMPRIS",st:"ok",ds:"RCT（n=451）",pop:"症候性頭蓋内狭窄70〜99%",res:"30日の脳卒中・死亡はステント14.7% vs 内科治療5.8%。内科群はDAPT 90日＋強化管理。",tk:"頭蓋内狭窄はまず内科治療"},
  {c:"dapt",nm:"MATCH",y:2004,r:"MATCH",st:"sec",ds:"RCT",pop:"高リスクの脳梗塞・TIA",res:"クロピドグレルへのアスピリン追加（長期）は再発を有意に減らさず、重い出血が増えた。",tk:"長期DAPTはしない"}
 ];
+const CAT=[
+ {c:"dapt",t:"DAPT（非心原性の脳梗塞・TIA）",tab:"dapt"},
+ {c:"af",t:"心房細動を伴う脳梗塞：DOACの開始時期",tab:"doac"},
+ {c:"bleed",t:"出血時の中和",tab:"bleed"},
+ {c:"peri",t:"周術期",tab:"peri"},
+ {c:"gl",t:"ガイドライン",tab:null}
+];
+const TOPIC=[
+ {c:"dapt",t:"DAPTの適応と期間（発症24時間以内）",q:"軽症脳梗塞・高リスクTIAにDAPTは効くか、何日続けるか",ids:["CHANCE","POINT","POOL"]},
+ {c:"dapt",t:"対象の拡大（発症72時間まで・NIHSS 4〜5）",q:"24時間を過ぎた例、NIHSS 4〜5でもDAPTは効くか",ids:["INSPIRES"]},
+ {c:"dapt",t:"2剤目の選び方（チカグレロル・CYP2C19）",q:"クロピドグレル以外の組み合わせは。国内では使えない",ids:["THALES","CHANCE2"]},
+ {c:"dapt",t:"静注血栓溶解の代わりにDAPT",q:"非障害性の軽症に血栓溶解は必要か",ids:["ARAMIS"]},
+ {c:"dapt",t:"症候性頭蓋内狭窄",q:"70〜99%の狭窄は内科治療（DAPT 90日）かステントか",ids:["SAMMPRIS"]},
+ {c:"dapt",t:"慢性期の併用（シロスタゾール）",q:"高リスク例で慢性期に2剤目を加えてよいか",ids:["CSPS"]},
+ {c:"dapt",t:"長期DAPTの害",q:"アスピリン＋クロピドグレルを長く続けるとどうなるか",ids:["MATCH","SPS3"]},
+ {c:"af",t:"ランダム化試験",q:"早期（4日以内・48時間以内）の開始は安全か",ids:["TIMING","ELAN","OPTIMAS"]},
+ {c:"af",t:"統合解析",q:"早期開始は遅い開始より良いか",ids:["CATALYST"]},
+ {c:"af",t:"国内の目安",q:"重症度別に何日目から始めるか",ids:["R1234"]},
+ {c:"bleed",t:"Xa阻害薬の中和",q:"アンデキサネットは脳出血の転帰を良くするか",ids:["ANNEXAI"]},
+ {c:"bleed",t:"ダビガトランの中和",q:"イダルシズマブで作用は消えるか",ids:["REVERSE"]},
+ {c:"bleed",t:"抗血小板薬内服中の脳出血",q:"血小板輸血は役に立つか",ids:["PATCH"]},
+ {c:"peri",t:"脳梗塞後の待機手術の時期",q:"発症後いつまで手術を待つべきか",ids:["JORG"]},
+ {c:"gl",t:"急性期の抗血栓療法（米国）",q:"DAPTの対象・時間窓、AFでの抗血小板薬の上乗せ",ids:["AHA26"]},
+ {c:"gl",t:"二次予防全般（米国）",q:"頭蓋内狭窄のDAPTなど",ids:["AHA21"]},
+ {c:"gl",t:"国内ガイドライン",q:"DOACの早期開始、軽症例での抗血小板薬など",ids:["JSS25"]}
+];
+function evCard(e){return `<article class="ev">
+    <div class="hd"><span class="nm">${esc(e.nm)}</span><span class="yr">${e.y}</span><span class="hint" style="margin:0;font-size:12px">${esc(e.ds)}</span></div>
+    <dl><dt>対象</dt><dd>${esc(e.pop)}</dd><dt>結果</dt><dd>${esc(e.res)}</dd></dl>
+    <div class="take">→ ${esc(e.tk)}</div>${src([e.r],e.st)}
+    <div class="hint" style="font-size:11.5px">${esc(R[e.r].t)}</div>
+  </article>`}
 function renderEv(){
   $("e-news").innerHTML=NEWS.map(([d,t])=>`<div><b>${d}</b>${esc(t)}</div>`).join("");
   const f=val("e-f")||"all";
-  const tagTx={dapt:"DAPT",af:"AF・DOAC",bleed:"出血",peri:"周術期",gl:"GL"};
-  $("e-list").innerHTML=EV.filter(e=>f==="all"||e.c===f).sort((a,b)=>b.y-a.y).map(e=>`<article class="ev">
-    <div class="hd"><span class="nm">${esc(e.nm)}</span><span class="yr">${e.y}</span><span class="tag ${e.c}">${tagTx[e.c]}</span></div>
-    <dl><dt>形式</dt><dd>${esc(e.ds)}</dd><dt>対象</dt><dd>${esc(e.pop)}</dd><dt>結果</dt><dd>${esc(e.res)}</dd></dl>
-    <div class="take">→ ${esc(e.tk)}</div>${src([e.r],e.st)}
-    <div class="hint" style="font-size:11.5px">${esc(R[e.r].t)}</div>
-  </article>`).join("");
+  const byR=Object.fromEntries(EV.map(e=>[e.r,e]));
+  $("e-list").innerHTML=CAT.filter(c=>f==="all"||c.c===f).map(c=>{
+    const tops=TOPIC.filter(t=>t.c===c.c).map(t=>{
+      const cards=t.ids.map(k=>byR[k]).filter(Boolean).sort((a,b)=>b.y-a.y).map(evCard).join("");
+      return `<div class="topic"><div class="tp-h"><b>${esc(t.t)}</b><span>${esc(t.q)}</span></div>${cards}</div>`;
+    }).join("");
+    const go=c.tab?`<button type="button" class="tp-go" data-go="${c.tab}">判定へ</button>`:"";
+    return `<section class="evcat ${c.c}"><h2 class="cat-h"><span class="tag ${c.c}">${esc(c.t)}</span>${go}</h2>${tops}</section>`;
+  }).join("");
 }
 
 /* ============ 共通 ============ */
@@ -721,6 +764,7 @@ document.addEventListener("click",e=>{
 });
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),3500)}
 load(); setTab(curTab); renderAll();
+function hh(){try{document.documentElement.style.setProperty('--hh',document.querySelector('header.top').offsetHeight+'px')}catch(e){}}hh();addEventListener('resize',hh);
 </script>
 <script>
 (function(){

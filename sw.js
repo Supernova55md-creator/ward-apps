@@ -2,7 +2,7 @@
    アプリを更新・追加したら VERSION を必ず変える（例 a→b、日付更新）。
    新しいアプリを足すときは APPS に slug を追加する。
    画面（HTML）は no-cache で毎回サーバーに確認する（GitHub Pages の10分キャッシュで古い版が出るのを防ぐ）。 */
-const VERSION = "ward-2026-11-09f";
+const VERSION = "ward-2026-11-10a";
 const APPS = ["dm", "htn", "lipid", "loc", "nih", "referral", "updrs", "dementia", "mmt", "inf", "kampo", "imm", "enc", "atn"];
 const ROOT = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 const PER_APP = ["", "index.html", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
