@@ -255,6 +255,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "主治医意見書 自立度判定",
+      "short_name": "意見書自立度",
+      "url": "iken/",
+      "icons": [
+        {
+          "src": "iken/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
