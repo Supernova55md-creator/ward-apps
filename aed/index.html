@@ -150,7 +150,7 @@ a{color:var(--info)}
 </head>
 <body>
 <header class="top">
-  <div class="brand"><h1>抗てんかん薬ナビ</h1><small>重積・薬の選択・相互作用・切替・脳波</small></div>
+  <div class="brand"><h1>抗てんかん薬ナビ</h1><small>重積の推奨・薬の選択・相互作用・切替・脳波</small></div>
   <nav class="tabs" role="tablist" aria-label="場面">
     <button type="button" role="tab" data-v="se" aria-selected="true">重積</button>
     <button type="button" role="tab" data-v="sel" aria-selected="false">薬の<br>選択</button>
@@ -163,64 +163,7 @@ a{color:var(--info)}
 </header>
 
 <main>
-<!-- ===================== 重積 ===================== -->
-<div id="v-se" class="view">
-  <section class="card">
-    <div class="tm p0" id="tm">
-      <div class="ph" id="tm-ph">未開始</div>
-      <div class="clock" id="tm-clock" aria-live="off">00:00</div>
-      <div class="nx" id="tm-nx">発作が始まったら「発作開始」を押します</div>
-      <div class="btns" style="margin-top:6px">
-        <button type="button" class="btn go" id="tm-start">発作開始（今）</button>
-      </div>
-      <div class="btns" id="tm-adj">
-        <button type="button" class="btn sm" data-adj="-5">開始を5分前に</button>
-        <button type="button" class="btn sm" data-adj="-1">1分前に</button>
-        <button type="button" class="btn sm" data-adj="1">1分後に</button>
-        <button type="button" class="btn sm" id="tm-reset">リセット</button>
-      </div>
-      <label class="chk" style="justify-content:center"><input type="checkbox" id="tm-snd" data-s checked>節目で音と振動を出す（5・10・20・30・40・60分）</label>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>記録（押した時刻が残ります）</h2>
-    <div class="btns">
-      <button type="button" class="btn" data-ev="ベンゾジアゼピン投与">BZD投与</button>
-      <button type="button" class="btn" data-ev="第2段階薬 投与開始">第2段階薬</button>
-      <button type="button" class="btn" data-ev="麻酔薬 持続開始">麻酔薬開始</button>
-      <button type="button" class="btn" data-ev="発作停止（目視）">発作停止</button>
-      <button type="button" class="btn" data-ev="意識回復">意識回復</button>
-      <button type="button" class="btn" data-ev="発作再開">発作再開</button>
-    </div>
-    <ul class="log" id="tm-log" style="margin-top:10px"></ul>
-    <p class="hint">記録は端末内だけに残ります。カルテへは時刻を転記してください。</p>
-  </section>
-
-  <section class="card">
-    <h2>体重（投与量の計算に使います）</h2>
-    <div class="grid">
-      <label class="f">体重（kg）<input type="number" id="se-wt" data-s inputmode="decimal" step="0.1" placeholder="例 50"></label>
-      <label class="f">年齢<input type="number" id="se-age" data-s inputmode="numeric" placeholder="歳"></label>
-    </div>
-    <label class="chk"><input type="checkbox" id="se-frail" data-s>高齢・呼吸が不安定・前治療で SpO2 低下あり（BZD は少なめから）</label>
-    <p class="hint">「薬の選択」タブの体重・年齢と共通です。用量は成人の添付文書・ガイドラインの目安です。投与は医師の指示で行います。</p>
-  </section>
-
-  <div id="se-steps" style="display:flex;flex-direction:column;gap:10px"></div>
-
-  <section class="card">
-    <h2>非けいれん性てんかん重積（NCSE）を疑うとき</h2>
-    <ul class="list">
-      <li class="item caution"><div class="t">発作が止まったのに意識が戻らない</div><div class="d">けいれん後のもうろうが長引く、または意識が変動する場合は NCSE を疑い、脳波を至急依頼します。「脳波」タブで判定の流れを確認できます。</div></li>
-      <li class="item note"><div class="t">治療は CSE に準じる</div><div class="d">GL2018 は NCSE もけいれん性重積に準じて治療するとしていますが、全身麻酔の有用性は定まっていません。高齢者では静注抗てんかん薬を重ねて、麻酔は慎重に判断します。</div></li>
-      <li class="item note"><div class="t">講演より：外来と病棟は地続き</div><div class="d">高齢者では「ぼんやり」発作の重症版が病棟の NCSE です。原因のはっきりしない遷延する意識障害では、常に NCSE を鑑別に挙げます。</div></li>
-    </ul>
-  </section>
-</div>
-
-<!-- ===================== 薬の選択 ===================== -->
-<div id="v-sel" class="view hidden">
+<div id="prof" class="hidden" style="display:flex;flex-direction:column;gap:12px">
   <section class="card">
     <h2>患者背景</h2>
     <div class="grid">
@@ -246,17 +189,10 @@ a{color:var(--info)}
       <label class="chip"><input type="radio" name="p-fem" value="cb" data-s><span>妊娠可能年齢の女性</span></label>
       <label class="chip"><input type="radio" name="p-fem" value="pg" data-s><span>妊娠中・妊娠を計画</span></label>
     </div></div>
-    <div class="q"><span class="lb">発作型</span><div class="chips">
-      <label class="chip"><input type="radio" name="p-type" value="focal" data-s checked><span>焦点起始（部分発作）</span></label>
-      <label class="chip"><input type="radio" name="p-type" value="gtc" data-s><span>全般 強直間代</span></label>
-      <label class="chip"><input type="radio" name="p-type" value="abs" data-s><span>欠神</span></label>
-      <label class="chip"><input type="radio" name="p-type" value="myo" data-s><span>ミオクロニー</span></label>
-      <label class="chip"><input type="radio" name="p-type" value="unk" data-s><span>分類不能</span></label>
-    </div></div>
   </section>
 
   <section class="card">
-    <h2>併存症・状況</h2>
+    <h2>併存症・併用薬</h2>
     <div class="chips" id="p-cm">
       <label class="chip"><input type="checkbox" value="cond" data-s><span>徐脈・房室ブロック・PR延長</span></label>
       <label class="chip"><input type="checkbox" value="psy" data-s><span>うつ・易怒性・精神症状</span></label>
@@ -282,6 +218,79 @@ a{color:var(--info)}
       <label class="chip"><input type="checkbox" value="vpa" data-s><span>バルプロ酸を併用中</span></label>
       <label class="chip"><input type="checkbox" value="ind" data-s><span>酵素誘導薬を併用中（CBZ・PHT・PB）</span></label>
     </div>
+  </section>
+
+</div>
+<!-- ===================== 重積 ===================== -->
+<div id="v-se" class="view">
+  <section class="card">
+    <h2>重積の状況</h2>
+    <div class="q"><span class="lb">病型</span><div class="chips">
+      <label class="chip"><input type="radio" name="se-kind" value="cse" data-s checked><span>けいれん性（CSE）</span></label>
+      <label class="chip"><input type="radio" name="se-kind" value="ncse" data-s><span>非けいれん性（NCSE）疑い・意識が戻らない</span></label>
+    </div></div>
+    <div class="q"><span class="lb">今の段階</span><div class="chips">
+      <label class="chip"><input type="radio" name="se-stage" value="0" data-s checked><span>発作中・まだ治療なし</span></label>
+      <label class="chip"><input type="radio" name="se-stage" value="1" data-s><span>BZD のあとも続く</span></label>
+      <label class="chip"><input type="radio" name="se-stage" value="2" data-s><span>第2段階薬のあとも続く</span></label>
+      <label class="chip"><input type="radio" name="se-stage" value="3" data-s><span>麻酔薬でも続く・再燃</span></label>
+    </div></div>
+    <div class="q"><span class="lb">静脈路</span><div class="chips">
+      <label class="chip"><input type="radio" name="se-iv" value="yes" data-s checked><span>確保できている</span></label>
+      <label class="chip"><input type="radio" name="se-iv" value="no" data-s><span>まだ・困難</span></label>
+    </div></div>
+    <div class="q"><span class="lb">呼吸</span><div class="chips">
+      <label class="chip"><input type="radio" name="se-resp" value="ok" data-s checked><span>保たれている</span></label>
+      <label class="chip"><input type="radio" name="se-resp" value="bad" data-s><span>不安定・SpO2低下</span></label>
+      <label class="chip"><input type="radio" name="se-resp" value="intub" data-s><span>挿管・人工呼吸中</span></label>
+    </div></div>
+    <label class="chk"><input type="checkbox" id="se-bp" data-s>低血圧（収縮期90mmHg未満・昇圧薬使用）</label>
+    <div class="q" style="margin-top:6px"><span class="lb">内服中の抗てんかん薬</span><div class="chips" id="se-home">
+      <label class="chip"><input type="checkbox" value="LEV" data-s><span>LEV</span></label>
+      <label class="chip"><input type="checkbox" value="LCM" data-s><span>LCM</span></label>
+      <label class="chip"><input type="checkbox" value="BRV" data-s><span>BRV</span></label>
+      <label class="chip"><input type="checkbox" value="PHT" data-s><span>PHT</span></label>
+      <label class="chip"><input type="checkbox" value="VPA" data-s><span>VPA</span></label>
+      <label class="chip"><input type="checkbox" value="CBZ" data-s><span>CBZ</span></label>
+      <label class="chip"><input type="checkbox" value="LTG" data-s><span>LTG</span></label>
+      <label class="chip"><input type="checkbox" value="PB" data-s><span>PB</span></label>
+      <label class="chip"><input type="checkbox" value="PER" data-s><span>PER</span></label>
+    </div></div>
+    <label class="chk"><input type="checkbox" id="se-miss" data-s>怠薬・最近の減量や中止がある</label>
+    <div class="q" style="margin-top:6px"><span class="lb">考えられる原因・背景</span><div class="chips" id="se-cause">
+      <label class="chip"><input type="checkbox" value="hypo" data-s><span>低血糖</span></label>
+      <label class="chip"><input type="checkbox" value="b1" data-s><span>アルコール・低栄養</span></label>
+      <label class="chip"><input type="checkbox" value="na" data-s><span>低Na・電解質異常</span></label>
+      <label class="chip"><input type="checkbox" value="drug" data-s><span>薬剤性（セフェピムなど）</span></label>
+      <label class="chip"><input type="checkbox" value="acute" data-s><span>急性の脳卒中・脳炎・外傷</span></label>
+    </div></div>
+  </section>
+
+  <div class="profslot"></div>
+
+  <section class="card" id="se-eegcard">
+    <h2>脳波所見（NCSE の判定）</h2>
+    <p class="hint" style="margin:-4px 0 8px" id="eg-hint">『はじめての脳波トリアージ』の発作リスク判定フロー（Salzburg 基準を参考に作成）に沿って、所見を順に答えます。判定は下の推奨に反映されます。</p>
+    <div class="ck" id="eg-q"></div>
+    <div id="eg-out" style="margin-top:10px"></div>
+  </section>
+
+  <div class="sumline" id="se-sum"></div>
+  <div id="se-out" style="display:flex;flex-direction:column;gap:10px"></div>
+</div>
+
+<!-- ===================== 薬の選択 ===================== -->
+<div id="v-sel" class="view hidden">
+  <div class="profslot"></div>
+  <section class="card">
+    <h2>発作型</h2>
+    <div class="q"><div class="chips">
+      <label class="chip"><input type="radio" name="p-type" value="focal" data-s checked><span>焦点起始（部分発作）</span></label>
+      <label class="chip"><input type="radio" name="p-type" value="gtc" data-s><span>全般 強直間代</span></label>
+      <label class="chip"><input type="radio" name="p-type" value="abs" data-s><span>欠神</span></label>
+      <label class="chip"><input type="radio" name="p-type" value="myo" data-s><span>ミオクロニー</span></label>
+      <label class="chip"><input type="radio" name="p-type" value="unk" data-s><span>分類不能</span></label>
+    </div></div>
   </section>
 
   <div class="sumline" id="sel-sum"></div>
@@ -437,10 +446,8 @@ a{color:var(--info)}
   </section>
 
   <section class="card">
-    <h2>NCSE の判定（レッド・グレー・グリーン）</h2>
-    <p class="hint" style="margin:-4px 0 8px">『はじめての脳波トリアージ』の発作リスク判定フロー（Salzburg 基準を参考に作成）に沿って、所見を順に答えます。</p>
-    <div class="ck" id="eg-q"></div>
-    <div id="eg-out" style="margin-top:10px"></div>
+    <h2>NCSE の判定</h2>
+    <p class="hint" style="margin:0">レッド・グレー・グリーンの判定は「重積」タブにあります（患者の情報と合わせて治療の推奨を出します）。</p>
   </section>
 
   <section class="card">
@@ -518,7 +525,7 @@ a{color:var(--info)}
 "use strict";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const KEY="aed-nav-v1", TKEY="aed-se-v1";
+const KEY="aed-nav-v1";
 const num=id=>{const v=parseFloat(($(id)||{}).value);return isFinite(v)?v:null};
 const radio=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:""};
 const checked=sel=>[...document.querySelectorAll(sel+" input:checked")].map(e=>e.value);
@@ -585,14 +592,12 @@ function setTab(v){
   curTab=v;
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v?"true":"false"));
   document.querySelectorAll(".view").forEach(d=>d.classList.toggle("hidden",d.id!=="v-"+v));
+  const slot=document.querySelector("#v-"+v+" .profslot"), pf=$("prof");
+  if(slot){slot.appendChild(pf);pf.classList.remove("hidden")}else pf.classList.add("hidden");
 }
 document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;setTab(b.dataset.v);renderAll();save();window.scrollTo({top:0})});
 
 /* ============ 患者共通 ============ */
-function syncWt(from){ // 重積タブと選択タブの体重・年齢を同期
-  const pairs=[["se-wt","p-wt"],["se-age","p-age"]];
-  pairs.forEach(([a,b])=>{if(from===a)$(b).value=$(a).value;if(from===b)$(a).value=$(b).value});
-}
 function pt(){
   const age=num("p-age"), wt=num("p-wt"), cr=num("p-cr"), sex=$("p-sex").value;
   let ccr=null;
@@ -999,83 +1004,156 @@ function renderIv(){
   else $("iv-phtout").innerHTML="";
 }
 
-/* ============ 重積タイマー ============ */
-let T={start:null,log:[],fired:[]};
-function tload(){try{const o=JSON.parse(localStorage.getItem(TKEY)||"null");if(o)T=Object.assign({start:null,log:[],fired:[]},o)}catch(e){}}
-function tsave(){try{localStorage.setItem(TKEY,JSON.stringify(T))}catch(e){}}
-const MS=[[5,"5分：重積として治療開始（第1段階：ベンゾジアゼピン）"],[10,"10分：止まらなければ BZD をもう1回"],[20,"20分：第2段階（ホスフェニトイン／レベチラセタム／フェノバルビタール）"],[30,"30分：確定した重積。ICU・挿管の準備を連絡"],[40,"40分：第3段階（麻酔薬の持続静注・持続脳波）"],[60,"60分：難治性重積。ICU で管理"]];
-function elapsed(){return T.start?Math.max(0,(Date.now()-T.start)/1000):0}
-const mmss=s=>{s=Math.floor(s);const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,"0")+":"+String(x).padStart(2,"0")};
-function phaseOf(min){return min<5?0:min<20?1:min<40?2:3}
-const PH=["安定化（0〜5分）","第1段階：BZD（5〜20分）","第2段階（20〜40分）","第3段階：難治（40分〜）"];
-let actx=null;
-function beep(){
-  if(!$("tm-snd").checked)return;
-  try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}
-  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type="square";o.frequency.value=880;g.gain.value=0.08;o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+0.6)}catch(e){}
+/* ============ 重積：推奨エンジン ============ */
+function seP(){
+  const p=pt();
+  p.kind=radio("se-kind");p.stage=+radio("se-stage")||0;p.iv=radio("se-iv");p.resp=radio("se-resp");
+  p.bp=$("se-bp").checked;p.home=new Set(checked("#se-home"));p.miss=$("se-miss").checked;p.cause=new Set(checked("#se-cause"));
+  p.zone=egZone().z;return p;
 }
-function tick(){
-  const s=elapsed(),min=s/60;
-  $("tm-clock").textContent=mmss(s);
-  const tm=$("tm");
-  if(!T.start){tm.className="tm p0";$("tm-ph").textContent="未開始";$("tm-nx").textContent="発作が始まったら「発作開始」を押します";$("tm-start").textContent="発作開始（今）";return}
-  const ph=phaseOf(min);tm.className="tm p"+ph;$("tm-ph").textContent=PH[ph];
-  const nx=MS.find(m=>m[0]>min);
-  $("tm-nx").textContent=nx?`次の節目まで ${mmss(nx[0]*60-s)}：${nx[1]}`:"60分を超えました";
-  $("tm-start").textContent="開始時刻を今にする";
-  MS.forEach(([m,t])=>{if(min>=m&&!T.fired.includes(m)){T.fired.push(m);tsave();if(min<m+1){beep();toast(t);tm.classList.add("flash");setTimeout(()=>tm.classList.remove("flash"),3200)}renderSe()}});
-  const cur=phaseOf(min);if(cur!==lastPh){lastPh=cur;renderSe()}
+const f1=x=>Math.round(x*10)/10;
+function opt(o){return Object.assign({sc:5,why:[],av:null},o)}
+function scoreOpts(list){
+  const ok=list.filter(o=>!o.av).sort((a,b)=>b.sc-a.sc), ng=list.filter(o=>o.av);
+  return {ok,ng};
 }
-let lastPh=-1;
-function addLog(label){T.log.push({t:Date.now(),e:T.start?elapsed():null,l:label});tsave();renderLog()}
-function renderLog(){
-  $("tm-log").innerHTML=T.log.slice().reverse().map(x=>{const d=new Date(x.t);return `<li><b>${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}</b><i>${x.e!=null?mmss(x.e):"—"}</i><span>${esc(x.l)}</span></li>`}).join("")||`<li><span class="hint" style="margin:0">まだ記録はありません</span></li>`;
+function stage1(p){ // BZD
+  const w=p.wt, frail=p.eld||p.resp==="bad", L=[];
+  const nc=p.kind==="ncse";
+  if(p.iv==="no"){
+    L.push(opt({n:"ミダゾラム筋注（ドルミカム 10mg/2mL）",v:w&&w<40?"5mg 筋注":"10mg 筋注",d:"40kg超は10mg、13〜40kgは5mg。静脈路のない成人で静注ロラゼパムより有効（AES 2016、Level A）。国内では筋注は適応外。",sc:9,why:[["p","静脈路なしで最速"]],r:["AES"]}));
+  }
+  const ivTag=p.iv==="no"?"（静脈路確保後）":"";
+  L.push(opt({n:"ロラゼパム（ロラピタ静注 2mg/1mL）"+ivTag,v:frail||nc?"2mg から（反応を見て計4mg）":"4mg（2mL）",d:"2mg/分を目安に静注。必要なら4mgを1回追加（総量8mgまで）。2回を超えた効果は限定的。冷所保存。",sc:p.iv==="no"?6:8.5,why:[["p","作用時間が長く再発が少ない"]],r:["LZP","AES"]}));
+  L.push(opt({n:"ジアゼパム（セルシン・ホリゾン注 10mg/2mL）"+ivTag,v:frail||nc?"5mg から":"10mg",d:"緩徐に静注（5mg/分以下）。5〜10分後に1回追加可。作用が短く、第2段階薬を続けて入れる。",sc:p.iv==="no"?5.5:8,why:[["i","どこの病棟にもある"]],r:["GL18"]}));
+  const md=w?(frail||nc?0.1:0.15)*w:null;
+  L.push(opt({n:"ミダゾラム静注（ミダフレッサ 0.1% 1mg/mL）"+ivTag,v:md?`${f1(md)}mg ＝ ${f1(md)}mL`:`${frail||nc?"0.1":"0.15"}mg/kg`,d:`1mg/分（${md?"約"+Math.ceil(md)+"分":"—"}）。追加は1回0.1〜0.3mg/kg、総量0.6mg/kg${w?"（"+f1(0.6*w)+"mg）":""}まで。高齢・呼吸不安定では0.1mg/kgから開始可（添付文書RMP資材）。`,sc:p.iv==="no"?5:7.5,why:[],r:["MDZ"]}));
+  if(frail)L.forEach(o=>o.why.push(["m","高齢・呼吸不安定：少なめから。ただし投与を遅らせない（未治療の方が呼吸器合併症は多い）"]));
+  return L;
 }
-function seDoses(){
-  const w=num("se-wt"), frail=$("se-frail").checked, age=num("se-age");
-  const W=w?w+"kg":"体重未入力";
-  const kg=(per,max)=>w?Math.min(per*w,max||1e9):null;
-  const f1=x=>x==null?"—":(Math.round(x*10)/10);
-  const mdz=w?(frail?0.1:0.15)*w:null;
-  const fos=kg(22.5), fosRate=w?Math.min(3*w,150):null;
-  const levD=w?Math.min(3000,Math.max(1000,Math.round(60*w/500)*500)):null;
-  const pbL=kg(15),pbH=kg(20);
-  return {w,W,frail,age,mdz,fos,fosRate,levD,pbL,pbH,f1};
+function stage2(p){
+  const w=p.wt, L=[], nc=p.kind==="ncse", h=p.home;
+  const ind=p.co.has("doac")||p.co.has("onc")||p.co.has("imsup");
+  // LEV
+  const lev=w?Math.min(3000,Math.max(1000,Math.round((nc?40:60)*w/500)*500)):null;
+  const o1=opt({k:"LEV",n:"レベチラセタム（イーケプラ点滴静注 500mg/5mL）",v:lev?`${lev}mg ＝ ${lev/100}mL（希釈）`:"1回1000〜3000mg",
+    d:`2〜5mg/kg/分${w&&lev?"（"+Math.ceil(lev/(5*w))+"〜"+Math.ceil(lev/(2*w))+"分）":""}。1日最大3000mg。表示は ${nc?"40":"60"}mg/kg を1000〜3000mgの範囲で丸めた量。心血管・呼吸への影響が少ない。`,sc:8.5,why:[["i","ESETT：3剤の効果は同等（約半数で停止）"]],r:["LEViv","ESETT"]});
+  if(p.eld){o1.sc+=1;o1.why.push(["p","高齢者で安全域が広い"])}
+  if(p.cm.has("cond")){o1.sc+=1;o1.why.push(["p","伝導障害に影響しない"])}
+  if(p.bp){o1.sc+=1;o1.why.push(["p","血圧を下げにくい"])}
+  if(p.cp==="B"||p.cp==="C"){o1.sc+=1;o1.why.push(["p","肝代謝をほぼ受けない"])}
+  if(ind){o1.sc+=1;o1.why.push(["p","DOAC・抗がん剤・免疫抑制薬と相互作用が少ない"])}
+  if(p.fem==="pg"){o1.sc+=0.5;o1.why.push(["p","妊娠中も使いやすい"])}
+  if(h.has("LEV")){o1.sc+=p.miss?1.5:-1.5;o1.why.push(p.miss?["p","怠薬：普段の LEV を静注で再開・追加"]:["m","LEV 内服中：内服量と合わせて1日3000mgまで。十分量なら別の薬を"])}
+  if(p.hd||(p.ccr!=null&&p.ccr<50))o1.why.push(["i","腎機能低下：初回量は減らさず、維持量を CCr で調整"]);
+  L.push(o1);
+  // fosPHT
+  const fos=w?22.5*w:null, rate=w?Math.min(3*w,150):null;
+  const o2=opt({k:"FOS",n:"ホスフェニトイン（ホストイン 750mg/10mL）",v:fos?`${Math.round(fos)}mg ＝ ${f1(fos/75)}mL`:"22.5mg/kg",
+    d:`${rate?Math.round(rate)+"mg/分以下（約"+Math.ceil(fos/rate)+"分以上）":"3mg/kg/分と150mg/分の低い方以下"}。心電図・血圧を連続監視。維持は12〜24時間後から 5〜7.5mg/kg/日${w?"（"+Math.round(5*w)+"〜"+Math.round(7.5*w)+"mg/日）":""}。`,sc:8,why:[],r:["FOS","ESETT"]});
+  if(p.cm.has("cond"))o2.av="洞性徐脈・高度の刺激伝導障害は禁忌";
+  if(p.bp){o2.sc-=3;o2.why.push(["m","低血圧・不整脈を起こしうる"])}
+  if(p.eld){o2.sc-=1;o2.why.push(["m","高齢者は速度をさらに落とす"])}
+  if(p.cp==="C"){o2.sc-=2;o2.why.push(["m","重度肝障害"])}
+  if(ind){o2.sc-=1.5;o2.why.push(["m","維持で PHT を続けると DOAC・抗がん剤・免疫抑制薬の濃度を下げる"])}
+  if(p.fem==="pg"){o2.sc-=1;o2.why.push(["m","催奇形性（短期使用なら許容）"])}
+  if(h.has("PHT")){o2.sc+=p.miss?1:-2;o2.why.push(p.miss?["p","怠薬：PHT の再ローディング（血中濃度を確認）"]:["m","PHT 内服中：血中濃度を確認。治療域なら全量の負荷は避ける"])}
+  L.push(o2);
+  // PB
+  const o3=opt({k:"PB",n:"フェノバルビタール（ノーベルバール静注用 250mg）",v:w?`${Math.round(15*w)}〜${Math.round(20*w)}mg`:"15〜20mg/kg",
+    d:`100mg/分以下・10分以上かけて${w?(()=>{const x=Math.max(10,Math.ceil(15*w/100)),y=Math.max(10,Math.ceil(20*w/100));return x===y?"（"+x+"分以上）":"（約"+x+"〜"+y+"分以上）"})():""}。維持は 2.5〜5mg/kg/日。停止効果は高いが呼吸抑制・低血圧が多い。`,sc:6.5,why:[],r:["GL18"]});
+  if(p.resp==="bad")o3.av="呼吸が不安定（挿管前）では BZD との重ねで呼吸停止の危険";
+  if(p.resp==="intub"){o3.sc+=1.5;o3.why.push(["p","挿管済みなら呼吸抑制は問題になりにくい"])}
+  if(p.bp){o3.sc-=3;o3.why.push(["m","低血圧"])}
+  if(p.eld){o3.sc-=2;o3.why.push(["m","高齢者：鎮静の遷延"])}
+  if(nc&&p.resp!=="intub"){o3.sc-=1.5;o3.why.push(["m","NCSE：鎮静で意識の評価が難しくなる"])}
+  if(ind){o3.sc-=1.5;o3.why.push(["m","強い酵素誘導（DOAC などの濃度低下）"])}
+  if(h.has("PB")&&p.miss){o3.sc+=1;o3.why.push(["p","怠薬：普段の PB を再開"])}
+  L.push(o3);
+  // LCM
+  const o4=opt({k:"LCM",n:"ラコサミド（ビムパット点滴静注 200mg/20mL）",v:"200〜400mg",d:"30〜60分で点滴。国内の静注は内服の代替のみで、重積は適応外。投与前に心電図（PR）。",sc:nc?7:4,why:[["i","国内では重積に適応外"]],r:["LCMiv"]});
+  if(p.cm.has("cond"))o4.av="PR延長・房室ブロック";
+  if(p.cp==="C")o4.av="重度肝障害は禁忌";
+  if(nc){o4.why.push(["p","非鎮静で、NCSE の追加薬として使われる"])}
+  if(p.eld&&nc)o4.sc+=0.5;
+  if(h.has("LCM")){o4.sc+=p.miss?2:-1;o4.why.push(p.miss?["p","怠薬：普段の LCM を静注で再開"]:["m","LCM 内服中：1日400mgまで"])}
+  L.push(o4);
+  return L;
+}
+function stage3(p){
+  const w=p.wt, L=[], nc=p.kind==="ncse";
+  const notInt=p.resp!=="intub";
+  const add=opt({n:"第2段階の別の薬をもう1剤",v:"上の表で残っている薬",d:nc?"非鎮静の静注抗てんかん薬（LEV・LCM・ホスフェニトイン）を重ねる。意識が保たれ呼吸が安定した NCSE では、麻酔より先にこちら。":"ICU・挿管の準備をしながら、作用機序の違う薬を追加する。",sc:nc?9:7,why:nc?[["p","GL2018：NCSE での全身麻酔の有用性は定まっていない"]]:[],r:["GL18"]});
+  if(nc&&p.eld){add.sc+=1;add.why.push(["p","高齢者の NCSE では麻酔の害が大きい"])}
+  L.push(add);
+  const m=opt({n:"ミダゾラム持続（ミダフレッサ 1mg/mL）",v:w?`開始 ${f1(0.1*w)}mL/時（0.1mg/kg/時）`:"0.1mg/kg/時から",d:`必要に応じ0.05〜0.1mg/kg/時ずつ増量、最大0.4mg/kg/時${w?"（"+f1(0.4*w)+"mL/時）":""}。持続脳波で発作抑制またはバースト・サプレッションを24〜48時間、その後漸減。`,sc:nc?5:8.5,why:[["i","第3段階でまず使われることが多い"]],r:["MDZ","GL18"]});
+  const pr=opt({n:"プロポフォール（1% 10mg/mL）",v:w?`ボーラス ${Math.round(w)}〜${Math.round(2*w)}mg、持続 ${f1(0.2*w)}〜${f1(0.5*w)}mL/時`:"1〜2mg/kg、持続2〜5mg/kg/時",d:"長時間・高用量でプロポフォール注入症候群（代謝性アシドーシス・横紋筋融解・CK上昇）。",sc:nc?4.5:7.5,why:[],r:["GL18"]});
+  const th=opt({n:"チオペンタール／チアミラール",v:w?`${Math.round(3*w)}〜${Math.round(5*w)}mg 静注、持続 ${Math.round(3*w)}〜${Math.round(5*w)}mg/時`:"3〜5mg/kg、持続3〜5mg/kg/時",d:"心抑制・低血圧が強い。半減期が長く覚醒が遅れる。",sc:nc?3:6,why:[],r:["GL18"]});
+  [m,pr,th].forEach(o=>{if(notInt)o.why.push(["m","気管挿管・人工呼吸が前提"]);if(nc)o.why.push(["m","昏睡の NCSE で ICU 管理下の場合に限る"])});
+  if(p.bp){pr.sc-=2;th.sc-=3;m.sc-=0.5;[pr,th].forEach(o=>o.why.push(["m","低血圧を悪化させる"]))}
+  if(p.cm.has("cond"))th.sc-=1;
+  if(nc&&p.resp==="intub"){m.sc+=3;pr.sc+=2;m.why.push(["p","挿管済みで ICU 管理下なら選択肢になる"])}
+  L.push(m,pr,th);
+  return L;
+}
+function optHtml(o,i){
+  const tags=o.why.map(([k,w])=>`<span class="${k}">${k==="p"?"＋":k==="m"?"−":"ⓘ"} ${esc(w)}</span>`).join("");
+  return `<div class="drug"><div class="dn">${i===0?'<span class="no" style="font-family:var(--num);font-size:12px;color:#fff;background:var(--ok);border-radius:999px;padding:1px 8px;margin-right:6px">推奨</span>':""}${esc(o.n)}</div>${o.v?`<div class="dv">${esc(o.v)}</div>`:""}<div class="dd">${esc(o.d)}</div>${tags?`<div class="why">${tags}</div>`:""}${o.r&&o.r.length?src(o.r):""}</div>`;
+}
+function stageCard(title,tm,list,now,lead){
+  const {ok,ng}=scoreOpts(list);
+  return `<section class="step${now?" now":""}"><div class="sh"><b>${title}</b><span>${tm}</span></div>${lead?`<p class="hint" style="margin:0 0 6px">${lead}</p>`:""}${ok.map(optHtml).join("")}${ng.length?`<ul class="list" style="margin-top:6px">${ng.map(o=>`<li class="item avoid"><div class="t">避ける：${esc(o.n)}</div><div class="d">${esc(o.av)}</div></li>`).join("")}</ul>`:""}</section>`;
 }
 function renderSe(){
-  const s=elapsed(),min=s/60,ph=T.start?phaseOf(min):-1;
-  const d=seDoses(), f1=d.f1;
-  const DR=(n,v,t)=>`<div class="drug"><div class="dn">${n}</div>${v?`<div class="dv">${v}</div>`:""}<div class="dd">${t}</div></div>`;
-  const steps=[
-   {h:"安定化",tm:"0〜5分",body:
-    `<ul class="list">
-      <li class="item note"><div class="t"><span class="role ns">看護師</span>安全確保・回復体位、時刻を記録</div><div class="d">押さえつけない。口に物を入れない。可能なら動画（顔と四肢、呼びかけへの反応）。眼球偏位・左右差・始まった部位を観察。</div></li>
-      <li class="item note"><div class="t"><span class="role ns">看護師</span>酸素・吸引、SpO2・心電図・血圧モニター</div><div class="d">医師へ連絡（ドクターコール）。静脈路を確保し採血（血糖・電解質・血算・肝腎機能・抗てんかん薬濃度・NH3）。</div></li>
-      <li class="item caution"><div class="t"><span class="role ns">看護師</span>まず血糖を測る</div><div class="d">低血糖なら医師の指示で ビタミンB1 100mg 静注のあと 50%ブドウ糖 40〜50mL。</div></li>
-    </ul>`},
-   {h:"第1段階：ベンゾジアゼピン",tm:"5〜20分",body:
-    `<p class="hint" style="margin:0 0 6px"><span class="role dr">医師指示</span>いずれか1剤。止まらなければ5〜10分後に1回追加。${d.frail?"高齢・呼吸不安定のため少なめで表示しています。":""}</p>`+
-    DR("ジアゼパム（セルシン・ホリゾン注 10mg/2mL）",d.frail?"5〜10mg":"10mg","緩徐に静注（5mg/分以下が目安）。5〜10分後に1回追加可。")+
-    DR("ロラゼパム（ロラピタ静注 2mg/1mL）","4mg（2mL）","2mg/分を目安に約2分で静注。必要なら4mgを1回追加（総量8mgまで）。冷所保存。")+
-    DR("ミダゾラム（ミダフレッサ静注0.1% 1mg/mL）",d.mdz?`${f1(d.mdz)}mg ＝ ${f1(d.mdz)}mL`:`${d.frail?"0.1":"0.15"}mg/kg`,`${d.frail?"0.1":"0.15"}mg/kg を1mg/分で（${d.mdz?"約"+Math.ceil(d.mdz)+"分":"—"}）。追加は1回0.1〜0.3mg/kg、総量0.6mg/kg${d.w?"（"+f1(0.6*d.w)+"mg）":""}まで。`)+
-    DR("静脈路がとれないとき","ミダゾラム 10mg 筋注（40kg超）","AES 2016 で Level A（静脈路のない成人で静注ロラゼパムより有効）。国内では筋注は適応外。")+
-    src(["LZP","MDZ","AES","GL18"])},
-   {h:"第2段階：ホスフェニトイン／レベチラセタム／フェノバルビタール",tm:"20〜40分",body:
-    `<p class="hint" style="margin:0 0 6px"><span class="role dr">医師指示</span>BZD で止まらない、または意識が戻らない。BZD の直後に続けて入れることも多い。3剤の効果はほぼ同等（ESETT：約半数で停止）。</p>`+
-    DR("ホスフェニトイン（ホストイン 750mg/10mL）",d.fos?`${r0(d.fos)}mg ＝ ${f1(d.fos/75)}mL`:"22.5mg/kg",`速度は ${d.fosRate?r0(d.fosRate)+"mg/分以下（3mg/kg/分と150mg/分の低い方）→ 約"+Math.ceil(d.fos/d.fosRate)+"分以上":"3mg/kg/分または150mg/分の低い方を超えない"}。心電図・血圧を連続監視。洞性徐脈・高度の伝導障害は禁忌。維持は12〜24時間後から 5〜7.5mg/kg/日。`)+
-    DR("レベチラセタム（イーケプラ点滴静注 500mg/5mL）",d.levD?`${d.levD}mg ＝ ${d.levD/100}mL（生食などで希釈）`:"1回1000〜3000mg",`添付文書：1回1000〜3000mg、2〜5mg/kg/分${d.w&&d.levD?"（"+Math.ceil(d.levD/(5*d.w))+"〜"+Math.ceil(d.levD/(2*d.w))+"分）":""}、1日最大3000mg。表示は 60mg/kg（ESETT）を3000mgで頭打ち。心血管系への影響が少なく、高齢者で使いやすい。維持量は腎機能で（静注⇄内服タブ）。`)+
-    DR("フェノバルビタール（ノーベルバール静注用 250mg）",d.pbL?`${r0(d.pbL)}〜${r0(d.pbH)}mg`:"15〜20mg/kg",`100mg/分以下・10分以上かけて${d.pbH?"（約"+Math.max(10,Math.ceil(d.pbL/100))+"〜"+Math.max(10,Math.ceil(d.pbH/100))+"分以上）":""}。呼吸抑制・低血圧が多く、気道確保の準備を。維持は 2.5〜5mg/kg/日。`)+
-    `<p class="hint">バルプロ酸の静注製剤は国内にありません。ラコサミド静注は国内では重積の適応がありません。</p>`+
-    src(["FOS","LEViv","ESETT","ICU","GL18"])},
-   {h:"第3段階：難治性重積（麻酔薬）",tm:"40分〜",body:
-    `<p class="hint" style="margin:0 0 6px"><span class="role dr">医師指示</span>ICU・気管挿管・人工呼吸下で、持続脳波を見ながら。目標は発作の抑制またはバースト・サプレッションを24〜48時間、その後漸減。</p>`+
-    DR("ミダゾラム持続（ミダフレッサ 1mg/mL）",d.w?`開始 ${f1(0.1*d.w)}mL/時（0.1mg/kg/時）`:"0.1mg/kg/時から",`必要に応じ0.05〜0.1mg/kg/時ずつ増量、最大0.4mg/kg/時${d.w?"（"+f1(0.4*d.w)+"mL/時）":""}。`)+
-    DR("プロポフォール（1% 10mg/mL）",d.w?`ボーラス ${r0(1*d.w)}〜${r0(2*d.w)}mg、持続 ${f1(0.2*d.w)}〜${f1(0.5*d.w)}mL/時`:"1〜2mg/kg、持続2〜5mg/kg/時",`低血圧に注意。長時間・高用量でプロポフォール注入症候群（代謝性アシドーシス・横紋筋融解・CK上昇）。`)+
-    DR("チオペンタール／チアミラール",d.w?`${r0(3*d.w)}〜${r0(5*d.w)}mg 静注、持続 ${r0(3*d.w)}〜${r0(5*d.w)}mg/時`:"3〜5mg/kg、持続3〜5mg/kg/時",`低血圧・心抑制が強く、昇圧薬を準備。半減期が長く覚醒が遅れる。`)+
-    `<p class="hint">用量は GL2018 のフローチャートと添付文書の目安です。施設のプロトコルを優先します。</p>`+
-    src(["MDZ","GL18","ICU"])}
-  ];
-  $("se-steps").innerHTML=steps.map((st,i)=>`<section class="step${i===ph?" now":""}"><div class="sh"><b>${st.h}</b><span>${st.tm}</span></div>${st.body}</section>`).join("");
+  const p=seP(), nc=p.kind==="ncse", z=p.zone;
+  $("p-ccr").textContent=p.ccr!=null?p.ccr:"—";
+  $("eg-hint").textContent=nc?"『はじめての脳波トリアージ』の発作リスク判定フロー（Salzburg 基準を参考に作成）に沿って所見を答えます。判定は下の推奨に反映されます。":"けいれんが止まっても意識が戻らない・変動するときは、病型を「NCSE」にして脳波所見を入れます。";
+  const sum=[];if(p.age)sum.push(p.age+"歳");if(p.wt)sum.push(p.wt+"kg");else sum.push("体重未入力（用量は mg/kg で表示）");
+  if(p.ccr!=null)sum.push("CCr "+p.ccr);if(p.hd)sum.push("透析");if(p.cp&&p.cp!=="0")sum.push("Child-Pugh "+p.cp);if(p.fem==="pg")sum.push("妊娠中");
+  if(p.cm.has("cond"))sum.push("伝導障害");if(p.bp)sum.push("低血圧");sum.push({ok:"呼吸安定",bad:"呼吸不安定",intub:"挿管中"}[p.resp]);
+  $("se-sum").textContent=sum.join("・");
+  const out=[];
+  // 安定化
+  const st=[
+    `<li class="item note"><div class="t"><span class="role ns">看護師</span>安全確保・回復体位、発作開始時刻を記録、可能なら動画</div><div class="d">押さえつけない。口に物を入れない。眼球偏位・左右差・始まった部位を観察。</div></li>`,
+    `<li class="item note"><div class="t"><span class="role ns">看護師</span>酸素・吸引、SpO2・心電図・血圧モニター、静脈路と採血</div><div class="d">血糖・電解質（Na・Ca・Mg）・血算・肝腎機能・CK・NH3・抗てんかん薬の血中濃度。</div></li>`,
+    `<li class="item caution"><div class="t"><span class="role ns">看護師</span>まず血糖を測る</div><div class="d">低血糖なら医師の指示で ビタミンB1 100mg 静注のあと 50%ブドウ糖 40〜50mL。</div></li>`];
+  const c=p.cause;
+  if(c.has("b1"))st.push(`<li class="item caution"><div class="t">アルコール・低栄養：ブドウ糖の前にビタミンB1 100mg</div><div class="d">Wernicke 脳症の予防。アルコール離脱けいれんでは BZD が中心。</div></li>`);
+  if(c.has("na"))st.push(`<li class="item caution"><div class="t">低Na・電解質異常：原因の補正が治療の中心</div><div class="d">症候性の高度低Naは高張食塩水で数 mEq/L 上げる（医師指示、過補正に注意）。低Ca・低Mgも補正。</div></li>`);
+  if(c.has("drug"))st.push(`<li class="item caution"><div class="t">薬剤性：原因薬の中止・用量見直し</div><div class="d">腎機能低下時のセフェピム・カルバペネム、テオフィリン、トラマドールなど。VPA 内服中にカルバペネムを使っていないか確認。</div></li>`);
+  if(c.has("acute"))st.push(`<li class="item note"><div class="t">急性症候性：原因の治療を並行</div><div class="d">画像・必要なら髄液。脳炎を疑えば早期にアシクロビル。自己免疫性脳炎は別ナビ参照。</div></li>`);
+  if(p.miss)st.push(`<li class="item note"><div class="t">怠薬・減量：普段の抗てんかん薬を静注で再開</div><div class="d">静注がある薬（LEV・LCM・BRV・PHT・PB）は下の推奨で優先度を上げています。VPA は国内に静注製剤がなく、LEV 静注でつなぎます。</div></li>`);
+  if(p.home.has("VPA")&&p.co.has("carba"))st.push(`<li class="item avoid"><div class="t">VPA 内服中にカルバペネム：併用禁忌</div><div class="d">VPA 濃度が急に下がり、重積の原因になりえます。抗菌薬を変更し、LEV 静注で補う。</div></li>`);
+  if(p.fem==="pg")st.push(`<li class="item avoid"><div class="t">妊娠20週以降・産褥：子癇を考える</div><div class="d">硫酸マグネシウムが第一選択。産科と同時に対応。</div></li>`);
+  out.push(`<section class="step${p.stage===0&&!nc?"":""}"><div class="sh"><b>安定化</b><span>0〜5分</span></div><ul class="list">${st.join("")}</ul>${src(["GL18","ICU"])}</section>`);
+  // NCSE の判定による分岐
+  if(nc){
+    if(z==="ok"){
+      out.push(`<div class="verdict ok"><span class="pill">グリーン</span><div class="big">抗てんかん薬の開始・追加・強化は不要</div><div>脳波で発作の基準を満たしません。意識障害の他の原因（代謝・薬剤・構造病変・せん妄）を探します。臨床的に疑いが強ければ、脳波を延長・再検し、2HELPS2B で持続脳波の長さを決めます。</div>${src(["TRI","H2B"])}</div>`);
+      $("se-out").innerHTML=out.join("");return;
+    }
+    if(z==="gray"){
+      out.push(`<div class="verdict gray"><span class="pill">グレー</span><div class="big">BZD トライアル → 陽性なら非鎮静の静注抗てんかん薬</div><div>IIC。脳波を記録しながらミダゾラム 1mg（またはジアゼパム 2〜5mg）を数分おきに静注し、脳波と臨床の両方が改善すれば NCSE として治療。脳波だけの改善は possible NCSE。麻酔は原則として使いません。</div>${src(["TRI","SALZ","ACNS"])}</div>`);
+    }
+    if(z==="crit")out.push(`<div class="verdict crit"><span class="pill">レッド</span><div class="big">NCSE として治療</div><div>BZD は少量から反応を見て。第2段階は非鎮静の静注薬（LEV・LCM・ホスフェニトイン）を重ね、麻酔は昏睡の NCSE で ICU 管理下に限ります。</div>${src(["TRI","GL18"])}</div>`);
+    if(!z)out.push(`<div class="verdict info"><div class="big">脳波所見を入れると推奨が変わります</div><div>すぐに脳波が取れず臨床的に NCSE が強く疑われるときは、BZD を少量から使い（診断的治療）、反応を見て第2段階へ。</div></div>`);
+  }
+  const now1=p.stage===0, now2=p.stage===1, now3=p.stage>=2;
+  const lead1=p.stage>=1?"BZD はすでに投与済み。2回までで止め、次の段階へ。":(nc?"<span class=\"role dr\">医師指示</span>NCSE では少量ずつ、脳波と意識を見ながら。":"<span class=\"role dr\">医師指示</span>上ほど推奨。止まらなければ5〜10分後に1回追加。");
+  out.push(stageCard(nc&&z==="gray"?"第1段階：BZD（トライアルとして）":"第1段階：ベンゾジアゼピン","5〜20分",stage1(p),now1,lead1));
+  out.push(stageCard(nc&&z==="gray"?"BZD トライアル陽性なら：非鎮静の静注薬":"第2段階","20〜40分",stage2(p),now2,`<span class="role dr">医師指示</span>${nc?"非鎮静の薬を優先。":"BZD の直後に続けて入れることも多い。"}上ほど推奨。VPA の静注製剤は国内にありません。`));
+  if(!(nc&&z==="gray"))out.push(stageCard(nc?"第3段階：まだ続くとき":"第3段階：難治性重積","40分〜",stage3(p),now3,`<span class="role dr">医師指示</span>${nc?"意識が保たれ呼吸が安定していれば、麻酔より静注薬の追加を優先。":"ICU・挿管・持続脳波のもとで。"}用量は GL2018・添付文書の目安、施設のプロトコルを優先。`));
+  if(p.stage===3)out.push(`<div class="verdict crit"><div class="big">麻酔薬でも続く・再燃（超難治性）</div><div>24時間以上続く場合は治療法が確立していません（GL2018）。原因の再検索（自己免疫性脳炎・NORSE を含む）と専門施設への相談を。</div>${src(["GL18"])}</div>`);
+  // 維持
+  const top2=scoreOpts(stage2(p)).ok[0];
+  const rr=levRenal(p), w=p.wt;
+  const mt=[];
+  mt.push(`<li class="item note"><div class="t">LEV を使ったとき</div><div class="d">${rr?`${esc(rr.band)}：維持 1日${esc(rr.day)}（通常 ${esc(rr.usual)}）。${rr.extra?esc(rr.extra)+"。":""}`:"CCr を入れると腎機能別の維持量を表示します。"}約12時間後から。</div></li>`);
+  mt.push(`<li class="item note"><div class="t">ホスフェニトインを使ったとき</div><div class="d">12〜24時間後から 5〜7.5mg/kg/日${w?"（"+Math.round(5*w)+"〜"+Math.round(7.5*w)+"mg/日）":""}、速度は1mg/kg/分または75mg/分の低い方以下。血中濃度はアルブミンで補正。長期の薬は相互作用の少ない薬へ切替を検討。</div></li>`);
+  mt.push(`<li class="item note"><div class="t">フェノバルビタールを使ったとき</div><div class="d">維持 2.5〜5mg/kg/日${w?"（"+Math.round(2.5*w)+"〜"+Math.round(5*w)+"mg/日）":""}。</div></li>`);
+  out.push(`<section class="step"><div class="sh"><b>止まったあと：維持</b><span>${top2?"推奨の第2段階："+esc(DN[top2.k]||top2.n):""}</span></div><ul class="list">${mt.join("")}</ul><p class="hint">内服への移行は「静注⇄内服」、長期の薬は「薬の選択」タブで（同じ患者情報を使います）。</p></section>`);
+  $("se-out").innerHTML=out.join("");
 }
 
 /* ============ 脳波：NCSE 判定 ============ */
@@ -1091,20 +1169,25 @@ const EGQ=[
  {k:"bzde",t:"BZD トライアルで脳波だけが改善した",s:"possible NCSE",dep:"pat"}
 ];
 function ynHtml(group,k,v){return `<span class="yn"><button type="button" data-${group}="${k}" data-a="0" aria-pressed="${v===0}">いいえ</button><button type="button" data-${group}="${k}" data-a="1" aria-pressed="${v===1}">はい</button></span>`}
-function renderEeg(){
-  const q=EGQ.filter(x=>!x.dep||EG[x.dep]===1).filter(x=>!(x.k!=="grda"&&x.k!=="pat"&&EG.grda===1));
-  $("eg-q").innerHTML=q.map(x=>`<div class="it"><div class="tx">${esc(x.t)}<small>${esc(x.s)}</small></div>${ynHtml("eg",x.k,EG[x.k])}</div>`).join("");
+function egZone(){
   let z=null,msg="",act="";
   if(EG.pat===0){z="ok";msg="グリーンゾーン：発作の基準なし";act="抗てんかん薬の開始・追加は不要。臨床的に疑いが強ければ脳波を延長・再検。"}
   else if(EG.pat===1){
     if(EG.grda===1){z="ok";msg="グリーンゾーン：全般性 RDA のみ";act="発作リスクは低い。抗てんかん薬の開始・追加は不要。"}
-    else if(EG.f25===1||EG.evo===1||EG.bzd===1||EG.clin===1){z="crit";msg="レッドゾーン：発作（NCSE）の基準を満たす";act="抗てんかん薬を開始・追加。重積の基準（10分以上、または記録の20%以上）を満たすか確認し、満たせば重積として治療（重積タブ）。"}
+    else if(EG.f25===1||EG.evo===1||EG.bzd===1||EG.clin===1){z="crit";msg="レッドゾーン：発作（NCSE）の基準を満たす";act="抗てんかん薬を開始・追加。重積の基準（10分以上、または記録の20%以上）を満たせば重積として治療。"}
     else if(EG.f1===1||EG.lrda===1||EG.bzde===1){z="gray";msg="グレーゾーン：IIC（発作と発作間欠期のあいだ）";act="臨床的に総合判断。NCSE を疑う症状を見直し、BZD トライアルを一度は行う（脳波トリアージ）。2HELPS2B も参考に、持続脳波を検討。"}
     else if(["f25","evo","bzd","clin","f1","lrda","bzde"].every(k=>EG[k]===0)){z="ok";msg="グリーンゾーン：1.0Hz 未満で＋所見なし";act="基本的に治療適応はない。経過で変化すれば再評価。"}
   }
+  return {z,msg,act};
+}
+function renderEg(){
+  const q=EGQ.filter(x=>!x.dep||EG[x.dep]===1).filter(x=>!(x.k!=="grda"&&x.k!=="pat"&&EG.grda===1));
+  $("eg-q").innerHTML=q.map(x=>`<div class="it"><div class="tx">${esc(x.t)}<small>${esc(x.s)}</small></div>${ynHtml("eg",x.k,EG[x.k])}</div>`).join("");
+  const {z,msg,act}=egZone();
   const lab={ok:"グリーン",gray:"グレー",crit:"レッド"};
   $("eg-out").innerHTML=(z?`<div class="verdict ${z==="ok"?"ok":z}"><span class="pill">${lab[z]}</span><div class="big">${esc(msg)}</div><div>${esc(act)}</div>${src(["TRI","SALZ","ACNS"])}</div>`:`<p class="hint">上から順に答えると判定が出ます。</p>`)+`<div class="btns" style="justify-content:flex-start;margin-top:8px"><button type="button" class="btn sm" id="eg-reset">回答を消す</button></div>`;
-  // 2HELPS2B
+}
+function renderH2(){
   const H=[["f2","周期性・律動性パターンの周波数が 2Hz を超える",1],["sed","散発性のてんかん様放電",1],["lpd","LPD・LRDA・BIPD がある",1],["plus","＋所見（律動性・速波・鋭波の重畳）",1],["sz","脳波検査前に発作があった",1],["bird","BIRDs（短い律動性放電）",2]];
   $("h2-q").innerHTML=H.map(([k,t,pt])=>`<div class="it"><div class="tx">${esc(t)}<span class="sc">${pt}点</span></div>${ynHtml("h2",k,H2[k])}</div>`).join("");
   const sc=H.reduce((a,[k,,pt])=>a+(H2[k]===1?pt:0),0);
@@ -1121,15 +1204,15 @@ function renderEv(){
 
 /* ============ 共通 ============ */
 function renderAll(){
-  if(curTab==="se")renderSe();
+  if(curTab==="se"){renderEg();renderSe();}
   if(curTab==="sel")renderSel();
   if(curTab==="ia")renderIa();
   if(curTab==="sw")renderSw();
   if(curTab==="iv")renderIv();
-  if(curTab==="eeg")renderEeg();
+  if(curTab==="eeg")renderH2();
   if(curTab==="ev")renderEv();
 }
-document.addEventListener("input",e=>{if(e.target.closest("[data-ia]"))return;if(e.target.closest("main")){if(e.target.id)syncWt(e.target.id);renderAll();save()}});
+document.addEventListener("input",e=>{if(e.target.closest("[data-ia]"))return;if(e.target.closest("main")){renderAll();save()}});
 document.addEventListener("change",e=>{
   const ia=e.target.closest("[data-ia]");
   if(ia){const g=ia.dataset.ia;const s=new Set(iaSel[g]||[]);ia.checked?s.add(ia.value):s.delete(ia.value);iaSel[g]=[...s];renderIa();save();return}
@@ -1137,28 +1220,17 @@ document.addEventListener("change",e=>{
 });
 document.addEventListener("click",e=>{
   const g=e.target.closest("[data-eg]");if(g){const k=g.dataset.eg,a=+g.dataset.a;if(EG[k]===a)delete EG[k];else EG[k]=a;
-    if(k==="pat"&&a===0)EGQ.forEach(x=>{if(x.k!=="pat")delete EG[x.k]});renderEeg();save();return}
-  const h=e.target.closest("[data-h2]");if(h){const k=h.dataset.h2,a=+h.dataset.a;if(H2[k]===a)delete H2[k];else H2[k]=a;renderEeg();save();return}
-  if(e.target.id==="eg-reset"){EG={};renderEeg();save();return}
-  const ev=e.target.closest("[data-ev]");if(ev){addLog(ev.dataset.ev);toast("記録しました："+ev.dataset.ev);return}
-  const adj=e.target.closest("[data-adj]");if(adj){if(!T.start){toast("先に「発作開始」を押してください");return}T.start+=(+adj.dataset.adj)*60000;if(T.start>Date.now())T.start=Date.now();T.fired=MS.filter(m=>elapsed()/60>=m[0]).map(m=>m[0]);tsave();tick();renderSe();return}
+    if(k==="pat"&&a===0)EGQ.forEach(x=>{if(x.k!=="pat")delete EG[x.k]});renderEg();renderSe();save();return}
+  const h=e.target.closest("[data-h2]");if(h){const k=h.dataset.h2,a=+h.dataset.a;if(H2[k]===a)delete H2[k];else H2[k]=a;renderH2();save();return}
+  if(e.target.id==="eg-reset"){EG={};renderEg();renderSe();save();return}
 });
-$("tm-start").addEventListener("click",()=>{
-  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}
-  T.start=Date.now();T.fired=[];addLog("発作開始");tsave();lastPh=-1;tick();renderSe();
-});
-$("tm-reset").addEventListener("click",()=>{if(!confirm("タイマーと記録を消しますか？"))return;T={start:null,log:[],fired:[]};tsave();renderLog();tick();renderSe()});
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),3800)}
 
 $("sw-a").innerHTML=SW_D.map(k=>`<option value="${k}">${DN[k]}</option>`).join("");
 $("sw-b").innerHTML=SW_D.map(k=>`<option value="${k}">${DN[k]}</option>`).join("");
 $("sw-a").value="CBZ";$("sw-b").value="LEV";
-load(); tload();
-// 再読み込み時は過ぎた節目を鳴らさない
-if(T.start){const mn=elapsed()/60;MS.forEach(([m])=>{if(mn>=m&&!T.fired.includes(m))T.fired.push(m)});tsave()}
-[["se-wt","p-wt"],["se-age","p-age"]].forEach(([a,b])=>{if(!$(b).value&&$(a).value)$(b).value=$(a).value;else if(!$(a).value&&$(b).value)$(a).value=$(b).value});
-setTab(curTab); renderLog(); tick(); renderAll();
-setInterval(tick,500);
+load();
+setTab(curTab); renderAll();
 </script>
 <script>
 (function(){
