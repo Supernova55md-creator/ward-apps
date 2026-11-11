@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>神経診察チェック</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#1F7A8C">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="神経診察">
+<style>
+/* 片手で使う病棟ツール：上に進み具合、下にタブ。ティール＝局在ナビ（アンバー）と区別 */
+:root{
+  --bg:#F4F6F6; --surface:#FFFFFF; --ink:#1B2428; --muted:#5B666B; --line:#DCE3E5;
+  --accent:#1F7A8C; --accent-strong:#135463; --accent-soft:#E2F2F5; --on-accent:#FFFFFF;
+  --ok:#2E7D4F; --ok-soft:#E5F3EA; --warn:#B45309; --warn-soft:#FDEEDC; --crit:#B42318; --crit-soft:#FDE7E5;
+  --font:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121618; --surface:#1C2225; --ink:#E8ECED; --muted:#A3AEB2; --line:#2F383C;
+    --accent:#5BC0D3; --accent-strong:#8ED6E3; --accent-soft:#12333A; --on-accent:#06222A;
+    --ok:#5CC48A; --ok-soft:#173326; --warn:#F0A35A; --warn-soft:#3A2614; --crit:#F27A6E; --crit-soft:#3D1C1A;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+a{color:var(--accent-strong)}
+.app{max-width:640px;margin:0 auto;min-height:100%;padding:0 calc(14px + env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;background:var(--accent);flex:none;position:relative}
+.mark::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--bg)}
+.brand h1{font-size:19px;font-weight:900}
+.brand small{color:var(--muted);font-size:11px;margin-left:auto;text-align:right;line-height:1.3}
+.summary{margin-top:8px;display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:stretch}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:5px 9px;min-width:0}
+.tile .k{font-size:11px;color:var(--muted);display:block}
+.tile .v{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.tile .v.ab{color:var(--warn)}
+.pbar{height:4px;background:var(--line);border-radius:2px;margin-top:3px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--accent);width:0}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:12px}
+.card h2{font-size:16px;font-weight:700;margin-bottom:8px}
+.row-btn{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:9px 13px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sm{min-height:36px;padding:5px 10px;font-size:14px}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+input[type=text],input[type=number],select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 9px;min-height:42px}
+input[type=text]{width:100%}
+textarea{width:100%;min-height:260px;line-height:1.55;font-size:15px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+/* セクション */
+details.sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+details.sec>summary{list-style:none;cursor:pointer;padding:12px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::after{content:"＋";margin-left:6px;color:var(--muted);font-weight:400}
+details.sec[open]>summary::after{content:"－"}
+.no{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);font-size:13px;display:flex;align-items:center;justify-content:center}
+.sec.done .no{background:var(--accent);color:var(--on-accent)}
+.prog{margin-left:auto;font-size:12px;font-weight:400;color:var(--muted);white-space:nowrap}
+.abn{font-size:12px;background:var(--warn);color:#fff;border-radius:999px;padding:0 8px;display:none}
+.abn.on{display:inline-block}
+.sectool{display:flex;gap:8px;padding:0 12px 10px;flex-wrap:wrap}
+/* 項目 */
+.it{border-top:1px solid var(--line);padding:9px 12px}
+.it.s-a{background:var(--warn-soft)}
+.it.flash{animation:flash 1.4s ease-out}
+.ih{display:flex;gap:8px;align-items:center}
+.it-t{flex:1;min-width:0;font-size:15px;font-weight:700;line-height:1.4}
+.it-t em{font-style:normal;font-weight:400;font-size:12px;color:var(--muted);display:block}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex:none}
+.seg button{font:inherit;font-size:13px;border:0;background:var(--bg);color:var(--ink);min-width:46px;min-height:40px;cursor:pointer;padding:0 6px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[data-s="n"][aria-pressed="true"]{background:var(--ok);color:#fff;font-weight:700}
+.seg button[data-s="a"][aria-pressed="true"]{background:var(--warn);color:#fff;font-weight:700}
+.seg button[data-s="x"][aria-pressed="true"]{background:var(--muted);color:var(--surface);font-weight:700}
+.stag{font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.stag.n{background:var(--ok-soft);color:var(--ok)}
+.stag.a{background:var(--warn);color:#fff}
+.stag.x{background:var(--line);color:var(--muted)}
+.stag.u{background:var(--bg);color:var(--muted);border:1px dashed var(--line)}
+.nlp{font-size:13px;color:var(--ok);margin-top:3px}
+.idt{margin-top:8px}
+.opt{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:5px 0;border-top:1px dashed var(--line);font-size:14px;line-height:1.4}
+.opt:first-child{border-top:0}
+.opt.on .ol{font-weight:700;color:var(--warn)}
+.sides{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.sides button{font:inherit;font-size:14px;border:0;background:var(--surface);color:var(--ink);width:42px;min-height:38px;cursor:pointer;padding:0}
+.sides button+button{border-left:1px solid var(--line)}
+.sides button[aria-pressed="true"]{background:var(--warn);color:#fff;font-weight:700}
+.sides.one button{width:56px}
+.memo{margin-top:6px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th,.tbl td{border-top:1px solid var(--line);padding:4px 3px;text-align:left;vertical-align:middle}
+.tbl th{color:var(--muted);font-size:12px;font-weight:700}
+.tbl td.c,.tbl th.c{text-align:center}
+.tbl select{min-height:38px;padding:4px 4px;font-size:15px;width:4.2em}
+.tbl select.ab{border-color:var(--warn);background:var(--warn-soft);font-weight:700}
+.tbl small{color:var(--muted);font-size:11px;display:block;line-height:1.2}
+.wrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0}
+.wrow label{font-size:13px;color:var(--muted)}
+.wrow select,.wrow input{min-width:4.5em}
+.rg{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
+.tg{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:6px 10px;min-height:38px;cursor:pointer}
+.tg[aria-pressed="true"]{background:var(--warn);border-color:var(--warn);color:#fff;font-weight:700}
+.sd{border-top:1px dashed var(--line);padding-top:6px;margin-top:6px}
+.sd b{font-size:14px}
+.legend{font-size:11px;color:var(--muted);margin-top:4px}
+/* 出力 */
+.out-sum{font-size:15px;background:var(--accent-soft);border-radius:9px;padding:9px 11px;line-height:1.55;white-space:pre-wrap}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;margin:4px 0}
+.chk input{width:20px;height:20px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(80px + env(safe-area-inset-bottom));background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:14px;z-index:20;display:none}
+.toast.on{display:block}
+.lc{list-style:none;padding:0;margin:0;font-size:14px}
+.lc li{border-top:1px solid var(--line);padding:6px 0;line-height:1.45}
+.lc li small{color:var(--muted);display:block;font-size:12px}
+.alert{border-left:5px solid var(--accent);background:var(--accent-soft);border-radius:9px;padding:9px 11px;margin:0 0 10px;font-size:14px}
+.alert.warn{border-color:var(--warn);background:var(--warn-soft)}
+.refs{padding-left:20px;font-size:14px}
+.refs li{margin:6px 0}
+.empty{color:var(--muted);font-size:14px;text-align:center;padding:18px 8px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs button{font:inherit;font-size:12px;border:0;background:none;color:var(--muted);padding:9px 0 11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+nav.tabs button b{font-size:16px}
+nav.tabs button[aria-selected="true"]{color:var(--accent-strong)}
+nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
+#dlg{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#dlg.on{display:flex}
+#dlg .bx{background:var(--surface);color:var(--ink);border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#dlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#dlg .bx p{margin:0 0 14px;font-size:13.5px;color:var(--muted)}
+#dlg .rw{display:flex;gap:8px;justify-content:flex-end}
+@keyframes flash{0%{background:var(--accent-soft)}100%{background:transparent}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><h1>神経診察チェック</h1><small>診察手順→<br>カルテ定型文</small></div>
+  <div class="summary" aria-live="polite">
+    <div class="tile"><span class="k">評価済み</span><span class="v" id="sumN">0/0</span><div class="pbar"><i id="sumBar"></i></div></div>
+    <div class="tile"><span class="k">異常所見</span><span class="v" id="sumA">0</span></div>
+    <button class="btn sm" id="btnNext" type="button">次の未評価 ↓</button>
+  </div>
+</header>
+
+<!-- ============ 診察 ============ -->
+<section class="view active" id="v-exam" aria-label="診察チェックリスト">
+  <p class="hint" style="margin:0 0 10px">診察の順に並べています。各項目で「正常」「異常」「未施行」を選び、異常なら該当所見と左右を押します（もう一度押すと解除）。セクションの「未入力を正常に」で、残りをまとめて正常にできます。</p>
+  <div id="secs"></div>
+</section>
+
+<!-- ============ カルテ文 ============ -->
+<section class="view" id="v-chart" aria-label="カルテ記載">
+  <div class="card">
+    <h2>所見の要約（1行）</h2>
+    <div class="out-sum" id="outSum"></div>
+    <div class="row-btn" style="margin-top:8px"><button class="btn sm" type="button" data-copy="outSum">要約をコピー</button></div>
+  </div>
+  <div class="card">
+    <h2>神経学的所見（カルテ定型文）</h2>
+    <label class="chk"><input type="checkbox" id="optAb">異常所見のみ書く（他は「異常なし」とまとめる）</label>
+    <label class="chk"><input type="checkbox" id="optUn" checked>未評価・未施行の項目を書く</label>
+    <textarea id="outTxt" aria-label="カルテ定型文" spellcheck="false"></textarea>
+    <div class="row-btn" style="margin-top:8px">
+      <button class="btn primary" type="button" data-copy="outTxt">全文をコピー</button>
+      <button class="btn" type="button" id="btnRegen">入力から作り直す</button>
+    </div>
+    <p class="hint">この欄は手で直せます（直した内容は保存されません。診察タブで入力を変えると作り直されます）。電子カルテに貼るときの文字化けを避けるため、記号は半角の - + / と ± だけを使い、Barré などのアクセント記号は外して出力します。</p>
+  </div>
+</section>
+
+<!-- ============ 局在ナビへ ============ -->
+<section class="view" id="v-loc" aria-label="局在ナビへ送る">
+  <div class="card">
+    <h2>神経病巣局在ナビに送る所見</h2>
+    <div id="locList"></div>
+    <div class="row-btn" style="margin-top:10px">
+      <button class="btn primary" type="button" id="btnSend">局在ナビで病巣候補を見る →</button>
+    </div>
+    <p class="hint">局在ナビの「所見入力」を、この診察の所見で置き換えます（局在ナビに保存したケースと優位半球の設定は残ります）。麻痺はMMT・Barré・Mingazzini・顔面麻痺から、感覚は感覚の表から、腱反射亢進・低下は腱反射の表から自動で組み立てます。送ったあとは局在ナビ側で追加・修正できます。</p>
+  </div>
+</section>
+
+<!-- ============ 使い方 ============ -->
+<section class="view" id="v-help" aria-label="使い方と出典">
+  <div class="card">
+    <h2>使い方</h2>
+    <ol style="font-size:14px;padding-left:20px;margin:0">
+      <li>「診察」タブで上から順に診察し、項目ごとに正常／異常／未施行を入れる。右上の「次の未評価 ↓」で抜けている項目へ飛べます。</li>
+      <li>「カルテ」タブで定型文と1行要約をコピーして電子カルテへ貼る。</li>
+      <li>局在を考えたいときは「局在」タブから神経病巣局在ナビへ送る。</li>
+      <li>次の患者さんの前に、右上の「入力クリア」で消す。</li>
+    </ol>
+    <p class="hint">入力はこの端末のブラウザ内にだけ自動保存されます。氏名・ID・生年月日などは入力しないでください。診察所見の判断を置き換えるものではなく、記載の補助ツールです。</p>
+  </div>
+  <div class="card">
+    <h2>表記のきまり</h2>
+    <ul style="font-size:14px;padding-left:20px;margin:0">
+      <li>左右のある所見は「<b>所見がある側</b>」で入力（共同偏視は眼が向く側、注視麻痺は向けない側、舌は偏る側、半盲・無視は欠損側）。</li>
+      <li>腱反射：- 消失、± 低下、+ 正常、++ やや亢進、+++ 亢進、++++ 著明亢進（クローヌス）。</li>
+      <li>MMT：MRC 0〜5（4+・4-を含む）。表の数字は右/左。</li>
+      <li>JCS 0〜300、GCS は E・V・M を別々に（挿管は V=T、失語は V=A）。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>出典</h2>
+    <ol class="refs">
+      <li>田崎義昭, 斎藤佳雄（著）, 坂井文彦（改訂）. ベッドサイドの神経の診かた. 改訂18版. 南山堂; 2016.（書籍：診察手順・腱反射の表記）</li>
+      <li>Medical Research Council. Aids to the Examination of the Peripheral Nervous System. Memorandum No. 45. HMSO; 1976.（MMT 0〜5）</li>
+      <li>Teasdale G, Jennett B. Assessment of coma and impaired consciousness. A practical scale. Lancet. 1974;2:81-84. <a href="https://pubmed.ncbi.nlm.nih.gov/4136544/" target="_blank" rel="noopener">PubMed 4136544</a></li>
+      <li>Uchihara T, Tsukagoshi H. Jolt accentuation of headache: the most sensitive sign of CSF pleocytosis. Headache. 1991;31:167-171. <a href="https://doi.org/10.1111/j.1526-4610.1991.hed3103167.x" target="_blank" rel="noopener">doi:10.1111/j.1526-4610.1991.hed3103167.x</a></li>
+    </ol>
+    <p class="hint">関連：<a href="../loc/">神経病巣局在ナビ</a>／<a href="../mmt/">MMTナビ</a>／<a href="../nih/">NIHSS評価</a></p>
+  </div>
+</section>
+</div>
+
+<nav class="tabs" aria-label="画面切り替え"><div class="in" role="tablist">
+  <button role="tab" data-v="v-exam" aria-selected="true"><b>診察</b>チェック</button>
+  <button role="tab" data-v="v-chart" aria-selected="false"><b>カルテ</b>定型文</button>
+  <button role="tab" data-v="v-loc" aria-selected="false"><b>局在</b>ナビへ</button>
+  <button role="tab" data-v="v-help" aria-selected="false"><b>使い方</b>・出典</button>
+</div></nav>
+
+<div id="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgT"><div class="bx"><b id="dlgT">局在ナビの入力を置き換えますか？</b><p id="dlgP">局在ナビにいま入っている所見は消え、この診察の所見に置き換わります。保存したケースは残ります。</p><div class="rw"><button type="button" class="btn" id="dlgNo">やめる</button><button type="button" class="btn primary" id="dlgYes">置き換える</button></div></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="neuroExam.v1", OKEY="neuroExam.opt.v1", LKEY="lesionNavi.v1";
+
+/* ---------------- 定義 ----------------
+ o(id, 表示, 左右あり, 局在ナビの所見ID, カルテ文（{S}=右/左/両側）) */
+function o(i,t,s,L,x){return {i:i,t:t,s:s?1:0,L:L||"",x:x||t.replace(/（[^）]*）$/,"")};}
+var SECS=[["con","意識・精神状態"],["hbf","高次脳機能"],["cn","脳神経"],["mot","運動"],["ref","反射"],["sen","感覚"],["crd","協調運動・不随意運動"],["gait","歩行・姿勢"],["men","髄膜刺激徴候"],["aut","自律神経"]];
+var IT=[
+ {id:"consc",g:"con",t:"意識レベル",ty:"consc",how:"JCS と GCS（E・V・M）"},
+ {id:"orient",g:"con",t:"見当識",nl:"見当識 保たれる",pre:"見当識障害",o:[o("or_t","時間"),o("or_p","場所"),o("or_h","人")]},
+
+ {id:"lang",g:"hbf",t:"言語",how:"自発話・理解・復唱・呼称・読み書き",nl:"失語なし",o:[
+   o("aph_m","非流暢性失語（Broca型）",0,"aph_motor"),o("aph_s","流暢性失語（Wernicke型）",0,"aph_sens"),o("aph_c","伝導失語（復唱障害が目立つ）",0,"aph_cond"),
+   o("aph_t","超皮質性運動失語（復唱は保たれる）",0,"aph_tcm"),o("anom","失名詞（呼称障害）"),o("alex","失書を伴わない失読",0,"alexia"),o("agra","失書")]},
+ {id:"negl",g:"hbf",t:"半側空間無視・病態失認",how:"線分二等分・抹消試験、両側同時刺激",nl:"半側空間無視なし",o:[
+   o("negl","半側空間無視（無視される側）",1,"neglect","{S}半側空間無視"),o("ext","消去現象（消える側）",1,"","{S}消去現象"),o("anos","病態失認",0,"anosog")]},
+ {id:"prax",g:"hbf",t:"失行・失認",nl:"失行・失認なし",o:[
+   o("apr","観念運動失行",0,"apraxia"),o("gers","Gerstmann症候群（失算・失書・左右失認・手指失認）",0,"gerstmann"),o("dres","着衣失行"),o("cons","構成障害"),o("bal","Bálint症候群",0,"balint"),o("cbl","皮質盲",0,"cblind")]},
+ {id:"mem",g:"hbf",t:"記憶・前頭葉機能",nl:"明らかな記憶障害・前頭葉症状なし",o:[
+   o("amn","前向性健忘",0,"amnesia"),o("abu","無為・自発性低下",0,"abulia"),o("dis","脱抑制・人格変化",0,"disinhib"),o("grs","把握反射（出る側）",1,"","{S}把握反射陽性")]},
+ {id:"score",g:"hbf",t:"認知機能検査（任意）",ty:"score",opt:1},
+
+ {id:"cn2",g:"cn",t:"II 視力・視野",how:"対座法で4象限、指数弁",nl:"視野 対座法で欠損なし",o:[
+   o("hem","同名半盲（欠損側）",1,"hemianopia","{S}同名半盲"),o("qup","上1/4同名半盲（欠損側）",1,"quad_up","{S}上1/4同名半盲"),o("qlo","下1/4同名半盲（欠損側）",1,"quad_low","{S}下1/4同名半盲"),
+   o("mac","黄斑回避あり",0,"macspare","黄斑回避あり"),o("bit","両耳側半盲",0,"bitemp"),o("va","視力低下（低下側）",1,"monovis","{S}視力低下"),o("rapd","RAPD（陽性側）",1,"monovis","{S}RAPD陽性")]},
+ {id:"pupil",g:"cn",t:"瞳孔・対光反射",ty:"pupil",o:[o("hor","Horner症候群",1,"horner","{S}Horner症候群"),o("lnd","対光-近見反射解離",0,"lnd"),o("pto","眼瞼下垂（下垂側）",1,"","{S}眼瞼下垂")]},
+ {id:"eom",g:"cn",t:"III・IV・VI 眼球運動",how:"追視（H字）・輻輳、注視方向ごとの眼振",nl:"眼球運動 制限なし、眼振なし、複視なし",o:[
+   o("cdev","共同偏視（眼が向く側）",1,"conjdev","{S}への共同偏視"),o("gzp","水平注視麻痺（向けない側）",1,"gazepal","{S}方向への水平注視麻痺"),
+   o("cn3","動眼神経麻痺",1,"cn3","{S}動眼神経麻痺"),o("cn4","滑車神経麻痺",1,"cn4","{S}滑車神経麻痺"),o("cn6","外転神経麻痺",1,"cn6","{S}外転神経麻痺"),
+   o("ino","INO（内転障害側）",1,"ino","{S}INO（{S}眼の内転障害）"),o("oah","one-and-a-half症候群（注視麻痺側）",1,"onehalf","{S}one-and-a-half症候群"),
+   o("vgz","上方注視麻痺",0,"vertgaze"),o("skw","斜偏倚（skew deviation）",0,"skew","斜偏倚"),o("nys","眼振（方向はメモへ）",0,"nystag","眼振"),o("dip","複視"),o("ptf","易疲労性の眼瞼下垂・複視",0,"ptosisfat")]},
+ {id:"cn5",g:"cn",t:"V 三叉神経",nl:"顔面の感覚 左右差なし、角膜反射 正常",o:[
+   o("fs","顔面の感覚低下（全感覚）",1,"face_sens","{S}顔面の感覚低下"),o("fp","顔面の温痛覚低下",1,"face_sens","{S}顔面の温痛覚低下"),o("cor","角膜反射低下",1,"","{S}角膜反射低下"),o("mas","咬筋の筋力低下",1,"","{S}咬筋の筋力低下")]},
+ {id:"cn7",g:"cn",t:"VII 顔面神経",how:"額のしわ寄せ・閉眼・口角",nl:"顔面麻痺なし",o:[
+   o("fu","中枢性顔面麻痺（額は保たれる）",1,"face_umn","{S}中枢性顔面麻痺"),o("fl","末梢性顔面麻痺（額も麻痺）",1,"face_lmn","{S}末梢性顔面麻痺")]},
+ {id:"cn8",g:"cn",t:"VIII 聴覚・前庭",nl:"聴力 左右差なし、めまいなし",o:[
+   o("hea","難聴",1,"hearing","{S}難聴"),o("ver","回転性めまい",0,"vertigo"),o("hit","head impulse test 陽性（陽性側）",1,"","{S}head impulse test陽性")]},
+ {id:"cn910",g:"cn",t:"IX・X 舌咽・迷走神経",nl:"軟口蓋挙上 良好、カーテン徴候なし、嚥下障害・嗄声なし",o:[
+   o("pal","軟口蓋挙上不良・カーテン徴候（麻痺側）",1,"palate","{S}軟口蓋挙上不良（カーテン徴候）"),o("dys","嚥下障害",0,"dysphagia"),o("hoa","嗄声",0,"dysphagia"),o("gag","咽頭反射低下",1,"","{S}咽頭反射低下"),o("hic","吃逆",0,"hiccup")]},
+ {id:"spch",g:"cn",t:"構音",nl:"構音障害なし",o:[o("dya","構音障害（性状はメモへ）",0,"dysarthria","構音障害"),o("pla","強制泣き笑い",0,"pseudob")]},
+ {id:"cn11",g:"cn",t:"XI 副神経",nl:"胸鎖乳突筋・僧帽筋の筋力低下なし",o:[o("scm","胸鎖乳突筋・僧帽筋の筋力低下",1,"cn11","{S}胸鎖乳突筋・僧帽筋の筋力低下")]},
+ {id:"cn12",g:"cn",t:"XII 舌下神経",nl:"挺舌 正中、舌萎縮・線維束性収縮なし",o:[o("tdv","挺舌時の偏倚（偏る側）",1,"tongue","挺舌時{S}へ偏倚"),o("tfa","舌萎縮・線維束性収縮",0,"tonguefas")]},
+
+ {id:"tone",g:"mot",t:"筋トーヌス",nl:"筋トーヌス 正常",o:[o("spa","痙縮",1,"","{S}痙縮"),o("rig","固縮（歯車様などはメモへ）",1,"","{S}固縮"),o("hyt","筋緊張低下",1,"","{S}筋緊張低下"),o("par","パラトニア（Gegenhalten）")]},
+ {id:"atro",g:"mot",t:"筋萎縮・線維束性収縮",nl:"筋萎縮・線維束性収縮なし",o:[
+   o("fas","広範な筋萎縮・線維束性収縮",0,"fasc"),o("hin","手内筋の萎縮",1,"handint","{S}手内筋の萎縮"),o("the","母指球筋の萎縮",1,"thenar","{S}母指球筋の萎縮"),o("atx","その他の筋萎縮（部位はメモへ）",0,"","筋萎縮")]},
+ {id:"drift",g:"mot",t:"Barré徴候・Mingazzini徴候",how:"上肢：手掌を上に前方挙上し閉眼で保持（回内・下垂）。下肢：背臥位で股・膝90°屈曲を保持",nl:"上肢Barré徴候 陰性、Mingazzini徴候 陰性",o:[
+   o("bar","上肢Barré徴候 陽性",1,"","{S}上肢Barré徴候陽性"),o("min","Mingazzini徴候 陽性",1,"","{S}Mingazzini徴候陽性")]},
+ {id:"mmt",g:"mot",t:"徒手筋力テスト（MMT）",ty:"mmt"},
+ {id:"mpat",g:"mot",t:"筋力低下の特徴（任意）",opt:1,o:[
+   o("prx","近位筋優位（両側）",0,"prox","近位筋優位の筋力低下"),o("dst","遠位筋優位（両側）",0,"distal","遠位筋優位の筋力低下"),o("wd","下垂手",1,"wristdrop","{S}下垂手"),o("fd","下垂足",1,"footdrop","{S}下垂足"),
+   o("ftg","易疲労性・日内変動",0,"fatigue"),o("nkf","頸部屈筋の筋力低下")]},
+
+ {id:"dtr",g:"ref",t:"腱反射",ty:"dtr"},
+ {id:"path",g:"ref",t:"病的反射",nl:"Hoffmann・Trömner 陰性、Babinski・Chaddock 陰性",o:[
+   o("hof","Hoffmann反射 陽性",1,"hyperref","{S}Hoffmann反射陽性"),o("tro","Trömner反射 陽性",1,"hyperref","{S}Trömner反射陽性"),
+   o("bab","Babinski徴候 陽性",1,"babinski","{S}Babinski徴候陽性"),o("cha","Chaddock反射 陽性",1,"babinski","{S}Chaddock反射陽性"),
+   o("clo","足クローヌス",1,"hyperref","{S}足クローヌス"),o("jaw","下顎反射 亢進",0,"pseudob","下顎反射亢進"),o("sno","口とがらし反射 陽性",0,"","口とがらし反射陽性")]},
+
+ {id:"sens",g:"sen",t:"表在覚・深部覚（四肢・体幹）",ty:"sens",how:"触覚・痛覚・温度覚・振動覚（音叉）・位置覚。顔面は「V 三叉神経」へ"},
+ {id:"spat",g:"sen",t:"感覚障害の型（任意）",opt:1,o:[
+   o("glv","手袋靴下型",0,"s_glove","手袋靴下型の感覚障害"),o("lvl","感覚レベル（髄節はメモへ）",0,"s_level","感覚レベルあり"),o("cap","宙吊り型（ケープ状）の温痛覚障害",0,"s_cape","宙吊り型の温痛覚障害"),
+   o("sad","サドル型",0,"s_saddle","サドル型の感覚障害"),o("cor","皮質性感覚障害（立体覚・2点識別覚）",1,"s_cort","{S}皮質性感覚障害"),o("che","手口感覚症候群",1,"s_cheiro","{S}手口感覚症候群"),
+   o("thp","中枢性疼痛",1,"s_thpain","{S}中枢性疼痛"),o("dma","上肢の皮節に沿う（髄節はメモへ）",1,"s_derm_a","{S}上肢の皮節性感覚障害"),o("dml","下肢の皮節に沿う（髄節はメモへ）",1,"s_derm_l","{S}下肢の皮節性感覚障害"),
+   o("med","正中神経領域",1,"s_median","{S}正中神経領域の感覚障害"),o("uln","尺骨神経領域",1,"s_ulnar","{S}尺骨神経領域の感覚障害"),o("rad","橈骨神経（浅枝）領域",1,"s_radial","{S}橈骨神経浅枝領域の感覚障害"),
+   o("per","腓骨神経領域",1,"s_peron","{S}腓骨神経領域の感覚障害"),o("rpn","神経根痛（放散痛）",1,"radpain","{S}神経根痛")]},
+ {id:"romb",g:"sen",t:"Romberg徴候",nl:"Romberg徴候 陰性",o:[o("rom","Romberg徴候 陽性",0,"romberg","Romberg徴候陽性")]},
+
+ {id:"coord",g:"crd",t:"四肢の協調運動",nl:"指鼻試験・踵膝試験・反復拮抗運動 拙劣なし",o:[
+   o("fn","指鼻試験 拙劣",1,"ataxlimb","{S}指鼻試験拙劣"),o("hk","踵膝試験 拙劣",1,"ataxlimb","{S}踵膝試験拙劣"),o("dd","反復拮抗運動障害",1,"ataxlimb","{S}反復拮抗運動障害")]},
+ {id:"invol",g:"crd",t:"不随意運動",nl:"不随意運動なし",o:[
+   o("rst","安静時振戦",1,"","{S}安静時振戦"),o("pst","姿勢時振戦",1,"","{S}姿勢時振戦"),o("itt","企図振戦",1,"","{S}企図振戦"),o("hol","Holmes振戦",1,"holmes","{S}Holmes振戦"),
+   o("bal","片側バリズム・舞踏運動",1,"ballism","{S}バリズム・舞踏運動"),o("dyt","ジストニア",1,"","{S}ジストニア"),o("myo","ミオクローヌス"),o("ast","羽ばたき振戦")]},
+
+ {id:"gait",g:"gait",t:"歩行・姿勢",how:"通常歩行・継ぎ足歩行・方向転換、座位／立位保持",nl:"歩行 正常、継ぎ足歩行 可能",o:[
+   o("gnt","歩行不能（理由はメモへ）",0,"","歩行不能"),o("hmg","片麻痺性歩行（分回し）",1,"","{S}片麻痺性歩行"),o("atg","失調性歩行（開脚・動揺）",0,"ataxtrunk","失調性歩行"),
+   o("tdm","継ぎ足歩行 不能",0,"ataxtrunk","継ぎ足歩行不能"),o("trk","体幹失調（座位・立位の動揺）",0,"ataxtrunk","体幹失調"),o("spg","痙性歩行"),o("pkg","小刻み歩行・すくみ足"),
+   o("pos","姿勢反射障害（pull test 陽性）",0,"","姿勢反射障害（pull test陽性）"),o("stp","鶏歩",1,"","{S}鶏歩"),o("wad","動揺性歩行")]},
+
+ {id:"men",g:"men",t:"髄膜刺激徴候",how:"jolt：頭部を水平に1秒2〜3回振って頭痛が増すか",nl:"項部硬直なし、Kernig徴候 陰性、jolt accentuation 陰性",o:[
+   o("nr","項部硬直"),o("ker","Kernig徴候 陽性",0,"","Kernig徴候陽性"),o("bru","Brudzinski徴候 陽性",0,"","Brudzinski徴候陽性"),o("jlt","jolt accentuation 陽性",0,"","jolt accentuation陽性")]},
+
+ {id:"aut",g:"aut",t:"自律神経",nl:"膀胱直腸障害なし",o:[o("bla","膀胱直腸障害",0,"bladder"),o("oh","起立性低血圧（数値はメモへ）",0,"","起立性低血圧"),o("swt","発汗障害")]}
+];
+var IM={};IT.forEach(function(it){IM[it.id]=it;});
+
+var MUS=[ /* id, 筋, 髄節, 肢(a/l), 遠位 */
+ ["del","三角筋","C5","a",0],["bic","上腕二頭筋","C5-6","a",0],["tri","上腕三頭筋","C7","a",0],["wex","手関節背屈","C6-7","a",1],
+ ["ffx","手指屈曲（握力）","C8","a",1],["ios","骨間筋（指の開排）","C8-T1","a",1],["apb","短母指外転筋","C8-T1","a",1],
+ ["ilp","腸腰筋","L2-3","l",0],["qua","大腿四頭筋","L3-4","l",0],["ham","大腿屈筋群","L5-S1","l",0],
+ ["ta","前脛骨筋","L4-5","l",1],["ehl","長母趾伸筋","L5","l",1],["gas","下腿三頭筋","S1","l",1]
+];
+var MV=["","5","4+","4","4-","3","2","1","0"];
+function mnum(v){return {"5":5,"4+":4.3,"4":4,"4-":3.7,"3":3,"2":2,"1":1,"0":0}[v];}
+var DTR=[["btr","BTR","上腕二頭筋"],["ttr","TTR","上腕三頭筋"],["br","BR","腕橈骨筋"],["ptr","PTR","膝蓋腱"],["atr","ATR","アキレス腱"]];
+var DV=["","-","±","+","++","+++","++++"];
+function dnum(v){return DV.indexOf(v)-1;} /* - =0, ± =1, + =2 ... */
+var JCS=["","0","1","2","3","10","20","30","100","200","300"];
+var SREG=[["a","上肢"],["t","体幹"],["l","下肢"]];
+var SMOD=[["tou","触覚"],["pai","痛覚"],["tem","温度覚"],["vib","振動覚"],["pos","位置覚"]];
+var SDEG=["低下","消失","過敏・異常感覚"];
+var SIDE={R:"右",L:"左",B:"両側"};
+
+/* ---------------- 状態 ---------------- */
+function sn0(){return {R:{r:{},m:{},d:"低下"},L:{r:{},m:{},d:"低下"}};}
+var st={v:{},cv:{},pu:{},mm:{},dt:{},sn:sn0(),sc:{},open:{con:1}};
+var opt={ab:false,un:true};
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.v=j.v||{};st.cv=j.cv||{};st.pu=j.pu||{};st.mm=j.mm||{};st.dt=j.dt||{};st.sn=j.sn||sn0();st.sc=j.sc||{};if(j.open)st.open=j.open;}}catch(e){}
+  try{var k=JSON.parse(localStorage.getItem(OKEY)||"null");if(k){opt.ab=!!k.ab;opt.un=k.un!==false;}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+function saveOpt(){try{localStorage.setItem(OKEY,JSON.stringify(opt));}catch(e){}}
+function V(id){return st.v[id]||(st.v[id]={s:"",o:{},m:""});}
+
+var $=function(id){return document.getElementById(id);};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function anyOpt(id){var v=st.v[id];return !!(v&&v.o&&Object.keys(v.o).length);}
+
+/* ---------------- 状態判定 ---------------- */
+function mmtVals(){var r=[];MUS.forEach(function(m){var x=st.mm[m[0]]||{};["R","L"].forEach(function(S){if(x[S])r.push(x[S]);});});return r;}
+function dtrAb(){var ab=false,any=false;DTR.forEach(function(d){var x=st.dt[d[0]]||{};["R","L"].forEach(function(S){var v=x[S];if(!v)return;any=true;var n=dnum(v);if(n<=1||n>=4)ab=true;});if(x.R&&x.L&&x.R!==x.L)ab=true;});return any?(ab?"a":"n"):"";}
+function snAny(){return ["R","L"].some(function(S){return Object.keys(st.sn[S].r).some(function(k){return st.sn[S].r[k];});});}
+function cstat(it){
+  var v=V(it.id);
+  if(it.ty==="consc"){var c=st.cv;if(!c.jcs&&!c.e&&!c.v&&!c.m)return "";return ((c.jcs&&c.jcs!=="0")||(c.e&&c.e!=="4")||(c.v&&c.v!=="5")||(c.m&&c.m!=="6"))?"a":"n";}
+  if(it.ty==="pupil"){var p=st.pu,has=p.r||p.l||p.lr||p.ll;if(!has&&!anyOpt(it.id))return "";
+    var ab=anyOpt(it.id)||(p.r&&p.l&&Math.abs(+p.r-+p.l)>=1)||(p.lr&&p.lr!=="迅速")||(p.ll&&p.ll!=="迅速");return ab?"a":"n";}
+  if(it.ty==="mmt"){var a=mmtVals();if(!a.length)return "";return a.some(function(x){return x!=="5";})?"a":"n";}
+  if(it.ty==="dtr")return dtrAb();
+  if(it.ty==="sens"){if(snAny())return "a";return v.s==="n"?"n":"";}
+  return "";
+}
+function stat(it){
+  if(it.opt) return (it.ty==="score")?((st.sc.hds||st.sc.mmse||st.sc.moca)?"i":""):(anyOpt(it.id)?"a":"");
+  var v=V(it.id); if(v.s==="x")return "x";
+  if(it.ty) return cstat(it);
+  return v.s||"";
+}
+
+/* ---------------- 描画 ---------------- */
+function sideBtns(v,lab,oid,sided){
+  if(!sided) return '<div class="sides one" role="group" aria-label="'+esc(lab)+'"><button type="button" data-o="'+oid+'" data-v="Y" aria-pressed="'+(v==="Y")+'">あり</button></div>';
+  return '<div class="sides" role="group" aria-label="'+esc(lab)+'">'+["R","L","B"].map(function(S){return '<button type="button" data-o="'+oid+'" data-v="'+S+'" aria-pressed="'+(v===S)+'">'+(S==="R"?"右":S==="L"?"左":"両")+'</button>';}).join("")+'</div>';
+}
+function optsHTML(it){
+  if(!it.o) return "";
+  var v=V(it.id);
+  return '<div class="opts">'+it.o.map(function(op){var cur=v.o[op.i]||"";return '<div class="opt'+(cur?" on":"")+'"><div class="ol">'+esc(op.t)+'</div>'+sideBtns(cur,op.t,op.i,op.s)+'</div>';}).join("")+'</div>';
+}
+function selHTML(arr,cur,attrs,cls){return '<select '+attrs+(cls?' class="'+cls+'"':'')+'>'+arr.map(function(x){return '<option value="'+esc(x)+'"'+(x===cur?" selected":"")+'>'+(x===""?"未":esc(x))+'</option>';}).join("")+'</select>';}
+function widgetHTML(it){
+  var h="";
+  if(it.ty==="consc"){var c=st.cv;
+    h+='<div class="wrow"><label>JCS</label>'+selHTML(JCS,c.jcs||"",'data-w="cv" data-k="jcs" aria-label="JCS"')+'</div>';
+    h+='<div class="wrow"><label>GCS E</label>'+selHTML(["","4","3","2","1"],c.e||"",'data-w="cv" data-k="e" aria-label="GCS E"')+'<label>V</label>'+selHTML(["","5","4","3","2","1","T","A"],c.v||"",'data-w="cv" data-k="v" aria-label="GCS V"')+'<label>M</label>'+selHTML(["","6","5","4","3","2","1"],c.m||"",'data-w="cv" data-k="m" aria-label="GCS M"')+'</div>';
+    h+='<p class="legend">V：T＝挿管・気切、A＝失語で評価困難</p>';}
+  if(it.ty==="pupil"){var p=st.pu, sz=[""];for(var x=1;x<=8.001;x+=0.5)sz.push(x.toFixed(1));
+    h+='<table class="tbl"><tr><th></th><th class="c">右</th><th class="c">左</th></tr>';
+    h+='<tr><td>径（mm）</td><td class="c">'+selHTML(sz,p.r||"",'data-w="pu" data-k="r" aria-label="右瞳孔径"')+'</td><td class="c">'+selHTML(sz,p.l||"",'data-w="pu" data-k="l" aria-label="左瞳孔径"')+'</td></tr>';
+    h+='<tr><td>対光反射</td><td class="c">'+selHTML(["","迅速","緩慢","消失"],p.lr||"",'data-w="pu" data-k="lr" aria-label="右対光反射"',p.lr&&p.lr!=="迅速"?"ab":"")+'</td><td class="c">'+selHTML(["","迅速","緩慢","消失"],p.ll||"",'data-w="pu" data-k="ll" aria-label="左対光反射"',p.ll&&p.ll!=="迅速"?"ab":"")+'</td></tr></table>';}
+  if(it.ty==="mmt"){
+    h+='<table class="tbl"><tr><th>筋（髄節）</th><th class="c">右</th><th class="c">左</th></tr>';
+    var lim="";
+    MUS.forEach(function(m){var x=st.mm[m[0]]||{};
+      if(m[3]!==lim){lim=m[3];h+='<tr><th colspan="3">'+(lim==="a"?"上肢":"下肢")+'</th></tr>';}
+      h+='<tr><td>'+esc(m[1])+'<small>'+m[2]+'</small></td>'+["R","L"].map(function(S){return '<td class="c">'+selHTML(MV,x[S]||"",'data-w="mm" data-k="'+m[0]+'" data-sd="'+S+'" aria-label="'+(S==="R"?"右":"左")+m[1]+'"',x[S]&&x[S]!=="5"?"ab":"")+'</td>';}).join("")+'</tr>';});
+    h+='</table><div class="row-btn" style="margin-top:6px"><button type="button" class="btn sm" data-fill5="1">未入力を5にする</button></div><p class="legend">MRC 0〜5。筋の神経支配は <a href="../mmt/">MMTナビ</a> へ。</p>';}
+  if(it.ty==="dtr"){
+    h+='<table class="tbl"><tr><th>反射</th><th class="c">右</th><th class="c">左</th></tr>';
+    DTR.forEach(function(d){var x=st.dt[d[0]]||{};
+      h+='<tr><td>'+d[1]+'<small>'+d[2]+'</small></td>'+["R","L"].map(function(S){var v=x[S]||"";var n=dnum(v);var ab=v&&(n<=1||n>=4||(x.R&&x.L&&x.R!==x.L));return '<td class="c">'+selHTML(DV,v,'data-w="dt" data-k="'+d[0]+'" data-sd="'+S+'" aria-label="'+(S==="R"?"右":"左")+d[1]+'"',ab?"ab":"")+'</td>';}).join("")+'</tr>';});
+    h+='</table><div class="row-btn" style="margin-top:6px"><button type="button" class="btn sm" data-fillp="1">未入力を + にする</button></div><p class="legend">- 消失、± 低下、+ 正常、++ やや亢進、+++ 亢進、++++ 著明亢進（クローヌス）</p>';}
+  if(it.ty==="sens"){
+    ["R","L"].forEach(function(S){var x=st.sn[S];
+      h+='<div class="sd"><b>'+SIDE[S]+'</b>：範囲<div class="rg">'+SREG.map(function(r){return '<button type="button" class="tg" data-sn="'+S+'" data-sr="'+r[0]+'" aria-pressed="'+!!x.r[r[0]]+'">'+r[1]+'</button>';}).join("")+'</div>';
+      h+='種類<div class="rg">'+SMOD.map(function(m){return '<button type="button" class="tg" data-sn="'+S+'" data-sm="'+m[0]+'" aria-pressed="'+!!x.m[m[0]]+'">'+m[1]+'</button>';}).join("")+'</div>';
+      h+='<div class="wrow"><label>程度</label>'+selHTML(SDEG,x.d||"低下",'data-w="snd" data-sd="'+S+'" aria-label="'+SIDE[S]+'の感覚障害の程度"')+'</div></div>';});
+    h+='<p class="legend">範囲と種類を左右それぞれで押す。種類を押さないと「感覚」とだけ書きます。</p>';}
+  if(it.ty==="score"){var c2=st.sc;
+    h+='<div class="wrow"><label>HDS-R</label><input type="number" inputmode="numeric" min="0" max="30" data-w="sc" data-k="hds" value="'+esc(c2.hds||"")+'" aria-label="HDS-R" style="width:5em"><label>/30　MMSE</label><input type="number" inputmode="numeric" min="0" max="30" data-w="sc" data-k="mmse" value="'+esc(c2.mmse||"")+'" aria-label="MMSE" style="width:5em"><label>/30</label></div>';
+    h+='<div class="wrow"><label>MoCA-J</label><input type="number" inputmode="numeric" min="0" max="30" data-w="sc" data-k="moca" value="'+esc(c2.moca||"")+'" aria-label="MoCA-J" style="width:5em"><label>/30</label></div>';}
+  return h;
+}
+var STL={n:"正常",a:"異常",x:"未施行",u:"未評価",i:"入力あり"};
+function itemHTML(it){
+  var v=V(it.id), s=stat(it);
+  var h='<div class="it s-'+(s||"u")+'" id="it-'+it.id+'" data-i="'+it.id+'"><div class="ih"><div class="it-t">'+esc(it.t)+(it.how?'<em>'+esc(it.how)+'</em>':'')+'</div>';
+  if(it.opt){ h+= s?'<span class="stag '+(s==="i"?"n":"a")+'">'+(s==="i"?"入力あり":"あり")+'</span>':''; }
+  else if(it.ty){
+    h+='<span class="stag '+(s||"u")+'">'+STL[s||"u"]+'</span><div class="seg" role="group" aria-label="'+esc(it.t)+'"><button type="button" data-s="n" aria-pressed="false">正常に</button><button type="button" data-s="x" aria-pressed="'+(s==="x")+'">未施行</button></div>';
+  } else {
+    h+='<div class="seg" role="group" aria-label="'+esc(it.t)+'">'+[["n","正常"],["a","異常"],["x","未施行"]].map(function(b){return '<button type="button" data-s="'+b[0]+'" aria-pressed="'+(v.s===b[0])+'">'+b[1]+'</button>';}).join("")+'</div>';
+  }
+  h+='</div>';
+  if(!it.ty&&!it.opt&&v.s==="n") h+='<div class="nlp">→ '+esc(it.nl)+'</div>';
+  var showD = it.opt || (it.ty&&s!=="x") || (!it.ty&&v.s==="a");
+  if(showD){
+    h+='<div class="idt">'+(it.ty?widgetHTML(it):"")+optsHTML(it);
+    if(it.ty!=="score") h+='<input type="text" class="memo" data-memo="'+it.id+'" value="'+esc(v.m||"")+'" placeholder="メモ（方向・程度・部位など。カルテ文に入ります）" aria-label="'+esc(it.t)+'のメモ">';
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+function buildSecs(){
+  var h="";
+  SECS.forEach(function(g,i){
+    h+='<details class="sec" data-g="'+g[0]+'" id="sec-'+g[0]+'"'+(st.open[g[0]]?" open":"")+'><summary><span class="no">'+(i+1)+'</span>'+g[1]+'<span class="abn" id="abn-'+g[0]+'"></span><span class="prog" id="prog-'+g[0]+'"></span></summary>';
+    h+='<div class="sectool"><button type="button" class="btn sm" data-fillsec="'+g[0]+'">未入力を正常に</button></div>';
+    IT.filter(function(it){return it.g===g[0];}).forEach(function(it){h+=itemHTML(it);});
+    h+='</details>';
+  });
+  $("secs").innerHTML=h;
+  document.querySelectorAll("details.sec").forEach(function(d){d.addEventListener("toggle",function(){st.open[d.getAttribute("data-g")]=d.open?1:0;save();});});
+}
+function refreshItem(id){var el=$("it-"+id);if(el)el.outerHTML=itemHTML(IM[id]);refreshCounts();}
+function refreshCounts(){
+  var T=0,D=0,A=0;
+  SECS.forEach(function(g){
+    var t=0,d=0,a=0;
+    IT.filter(function(it){return it.g===g[0];}).forEach(function(it){var s=stat(it);if(!it.opt){t++;if(s)d++;}if(s==="a")a++;});
+    T+=t;D+=d;A+=a;
+    $("prog-"+g[0]).textContent=d+"/"+t;
+    var ab=$("abn-"+g[0]);ab.textContent="異常"+a;ab.classList.toggle("on",a>0);
+    $("sec-"+g[0]).classList.toggle("done",t>0&&d===t);
+  });
+  $("sumN").textContent=D+"/"+T;$("sumBar").style.width=(T?Math.round(D/T*100):0)+"%";
+  $("sumA").textContent=A;$("sumA").classList.toggle("ab",A>0);
+}
+
+/* ---------------- 正常で埋める ---------------- */
+function fillNormal(it){
+  var v=V(it.id);
+  if(it.opt) return;
+  if(it.ty==="consc"){var c=st.cv;if(!c.jcs)c.jcs="0";if(!c.e)c.e="4";if(!c.v)c.v="5";if(!c.m)c.m="6";}
+  else if(it.ty==="pupil"){var p=st.pu;if(!p.r)p.r="3.0";if(!p.l)p.l="3.0";if(!p.lr)p.lr="迅速";if(!p.ll)p.ll="迅速";}
+  else if(it.ty==="mmt"){MUS.forEach(function(m){var x=st.mm[m[0]]||(st.mm[m[0]]={});if(!x.R)x.R="5";if(!x.L)x.L="5";});}
+  else if(it.ty==="dtr"){DTR.forEach(function(d){var x=st.dt[d[0]]||(st.dt[d[0]]={});if(!x.R)x.R="+";if(!x.L)x.L="+";});}
+  else if(it.ty==="sens"){if(!snAny())v.s="n";}
+  else {v.s="n";v.o={};}
+  if(it.ty&&v.s==="x")v.s="";
+}
+
+/* ---------------- カルテ文 ---------------- */
+function optTxt(op,val){var S=SIDE[val]||"";if(!op.s)return op.x;return op.x.indexOf("{S}")>=0?op.x.replace(/\{S\}/g,S):S+op.x;}
+function optsTxt(it){var v=V(it.id);if(!it.o)return [];return it.o.filter(function(op){return v.o[op.i];}).map(function(op){return optTxt(op,v.o[op.i]);});}
+function withMemo(arr,m){m=(m||"").trim();if(!m)return arr.join("、");return arr.length?arr.join("、")+"（"+m+"）":m;}
+function mmtLimbSum(){ /* 右上肢 4- など、側・肢ごとの最低値 */
+  var r=[];["R","L"].forEach(function(S){["a","l"].forEach(function(L){var mn=null,mv="";MUS.forEach(function(m){if(m[3]!==L)return;var v=(st.mm[m[0]]||{})[S];if(!v)return;var n=mnum(v);if(n<5&&(mn===null||n<mn)){mn=n;mv=v;}});if(mn!==null)r.push(SIDE[S]+(L==="a"?"上肢":"下肢")+"筋力低下（MMT "+mv+"）");});});return r;}
+function dtrSides(){ /* 亢進・低下の側 */
+  var hy={},ho={};
+  ["R","L"].forEach(function(S){var O=S==="R"?"L":"R",cntHi=0,anyHi3=false;
+    DTR.forEach(function(d){var x=st.dt[d[0]]||{};var v=x[S];if(!v)return;var n=dnum(v);
+      if(n>=4)hy[S]=1; if(n<=1)ho[S]=1;
+      if(x[O]&&n>dnum(x[O])){cntHi++;if(n>=3)anyHi3=true;}});
+    if(cntHi>=2&&anyHi3)hy[S]=1;});
+  function sd(o){return o.R&&o.L?"B":o.R?"R":o.L?"L":"";}
+  return {hy:sd(hy),ho:sd(ho)};
+}
+function snTxt(){
+  var r=[];["R","L"].forEach(function(S){var x=st.sn[S];var rg=SREG.filter(function(g){return x.r[g[0]];}).map(function(g){return g[1];});if(!rg.length)return;
+    var md=SMOD.filter(function(m){return x.m[m[0]];}).map(function(m){return m[1];});
+    var d=x.d||"低下";
+    r.push(SIDE[S]+rg.join("・")+"の"+(md.length?md.join("・"):"感覚")+(d==="過敏・異常感覚"?"の過敏・異常感覚":d));});
+  return r;
+}
+function itemText(it){ /* {t:本文, ab:異常か, sum:[要約]} */
+  var v=V(it.id), s=stat(it), m=v.m;
+  if(it.ty==="score"){var c=st.sc,a=[];if(c.hds)a.push("HDS-R "+c.hds+"/30");if(c.mmse)a.push("MMSE "+c.mmse+"/30");if(c.moca)a.push("MoCA-J "+c.moca+"/30");return {t:a.join("、"),ab:false,sum:[],info:!!a.length};}
+  if(!s||s==="x") return {t:"",ab:false,sum:[]};
+  if(it.ty==="consc"){var cv=st.cv,p=[];if(cv.jcs)p.push("JCS "+cv.jcs);
+    if(cv.e||cv.v||cv.m){var g="GCS E"+(cv.e||"?")+"V"+(cv.v||"?")+"M"+(cv.m||"?");if(/^\d$/.test(cv.e)&&/^\d$/.test(cv.v)&&/^\d$/.test(cv.m))g+="（計"+(+cv.e+ +cv.v+ +cv.m)+"）";p.push(g);}
+    var t=withMemo(p,m);return {t:t,ab:s==="a",sum:s==="a"?["意識障害（"+p.join("、")+"）"]:[]};}
+  if(it.ty==="pupil"){var pu=st.pu,q=[];
+    if(pu.r||pu.l){var d=(pu.r&&pu.l)?Math.abs(+pu.r-+pu.l):null;q.push("瞳孔 右"+(pu.r||"?")+"mm/左"+(pu.l||"?")+"mm"+(d===null?"":d>=1?" 瞳孔不同あり":d===0?" 正円同大":""));}
+    if(pu.lr||pu.ll)q.push("対光反射 "+(pu.lr||"?")+"/"+(pu.ll||"?"));
+    var ot=optsTxt(it);var sm=ot.slice();if(pu.r&&pu.l&&Math.abs(+pu.r-+pu.l)>=1)sm.unshift("瞳孔不同（右"+pu.r+"/左"+pu.l+"mm）");
+    ["lr","ll"].forEach(function(k){if(pu[k]&&pu[k]!=="迅速")sm.push((k==="lr"?"右":"左")+"対光反射"+pu[k]);});
+    return {t:withMemo(q.concat(ot),m),ab:s==="a",sum:s==="a"?sm:[]};}
+  if(it.ty==="mmt"){var rows=[],all5=true,filled=0,other5=false;
+    MUS.forEach(function(mu){var x=st.mm[mu[0]]||{};if(!x.R&&!x.L)return;filled++;
+      if((x.R&&x.R!=="5")||(x.L&&x.L!=="5")){all5=false;rows.push(mu[1]+" "+(x.R||"未")+"/"+(x.L||"未"));}else other5=true;});
+    var t2=all5?(filled===MUS.length?"MMT 上下肢 5/5（左右差なし）":"MMT 評価した筋は5/5"):"MMT（右/左）："+rows.join("、")+(other5?"（他は5/5）":"");
+    return {t:withMemo([t2],m),ab:s==="a",sum:s==="a"?mmtLimbSum():[]};}
+  if(it.ty==="dtr"){var r=[];DTR.forEach(function(d){var x=st.dt[d[0]]||{};if(x.R||x.L)r.push(d[1]+" "+(x.R||"未")+"/"+(x.L||"未"));});
+    var ds=dtrSides(),sm2=[];if(ds.hy)sm2.push((ds.hy==="B"?"両側":SIDE[ds.hy])+"腱反射亢進");if(ds.ho)sm2.push((ds.ho==="B"?"両側":SIDE[ds.ho])+"腱反射低下");
+    if(s==="a"&&!sm2.length)sm2.push("腱反射の左右差");
+    return {t:withMemo(["腱反射（右/左）："+r.join("、")],m),ab:s==="a",sum:s==="a"?sm2:[]};}
+  if(it.ty==="sens"){if(s==="n")return {t:withMemo(["表在覚・深部覚 左右差なし"],m),ab:false,sum:[]};var a3=snTxt();return {t:withMemo(a3,m),ab:true,sum:a3};}
+  if(it.opt){var a4=optsTxt(it);return {t:withMemo(a4,m),ab:a4.length>0,sum:a4};}
+  if(s==="n") return {t:it.nl+(m&&m.trim()?"（"+m.trim()+"）":""),ab:false,sum:[]};
+  var a5=optsTxt(it);
+  if(it.pre&&a5.length){var w=it.pre+"（"+a5.join("・")+"）";return {t:withMemo([w],m),ab:true,sum:[w]};}
+  var t5=withMemo(a5,m)||(it.t+" 異常あり");
+  return {t:t5,ab:true,sum:a5.length?a5:[it.t+"の異常"+(m?"（"+m.trim()+"）":"")]};
+}
+function buildChart(){
+  var lines=[],sum=[],un=[],anyN=false,anyDone=false;
+  SECS.forEach(function(g){
+    var parts=[];
+    IT.filter(function(it){return it.g===g[0];}).forEach(function(it){
+      var s=stat(it),r=itemText(it);
+      if(!it.opt&&(!s||s==="x")){un.push(it.t+(s==="x"?"（未施行）":""));return;}
+      if(s&&s!=="x")anyDone=true;
+      if(!r.t)return;
+      sum=sum.concat(r.sum);
+      if(opt.ab){ if(r.ab||it.id==="consc"||r.info) parts.push(r.t); else anyN=true; }
+      else parts.push(r.t);
+    });
+    if(parts.length) lines.push("【"+g[1]+"】"+parts.join("。")+"。");
+  });
+  if(opt.ab&&anyN) lines.push("上記以外の評価項目に異常なし。");
+  if(opt.un&&un.length) lines.push("（未評価："+un.join("、")+"）");
+  /* 電子カルテ（Shift_JIS）で化けないよう、アクセント付き文字は外す */
+  function sj(t){return t.replace(/[éè]/g,"e").replace(/[áà]/g,"a").replace(/ö/g,"o").replace(/ü/g,"u");}
+  $("outTxt").value=lines.length?sj("神経学的所見\n"+lines.join("\n")):"";
+  $("outSum").textContent=sum.length?sj("神経学的所見："+sum.join("、")):(anyDone?"神経学的所見：明らかな異常なし":"（まだ入力がありません）");
+}
+
+/* ---------------- 局在ナビへの変換 ---------------- */
+function toLoc(){
+  var f={},list=[];
+  function add(id,S,src){if(!id)return;var v=S||"Y",cur=f[id];if(cur&&cur!==v)v=(cur==="Y"||v==="Y")?cur:"B";f[id]=v;list.push({id:id,S:S,src:src});}
+  function sides(val){return val==="B"?["R","L"]:[val];}
+  IT.forEach(function(it){var s=stat(it);if(s==="x"||!it.o)return;var v=V(it.id);
+    it.o.forEach(function(op){var val=v.o[op.i];if(!val||!op.L)return;add(op.L,op.s?val:"",optTxt(op,val));});});
+  var c=st.cv;if((c.jcs&&c.jcs!=="0")||(/^\d$/.test(c.e+"")&&/^\d$/.test(c.v+"")&&/^\d$/.test(c.m+"")&&(+c.e+ +c.v+ +c.m)<15))add("consc","","意識障害（"+(c.jcs?"JCS "+c.jcs:"GCS")+"）");
+  if(V("dtr").s!=="x"){var ds=dtrSides();if(ds.hy)sides(ds.hy).forEach(function(S){add("hyperref",S,SIDE[S]+"腱反射亢進（腱反射の表）");});if(ds.ho)sides(ds.ho).forEach(function(S){add("hyporef",S,SIDE[S]+"腱反射低下（腱反射の表）");});}
+  /* 麻痺の格子 */
+  var m={R:{f:0,a:0,l:0},L:{f:0,a:0,l:0},emph:"eq"},sev={R:{a:0,l:0},L:{a:0,l:0}};
+  var dv=V("drift"),mv=V("mpat"),useMMT=V("mmt").s!=="x";
+  function has(o,k,S){var x=o.o[k];return x===S||x==="B";}
+  ["R","L"].forEach(function(S){
+    var weak={a:[],l:[]};
+    if(useMMT)MUS.forEach(function(mu){var x=(st.mm[mu[0]]||{})[S];if(x&&x!=="5"){weak[mu[3]].push(mu);sev[S][mu[3]]=Math.max(sev[S][mu[3]],5-mnum(x));}});
+    if(dv.s==="a"){if(has(dv,"bar",S)){sev[S].a=Math.max(sev[S].a,.5);weak.a.push(["bar",,,"a",0]);}if(has(dv,"min",S)){sev[S].l=Math.max(sev[S].l,.5);weak.l.push(["min",,,"l",0]);}}
+    var focA=has(mv,"wd",S)||has(V("atro"),"hin",S)||has(V("atro"),"the",S), focL=has(mv,"fd",S);
+    var onlyDistA=weak.a.length&&weak.a.every(function(x){return x[4]===1;}), onlyDistL=weak.l.length&&weak.l.every(function(x){return x[0]==="ta"||x[0]==="ehl";});
+    m[S].a=weak.a.length&&!(focA&&onlyDistA)?1:0;
+    m[S].l=weak.l.length&&!(focL&&onlyDistL)?1:0;
+    var c7=V("cn7");if(c7.s==="a"&&(has(c7,"fu",S)||has(c7,"fl",S))&&(m[S].a||m[S].l))m[S].f=1;
+  });
+  var best=null;["R","L"].forEach(function(S){if(m[S].a&&m[S].l){var tot=sev[S].a+sev[S].l;if(!best||tot>best.t)best={S:S,t:tot};}});
+  if(best){var a=sev[best.S].a,l=sev[best.S].l;m.emph=(a-l>=0.9)?"arm":(l-a>=0.9)?"leg":"eq"; /* 約1段階以上の差があるときだけ優位とする */}
+  /* 感覚の格子 */
+  var sg={R:{a:0,t:0,l:0,mod:"all"},L:{a:0,t:0,l:0,mod:"all"}};
+  if(V("sens").s!=="x")["R","L"].forEach(function(S){var x=st.sn[S];if(!(x.r.a||x.r.t||x.r.l))return;
+    var sup=x.m.tou||x.m.pai||x.m.tem, deep=x.m.vib||x.m.pos;
+    var mod=(deep&&!sup)?"deep":(!deep&&!x.m.tou&&(x.m.pai||x.m.tem))?"pain":"all";
+    sg[S]={a:x.r.a?1:0,t:x.r.t?1:0,l:x.r.l?1:0,mod:mod};});
+  return {f:f,m:m,sg:sg,list:list};
+}
+function renderLoc(){
+  var L=toLoc(),h="";
+  var items=L.list.map(function(x){return '<li>'+esc(x.src)+'</li>';});
+  ["R","L"].forEach(function(S){var g=L.m[S];if(g.a||g.l){var p=[];if(g.f)p.push("顔");if(g.a)p.push("上肢");if(g.l)p.push("下肢");items.push('<li>麻痺：'+SIDE[S]+" "+p.join("・")+((g.a&&g.l)?'（'+{arm:"上肢優位",leg:"下肢優位",eq:"ほぼ均等"}[L.m.emph]+'）':'')+'<small>MMT・Barré・Mingazzini・顔面麻痺から</small></li>');}});
+  ["R","L"].forEach(function(S){var g=L.sg[S];if(g.a||g.t||g.l){var p=[];if(g.a)p.push("上肢");if(g.t)p.push("体幹");if(g.l)p.push("下肢");items.push('<li>感覚：'+SIDE[S]+" "+p.join("・")+'（'+{all:"全感覚",pain:"温痛覚",deep:"深部覚"}[g.mod]+'）<small>感覚の表から</small></li>');}});
+  h=items.length?'<ul class="lc">'+items.join("")+'</ul>':'<div class="empty">局在ナビに送れる異常所見はまだありません。</div>';
+  $("locList").innerHTML=h;
+  $("btnSend").disabled=!items.length;
+}
+function locHasInput(j){if(!j)return false;if(j.f&&Object.keys(j.f).length)return true;
+  var g=function(o,ks){return o&&["R","L"].some(function(S){return o[S]&&ks.some(function(k){return o[S][k];});});};
+  return g(j.m,["f","a","l"])||g(j.sg,["a","t","l"]);}
+function sendLoc(){
+  var L=toLoc(),j=null;try{j=JSON.parse(localStorage.getItem(LKEY)||"null");}catch(e){}
+  j=j||{};j.f=L.f;j.m=L.m;j.sg=L.sg;j.neg={};if(!j.dom)j.dom="L";if(!j.cases)j.cases=[];if(!j.open)j.open={cn:1,mot:1};
+  try{localStorage.setItem(LKEY,JSON.stringify(j));}catch(e){}
+  location.href="../loc/#result";
+}
+
+/* ---------------- 操作 ---------------- */
+function show(v){
+  document.querySelectorAll("section.view").forEach(function(s){s.classList.toggle("active",s.id===v);});
+  document.querySelectorAll("nav.tabs button").forEach(function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===v?"true":"false");});
+  if(v==="v-chart")buildChart();
+  if(v==="v-loc")renderLoc();
+  window.scrollTo(0,0);
+}
+function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on");},1800);}
+function copyText(txt){
+  function fb(){var ta=document.createElement("textarea");ta.value=txt;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.top="-1000px";document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy");}catch(e){}document.body.removeChild(ta);toast(ok?"コピーしました":"コピーできませんでした。長押しで選択してください");}
+  try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(function(){toast("コピーしました");},fb);return;}}catch(e){}
+  fb();
+}
+
+$("secs").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  var fs=b.getAttribute("data-fillsec");
+  if(fs){IT.filter(function(it){return it.g===fs&&!it.opt&&!stat(it);}).forEach(fillNormal);save();IT.filter(function(it){return it.g===fs;}).forEach(function(it){refreshItem(it.id);});toast("未入力の項目を正常にしました");return;}
+  var row=b.closest(".it");if(!row)return;var id=row.getAttribute("data-i"),it=IM[id],v=V(id);
+  if(b.hasAttribute("data-s")){var s=b.getAttribute("data-s");
+    if(it.ty){ if(s==="x"){v.s=v.s==="x"?"":"x";} else {v.s="";fillNormal(it);} }
+    else { if(v.s===s)v.s=""; else {v.s=s; if(s!=="a")v.o={};} }
+    save();refreshItem(id);return;}
+  if(b.hasAttribute("data-o")){var k=b.getAttribute("data-o"),val=b.getAttribute("data-v");
+    if(v.o[k]===val)delete v.o[k]; else v.o[k]=val;
+    if(!it.ty&&!it.opt)v.s="a"; else if(it.ty&&v.s==="x")v.s="";
+    save();refreshItem(id);return;}
+  if(b.hasAttribute("data-fill5")){MUS.forEach(function(m){var x=st.mm[m[0]]||(st.mm[m[0]]={});if(!x.R)x.R="5";if(!x.L)x.L="5";});v.s="";save();refreshItem(id);return;}
+  if(b.hasAttribute("data-fillp")){DTR.forEach(function(d){var x=st.dt[d[0]]||(st.dt[d[0]]={});if(!x.R)x.R="+";if(!x.L)x.L="+";});v.s="";save();refreshItem(id);return;}
+  if(b.hasAttribute("data-sn")){var S=b.getAttribute("data-sn"),x=st.sn[S];
+    if(b.hasAttribute("data-sr")){var r=b.getAttribute("data-sr");x.r[r]=x.r[r]?0:1;}
+    else {var mm=b.getAttribute("data-sm");x.m[mm]=x.m[mm]?0:1;}
+    if(v.s==="x"||v.s==="n")v.s="";
+    save();refreshItem(id);return;}
+});
+$("secs").addEventListener("change",function(e){
+  var el=e.target;var w=el.getAttribute("data-w");if(!w)return;
+  var row=el.closest(".it"),id=row.getAttribute("data-i"),v=V(id),k=el.getAttribute("data-k"),S=el.getAttribute("data-sd");
+  if(w==="cv")st.cv[k]=el.value;
+  else if(w==="pu")st.pu[k]=el.value;
+  else if(w==="mm"){(st.mm[k]||(st.mm[k]={}))[S]=el.value;}
+  else if(w==="dt"){(st.dt[k]||(st.dt[k]={}))[S]=el.value;}
+  else if(w==="snd"){st.sn[S].d=el.value;}
+  else if(w==="sc"){st.sc[k]=el.value;}
+  if(v.s==="x")v.s="";
+  save();refreshItem(id);
+});
+$("secs").addEventListener("input",function(e){var el=e.target;var id=el.getAttribute("data-memo");if(!id)return;V(id).m=el.value;save();});
+document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){show(b.getAttribute("data-v"));});});
+$("btnNext").addEventListener("click",function(){
+  var it=IT.filter(function(x){return !x.opt&&!stat(x);})[0];
+  if(!it){toast("すべて評価済みです");return;}
+  show("v-exam");var d=$("sec-"+it.g);d.open=true;st.open[it.g]=1;save();
+  var el=$("it-"+it.id);setTimeout(function(){el.scrollIntoView({block:"center"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");},60);
+});
+document.addEventListener("click",function(e){var b=e.target.closest("button[data-copy]");if(!b)return;var id=b.getAttribute("data-copy");copyText(id==="outTxt"?$("outTxt").value:$(id).textContent);});
+$("btnRegen").addEventListener("click",function(){buildChart();toast("入力から作り直しました");});
+$("optAb").addEventListener("change",function(){opt.ab=this.checked;saveOpt();buildChart();});
+$("optUn").addEventListener("change",function(){opt.un=this.checked;saveOpt();buildChart();});
+$("btnSend").addEventListener("click",function(){
+  var j=null;try{j=JSON.parse(localStorage.getItem(LKEY)||"null");}catch(e){}
+  if(locHasInput(j)){$("dlg").classList.add("on");$("dlgNo").focus();} else sendLoc();
+});
+$("dlgNo").addEventListener("click",function(){$("dlg").classList.remove("on");});
+$("dlgYes").addEventListener("click",function(){$("dlg").classList.remove("on");sendLoc();});
+$("dlg").addEventListener("click",function(e){if(e.target===$("dlg"))$("dlg").classList.remove("on");});
+
+/* ---------------- 初期化 ---------------- */
+load();
+$("optAb").checked=opt.ab;$("optUn").checked=opt.un;
+buildSecs();refreshCounts();
+if(location.hash==="#chart")show("v-chart");
+})();
+</script>
+<div id="swMsg" class="alert" style="display:none;position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:9">新しい版を取り込みました。次に開いたときに反映されます。</div>
+<script>
+(function(){try{
+  var h=location.hostname;
+  var ok=(location.protocol==="https:"||h==="localhost"||h==="127.0.0.1")&&!/(^|\.)claude\.ai$/.test(h)&&!/claudeusercontent|claude\.site/.test(h);
+  if(!ok||!("serviceWorker" in navigator))return;
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){if(w.state==="installed"&&navigator.serviceWorker.controller){var m=document.getElementById("swMsg");m.style.display="block";setTimeout(function(){m.style.display="none";},6000);}});});
+    }).catch(function(){});
+  });
+}catch(e){}})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[{"k": "neuroExam.v1", "keep": ["open"]}];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+</body>
+</html>

@@ -180,6 +180,7 @@ table.sg .mb{min-height:44px;font-size:14px}
         <option value="">例を読み込む…</option>
       </select>
     </div>
+    <p class="hint" style="margin-top:8px"><a href="../exam/">神経診察チェック</a>で診察しながら入力し、カルテ文を作ってからここへ送ることもできます。</p>
     <p class="hint">神経診察の順（高次脳→脳神経→運動→反射→感覚→協調）に並べています。左右のある所見は「<b>症状が出ている側</b>」で入力（眼の偏位は眼が向いている側、注視麻痺は向けない側、舌は偏る側、半盲・無視は欠損側）。もう一度押すと解除。</p>
   </div>
   <div class="card" id="liveCard"><h2>いまの候補</h2><div id="live"></div></div>
@@ -999,6 +1000,7 @@ function show(v){
 
 /* ---------------- 初期化 ---------------- */
 load();buildInput();buildDict();buildRefs();syncInput();compute();renderCases();
+if(location.hash==="#result"){show("v-result");try{history.replaceState(null,"",location.pathname);}catch(e){}}
 document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){show(b.getAttribute("data-v"));});});
 $("btnGo").addEventListener("click",function(){show("v-result");});
 $("btnClear").addEventListener("click",function(){

@@ -243,6 +243,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "神経診察チェック",
+      "short_name": "神経診察",
+      "url": "exam/",
+      "icons": [
+        {
+          "src": "exam/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
