@@ -33,8 +33,8 @@ header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + 
 header.top .brand{max-width:760px;margin:0 auto}
 header.top h1{font-size:19px;margin:0;line-height:1.3}
 header.top small{font-size:12px;opacity:.9}
-nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-nav.tabs button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:12.5px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
 nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
 @media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.2)}}
 main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
@@ -158,6 +158,7 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
 <header class="top">
   <div class="brand"><h1>肢体不自由 等級判定ナビ</h1><small>身障手帳 診断書・意見書（肢体不自由用・東京都様式）1枚目の下書き支援</small></div>
   <nav class="tabs" role="tablist">
+    <button data-tab="q">かんたん</button>
     <button data-tab="dx">原疾患</button>
     <button data-tab="fx">所見</button>
     <button data-tab="jt">関節</button>
@@ -169,12 +170,48 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
 <main>
 <div class="strip" id="strip"><span id="stripL">判定：—</span><button class="cp" type="button" data-go="rs">1枚目を見る</button></div>
 
+<!-- ========== かんたん ========== -->
+<div data-p="q">
+  <section class="card">
+    <h2>かんたん入力（等級を決める項目だけ）</h2>
+    <label class="f">原疾患<select class="dxSel" data-k="dx"></select></label>
+    <div class="q" style="margin-top:12px"><span class="lb">障害のある側</span><div class="chips" data-chips="side"></div></div>
+    <label class="f">③ 発症日（脳血管障害は6か月の要件確認に使う）<input type="date" data-k="onset"></label>
+  </section>
+  <section class="card" id="qUc">
+    <h2>上肢</h2>
+    <div id="qU"></div>
+  </section>
+  <section class="card">
+    <h2>歩行・起立（補装具なしで）</h2>
+    <div class="grid">
+      <label class="f">歩行能力<select data-k="walk"><option value="">—</option><option value="none">歩行不能</option><option value="lt100">100m以上歩行不能</option><option value="lt1k">1km以上歩行不能</option><option value="lt2k">2km以上歩行不能</option><option value="ok">2km以上歩行可</option></select></label>
+      <label class="f">起立位保持<select data-k="stand"><option value="">—</option><option value="none">起立位を保てない</option><option value="lt10">10分以上困難</option><option value="lt30">30分以上困難</option><option value="lt60">1時間以上困難</option><option value="ok">1時間以上可</option></select></label>
+    </div>
+    <div id="qL" style="margin-top:8px"></div>
+    <div class="q" style="margin-top:10px"><span class="lb">歩行・起立の障害の主因</span><div class="chips" data-chips="gait"></div></div>
+    <div id="qT" class="hidden">
+      <h3>体幹</h3>
+      <div class="grid">
+        <label class="f">坐位保持<select data-k="sit"><option value="">—</option><option value="none">坐っていられない</option><option value="lt10">10分以上保てない</option><option value="ok">10分以上保てる</option></select></label>
+        <label class="f">立ち上がり<select data-k="rise"><option value="">—</option><option value="self">自力で可</option><option value="aid">自力では不可（人・柱・杖で可）</option><option value="none">介助でも不可</option></select></label>
+        <label class="f">片脚起立<select data-k="oneleg"><option value="">—</option><option value="ok">どちらかで可</option><option value="none">両脚とも全く不可</option></select></label>
+      </div>
+    </div>
+  </section>
+  <section class="card">
+    <div id="qOut"></div>
+    <div class="rowx" style="margin-top:10px"><button class="btn" type="button" data-act="copyAll">1枚目をまとめてコピー</button><button class="btn" type="button" data-go="rs">1枚目を欄ごとに見る</button></div>
+    <p class="hint">ROM・MMT・握力・動作活動を詳細タブで足すと、総合所見の根拠（MMT著減など）と整合性チェックに反映される。診断書の2・3枚目にはこれらの記載が必要。</p>
+  </section>
+</div>
+
 <!-- ========== 原疾患 ========== -->
-<div data-p="dx">
+<div data-p="dx" class="hidden">
   <section class="card">
     <h2>原因となった疾病・外傷</h2>
     <label class="f">原疾患
-      <select id="dxSel" data-k="dx"></select>
+      <select id="dxSel" class="dxSel" data-k="dx"></select>
     </label>
     <label class="f hidden" id="dxOtherW" style="margin-top:8px">疾患名（自由記載）<input type="text" data-k="dxOther" placeholder="例：脊髄梗塞"></label>
     <div id="dxNote" style="margin-top:10px"></div>
@@ -182,7 +219,7 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
       <div class="chips" id="causeChips"></div>
     </div>
     <div class="q"><span class="lb">障害のある側</span>
-      <div class="chips" id="sideChips"></div>
+      <div class="chips" id="sideChips" data-chips="side"></div>
     </div>
   </section>
 
@@ -284,7 +321,7 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
     <h3>座り方（できないものにチェック）</h3>
     <div class="chips" data-arr="seatNg" data-opts="正座,あぐら,横座り,通常の腰掛け"></div>
     <div class="q" style="margin-top:12px"><span class="lb">歩行・起立の障害の主因（等級の当てはめ先）</span>
-      <div class="chips" id="gaitChips"></div>
+      <div class="chips" id="gaitChips" data-chips="gait"></div>
       <p class="hint">片麻痺で一側の体幹筋力低下を伴うものは<b>下肢</b>で認定（両側性病変を除く。東京都講習会資料）。PD・SCD・MSA などは体幹で評価するのが一般的。「両方」では高い方を採る（下肢と体幹は原則として指数合算しない）。</p>
     </div>
   </section>
@@ -521,7 +558,7 @@ const STANDT={none:"起立位を保てない",lt10:"10分以上困難",lt30:"30�
 
 function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function blankSide(){return {sh:{},el:{},wr:{},hip:{},kn:{},an:{},fin:"auto",lift:"",fine:false,toe:"",sup:false,ovU:"auto",ovL:"auto"}}
-function fresh(){return {tab:"dx",jside:"R",dx:"",dxOther:"",cause:"",side:"",onset:"",fixed:"",exam:today(),tha:"",course:"",imaging:"",comorb:"",
+function fresh(){return {tab:"q",jside:"R",dx:"",dxOther:"",cause:"",side:"",onset:"",fixed:"",exam:today(),tha:"",course:"",imaging:"",comorb:"",
  neuro:{sens:[],mot:[],site:[],bb:"",deform:""},grip:{R:"",L:""},len:{R:"",L:""},walk:"",stand:"",sit:"",rise:"",stairs:"",oneleg:"",seatNg:[],gait:"",adl:{},
  J:{R:blankSide(),L:blankSide()},rc:"auto",rcT:"1"}}
 let S=fresh();
@@ -559,12 +596,13 @@ function finEval(s){
 function upperEval(s){
  const J=S.J[s];const js={};JU.forEach(([k])=>js[k]=jointEval(k,J[k]));const fin=finEval(s);
  let wl=0,wwhy=[];const nL=JU.filter(([k])=>js[k].lv===3).length;
- if(nL===3&&fin.id==="all"){wl=3;wwhy.push("肩・肘・手関節とすべての指の全廃")}
+ if((nL===3&&fin.id==="all")||J.uAll){wl=3;wwhy.push("肩・肘・手関節とすべての指の全廃")}
  if(J.lift==="le5"){if(wl<2)wl=2;wwhy.push("5kg以内しか下げられない")}
  if(nL>=2&&wl<2){wl=2;wwhy.push("3大関節のうち2関節以上の全廃")}
  if(J.lift==="le10"&&wl<1){wl=1;wwhy.push("10kg以内しか下げられない")}
  if(J.fine&&wl<1){wl=1;wwhy.push("精密な運動ができない")}
  if(J.fine&&wl>=1&&!wwhy.includes("精密な運動ができない"))wwhy.push("精密な運動ができない");
+ wwhy=[...new Set(wwhy)];
  let ov=J.ovU||"auto";if(ov!=="auto"){wl=+ov;wwhy=["手動で指定"]}
  const wg=wl?{1:7,2:3,3:2}[wl]:0;
  const parts=[];JU.forEach(([k,n])=>{if(js[k].g)parts.push({k,n,g:js[k].g,lv:js[k].lv,why:js[k].why})});
@@ -757,10 +795,10 @@ function sheet2(){
 
 /* ---------- 描画 ---------- */
 function setTab(t){S.tab=t;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false"));
- document.querySelectorAll("[data-p]").forEach(p=>p.classList.toggle("hidden",p.dataset.p!==t));$("strip").classList.toggle("hidden",t==="rs"||t==="ref");save();window.scrollTo(0,0)}
+ document.querySelectorAll("[data-p]").forEach(p=>p.classList.toggle("hidden",p.dataset.p!==t));$("strip").classList.toggle("hidden",t==="rs"||t==="ref"||t==="q");save();window.scrollTo(0,0)}
 function chipsHTML(name,opts,cur,multi){return opts.map(o=>{const v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;const on=multi?cur.includes(v):cur===v;return '<label class="chip"><input type="'+(multi?"checkbox":"radio")+'" name="'+name+'" value="'+esc(v)+'"'+(on?" checked":"")+'><span>'+esc(l)+'</span></label>'}).join("")}
 function initStatic(){
- $("dxSel").innerHTML=(()=>{let h="",g="";DX.forEach(d=>{if(!d.id){h+='<option value="">'+d.n+'</option>';return}if(d.g!==g){if(g)h+="</optgroup>";h+='<optgroup label="'+d.g+'">';g=d.g}h+='<option value="'+d.id+'">'+d.n+'</option>'});return h+"</optgroup>"})();
+const dxOpts=(()=>{let h="",g="";DX.forEach(d=>{if(!d.id){h+='<option value="">'+d.n+'</option>';return}if(d.g!==g){if(g)h+="</optgroup>";h+='<optgroup label="'+d.g+'">';g=d.g}h+='<option value="'+d.id+'">'+d.n+'</option>'});return h+"</optgroup>"})();document.querySelectorAll(".dxSel").forEach(el=>el.innerHTML=dxOpts);
  $("finSel").innerHTML=FIN.map(f=>'<option value="'+f[0]+'">'+(f[2]?f[2]+"級：":"")+f[1]+'</option>').join("");
  $("adlBox").innerHTML=ADL.map(a=>'<div class="nm">'+a[1]+(a[2]?'<br><small>（'+a[2]+'）</small>':'')+'</div><div class="tri" data-adl="'+a[0]+'">'+["○","△","×"].map(v=>'<button type="button" data-v="'+v+'">'+v+'</button>').join("")+'</div>').join("");
  const row=(k,n,lax)=>'<tr data-j="'+k+'"><td>'+n+'</td><td><input type="number" inputmode="decimal" min="0" max="360" data-f="rom" placeholder="°"></td><td><select data-f="mmt"><option value="">—</option>'+["0","1","2","2.5","3","3.5","4","4.5","5"].map(v=>'<option>'+v+'</option>').join("")+'</select></td><td>'+(lax?'<select data-f="lax"><option value="">動揺なし</option><option>軽度</option><option>中等度</option><option>高度</option></select>':'')+'</td><td class="lvc"></td></tr>';
@@ -775,8 +813,8 @@ function fillBound(){
 function renderDx(){
  const d=dxObj();$("dxOtherW").classList.toggle("hidden",d.id!=="oth");$("thaW").classList.toggle("hidden",!d.tha&&!S.tha);
  $("causeChips").innerHTML=chipsHTML("cause",["外傷","自然災害","疾病","先天性","その他"],S.cause||d.cause||"",false);
- $("sideChips").innerHTML=chipsHTML("side",[["R","右"],["L","左"],["B","両側"]],S.side,false);
- $("gaitChips").innerHTML=chipsHTML("gait",[["limb","下肢"],["trunk","体幹"],["both","両方（高い方）"]],gaitMode(),false);
+ document.querySelectorAll("[data-chips=side]").forEach((el,i)=>el.innerHTML=chipsHTML("side"+i,[["R","右"],["L","左"],["B","両側"]],S.side,false));
+ document.querySelectorAll("[data-chips=gait]").forEach((el,i)=>el.innerHTML=chipsHTML("gait"+i,[["limb","下肢"],["trunk","体幹"],["both","両方（高い方）"]],gaitMode(),false));
  let n="";if(d.stroke)n+='<p class="note w">脳病変：原則として発症から<b>6か月以上</b>で認定。片麻痺は「上下肢機能障害（左片麻痺）」の形で、一側の体幹筋力低下は下肢で評価。</p>';
  if(d.pd)n+='<p class="note">PD：服薬でコントロールされた状態で判定。歩行・起立の障害は体幹で評価するのが一般的。</p>';
  if(d.prog&&!d.pd)n+='<p class="note">進行性疾患：上肢・下肢・体幹の欄で評価（脳原性運動機能障害の欄は使わない）。</p>';
@@ -814,7 +852,25 @@ function renderResult(R){
  $("sheet2").innerHTML='<dl class="kv">'+sheet2().map(x=>'<dt>'+x[0]+'</dt><dd>'+esc(x[1])+'</dd>').join("")+'</dl>';
 }
 function renderStrip(R){const g=R.g;$("stripL").innerHTML='判定：<b>'+(g&&g<=6?g+"級相当":g===7?"7級":"—")+'</b>　<span class="sub">上肢'+(R.uG||"—")+'・下肢'+(R.lG||"—")+'・体幹'+(R.T.g||"—")+'</span>'}
-function renderAll(){const R=compute();renderDx();renderJoints(R);renderADL();renderResult(R);renderStrip(R);save()}
+function syncBound(){const a=document.activeElement;document.querySelectorAll("[data-k]").forEach(el=>{if(el===a)return;const v=gp(el.dataset.k);if(el.type==="checkbox")el.checked=!!v;else{const nv=v==null?"":v;if(el.value!==nv)el.value=nv}})}
+function renderQuick(R){
+ const sd=sides();
+ const uopt=[["","障害なし／軽微"],["fine","精密運動ができない（7級）"],["le10","10kg以内のみ下げられる（7級）"],["le5","5kg以内のみ下げられる（3級）"],["all","全廃（2級）"]];
+ const uv=J=>J.uAll?"all":J.lift==="le5"?"le5":J.lift==="le10"?"le10":J.fine?"fine":"";
+ if(!sd.length){$("qU").innerHTML='<p class="hint">障害のある側を選ぶと表示。</p>';$("qL").innerHTML=""}
+ else{
+  $("qU").innerHTML=sd.map(s=>'<label class="f" style="margin-bottom:8px">'+SN[s]+'上肢<select data-uq="'+s+'">'+uopt.map(o=>'<option value="'+o[0]+'"'+(uv(S.J[s])===o[0]?" selected":"")+'>'+o[1]+'</option>').join("")+'</select></label>').join("")+(sd.some(s=>R.U[s].parts.length)?'<p class="hint">関節タブの入力も合算している。</p>':'');
+  $("qL").innerHTML=R.gm==="trunk"?"":sd.map(s=>'<label class="chk"><input type="checkbox" data-sup="'+s+'"'+(S.J[s].sup?" checked":"")+'><span>'+SN[s]+'下肢：患肢で立位を保持できない（全廃 3級）</span></label>').join("");
+ }
+ $("qT").classList.toggle("hidden",R.gm==="limb");
+ const g=R.g,f=window._s1||[];const so=f.find(x=>x[0].startsWith("⑤"));const nm=f.find(x=>x[0].startsWith("①"));
+ const cls=!g?"info":g<=2?"crit":g<=4?"warn":g<=6?"ok":"info";
+ $("qOut").innerHTML='<div class="verdict '+cls+'" style="margin-bottom:10px"><span class="pill">参考意見</span><div class="big">'+(g&&g<=6?g+"級相当":g===7?"7級（単独では非該当）":"該当する所見なし")+'</div><div class="sub">上肢 '+(R.uG?R.uG+"級":"—")+'・下肢 '+(R.lG?R.lG+"級":"—")+'・体幹 '+(R.T.g?R.T.g+"級":"—")+'</div></div>'
+  +(nm?'<div class="out"><div class="hd"><b>① 障害名</b></div><div class="tx">'+esc(nm[1])+'</div></div>':'')
+  +(so?'<div class="out"><div class="hd"><b>⑤ 総合所見</b><button class="cp" type="button" data-cp="'+f.indexOf(so)+'">コピー</button></div><div class="tx">'+esc(so[1])+'</div></div>':'')
+  +checks(R).filter(x=>x[0]!=="info").map(x=>'<p class="note w" style="margin:0 0 6px">'+esc(x[1])+'</p>').join("");
+}
+function renderAll(){const R=compute();syncBound();renderDx();renderJoints(R);renderADL();renderResult(R);renderQuick(R);renderStrip(R);save()}
 
 /* ---------- イベント ---------- */
 function applyDxDefaults(){const d=dxObj();if(!d.id)return;S.cause=d.cause;S.gait="";S.neuro.mot=d.mot.slice();S.neuro.site=d.site.slice();
@@ -828,8 +884,10 @@ document.addEventListener("change",e=>{const el=e.target;
  const tr=el.closest&&el.closest("tr[data-j]");if(tr&&el.dataset.f){S.J[S.jside][tr.dataset.j]=Object.assign({},S.J[S.jside][tr.dataset.j],{[el.dataset.f]:el.value});renderAll();return}
  const arr=el.closest&&el.closest("[data-arr]");if(arr){sp(arr.dataset.arr,[...arr.querySelectorAll("input:checked")].map(i=>i.value));renderAll();return}
  if(el.name==="cause"){S.cause=el.value;renderAll();return}
- if(el.name==="side"){S.side=el.value;renderAll();return}
- if(el.name==="gait"){S.gait=el.value;renderAll();return}
+ if(/^side\d/.test(el.name||"")){S.side=el.value;renderAll();return}
+ if(/^gait\d/.test(el.name||"")){S.gait=el.value;renderAll();return}
+ if(el.dataset.uq){const J=S.J[el.dataset.uq],v=el.value;J.uAll=v==="all";J.lift=v==="le5"||v==="le10"?v:"";J.fine=v==="fine";renderAll();return}
+ if(el.dataset.sup){S.J[el.dataset.sup].sup=el.checked;renderAll();return}
  const J=S.J[S.jside];
  if(el.id==="finSel")J.fin=el.value;else if(el.id==="liftSel")J.lift=el.value;else if(el.id==="fineChk")J.fine=el.checked;else if(el.id==="ovU")J.ovU=el.value;
  else if(el.id==="toeSel")J.toe=el.value;else if(el.id==="supChk")J.sup=el.checked;else if(el.id==="ovL")J.ovL=el.value;else return;
@@ -842,7 +900,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)r
  const tri=b.closest("[data-adl]");if(tri){const id=tri.dataset.adl;S.adl=S.adl||{};S.adl[id]=S.adl[id]===b.dataset.v?"":b.dataset.v;renderAll();return}
  if(b.id==="adlAllO"){ADL.forEach(a=>{if(!S.adl[a[0]])S.adl[a[0]]="○"});renderAll();toast("未入力の項目を○にしました");return}
  if(b.dataset.cp!=null){const x=window._s1[+b.dataset.cp];copy(x[1]);return}
- if(b.id==="copyAll"){copy(window._s1.map(x=>"【"+x[0]+"】\n"+x[1]).join("\n\n"));return}
+ if(b.id==="copyAll"||b.dataset.act==="copyAll"){copy(window._s1.map(x=>"【"+x[0]+"】\n"+x[1]).join("\n\n"));return}
 });
 function copy(t){const done=()=>toast("コピーしました");if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(done,()=>fb())}else fb();
  function fb(){const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){toast("コピーできませんでした")}ta.remove()}}
