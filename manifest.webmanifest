@@ -219,6 +219,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "指定難病・制度ナビ",
+      "short_name": "難病・制度ナビ",
+      "url": "nan/",
+      "icons": [
+        {
+          "src": "nan/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
