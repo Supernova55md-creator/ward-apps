@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#35506b">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="肢体不自由ナビ">
+<title>肢体不自由 等級判定ナビ</title>
+<style>
+:root{
+  --accent:#35506b; --accent-ink:#fff; --accent-soft:#e6edf4;
+  --bg:#f4f6f8; --surface:#fff; --ink:#1c2219; --muted:#5f6a5a; --line:#d9e0e6;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --info:#2b5b9a; --info-soft:#e7eef8;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#9cc0e4; --accent-ink:#0f1a25; --accent-soft:#1c2a38;
+  --bg:#121511; --surface:#1b1f19; --ink:#eef2ea; --muted:#a8b3a2; --line:#334030;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:19px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.2)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:16px;margin:0 0 10px;line-height:1.4}
+h3{font-size:14.5px;margin:14px 0 6px}
+h3:first-child{margin-top:0}
+.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.q{margin:0 0 14px}
+.q:last-child{margin-bottom:0}
+.q>.lb{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{position:relative;display:block}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt span{display:block;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 11px;font-size:14px;line-height:1.45;cursor:pointer}
+.opt span b{font-family:var(--num);margin-right:6px}
+.opt input:checked + span{background:var(--accent-soft);border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.opt input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
+.opt.th span{border-style:dashed}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:14px;line-height:1.3;cursor:pointer;min-height:36px}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=number],input[type=date],select{font:inherit;font-size:17px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
+select{font-size:15px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;padding:6px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.hidden{display:none!important}
+.verdict{border-radius:12px;padding:14px;border:1.5px solid var(--line);display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+.verdict.ok{background:var(--ok-soft);border-color:var(--ok)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.crit{background:var(--crit-soft);border-color:var(--crit)}
+.verdict.info{background:var(--info-soft);border-color:var(--info)}
+.pill{align-self:flex-start;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:#fff;background:var(--muted)}
+.verdict.ok .pill{background:var(--ok)}.verdict.warn .pill{background:var(--warn)}.verdict.crit .pill{background:var(--crit)}.verdict.info .pill{background:var(--info)}
+@media (prefers-color-scheme: dark){.pill{color:#111}}
+.big{font-size:17.5px;font-weight:700;line-height:1.45}
+.verdict ul{margin:0;padding-left:1.2em;font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tg{font-size:12.5px;font-weight:700;border-radius:6px;padding:3px 8px;border:1px solid var(--line);background:var(--bg)}
+.tg.y{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.tg.n{background:var(--bg);color:var(--muted)}
+.tg.c{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.score{font-family:var(--num);font-size:20px;font-weight:700}
+.bi .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dotted var(--line);font-size:14px}
+.bi .row:last-child{border-bottom:0}
+.bi select{width:auto;max-width:190px;font-size:14px;padding:6px}
+table.tl{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+table.tl th,table.tl td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+table.tl th{font-size:12px;color:var(--muted);font-weight:700;background:var(--bg);white-space:nowrap}
+table.tl td.n{text-align:right;font-family:var(--num);white-space:nowrap}
+table.tl tr.hl td{background:var(--accent-soft)}
+.wrapx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.list{margin:0;padding-left:1.2em;font-size:14px}
+.list li{margin:3px 0}
+.note{border-left:4px solid var(--info);background:var(--bg);border-radius:8px;padding:9px 11px;font-size:14px}
+.note.w{border-left-color:var(--warn)}
+.note.k{border-left-color:var(--ok)}
+.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.links a{font-size:12.5px;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--info);background:var(--surface)}
+.mo{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+@media (max-width:420px){.mo{grid-template-columns:repeat(3,1fr)}}
+.mo label{font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.mo input{font-size:15px;padding:6px}
+.mo input.hit{border-color:var(--ok);background:var(--ok-soft)}
+.mo input.hit2{border-color:var(--warn);background:var(--warn-soft)}
+.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;min-height:38px}
+.src{font-size:13px}
+.src li{margin:4px 0}
+.src a{color:var(--info);word-break:break-all}
+.dz{font-size:13px}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 14px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:50;max-width:90vw}
+#toast.on{opacity:.95}
+.foot{font-size:11.5px;color:var(--muted);text-align:center;margin:6px 0}
+
+</style>
+</head>
+<body>
+<style>
+.jt{width:100%;border-collapse:collapse;font-size:14px}
+.jt th{font-size:11.5px;color:var(--muted);font-weight:700;text-align:left;padding:4px 3px;white-space:nowrap}
+.jt td{padding:4px 3px;border-top:1px dotted var(--line);vertical-align:middle}
+.jt td:first-child{font-weight:700;white-space:nowrap;font-size:13.5px}
+.jt input,.jt select{font-size:15px;padding:6px 5px;min-width:0}
+.jt input{width:64px}
+.jt select{width:auto;max-width:96px}
+.lv{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 6px;white-space:nowrap;border:1px solid var(--line);color:var(--muted)}
+.lv.l1{background:var(--info-soft);color:var(--info);border-color:var(--info)}
+.lv.l2{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.lv.l3{background:var(--crit-soft);color:var(--crit);border-color:var(--crit)}
+.seg{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:10px}
+.seg button{font:inherit;font-weight:700;font-size:15px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;min-height:42px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.adl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;align-items:center}
+.adl .nm{font-size:14px;line-height:1.35}
+.adl .nm small{color:var(--muted);font-size:11.5px}
+.tri{display:inline-grid;grid-template-columns:repeat(3,40px);gap:4px}
+.tri button{font:inherit;font-size:16px;font-weight:700;min-height:38px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer}
+.tri button.on[data-v="○"]{background:var(--ok);color:#fff;border-color:var(--ok)}
+.tri button.on[data-v="△"]{background:var(--warn);color:#fff;border-color:var(--warn)}
+.tri button.on[data-v="×"]{background:var(--crit);color:#fff;border-color:var(--crit)}
+textarea{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;min-height:70px;resize:vertical}
+input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+.out{border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:var(--bg);margin:0 0 10px}
+.out .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.out .hd b{font-size:13.5px}
+.out .tx{white-space:pre-wrap;font-size:15px;line-height:1.65;word-break:break-word}
+.cp{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:7px;padding:5px 10px;min-height:32px;cursor:pointer;flex:none}
+.strip{position:sticky;top:var(--hh,96px);z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-size:13.5px;display:flex;justify-content:space-between;align-items:center;gap:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.strip b{font-size:16px}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:14px}
+.kv dt{color:var(--muted);font-weight:700}
+.kv dd{margin:0}
+.sub{font-size:12px;color:var(--muted)}
+.rowx{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+</style>
+
+<header class="top">
+  <div class="brand"><h1>肢体不自由 等級判定ナビ</h1><small>身障手帳 診断書・意見書（肢体不自由用・東京都様式）1枚目の下書き支援</small></div>
+  <nav class="tabs" role="tablist">
+    <button data-tab="dx">原疾患</button>
+    <button data-tab="fx">所見</button>
+    <button data-tab="jt">関節</button>
+    <button data-tab="rs">1枚目</button>
+    <button data-tab="ref">基準</button>
+  </nav>
+</header>
+
+<main>
+<div class="strip" id="strip"><span id="stripL">判定：—</span><button class="cp" type="button" data-go="rs">1枚目を見る</button></div>
+
+<!-- ========== 原疾患 ========== -->
+<div data-p="dx">
+  <section class="card">
+    <h2>原因となった疾病・外傷</h2>
+    <label class="f">原疾患
+      <select id="dxSel" data-k="dx"></select>
+    </label>
+    <label class="f hidden" id="dxOtherW" style="margin-top:8px">疾患名（自由記載）<input type="text" data-k="dxOther" placeholder="例：脊髄梗塞"></label>
+    <div id="dxNote" style="margin-top:10px"></div>
+    <div class="q" style="margin-top:12px"><span class="lb">原因の区分（②の右欄で○）</span>
+      <div class="chips" id="causeChips"></div>
+    </div>
+    <div class="q"><span class="lb">障害のある側</span>
+      <div class="chips" id="sideChips"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>日付</h2>
+    <div class="grid">
+      <label class="f">③ 疾病・外傷発生年月日<input type="date" data-k="onset"></label>
+      <label class="f">障害固定又は確定（推定）<input type="date" data-k="fixed"></label>
+      <label class="f">診断日（記載日）<input type="date" data-k="exam"></label>
+      <label class="f" id="thaW">人工関節・人工骨頭置換術<input type="date" data-k="tha"></label>
+    </div>
+    <div id="dateOut" style="margin-top:8px"></div>
+  </section>
+
+  <section class="card">
+    <h2>④ 経過・現症の素材</h2>
+    <label class="f">経過（治療・リハビリ・転帰など）<textarea data-k="course" placeholder="例：急性期治療後、回復期リハビリ病院で6か月リハビリを行い、令和8年3月に自宅退院"></textarea></label>
+    <label class="f" style="margin-top:8px">画像・検査所見<textarea data-k="imaging" placeholder="例：頭部MRIで右放線冠〜内包後脚に陳旧性梗塞"></textarea></label>
+    <label class="f" style="margin-top:8px">⑥ その他参考となる合併症状<input type="text" data-k="comorb" placeholder="例：高次脳機能障害、構音障害、嚥下障害"></label>
+    <p class="hint">患者を特定できる情報（氏名・ID・住所）は入力しない。</p>
+  </section>
+</div>
+
+<!-- ========== 所見 ========== -->
+<div data-p="fx" class="hidden">
+  <section class="card">
+    <h2>神経学的所見（2枚目上段）</h2>
+    <div class="q"><span class="lb">1 感覚障害</span><div class="chips" data-arr="neuro.sens" data-opts="感覚脱失,感覚鈍麻,異常感覚"></div></div>
+    <div class="q"><span class="lb">2 運動障害</span><div class="chips" data-arr="neuro.mot" data-opts="弛緩性麻痺,痙性麻痺,固縮,不随意運動,しんせん,運動失調,その他"></div></div>
+    <div class="q"><span class="lb">3 起因部位</span><div class="chips" data-arr="neuro.site" data-opts="脳,脊髄,末梢神経,筋肉,骨関節,その他"></div></div>
+    <div class="grid">
+      <label class="f">4 排尿・排便機能障害<select data-k="neuro.bb"><option value="">—</option><option>なし</option><option>あり</option></select></label>
+      <label class="f">5 形態異常<select data-k="neuro.deform"><option value="">—</option><option>なし</option><option>あり</option></select></label>
+    </div>
+    <p class="hint">原疾患を選ぶと運動障害・起因部位の初期値が入る（変更可）。</p>
+  </section>
+
+  <section class="card">
+    <h2>計測</h2>
+    <div class="grid">
+      <label class="f">握力 右（kg）<input type="number" inputmode="decimal" step="0.5" min="0" data-k="grip.R"></label>
+      <label class="f">握力 左（kg）<input type="number" inputmode="decimal" step="0.5" min="0" data-k="grip.L"></label>
+      <label class="f">下肢長 右（cm）<input type="number" inputmode="decimal" step="0.5" min="0" data-k="len.R"></label>
+      <label class="f">下肢長 左（cm）<input type="number" inputmode="decimal" step="0.5" min="0" data-k="len.L"></label>
+    </div>
+    <p class="hint">下肢長は上前腸骨棘→脛骨内果。握力が5kg以内なら手指4級、15kg以内なら手指7級の目安（関節タブの「手指」が自動のとき反映）。</p>
+  </section>
+
+  <section class="card">
+    <h2>歩行能力・起立位・坐位（補装具なしで）</h2>
+    <p class="note w" style="margin:0 0 10px">無理をすればできる一時的能力ではなく、<b>日常的に安定してできる能力</b>で判断する（認定基準・総括的解説）。</p>
+    <div class="grid">
+      <label class="f">歩行能力
+        <select data-k="walk">
+          <option value="">—</option>
+          <option value="none">歩行不能</option>
+          <option value="lt100">100m以上歩行不能</option>
+          <option value="lt1k">1km以上歩行不能</option>
+          <option value="lt2k">2km以上歩行不能</option>
+          <option value="ok">2km以上歩行可</option>
+        </select></label>
+      <label class="f">起立位保持
+        <select data-k="stand">
+          <option value="">—</option>
+          <option value="none">起立位を保てない</option>
+          <option value="lt10">10分以上困難</option>
+          <option value="lt30">30分以上困難</option>
+          <option value="lt60">1時間以上困難</option>
+          <option value="ok">1時間以上可</option>
+        </select></label>
+      <label class="f">坐位保持
+        <select data-k="sit">
+          <option value="">—</option>
+          <option value="none">坐っていられない（腰掛け・正座・横座り・あぐらいずれも不可）</option>
+          <option value="lt10">10分以上保てない</option>
+          <option value="ok">10分以上保てる</option>
+        </select></label>
+      <label class="f">臥位・坐位からの立ち上がり
+        <select data-k="rise">
+          <option value="">—</option>
+          <option value="self">自力で可</option>
+          <option value="aid">自力では不可（人・柱・杖などで可）</option>
+          <option value="none">介助があっても不可</option>
+        </select></label>
+      <label class="f">階段昇降（通常の駅の階段）
+        <select data-k="stairs">
+          <option value="">—</option>
+          <option value="ok">手すりなしで可</option>
+          <option value="rail">手すりにすがれば可</option>
+          <option value="none">不可</option>
+        </select></label>
+      <label class="f">片脚起立（どちらの脚でも）
+        <select data-k="oneleg">
+          <option value="">—</option>
+          <option value="ok">どちらかの脚で可</option>
+          <option value="none">両脚とも全く不可</option>
+        </select></label>
+    </div>
+    <h3>座り方（できないものにチェック）</h3>
+    <div class="chips" data-arr="seatNg" data-opts="正座,あぐら,横座り,通常の腰掛け"></div>
+    <div class="q" style="margin-top:12px"><span class="lb">歩行・起立の障害の主因（等級の当てはめ先）</span>
+      <div class="chips" id="gaitChips"></div>
+      <p class="hint">片麻痺で一側の体幹筋力低下を伴うものは<b>下肢</b>で認定（両側性病変を除く。東京都講習会資料）。PD・SCD・MSA などは体幹で評価するのが一般的。「両方」では高い方を採る（下肢と体幹は原則として指数合算しない）。</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>動作・活動（2枚目）</h2>
+    <p class="hint" style="margin:0 0 8px">自立○／半介助△／全介助又は不能×。左右差がある場合は共働での評価。（　）の用具を使う場合は原則として自立していない扱い。</p>
+    <div class="adl" id="adlBox"></div>
+    <div class="rowx" style="margin-top:10px"><button class="btn" type="button" id="adlAllO">すべて○にする</button></div>
+  </section>
+</div>
+
+<!-- ========== 関節 ========== -->
+<div data-p="jt" class="hidden">
+  <section class="card">
+    <div class="seg" id="sideSeg"><button type="button" data-s="R">右</button><button type="button" data-s="L">左</button></div>
+    <h2 id="jtTitle">右上肢</h2>
+    <table class="jt" id="jtU"></table>
+    <h3>手指</h3>
+    <label class="f"><select id="finSel"></select></label>
+    <div class="grid" style="margin-top:10px">
+      <label class="f">物を下げる・持ち上げる（患側上肢）
+        <select id="liftSel">
+          <option value="">—（10kgを超えて可）</option>
+          <option value="le10">10kg以内のみ</option>
+          <option value="le5">5kg以内のみ</option>
+        </select></label>
+      <label class="chk" style="align-self:end"><input type="checkbox" id="fineChk"><span>精密な運動ができない</span></label>
+    </div>
+    <label class="f" style="margin-top:8px">上肢全体の判定
+      <select id="ovU"><option value="auto">自動（下の根拠から）</option><option value="0">該当なし</option><option value="1">軽度の障害（7級）</option><option value="2">著しい障害（3級）</option><option value="3">全廃（2級）</option></select></label>
+    <div id="limbU" style="margin-top:8px"></div>
+  </section>
+
+  <section class="card">
+    <h2 id="jtTitleL">右下肢</h2>
+    <table class="jt" id="jtL"></table>
+    <div class="grid" style="margin-top:10px">
+      <label class="f">足指
+        <select id="toeSel"><option value="">—</option><option value="loss">すべての指の機能を全廃（下駄・草履が履けない）</option><option value="sev">すべての指の機能の著しい障害（特別の工夫で履ける）</option></select></label>
+      <label class="chk" style="align-self:end"><input type="checkbox" id="supChk"><span>患肢の支持性がほぼない（患肢で立位を保持できない）</span></label>
+    </div>
+    <label class="f" style="margin-top:8px">下肢全体の判定
+      <select id="ovL"><option value="auto">自動（下の根拠から）</option><option value="0">該当なし</option><option value="1">軽度の障害（7級）</option><option value="2">著しい障害（4級）</option><option value="3">全廃（3級）</option></select></label>
+    <div id="limbL" style="margin-top:8px"></div>
+  </section>
+
+  <section class="card">
+    <h2>入力のしかた</h2>
+    <ul class="list">
+      <li>ROM は<b>他動・連続した可動域</b>（例：膝 屈曲120°・伸展−10°→110°）。肩・股は原則として全方向で判断する。</li>
+      <li>MMT は<b>各運動方向の平均</b>。3.5 は四捨五入して 4（疑義解釈）。2枚目では ×（0〜2）・△（3）・○（4〜5）で記入。</li>
+      <li>ROM と MMT は<b>どちらか一方が基準に該当すれば</b>認定できる。</li>
+      <li>空欄の関節は判定しない。</li>
+    </ul>
+  </section>
+</div>
+
+<!-- ========== 判定・1枚目 ========== -->
+<div data-p="rs" class="hidden">
+  <div id="verdict"></div>
+  <section class="card">
+    <h2>等級の内訳</h2>
+    <div id="breakdown"></div>
+  </section>
+  <section class="card" id="warnCard">
+    <h2>整合性チェック</h2>
+    <div id="warns"></div>
+  </section>
+  <section class="card">
+    <h2>再認定（⑤の欄）</h2>
+    <div class="grid">
+      <label class="f">将来再認定<select data-k="rc"><option value="auto">自動の提案に従う</option><option value="no">不要</option><option value="mild">要（軽度化）</option><option value="sev">要（重度化）</option></select></label>
+      <label class="f">再認定の時期<select data-k="rcT"><option value="1">1年後</option><option value="3">3年後</option><option value="5">5年後</option></select></label>
+    </div>
+    <div id="rcNote" style="margin-top:8px"></div>
+  </section>
+  <section class="card">
+    <h2>1枚目（総括表）の下書き</h2>
+    <div id="sheet1"></div>
+    <div class="rowx"><button class="btn" type="button" id="copyAll">1枚目をまとめてコピー</button></div>
+  </section>
+  <section class="card">
+    <h2>2枚目の記入メモ</h2>
+    <div id="sheet2"></div>
+  </section>
+</div>
+
+<!-- ========== 基準 ========== -->
+<div data-p="ref" class="hidden">
+  <section class="card">
+    <h2>指数合算</h2>
+    <div class="wrapx"><table class="tl">
+      <tr><th>個別等級</th><td>1級</td><td>2級</td><td>3級</td><td>4級</td><td>5級</td><td>6級</td><td>7級</td></tr>
+      <tr><th>指数</th><td class="n">18</td><td class="n">11</td><td class="n">7</td><td class="n">4</td><td class="n">2</td><td class="n">1</td><td class="n">0.5</td></tr>
+      <tr><th>合計→等級</th><td class="n">18〜</td><td class="n">11〜17</td><td class="n">7〜10</td><td class="n">4〜6</td><td class="n">2〜3</td><td class="n">1</td><td class="n">0.5</td></tr>
+    </table></div>
+    <ul class="list" style="margin-top:8px">
+      <li>7級単独では手帳の対象外。7級が2つ以上で6級。</li>
+      <li>一肢の合計は、その肢を欠いた場合の等級が上限（一上肢＝上腕1/2以上で欠く2級、一下肢＝大腿1/2以上で欠く3級）。</li>
+      <li><b>下肢と体幹が重複する場合、原則として指数合算しない</b>（東京都様式の注記）。高い方で認定する。</li>
+      <li>片麻痺で一側の体幹筋力低下を伴うものは下肢で認定。両側性病変（脳幹出血・多発梗塞など）は例外。</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h2>関節の基準（ROM／MMT）</h2>
+    <div class="wrapx"><table class="tl">
+      <tr><th>関節</th><th>全廃</th><th>著しい障害</th><th>軽度の障害</th></tr>
+      <tr><td>肩</td><td>4級：ROM 30°以下／MMT 2以下</td><td>5級：60°以下／MMT 3</td><td>7級：概ね90°以下／MMT 4</td></tr>
+      <tr><td>肘</td><td>4級：10°以下／MMT 2以下／高度の動揺関節</td><td>5級：30°以下／MMT 3／中等度の動揺関節／回内外10°以下</td><td>7級：概ね90°以下／MMT 4／軽度の動揺関節</td></tr>
+      <tr><td>手</td><td>4級：10°以下／MMT 2以下</td><td>5級：30°以下／MMT 3</td><td>7級：概ね90°以下／MMT 4</td></tr>
+      <tr><td>股</td><td>4級：各方向10°以下／MMT 2以下</td><td>5級：30°以下／MMT 3</td><td>7級：MMT 4 など（例：小児の股関節脱臼で軽度の跛行）</td></tr>
+      <tr><td>膝</td><td>4級：10°以下／MMT 2以下／高度の動揺関節</td><td>5級：30°以下／MMT 3／中等度の動揺関節</td><td>7級：概ね90°以下／MMT 4／軽度の動揺関節</td></tr>
+      <tr><td>足</td><td>5級：5°以内／MMT 2以下／高度の動揺関節</td><td>6級：10°以内／MMT 3／中等度の動揺関節</td><td>7級：30°以下／MMT 4／軽度の動揺関節</td></tr>
+    </table></div>
+    <p class="hint">膝は可動域が10°を超えても、支持性がないことが明らかなら全廃（4級）にできる（疑義解釈）。</p>
+  </section>
+  <section class="card">
+    <h2>肢全体・体幹の具体例</h2>
+    <div class="wrapx"><table class="tl">
+      <tr><th>区分</th><th>具体例</th></tr>
+      <tr><td>一上肢 全廃（2級）</td><td>肩・肘・手関節とすべての指の機能を全廃</td></tr>
+      <tr><td>一上肢 著障（3級）</td><td>患肢で5kg以内しか下げられない／肩・肘・手関節のうち2関節の全廃</td></tr>
+      <tr><td>一上肢 軽障（7級）</td><td>精密な運動ができない／10kg以内しか下げられない</td></tr>
+      <tr><td>手指 著障（4級）</td><td>握力5kg以内／5kg以内しか持ち上げられない（おや指又はひとさし指を含む四指の著障）</td></tr>
+      <tr><td>手指 軽障（7級）</td><td>握力15kg以内／10kg以内しか持ち上げられない</td></tr>
+      <tr><td>一下肢 全廃（3級）</td><td>患肢で立位を保持できない（運動性・支持性をほとんど失う）</td></tr>
+      <tr><td>一下肢 著障（4級）</td><td>1km以上歩行不能／30分以上起立位を保てない／駅の階段に手すりが要る／通常の腰掛けに腰掛けられない／正座・あぐら・横座りいずれも不可</td></tr>
+      <tr><td>一下肢 軽障（7級）</td><td>2km以上歩行不能／1時間以上起立位を保てない／横座りはできるが正座・あぐらができない</td></tr>
+      <tr><td>下肢の短縮</td><td>健側比 10cm以上又は1/10以上＝4級、5cm以上又は1/15以上＝5級、3cm以上又は1/20以上＝7級</td></tr>
+      <tr><td>体幹 1級</td><td>腰掛け・正座・横座り・あぐらのいずれもできない</td></tr>
+      <tr><td>体幹 2級</td><td>10分以上坐位又は起立位を保てない／自力では起立できず、人・柱・杖などで初めて可能</td></tr>
+      <tr><td>体幹 3級</td><td>100m以上歩行不能／片脚による起立位保持が全く不可能</td></tr>
+      <tr><td>体幹 5級</td><td>2km以上歩行不能（3級と5級の中間でも4級としない）</td></tr>
+    </table></div>
+  </section>
+  <section class="card">
+    <h2>疾患ごとの注意</h2>
+    <ul class="list">
+      <li><b>脳血管障害</b>：原則として発症から6か月以上で認定。重度の麻痺や高齢などで3〜4か月で固定とみなす場合は、将来再認定（1年後）を付ける。</li>
+      <li><b>パーキンソン病</b>：服薬でコントロールされた状態で判定。大半の時間でコントロール不能な状態が永続する場合は対象になり得る。</li>
+      <li><b>進行性・成人発症の疾患</b>（ALS・SCD・PD など）は上肢・下肢・体幹の欄で評価し、脳原性運動機能障害の欄は使わない。</li>
+      <li><b>人工関節・人工骨頭</b>：置換術後の経過が安定した時点の機能で判定（平成26年4月改正）。置換術年月日を④に記入。</li>
+      <li>補装具を装着しない状態で判定する。疼痛・筋力低下は客観的に示せれば機能障害として扱う。</li>
+      <li>一時的な筋力低下や疲労による歩行障害、認知症など精神機能の影響は除いて評価する。</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h2>出典（2026年11月12日に確認）</h2>
+    <ul class="src">
+      <li><a href="https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/shitai2023-1" target="_blank" rel="noopener">東京都：身体障害者診断書・意見書（肢体不自由用）様式</a></li>
+      <li><a href="https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/2026-03-18-114130-426" target="_blank" rel="noopener">東京都心身障害者福祉センター：令和7年度 第15条指定医講習会資料（肢体不自由編）</a></li>
+      <li><a href="https://www.pref.osaka.lg.jp/documents/5333/520shitaifujiyu_1.pdf" target="_blank" rel="noopener">大阪府：肢体不自由（等級表・早見表・認定基準・疑義解釈）</a></li>
+      <li><a href="https://www.city.kofu.yamanashi.jp/shogaifukushi/iryoukikan/documents/documents/shitaihuziyuu.pdf" target="_blank" rel="noopener">甲府市：肢体不自由（早見表・認定基準・認定要領）</a></li>
+      <li><a href="https://www.pref.aichi.jp/uploaded/attachment/230780.pdf" target="_blank" rel="noopener">愛知県：身体障害認定基準等の取扱いに関する疑義解釈（肢体不自由）</a></li>
+    </ul>
+    <p class="hint">脳原性運動機能障害（乳幼児期以前の非進行性脳病変）と欠損（切断）はこのアプリでは扱わない。最終的な等級は東京都心身障害者福祉センターの審査で決まる。</p>
+  </section>
+</div>
+
+<p class="foot">自分用の補助ツール。患者個人情報は入力しない。入力はこの端末内にのみ保存。</p>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+const KEY="shi-nav-v1";
+const $=id=>document.getElementById(id);
+const IDX={1:18,2:11,3:7,4:4,5:2,6:1,7:0.5};
+const DX=[
+ {id:"",n:"— 選択 —"},
+ {id:"ci",n:"脳梗塞",g:"脳血管",cause:"疾病",site:["脳"],mot:["痙性麻痺"],gait:"limb",stroke:1},
+ {id:"ich",n:"脳出血",g:"脳血管",cause:"疾病",site:["脳"],mot:["痙性麻痺"],gait:"limb",stroke:1},
+ {id:"sah",n:"くも膜下出血",g:"脳血管",cause:"疾病",site:["脳"],mot:["痙性麻痺"],gait:"limb",stroke:1},
+ {id:"tbi",n:"外傷性脳損傷（頭部外傷）",g:"脳",cause:"外傷",site:["脳"],mot:["痙性麻痺"],gait:"limb",stroke:1},
+ {id:"btu",n:"脳腫瘍（術後を含む）",g:"脳",cause:"疾病",site:["脳"],mot:["痙性麻痺"],gait:"limb",stroke:1},
+ {id:"enc",n:"脳炎・脳症後遺症",g:"脳",cause:"疾病",site:["脳"],mot:["痙性麻痺"],gait:"both"},
+ {id:"pd",n:"パーキンソン病",g:"神経変性",cause:"疾病",site:["脳"],mot:["固縮","しんせん"],gait:"trunk",prog:1,pd:1},
+ {id:"psp",n:"進行性核上性麻痺",g:"神経変性",cause:"疾病",site:["脳"],mot:["固縮"],gait:"trunk",prog:1},
+ {id:"cbd",n:"大脳皮質基底核変性症",g:"神経変性",cause:"疾病",site:["脳"],mot:["固縮","不随意運動"],gait:"trunk",prog:1},
+ {id:"msa",n:"多系統萎縮症",g:"神経変性",cause:"疾病",site:["脳"],mot:["固縮","運動失調"],gait:"trunk",prog:1},
+ {id:"scd",n:"脊髄小脳変性症",g:"神経変性",cause:"疾病",site:["脳"],mot:["運動失調"],gait:"trunk",prog:1},
+ {id:"als",n:"筋萎縮性側索硬化症",g:"神経変性",cause:"疾病",site:["脳","脊髄"],mot:["弛緩性麻痺","痙性麻痺"],gait:"both",prog:1},
+ {id:"hd",n:"ハンチントン病",g:"神経変性",cause:"疾病",site:["脳"],mot:["不随意運動"],gait:"trunk",prog:1},
+ {id:"ms",n:"多発性硬化症",g:"神経免疫",cause:"疾病",site:["脳","脊髄"],mot:["痙性麻痺"],gait:"both"},
+ {id:"nmo",n:"視神経脊髄炎スペクトラム障害",g:"神経免疫",cause:"疾病",site:["脊髄"],mot:["痙性麻痺"],gait:"both"},
+ {id:"myel",n:"脊髄炎・脊髄梗塞",g:"脊髄",cause:"疾病",site:["脊髄"],mot:["痙性麻痺"],gait:"both"},
+ {id:"ham",n:"HTLV-1関連脊髄症（HAM）",g:"脊髄",cause:"疾病",site:["脊髄"],mot:["痙性麻痺"],gait:"both",prog:1},
+ {id:"csci",n:"頸髄損傷",g:"脊髄",cause:"外傷",site:["脊髄"],mot:["痙性麻痺"],gait:"both"},
+ {id:"tsci",n:"胸髄・腰髄損傷",g:"脊髄",cause:"外傷",site:["脊髄"],mot:["痙性麻痺"],gait:"both"},
+ {id:"cm",n:"頸椎症性脊髄症・後縦靱帯骨化症",g:"脊髄",cause:"疾病",site:["脊髄"],mot:["痙性麻痺"],gait:"both"},
+ {id:"lcs",n:"腰部脊柱管狭窄症",g:"脊椎",cause:"疾病",site:["末梢神経","骨関節"],mot:["弛緩性麻痺"],gait:"limb"},
+ {id:"gbs",n:"ギラン・バレー症候群（後遺症）",g:"末梢神経",cause:"疾病",site:["末梢神経"],mot:["弛緩性麻痺"],gait:"limb"},
+ {id:"cidp",n:"慢性炎症性脱髄性多発根ニューロパチー",g:"末梢神経",cause:"疾病",site:["末梢神経"],mot:["弛緩性麻痺"],gait:"limb"},
+ {id:"pni",n:"末梢神経損傷・腕神経叢損傷",g:"末梢神経",cause:"外傷",site:["末梢神経"],mot:["弛緩性麻痺"],gait:"limb"},
+ {id:"md",n:"筋ジストロフィー・筋疾患",g:"筋",cause:"疾病",site:["筋肉"],mot:["弛緩性麻痺"],gait:"both",prog:1},
+ {id:"ra",n:"関節リウマチ",g:"骨関節",cause:"疾病",site:["骨関節"],mot:[],gait:"limb"},
+ {id:"oa",n:"変形性関節症（人工関節置換を含む）",g:"骨関節",cause:"疾病",site:["骨関節"],mot:[],gait:"limb",tha:1},
+ {id:"fx",n:"骨折後遺症",g:"骨関節",cause:"外傷",site:["骨関節"],mot:[],gait:"limb"},
+ {id:"oth",n:"その他（自由記載）",g:"その他",cause:"疾病",site:[],mot:[],gait:"both"}
+];
+const ADL=[
+ ["a1","寝がえりする",""],["a2","あしをなげ出して座る",""],["a3","椅子に腰かける",""],
+ ["a4","立つ","手すり・壁・杖・松葉杖・義肢・装具"],["a5","家の中の移動","壁・杖・松葉杖・義肢・装具・車椅子"],
+ ["a6","洋式便器にすわる",""],["a7","排泄のあと始末をする",""],["a8","（箸で）食事をする","スプーン・自助具"],
+ ["a9","コップで水を飲む",""],["a10","シャツを着て脱ぐ",""],["a11","ズボンをはいて脱ぐ","自助具"],
+ ["a12","ブラシで歯をみがく","自助具"],["a13","顔を洗いタオルで拭く",""],["a14","タオルを絞る",""],
+ ["a15","背中を洗う",""],["a16","二階まで階段を上って下りる","手すり・杖・松葉杖"],
+ ["a17","屋外を移動する（家の周辺程度）","杖・松葉杖・車椅子"],["a18","公共の乗物を利用する",""]
+];
+const JU=[["sh","肩関節",0],["el","肘関節",1],["wr","手関節",0]];
+const JL=[["hip","股関節",0],["kn","膝関節",1],["an","足関節",1]];
+const JG={sh:[4,5,7],el:[4,5,7],wr:[4,5,7],hip:[4,5,7],kn:[4,5,7],an:[5,6,7]};
+const JROM={sh:[30,60,90],el:[10,30,90],wr:[10,30,90],hip:[10,30,90],kn:[10,30,90],an:[5,10,30]};
+const FIN=[
+ ["auto","自動（握力から：5kg以内→4級、15kg以内→7級）",0],
+ ["none","該当なし",0],
+ ["all","すべての指の機能を全廃",3],
+ ["f4s","おや指又はひとさし指を含めて四指の機能の著しい障害（握力5kg以内など）",4],
+ ["tiL","おや指及びひとさし指の機能を全廃",4],
+ ["t3L","おや指又はひとさし指を含めて三指の機能を全廃",4],
+ ["tL","おや指の機能を全廃",5],
+ ["tiS","おや指及びひとさし指の機能の著しい障害",5],
+ ["t3S","おや指又はひとさし指を含めて三指の機能の著しい障害",5],
+ ["tS","おや指の機能の著しい障害",6],
+ ["i2L","ひとさし指を含めて二指の機能を全廃",6],
+ ["i2S","ひとさし指を含めて二指の機能の著しい障害",7],
+ ["mrlL","なか指・くすり指・小指の機能を全廃",7],
+ ["mild","手指の機能の軽度の障害（握力15kg以内など）",7]
+];
+const SN={R:"右",L:"左"};
+const LVN={1:"軽度の障害",2:"著しい障害",3:"全廃"};
+const WALKT={none:"歩行不能",lt100:"100m以上歩行不能",lt1k:"1km以上歩行不能",lt2k:"2km以上歩行不能",ok:"2km以上歩行可"};
+const STANDT={none:"起立位を保てない",lt10:"10分以上困難",lt30:"30分以上困難",lt60:"1時間以上困難",ok:"1時間以上可"};
+
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function blankSide(){return {sh:{},el:{},wr:{},hip:{},kn:{},an:{},fin:"auto",lift:"",fine:false,toe:"",sup:false,ovU:"auto",ovL:"auto"}}
+function fresh(){return {tab:"dx",jside:"R",dx:"",dxOther:"",cause:"",side:"",onset:"",fixed:"",exam:today(),tha:"",course:"",imaging:"",comorb:"",
+ neuro:{sens:[],mot:[],site:[],bb:"",deform:""},grip:{R:"",L:""},len:{R:"",L:""},walk:"",stand:"",sit:"",rise:"",stairs:"",oneleg:"",seatNg:[],gait:"",adl:{},
+ J:{R:blankSide(),L:blankSide()},rc:"auto",rcT:"1"}}
+let S=fresh();
+function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");if(o){S=Object.assign(fresh(),o);S.neuro=Object.assign(fresh().neuro,o.neuro||{});S.J={R:Object.assign(blankSide(),(o.J||{}).R||{}),L:Object.assign(blankSide(),(o.J||{}).L||{})};}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function gp(p){return p.split(".").reduce((o,k)=>o==null?o:o[k],S)}
+function sp(p,v){const a=p.split(".");let o=S;for(let i=0;i<a.length-1;i++){if(o[a[i]]==null)o[a[i]]={};o=o[a[i]]}o[a[a.length-1]]=v}
+function num(v){if(v===""||v==null)return null;const n=parseFloat(v);return isNaN(n)?null:n}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function dxObj(){return DX.find(d=>d.id===S.dx)||DX[0]}
+function dxName(){const d=dxObj();if(!d.id)return"";return d.id==="oth"?(S.dxOther||"（疾患名）"):d.n}
+function idx2g(x){if(x>=18)return 1;if(x>=11)return 2;if(x>=7)return 3;if(x>=4)return 4;if(x>=2)return 5;if(x>=1)return 6;if(x>=0.5)return 7;return 0}
+function gIdx(g){return g?IDX[g]:0}
+function sides(){return S.side==="B"?["R","L"]:S.side?[S.side]:[]}
+function gaitMode(){return S.gait||dxObj().gait||"limb"}
+function monthsBetween(a,b){if(!a||!b)return null;const x=new Date(a),y=new Date(b);return (y-x)/(1000*60*60*24*30.44)}
+function jpDate(s){if(!s)return"　　年　　月　　日";const d=new Date(s);const y=d.getFullYear(),m=d.getMonth()+1,dd=d.getDate();let w="";if(y>=2019)w="令和"+(y-2018===1?"元":(y-2018))+"年";else if(y>=1989)w="平成"+(y-1988)+"年";else w="昭和"+(y-1925)+"年";return w+m+"月"+dd+"日"}
+
+/* ---------- 判定 ---------- */
+function jointEval(key,j){
+ const rom=num(j.rom),mm=num(j.mmt),lax=j.lax||"";const th=JROM[key];let lv=0,why=[];
+ const m=mm==null?null:Math.round(mm+1e-9);
+ function up(l,t){if(l>lv)lv=l;why.push([l,t])}
+ if(rom!=null){if(rom<=th[0])up(3,"ROM "+rom+"°");else if(rom<=th[1])up(2,"ROM "+rom+"°");else if(rom<=th[2])up(1,"ROM "+rom+"°")}
+ if(m!=null){if(m<=2)up(3,"MMT "+mm);else if(m===3)up(2,"MMT "+mm);else if(m===4)up(1,"MMT "+mm)}
+ if(lax==="高度")up(3,"高度の動揺関節");else if(lax==="中等度")up(2,"中等度の動揺関節");else if(lax==="軽度")up(1,"軽度の動揺関節");
+ const g=lv?JG[key][3-lv]:0;
+ return {lv,g,why:why.filter(w=>w[0]===lv).map(w=>w[1]),m,has:rom!=null||m!=null||!!lax};
+}
+function finEval(s){
+ const J=S.J[s];let id=J.fin||"auto";const gr=num(S.grip[s]);let auto=false;
+ if(id==="auto"){auto=true;id=gr!=null&&gr<=5?"f4s":gr!=null&&gr<=15?"mild":"none"}
+ const f=FIN.find(x=>x[0]===id)||FIN[1];return {id,g:f[2],label:f[1].replace(/（.*?）$/,""),auto,grip:gr};
+}
+function upperEval(s){
+ const J=S.J[s];const js={};JU.forEach(([k])=>js[k]=jointEval(k,J[k]));const fin=finEval(s);
+ let wl=0,wwhy=[];const nL=JU.filter(([k])=>js[k].lv===3).length;
+ if(nL===3&&fin.id==="all"){wl=3;wwhy.push("肩・肘・手関節とすべての指の全廃")}
+ if(J.lift==="le5"){if(wl<2)wl=2;wwhy.push("5kg以内しか下げられない")}
+ if(nL>=2&&wl<2){wl=2;wwhy.push("3大関節のうち2関節以上の全廃")}
+ if(J.lift==="le10"&&wl<1){wl=1;wwhy.push("10kg以内しか下げられない")}
+ if(J.fine&&wl<1){wl=1;wwhy.push("精密な運動ができない")}
+ if(J.fine&&wl>=1&&!wwhy.includes("精密な運動ができない"))wwhy.push("精密な運動ができない");
+ let ov=J.ovU||"auto";if(ov!=="auto"){wl=+ov;wwhy=["手動で指定"]}
+ const wg=wl?{1:7,2:3,3:2}[wl]:0;
+ const parts=[];JU.forEach(([k,n])=>{if(js[k].g)parts.push({k,n,g:js[k].g,lv:js[k].lv,why:js[k].why})});
+ if(fin.g)parts.push({k:"fin",n:"手指",g:fin.g,label:fin.label,why:fin.grip!=null?["握力 "+fin.grip+"kg"]:[]});
+ let sum=parts.reduce((a,p)=>a+gIdx(p.g),0);if(parts.length>=2&&parts.every(p=>p.g===7))sum=Math.max(sum,1);
+ let useWhole=!!wg&&gIdx(wg)>=Math.min(11,sum);
+ let idx=Math.min(11,Math.max(gIdx(wg),sum));
+ return {s,js,fin,wl,wg,wwhy,parts,sum,idx,g:idx2g(idx),useWhole,ov:ov!=="auto"};
+}
+function lowerEval(s,global){
+ const J=S.J[s];const js={};JL.forEach(([k])=>js[k]=jointEval(k,J[k]));
+ let wl=0,wwhy=[];const add=(l,t)=>{if(l>wl)wl=l;wwhy.push([l,t])};
+ if(J.sup)add(3,"患肢で立位を保持できない");
+ if(JL.every(([k])=>js[k].lv===3))add(3,"股・膝・足関節すべて全廃");
+ if(global){
+  const ng=S.seatNg||[];
+  if(S.walk==="none")add(2,"歩行不能");
+  if(S.walk==="lt100"||S.walk==="lt1k")add(2,"1km以上歩行不能");
+  if(S.stand==="none"||S.stand==="lt10"||S.stand==="lt30")add(2,"30分以上起立位を保てない");
+  if(S.stairs==="rail"||S.stairs==="none")add(2,"階段昇降に手すりが要る");
+  if(ng.includes("通常の腰掛け"))add(2,"通常の腰掛けに腰掛けられない");
+  if(ng.includes("正座")&&ng.includes("あぐら")&&ng.includes("横座り"))add(2,"正座・あぐら・横座りいずれも不可");
+  if(S.walk==="lt2k")add(1,"2km以上歩行不能");
+  if(S.stand==="lt60")add(1,"1時間以上起立位を保てない");
+  if(ng.includes("正座")&&ng.includes("あぐら")&&!ng.includes("横座り"))add(1,"正座・あぐらができない");
+ }
+ let ov=J.ovL||"auto";let why=wwhy.filter(w=>w[0]===wl).map(w=>w[1]);
+ if(ov!=="auto"){wl=+ov;why=["手動で指定"]}
+ const wg=wl?{1:7,2:4,3:3}[wl]:0;
+ const parts=[];JL.forEach(([k,n])=>{if(js[k].g)parts.push({k,n,g:js[k].g,lv:js[k].lv,why:js[k].why})});
+ // 短縮
+ const o=s==="R"?"L":"R",a=num(S.len[s]),b=num(S.len[o]);
+ if(a!=null&&b!=null&&b>a){const d=b-a,r=d/b;let g=0;if(d>=10||r>=1/10)g=4;else if(d>=5||r>=1/15)g=5;else if(d>=3||r>=1/20)g=7;
+  if(g)parts.push({k:"len",n:"下肢の短縮",g,why:["健側比 "+(Math.round(d*10)/10)+"cm短い"]})}
+ // 足指（片側全廃は7級。両側は下肢全体でまとめて判定）
+ if(J.toe==="loss")parts.push({k:"toe",n:"足指",g:7,label:"すべての指の機能を全廃",why:[]});
+ let sum=parts.reduce((x,p)=>x+gIdx(p.g),0);if(parts.length>=2&&parts.every(p=>p.g===7))sum=Math.max(sum,1);
+ let idx=Math.min(7,Math.max(gIdx(wg),sum));
+ return {s,js,wl,wg,wwhy:why,parts,sum,idx,g:idx2g(idx),useWhole:!!wg&&gIdx(wg)>=Math.min(7,sum),ov:ov!=="auto"};
+}
+function trunkEval(){
+ let lv=0,why=[];const add=(g,t)=>{if(!lv||g<lv){lv=g}why.push([g,t])};
+ if(S.sit==="none")add(1,"坐っていることができない");
+ if(S.sit==="lt10")add(2,"10分以上坐位を保てない");
+ if(S.stand==="none"||S.stand==="lt10")add(2,"10分以上起立位を保てない");
+ if(S.rise==="aid"||S.rise==="none")add(2,"自力のみでは立ち上がれない");
+ if(S.walk==="none"||S.walk==="lt100")add(3,S.walk==="none"?"歩行不能":"100m以上歩行不能");
+ if(S.oneleg==="none")add(3,"片脚起立が全く不可能");
+ if(S.walk==="lt1k"||S.walk==="lt2k")add(5,"2km以上歩行不能");
+ return {g:lv,why:why.filter(w=>w[0]===lv).map(w=>w[1])};
+}
+function compute(){
+ const gm=gaitMode();const aff=sides();const legGlobal=(gm==="limb"||gm==="both");
+ const U={},L={};["R","L"].forEach(s=>{U[s]=upperEval(s);L[s]=lowerEval(s,legGlobal&&aff.includes(s))});
+ // 両上肢・両下肢
+ let uIdx=U.R.idx+U.L.idx,uBil=0,uBilT="";
+ if(U.R.wl===3&&U.L.wl===3){uBil=18;uBilT="両上肢機能の全廃"}else if(U.R.wl>=2&&U.L.wl>=2){uBil=11;uBilT="両上肢機能の著しい障害"}
+ uIdx=Math.min(18,Math.max(uIdx,uBil));
+ let lIdx=L.R.idx+L.L.idx,lBil=0,lBilT="";
+ if(L.R.wl===3&&L.L.wl===3){lBil=18;lBilT="両下肢機能の全廃"}else if(L.R.wl>=2&&L.L.wl>=2){lBil=11;lBilT="両下肢機能の著しい障害"}
+ if(S.J.R.toe&&S.J.L.toe){const t=(S.J.R.toe==="loss"&&S.J.L.toe==="loss")?4:7;const cur=(S.J.R.toe==="loss"?0.5:0)+(S.J.L.toe==="loss"?0.5:0);lIdx+=gIdx(t)-cur;}
+ lIdx=Math.min(18,Math.max(lIdx,lBil));
+ const T=(gm==="trunk"||gm==="both")?trunkEval():{g:0,why:[]};
+ const tIdx=gIdx(T.g);
+ const ltIdx=Math.max(lIdx,tIdx);const ltFrom=(lIdx||tIdx)?(tIdx>lIdx?"trunk":"lower"):"";
+ const total=Math.min(18,uIdx+ltIdx);
+ let g=idx2g(total);
+ return {gm,aff,U,L,uIdx,uG:idx2g(uIdx),uBilT,lIdx,lG:idx2g(lIdx),lBilT,T,tIdx,ltFrom,total,g};
+}
+
+/* ---------- 整合性 ---------- */
+function checks(R){
+ const w=[],d=dxObj(),A=S.adl||{};
+ const adl=id=>A[id]||"";
+ if(!d.id)w.push(["info","原疾患が未選択。"]);
+ if(!S.side)w.push(["info","障害のある側（右・左・両側）が未選択。下肢の歩行・起立の基準はこの側に当てはめる。"]);
+ if(d.stroke){const mo=monthsBetween(S.onset,S.exam);if(mo!=null&&mo<6){w.push([mo<3?"crit":"warn","発症から約"+(Math.round(mo*10)/10)+"か月。脳血管障害は原則6か月以上で認定。3〜4か月で固定とみなすなら将来再認定（1年後）を付ける。"])}
+  if(!S.onset)w.push(["info","発症日が未入力（6か月の要件を確認できない）。"]);}
+ if(d.pd)w.push(["info","PDは服薬でコントロールされた状態で判定する（大半の時間でコントロール不能な状態が永続するなら対象になり得る）。"]);
+ if(d.tha&&!S.tha)w.push(["info","人工関節・人工骨頭なら置換術年月日を④に記入。術後経過が安定した時点で判定する。"]);
+ if(R.gm==="limb"&&R.aff.length===1&&(S.sit==="none"||S.sit==="lt10"||S.rise==="aid"))w.push(["warn","片側病変で坐位・起立の障害がある。両側性病変（脳幹・多発梗塞など）なら主因を「体幹」または「両方」に。"]);
+ if(R.gm!=="limb"&&R.lIdx&&R.tIdx)w.push(["info","下肢と体幹の両方に該当。指数は合算せず高い方（"+(R.ltFrom==="trunk"?"体幹":"下肢")+"）を採った。"]);
+ // 下肢 vs ADL
+ ["R","L"].forEach(s=>{const L=R.L[s];if(L.wl===3&&(adl("a17")==="○"||S.walk==="ok"||S.walk==="lt2k"))w.push(["warn",SN[s]+"下肢全廃としているが、屋外移動○または2km近く歩けることになっている。"]);
+  const U=R.U[s];if(U.wl===3&&U.fin.grip!=null&&U.fin.grip>5)w.push(["warn",SN[s]+"上肢全廃としているが握力が"+U.fin.grip+"kgある。"]);
+  if(U.fin.auto&&U.fin.grip!=null&&U.fin.grip<=15&&U.wl===0&&!U.parts.some(p=>p.k!=="fin"))w.push(["info",SN[s]+"手指は握力から自動で"+U.fin.g+"級としている。手指の所見（ROM・MMT）と矛盾しないか確認。"]);
+  [...JU,...JL].forEach(([k,n])=>{const j=S.J[s][k];if(j&&num(j.rom)!=null&&num(j.mmt)==null)w.push(["info",SN[s]+n+"：ROMのみ入力。MMTも記載（記載漏れは照会の原因）。"]);});
+ });
+ if(R.T.g&&R.T.g<=2&&adl("a3")==="○"&&adl("a4")==="○")w.push(["warn","体幹"+R.T.g+"級だが「椅子に腰かける」「立つ」がいずれも○。"]);
+ if(R.T.g===3&&adl("a17")==="○")w.push(["warn","体幹3級（100m以上歩行不能）だが屋外移動が○。"]);
+ if((S.walk==="ok")&&(adl("a5")==="×"||adl("a17")==="×"))w.push(["warn","2km以上歩けるとしているが、移動の動作が×。"]);
+ if(R.uG&&R.uG<=2&&adl("a8")==="○"&&adl("a9")==="○"&&R.U.R.idx&&R.U.L.idx)w.push(["warn","両上肢で上位等級だが食事・コップが○。"]);
+ const filled=ADL.filter(a=>A[a[0]]).length;if(filled<ADL.length&&(R.g&&R.g<=3))w.push(["info","動作・活動欄が未記入の項目あり（"+(ADL.length-filled)+"項目）。多肢・体幹の認定では妥当性確認に使われる。"]);
+ if(R.g===7)w.push(["warn","7級単独では手帳の対象外（7級が2つ以上で6級）。"]);
+ return w;
+}
+
+/* ---------- 文章 ---------- */
+function mmtWord(list){const m=list.filter(x=>x!=null);if(!m.length)return"";const a=m.reduce((x,y)=>x+y,0)/m.length;return a<=2?"MMT著減":a<=3?"MMT半減":"MMTやや減"}
+function limbLines(R){
+ const out=[];
+ const upU=R.uBilT&&R.U.R.useWhole&&R.U.L.useWhole, upL=R.lBilT&&R.L.R.useWhole&&R.L.L.useWhole;
+ const ug=R.uBilT?(R.uBilT.includes("全廃")?1:2):0, lg=R.lBilT?(R.lBilT.includes("全廃")?1:2):0;
+ if(upU){out.push(R.uBilT+" "+ug+"級（"+mmtWord(JU.map(([k])=>R.U.R.js[k].m).concat(JU.map(([k])=>R.U.L.js[k].m)))+"）。".replace("（）",""))}
+ ["R","L"].forEach(s=>{const U=R.U[s];if(upU||!U.idx)return;
+  if(U.useWhole){const mw=mmtWord(JU.map(([k])=>U.js[k].m));const det=[mw].concat(U.wwhy.filter(x=>x!=="手動で指定")).filter(Boolean);out.push(SN[s]+"上肢機能の"+LVN[U.wl]+" "+U.wg+"級"+(det.length?"（"+det.join("、")+"）":"")+"。")}
+  else{U.parts.forEach(p=>{if(p.k==="fin")out.push(SN[s]+"手指："+p.label+" "+p.g+"級"+(p.why.length?"（"+p.why.join("、")+"）":"")+"。");else out.push(SN[s]+p.n+"機能の"+LVN[p.lv]+" "+p.g+"級（"+p.why.join("、")+"）。")});
+   if(U.parts.length>=2)out.push("（"+SN[s]+"上肢 指数合算 "+U.g+"級相当）")}
+ });
+ if(upL){out.push(R.lBilT+" "+lg+"級（"+[mmtWord(JL.map(([k])=>R.L.R.js[k].m).concat(JL.map(([k])=>R.L.L.js[k].m)))].concat(R.L.R.wwhy).filter(Boolean).join("、")+"）。".replace("（）",""))}
+ ["R","L"].forEach(s=>{const L=R.L[s];if(upL||!L.idx)return;
+  if(L.useWhole){const mw=mmtWord(JL.map(([k])=>L.js[k].m));const det=[mw].concat(L.wwhy.filter(x=>x!=="手動で指定")).filter(Boolean);out.push(SN[s]+"下肢機能の"+LVN[L.wl]+" "+L.wg+"級"+(det.length?"（"+det.join("、")+"）":"")+"。");
+   L.parts.filter(p=>p.k==="len").forEach(p=>out.push(SN[s]+"下肢の短縮 "+p.g+"級（"+p.why.join("")+"）。"))}
+  else{L.parts.forEach(p=>{if(p.k==="len")out.push(SN[s]+"下肢の短縮 "+p.g+"級（"+p.why.join("")+"）。");else if(p.k==="toe")out.push(SN[s]+"足指："+p.label+" "+p.g+"級。");else out.push(SN[s]+p.n+"機能の"+LVN[p.lv]+" "+p.g+"級（"+p.why.join("、")+"）。")});
+   if(L.parts.length>=2)out.push("（"+SN[s]+"下肢 指数合算 "+L.g+"級相当）")}
+ });
+ if(S.J.R.toe&&S.J.L.toe&&!upL){out.push(S.J.R.toe==="loss"&&S.J.L.toe==="loss"?"両下肢のすべての指の機能の全廃 4級。":"両下肢のすべての指の機能の著しい障害 7級。")}
+ if(R.T.g){const t={1:"体幹の機能障害により坐っていることができない 1級",2:R.T.why.some(x=>x.includes("立ち上が"))?"体幹の機能障害により立ち上がることが困難 2級":"体幹の機能障害により坐位又は起立位を保つことが困難 2級",3:"体幹の機能障害により歩行が困難 3級",5:"体幹の機能の著しい障害 5級"}[R.T.g];
+  out.push(t+"（"+R.T.why.join("、")+"）。"+(R.ltFrom==="lower"&&R.lIdx?"※下肢の等級が上位のため総合等級は下肢で認定。":""))}
+ return out;
+}
+function adlSentence(){
+ const A=S.adl||{};const parts=[];
+ if(S.walk)parts.push("補装具なしで"+WALKT[S.walk]);
+ if(S.stand)parts.push("起立位保持は"+STANDT[S.stand]);
+ const tri=ADL.filter(a=>A[a[0]]==="△").map(a=>a[1].replace(/（.*?）/g,"")),xx=ADL.filter(a=>A[a[0]]==="×").map(a=>a[1].replace(/（.*?）/g,""));
+ let s=parts.length?parts.join("、")+"。":"";
+ if(xx.length)s+=xx.join("・")+"は全介助又は不能。";
+ if(tri.length)s+=tri.join("・")+"は一部介助。";
+ if(!xx.length&&!tri.length&&Object.keys(A).length)s+="ADLはおおむね自立。";
+ return s;
+}
+function disName(R){
+ const u=["R","L"].filter(s=>R.U[s].idx),l=["R","L"].filter(s=>R.L[s].idx);const d=dxObj();
+ const sideW=a=>a.length===2?"両":SN[a[0]];
+ const only=(L,a)=>{if(a.length!==1)return null;const X=L[a[0]];if(X.useWhole)return null;if(X.parts.length===1){const p=X.parts[0];return SN[a[0]]+(p.k==="fin"?"手指":p.k==="len"?"下肢短縮":p.k==="toe"?"足指":p.n)+"機能障害"}return null};
+ const arr=[];
+ if(R.T.g&&(R.ltFrom==="trunk"||!R.lIdx))arr.push("体幹機能障害");else if(R.T.g)arr.push("体幹機能障害");
+ if(u.length&&l.length&&u.join()===l.join()){
+  if(d.stroke&&u.length===1)arr.push("上下肢機能障害（"+SN[u[0]]+"片麻痺）");else arr.push(sideW(u)+"上下肢機能障害");
+ }else{
+  if(u.length)arr.push(only(R.U,u)||sideW(u)+"上肢機能障害");
+  if(l.length)arr.push(only(R.L,l)||sideW(l)+"下肢機能障害");
+ }
+ return arr.join("・");
+}
+function recert(){
+ const d=dxObj();const mo=monthsBetween(S.onset,S.exam);let sug="no",note="";
+ if(d.stroke&&mo!=null&&mo<6){sug="mild";note="発症後6か月未満で固定とみなすため、要（軽度化）・1年後を提案。"}
+ else if(d.prog){sug="no";note="進行性疾患。悪化時は等級変更の申請で対応するのが通常。重度化を見込んで再認定を付けることもできる。"}
+ else if(["gbs","myel","nmo","ms"].includes(d.id)&&mo!=null&&mo<12){sug="mild";note="回復の余地がある時期。要（軽度化）を検討。"}
+ else note="症状固定なら不要。";
+ const v=S.rc==="auto"?sug:S.rc;return {v,sug,note};
+}
+function sheet1(R){
+ const d=dxObj();const rc=recert();const L=limbLines(R);const f=[];
+ f.push(["① 障害名（部位を明記）",disName(R)||"（判定結果が出ると入る）"]);
+ f.push(["② 原因となった疾病・外傷名",(dxName()||"（原疾患）")+"　〔"+(S.cause||d.cause||"疾病")+"〕に○"]);
+ f.push(["③ 疾病・外傷発生年月日",jpDate(S.onset)]);
+ let c="";if(S.onset)c+=jpDate(S.onset)+"、"+(dxName()||"")+"を発症。";else if(dxName())c+=dxName()+"を発症。";
+ if(S.course)c+=S.course.replace(/[。\s]+$/,"")+"。";
+ const mot=S.neuro.mot.filter(x=>x!=="その他"),sen=S.neuro.sens;
+ const sw=S.side==="B"?"両側":S.side?SN[S.side]+"側":"";
+ if(mot.length||sen.length)c+="現在、"+(sw?sw+"に":"")+[mot.join("・"),sen.join("・")].filter(Boolean).join("と")+"を認める。";
+ if(S.imaging)c+=S.imaging.replace(/[。\s]+$/,"")+"。";
+ if(d.pd)c+="服薬調整後の状態で評価した。";
+ const tail=[];if(S.tha)tail.push("人工関節又は人工骨頭置換術　"+jpDate(S.tha));tail.push("障害固定又は障害確定（推定）　"+jpDate(S.fixed));
+ f.push(["④ 参考となる経過・現症",(c||"（経過を入力）")+"\n"+tail.join("\n")]);
+ const rcT={no:"〔将来再認定　不要〕",mild:"〔将来再認定　要（軽度化）〕〔再認定の時期　"+S.rcT+"年後〕",sev:"〔将来再認定　要（重度化）〕〔再認定の時期　"+S.rcT+"年後〕"}[rc.v];
+ f.push(["⑤ 総合所見",(L.length?L.join("\n"):"（等級に該当する所見なし）")+(adlSentence()?"\n"+adlSentence():"")+"\n"+rcT]);
+ f.push(["⑥ その他参考となる合併症状",S.comorb||"特記なし"]);
+ const g=R.g;
+ const op=g&&g<=6?"該当する（"+g+"級相当）":"該当しない";
+ f.push(["第15条第3項の意見",op+"\n内訳　上肢："+(R.uG?R.uG+"級":"—")+"　下肢："+(R.lG?R.lG+"級":"—")+"　体幹："+(R.T.g?R.T.g+"級":"—")]);
+ return f;
+}
+function sheet2(){
+ const n=S.neuro,f=[];
+ f.push(["1 感覚障害",n.sens.length?n.sens.join("・"):"なし"]);
+ f.push(["2 運動障害",n.mot.length?n.mot.join("・"):"なし"]);
+ f.push(["3 起因部位",n.site.length?n.site.join("・"):"—"]);
+ f.push(["4 排尿・排便機能障害",n.bb||"—"]);f.push(["5 形態異常",n.deform||"—"]);
+ f.push(["握力","右 "+(S.grip.R||"—")+"kg／左 "+(S.grip.L||"—")+"kg"]);
+ f.push(["歩行能力（補装具なしで）",S.walk?WALKT[S.walk]:"—"]);
+ f.push(["起立位保持（補装具なしで）",S.stand?STANDT[S.stand]:"—"]);
+ const mm=[];["R","L"].forEach(s=>[...JU,...JL].forEach(([k,nm])=>{const j=S.J[s][k];const m=num(j&&j.mmt);if(m!=null){const r=Math.round(m+1e-9);mm.push(SN[s]+nm+" "+(r<=2?"×":r===3?"△":"○"))}}));
+ f.push(["MMT記号（3枚目）",mm.length?mm.join("、"):"—"]);
+ return f;
+}
+
+/* ---------- 描画 ---------- */
+function setTab(t){S.tab=t;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false"));
+ document.querySelectorAll("[data-p]").forEach(p=>p.classList.toggle("hidden",p.dataset.p!==t));$("strip").classList.toggle("hidden",t==="rs"||t==="ref");save();window.scrollTo(0,0)}
+function chipsHTML(name,opts,cur,multi){return opts.map(o=>{const v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;const on=multi?cur.includes(v):cur===v;return '<label class="chip"><input type="'+(multi?"checkbox":"radio")+'" name="'+name+'" value="'+esc(v)+'"'+(on?" checked":"")+'><span>'+esc(l)+'</span></label>'}).join("")}
+function initStatic(){
+ $("dxSel").innerHTML=(()=>{let h="",g="";DX.forEach(d=>{if(!d.id){h+='<option value="">'+d.n+'</option>';return}if(d.g!==g){if(g)h+="</optgroup>";h+='<optgroup label="'+d.g+'">';g=d.g}h+='<option value="'+d.id+'">'+d.n+'</option>'});return h+"</optgroup>"})();
+ $("finSel").innerHTML=FIN.map(f=>'<option value="'+f[0]+'">'+(f[2]?f[2]+"級：":"")+f[1]+'</option>').join("");
+ $("adlBox").innerHTML=ADL.map(a=>'<div class="nm">'+a[1]+(a[2]?'<br><small>（'+a[2]+'）</small>':'')+'</div><div class="tri" data-adl="'+a[0]+'">'+["○","△","×"].map(v=>'<button type="button" data-v="'+v+'">'+v+'</button>').join("")+'</div>').join("");
+ const row=(k,n,lax)=>'<tr data-j="'+k+'"><td>'+n+'</td><td><input type="number" inputmode="decimal" min="0" max="360" data-f="rom" placeholder="°"></td><td><select data-f="mmt"><option value="">—</option>'+["0","1","2","2.5","3","3.5","4","4.5","5"].map(v=>'<option>'+v+'</option>').join("")+'</select></td><td>'+(lax?'<select data-f="lax"><option value="">動揺なし</option><option>軽度</option><option>中等度</option><option>高度</option></select>':'')+'</td><td class="lvc"></td></tr>';
+ const head='<tr><th></th><th>ROM°</th><th>MMT平均</th><th>動揺</th><th>判定</th></tr>';
+ $("jtU").innerHTML=head+JU.map(j=>row(...j)).join("");$("jtL").innerHTML=head+JL.map(j=>row(...j)).join("");
+ document.querySelectorAll("[data-arr]").forEach(el=>{el.innerHTML=chipsHTML(el.dataset.arr,el.dataset.opts.split(","),gp(el.dataset.arr)||[],true)});
+}
+function fillBound(){
+ document.querySelectorAll("[data-k]").forEach(el=>{const v=gp(el.dataset.k);if(el.type==="checkbox")el.checked=!!v;else el.value=v==null?"":v});
+ document.querySelectorAll("[data-arr]").forEach(el=>{const cur=gp(el.dataset.arr)||[];el.querySelectorAll("input").forEach(i=>i.checked=cur.includes(i.value))});
+}
+function renderDx(){
+ const d=dxObj();$("dxOtherW").classList.toggle("hidden",d.id!=="oth");$("thaW").classList.toggle("hidden",!d.tha&&!S.tha);
+ $("causeChips").innerHTML=chipsHTML("cause",["外傷","自然災害","疾病","先天性","その他"],S.cause||d.cause||"",false);
+ $("sideChips").innerHTML=chipsHTML("side",[["R","右"],["L","左"],["B","両側"]],S.side,false);
+ $("gaitChips").innerHTML=chipsHTML("gait",[["limb","下肢"],["trunk","体幹"],["both","両方（高い方）"]],gaitMode(),false);
+ let n="";if(d.stroke)n+='<p class="note w">脳病変：原則として発症から<b>6か月以上</b>で認定。片麻痺は「上下肢機能障害（左片麻痺）」の形で、一側の体幹筋力低下は下肢で評価。</p>';
+ if(d.pd)n+='<p class="note">PD：服薬でコントロールされた状態で判定。歩行・起立の障害は体幹で評価するのが一般的。</p>';
+ if(d.prog&&!d.pd)n+='<p class="note">進行性疾患：上肢・下肢・体幹の欄で評価（脳原性運動機能障害の欄は使わない）。</p>';
+ if(d.g==="脊髄")n+='<p class="note">脊髄病変：両下肢と体幹の両方に該当しやすい。下肢と体幹は指数合算せず高い方で認定。</p>';
+ if(d.tha)n+='<p class="note">人工関節・人工骨頭：置換術後の経過が安定した時点の機能で判定。</p>';
+ $("dxNote").innerHTML=n;
+ const mo=monthsBetween(S.onset,S.exam);$("dateOut").innerHTML=mo!=null?'<p class="hint">発症から約 <b>'+(Math.round(mo*10)/10)+'</b> か月（診断日時点）。</p>':"";
+}
+function lvBadge(e){return e.lv?'<span class="lv l'+e.lv+'">'+LVN[e.lv]+' '+e.g+'級</span>':(e.has?'<span class="lv">非該当</span>':"")}
+function renderJoints(R){
+ const s=S.jside;document.querySelectorAll("#sideSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===s?"true":"false"));
+ $("jtTitle").textContent=SN[s]+"上肢";$("jtTitleL").textContent=SN[s]+"下肢";
+ const J=S.J[s];
+ document.querySelectorAll("#jtU tr[data-j],#jtL tr[data-j]").forEach(tr=>{const k=tr.dataset.j;tr.querySelectorAll("[data-f]").forEach(el=>{if(document.activeElement!==el)el.value=(J[k]||{})[el.dataset.f]||""});
+  const e=(R.U[s].js[k]||R.L[s].js[k]);tr.querySelector(".lvc").innerHTML=lvBadge(e)});
+ $("finSel").value=J.fin||"auto";$("liftSel").value=J.lift||"";$("fineChk").checked=!!J.fine;$("ovU").value=J.ovU||"auto";
+ $("toeSel").value=J.toe||"";$("supChk").checked=!!J.sup;$("ovL").value=J.ovL||"auto";
+ const U=R.U[s],L=R.L[s];
+ const fin=U.fin;
+ $("limbU").innerHTML='<div class="out" style="margin:0"><div class="sub">'+SN[s]+'上肢の判定</div><div><b>'+(U.g?U.g+"級相当":"非該当")+'</b>（指数 '+U.idx+'）'+(U.wl?'　全体：'+LVN[U.wl]+'（'+U.wwhy.join("、")+'）':'')+(fin.auto&&fin.g?'<br><span class="sub">手指は握力'+fin.grip+'kgから自動で'+fin.g+'級</span>':'')+'</div></div>';
+ $("limbL").innerHTML='<div class="out" style="margin:0"><div class="sub">'+SN[s]+'下肢の判定'+(R.aff.includes(s)&&(R.gm!=="trunk")?'（歩行・起立の基準を適用）':'（歩行・起立の基準は未適用）')+'</div><div><b>'+(L.g?L.g+"級相当":"非該当")+'</b>（指数 '+L.idx+'）'+(L.wl?'　全体：'+LVN[L.wl]+'（'+L.wwhy.join("、")+'）':'')+(L.parts.filter(p=>p.k==="len").length?'<br><span class="sub">短縮：'+L.parts.filter(p=>p.k==="len")[0].why[0]+'</span>':'')+'</div></div>';
+}
+function renderADL(){const A=S.adl||{};document.querySelectorAll("[data-adl]").forEach(el=>{el.querySelectorAll("button").forEach(b=>b.classList.toggle("on",A[el.dataset.adl]===b.dataset.v))})}
+function renderResult(R){
+ const g=R.g;const cls=!g?"info":g<=2?"crit":g<=4?"warn":g<=6?"ok":"info";
+ $("verdict").innerHTML='<div class="verdict '+cls+'"><span class="pill">障害程度等級の参考意見</span><div class="big">'+(g&&g<=6?g+"級相当":g===7?"7級（単独では手帳非該当）":"該当する所見なし")+'</div><div class="sub">合計指数 '+R.total+'（上肢 '+R.uIdx+' ＋ '+(R.ltFrom==="trunk"?"体幹 "+R.tIdx:"下肢 "+R.lIdx)+(R.lIdx&&R.tIdx?'。下肢 '+R.lIdx+'・体幹 '+R.tIdx+' は合算しない':'')+'）</div></div>';
+ const row=(n,gr,ix,why)=>'<tr><td>'+n+'</td><td class="n">'+(gr?gr+"級":"—")+'</td><td class="n">'+ix+'</td><td>'+why+'</td></tr>';
+ const uw=["R","L"].filter(s=>R.U[s].idx).map(s=>SN[s]+" "+R.U[s].g+"級").join("、")+(R.uBilT?"（"+R.uBilT+"）":"");
+ const lw=["R","L"].filter(s=>R.L[s].idx).map(s=>SN[s]+" "+R.L[s].g+"級").join("、")+(R.lBilT?"（"+R.lBilT+"）":"");
+ $("breakdown").innerHTML='<div class="wrapx"><table class="tl"><tr><th>区分</th><th>等級</th><th>指数</th><th>根拠</th></tr>'+row("上肢",R.uG,R.uIdx,uw||"—")+row("下肢",R.lG,R.lIdx,lw||"—")+row("体幹",R.T.g,R.tIdx,R.T.g?R.T.why.join("、"):(R.gm==="limb"?"主因を「下肢」としたため未評価":"—"))+'</table></div><p class="hint">歩行・起立の主因：'+{limb:"下肢",trunk:"体幹",both:"両方（高い方を採用）"}[R.gm]+'。変更は「所見」タブ。</p>';
+ const w=checks(R);$("warns").innerHTML=w.length?w.map(x=>'<p class="note '+(x[0]==="crit"||x[0]==="warn"?"w":"")+'" style="margin:0 0 6px">'+esc(x[1])+'</p>').join(""):'<p class="note k" style="margin:0">明らかな矛盾は見当たらない。</p>';
+ const rc=recert();$("rcNote").innerHTML='<p class="hint">提案：'+{no:"不要",mild:"要（軽度化）",sev:"要（重度化）"}[rc.sug]+'。'+rc.note+'</p>';
+ const f=sheet1(R);window._s1=f;
+ $("sheet1").innerHTML=f.map((x,i)=>'<div class="out"><div class="hd"><b>'+x[0]+'</b><button class="cp" type="button" data-cp="'+i+'">コピー</button></div><div class="tx">'+esc(x[1])+'</div></div>').join("");
+ $("sheet2").innerHTML='<dl class="kv">'+sheet2().map(x=>'<dt>'+x[0]+'</dt><dd>'+esc(x[1])+'</dd>').join("")+'</dl>';
+}
+function renderStrip(R){const g=R.g;$("stripL").innerHTML='判定：<b>'+(g&&g<=6?g+"級相当":g===7?"7級":"—")+'</b>　<span class="sub">上肢'+(R.uG||"—")+'・下肢'+(R.lG||"—")+'・体幹'+(R.T.g||"—")+'</span>'}
+function renderAll(){const R=compute();renderDx();renderJoints(R);renderADL();renderResult(R);renderStrip(R);save()}
+
+/* ---------- イベント ---------- */
+function applyDxDefaults(){const d=dxObj();if(!d.id)return;S.cause=d.cause;S.gait="";S.neuro.mot=d.mot.slice();S.neuro.site=d.site.slice();
+ document.querySelectorAll("[data-arr]").forEach(el=>{const cur=gp(el.dataset.arr)||[];el.querySelectorAll("input").forEach(i=>i.checked=cur.includes(i.value))})}
+document.addEventListener("input",e=>{const el=e.target;
+ if(el.dataset.k){sp(el.dataset.k,el.type==="checkbox"?el.checked:el.value);if(el.dataset.k==="dx")applyDxDefaults();renderAll();return}
+ const tr=el.closest("tr[data-j]");if(tr&&el.dataset.f){const k=tr.dataset.j;S.J[S.jside][k]=Object.assign({},S.J[S.jside][k],{[el.dataset.f]:el.value});renderAll();return}
+});
+document.addEventListener("change",e=>{const el=e.target;
+ if(el.dataset.k&&el.tagName==="SELECT"){sp(el.dataset.k,el.value);if(el.dataset.k==="dx")applyDxDefaults();renderAll();return}
+ const tr=el.closest&&el.closest("tr[data-j]");if(tr&&el.dataset.f){S.J[S.jside][tr.dataset.j]=Object.assign({},S.J[S.jside][tr.dataset.j],{[el.dataset.f]:el.value});renderAll();return}
+ const arr=el.closest&&el.closest("[data-arr]");if(arr){sp(arr.dataset.arr,[...arr.querySelectorAll("input:checked")].map(i=>i.value));renderAll();return}
+ if(el.name==="cause"){S.cause=el.value;renderAll();return}
+ if(el.name==="side"){S.side=el.value;renderAll();return}
+ if(el.name==="gait"){S.gait=el.value;renderAll();return}
+ const J=S.J[S.jside];
+ if(el.id==="finSel")J.fin=el.value;else if(el.id==="liftSel")J.lift=el.value;else if(el.id==="fineChk")J.fine=el.checked;else if(el.id==="ovU")J.ovU=el.value;
+ else if(el.id==="toeSel")J.toe=el.value;else if(el.id==="supChk")J.sup=el.checked;else if(el.id==="ovL")J.ovL=el.value;else return;
+ renderAll();
+});
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.tab){setTab(b.dataset.tab);return}
+ if(b.dataset.go){setTab(b.dataset.go);return}
+ if(b.dataset.s){S.jside=b.dataset.s;renderAll();return}
+ const tri=b.closest("[data-adl]");if(tri){const id=tri.dataset.adl;S.adl=S.adl||{};S.adl[id]=S.adl[id]===b.dataset.v?"":b.dataset.v;renderAll();return}
+ if(b.id==="adlAllO"){ADL.forEach(a=>{if(!S.adl[a[0]])S.adl[a[0]]="○"});renderAll();toast("未入力の項目を○にしました");return}
+ if(b.dataset.cp!=null){const x=window._s1[+b.dataset.cp];copy(x[1]);return}
+ if(b.id==="copyAll"){copy(window._s1.map(x=>"【"+x[0]+"】\n"+x[1]).join("\n\n"));return}
+});
+function copy(t){const done=()=>toast("コピーしました");if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(done,()=>fb())}else fb();
+ function fb(){const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){toast("コピーできませんでした")}ta.remove()}}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2600)}
+function setHH(){const h=document.querySelector("header.top");if(h)document.documentElement.style.setProperty("--hh",(h.offsetHeight+6)+"px")}
+load();initStatic();fillBound();setTab(S.tab);renderAll();setHH();window.addEventListener("resize",setHH);
+</script>
+
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["shi-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+</body>
+</html>

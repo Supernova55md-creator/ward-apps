@@ -267,6 +267,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "肢体不自由 等級判定ナビ",
+      "short_name": "肢体不自由ナビ",
+      "url": "shi/",
+      "icons": [
+        {
+          "src": "shi/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
