@@ -266,7 +266,45 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
       <li>抗血栓薬、特に抗凝固薬の併用は出血リスクを考えて慎重に。詳細は添付文書と最適使用推進ガイドラインで確認</li>
       <li>DLBなどでアミロイドPETが陽性でも、それだけでADと判断しない（p.100）</li>
       <li>iNPHではAD・PSPの合併があり、髄液Aβ42/40比だけでAD判定しない（p.53）</li>
+      <li>1年以内のTIA・脳卒中・痙攣の既往（レカネマブで投与経験なし）、持続する高血圧（両剤）、重度の白質病変（ドナネマブで投与経験なし）は慎重に判断。投与中は血圧を管理</li>
       <li>ChEIとの併用効果のエビデンスは不十分（p.68）</li>
+    </ul>
+  </div>
+  <div class="card" id="stopflow">
+    <h3>投与中の継続・中断・中止の判断</h3>
+    <p class="note">添付文書（レケンビ 2026年9月改訂第6版、ケサンラ 2026年8月改訂第6版）の「ARIA発現時の対応」と「投与継続・完了の判断」に沿って判定します。</p>
+    <div class="q"><span class="qlab">薬剤</span>
+      <div class="seg" data-sk="drug"><button data-v="lec" class="on">レカネマブ</button><button data-v="don">ドナネマブ</button></div></div>
+    <div class="q"><span class="qlab">ARIAを示唆する症状（頭痛、錯乱、めまい、視覚障害、嘔気、歩行障害、痙攣など）</span>
+      <div class="seg" data-sk="sym"><button data-v="0" class="on">なし</button><button data-v="1">あり</button></div></div>
+    <div class="q"><span class="qlab">ARIA-E（FLAIR高信号）</span>
+      <div class="seg" data-sk="e"><button data-v="0" class="on">なし</button><button data-v="1">軽度</button><button data-v="2">中等度</button><button data-v="3">重度</button></div></div>
+    <div class="q"><span class="qlab">ARIA-H（新規の脳微小出血・脳表ヘモジデリン沈着）</span>
+      <div class="seg" data-sk="h"><button data-v="0" class="on">なし</button><button data-v="1">軽度</button><button data-v="2">中等度</button><button data-v="3">重度</button></div></div>
+    <div class="q"><span class="qlab">1 cmを超える脳出血</span>
+      <div class="seg" data-sk="ich"><button data-v="0" class="on">なし</button><button data-v="1">あり</button></div></div>
+    <div id="ariaout" class="result"></div>
+    <details><summary>ARIAの重症度（MRIでの分類）</summary><div>
+      <div class="tbl"><table><thead><tr><th></th><th>ARIA-E（FLAIR高信号）</th><th>脳微小出血</th><th>脳表ヘモジデリン沈着</th></tr></thead><tbody>
+        <tr><th>軽度</th><td>脳溝・皮質・皮質下白質の1カ所に限局、5 cm未満</td><td>新規1〜4個</td><td>1カ所</td></tr>
+        <tr><th>中等度</th><td>最大径5〜10 cm（1カ所、または10 cm未満が複数）</td><td>新規5〜9個</td><td>2カ所</td></tr>
+        <tr><th>重度</th><td>10 cmを超え、脳回腫脹・脳溝消失を伴う（1カ所以上）</td><td>新規10個以上</td><td>3カ所以上</td></tr>
+      </tbody></table></div>
+      <p class="note" style="margin-top:6px">ARIA-EとARIA-Hが同時にあるときは、それぞれ評価して厳しい方の対応をとる。</p>
+    </div></details>
+    <h3 style="margin-top:6px">有効性・投与期間による判断</h3>
+    <div class="grid2">
+      <div class="q"><label for="mon">投与開始からの月数</label><input type="number" id="mon" min="0" max="60" inputmode="numeric" placeholder="例：12"></div>
+      <div class="q"><label for="prog">直近の6カ月評価</label>
+        <select id="prog"><option value="">未評価</option><option value="ok">MCI〜軽度にとどまり、継続の意義あり</option><option value="mod">中等度以降に進行（CDR-GS 2以上など）</option><option value="noeff">有効性が期待できないと判断</option></select></div>
+    </div>
+    <div class="q" id="petq"><label for="pet">アミロイドPET（ドナネマブ、12カ月目安）</label>
+      <select id="pet"><option value="">未実施</option><option value="clear">プラーク除去を確認</option><option value="remain">除去が確認されない</option></select></div>
+    <div id="effout" class="result"></div>
+    <ul class="list note">
+      <li>投与中は6カ月ごとを目安に認知機能検査と臨床症状の評価を行い、有効性が期待できなければ中止。中等度以降に進行した人への継続投与の有効性は確立していない（両剤共通）</li>
+      <li>ARIAは開始後早期に多い（レカネマブは14週以内、ドナネマブは24週以内、重篤例は12週以内）。この期間は特に注意</li>
+      <li>症状があれば投与期間にかかわらず速やかに受診するよう指導し、臨床評価のうえARIAを疑えばMRI</li>
     </ul>
   </div>
   <div class="card">
@@ -279,7 +317,7 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
         <tr><th>CDR-GS</th><td colspan="2">0.5 または 1（両剤共通）</td></tr>
         <tr><th>用法</th><td>10 mg/kg 2週ごと点滴（約1時間）<br><span class="upd">2026年9月 皮下注250 mgペン承認（500 mg 週1回）。在宅自己注射は保険上の手続き後</span></td><td>350→700→1,050 mg、以後1,400 mg 4週ごと点滴（30分以上）<br><span class="note">2025年8月に用量変更。旧用量700 mgで開始した人は3回目まで700 mg</span></td></tr>
         <tr><th>投与前MRI（ARIA）</th><td>開始前1年以内、5・7・14回目の投与前、以後も定期的<br><span class="upd">2026年6月改訂：3回目投与前も望ましい</span></td><td>開始前1年以内、2・3・4・7回目の投与前、以後も定期的<br><span class="upd">2026年6月改訂：3回目投与前が必須に</span></td></tr>
-        <tr><th>期間・終了</th><td>原則18カ月。超える場合は有効性・安全性を評価して判断</td><td>12カ月目安でアミロイドPET、除去確認で完了。18カ月で完了、継続不可</td></tr>
+        <tr><th>期間・終了</th><td>原則18カ月。超える場合は有効性・安全性を評価して判断。皮下注から切り替えるときは最終皮下投与から1週間あける</td><td>12カ月目安でアミロイドPET、除去確認で完了。除去が確認されなくても原則18カ月で完了<br><span class="upd">2026年8月改訂：18カ月を超える投与は副作用・症状・プラークの変化を考慮して慎重に判断</span></td></tr>
         <tr><th>評価</th><td colspan="2">約6カ月ごとに認知機能・臨床症状を評価し、有効性が見込めなければ中止</td></tr>
         <tr><th>主要成績</th><td>CDR-SB 悪化27.1%抑制（18カ月）</td><td>iADRS 22.3%抑制（76週）、CDR-SB 28.9%抑制</td></tr>
       </tbody></table></div>
@@ -579,7 +617,7 @@ const SKEY="dementia-navi-state-v1";
 let WIPING=false;
 function saveState(){if(WIPING)return;try{
   const s={seg:st,rf:$$("#redflags input:checked").map(x=>x.dataset.rf),clues:[...sel],cdr:cv,
-    ab:{mmse:$("#mmse").value,cdr:$("#cdr").value,amy:$("#amy").value,chk:$$("#v-abeta input[type=checkbox]:checked").map(x=>x.id)},q:$("#q").value};
+    ab:{mmse:$("#mmse").value,cdr:$("#cdr").value,amy:$("#amy").value,chk:$$("#v-abeta input[type=checkbox]:checked").map(x=>x.id)},q:$("#q").value,sk,eff:{mon:$("#mon").value,prog:$("#prog").value,pet:$("#pet").value}};
   localStorage.setItem(SKEY,JSON.stringify(s));}catch(e){}}
 function loadState(){let s;try{s=JSON.parse(localStorage.getItem(SKEY)||"null");}catch(e){}if(!s)return;
   Object.entries(s.seg||{}).forEach(([k,v])=>{st[k]=v;$$(`.seg[data-k="${k}"] button`).forEach(b=>b.classList.toggle("on",b.dataset.v===v));});classify();
@@ -587,10 +625,60 @@ function loadState(){let s;try{s=JSON.parse(localStorage.getItem(SKEY)||"null");
   (s.clues||[]).forEach(k=>{const b=$(`#clues .chip[data-c="${k}"]`);if(b){sel.add(k);b.classList.add("on");b.setAttribute("aria-pressed","true");}});renderDx();
   Object.entries(s.cdr||{}).forEach(([k,v])=>{cv[k]=v;$$(`[data-cdr="${k}"] button`).forEach(b=>b.classList.toggle("on",+b.dataset.v===v));});cdrCalc();
   if(s.ab){$("#mmse").value=s.ab.mmse||"";$("#cdr").value=s.ab.cdr||"";$("#amy").value=s.ab.amy||"";(s.ab.chk||[]).forEach(id=>{const x=document.getElementById(id);if(x)x.checked=true;});}
-  if(s.q)$("#q").value=s.q;}
+  if(s.q)$("#q").value=s.q;
+  if(s.sk){Object.assign(sk,s.sk);Object.entries(sk).forEach(([k,v])=>$$(`[data-sk="${k}"] button`).forEach(b=>b.classList.toggle("on",b.dataset.v===v)));}
+  if(s.eff){$("#mon").value=s.eff.mon||"";$("#prog").value=s.eff.prog||"";$("#pet").value=s.eff.pet||"";}
+  ariaCalc();effCalc();}
 ["click","change","input"].forEach(ev=>document.addEventListener(ev,()=>setTimeout(saveState,0)));
 
 $("#wipe").addEventListener("click",()=>{WIPING=true;try{localStorage.removeItem(SKEY);}catch(e){}location.hash="flow";location.reload();});
+
+/* ---------- ARIA / stop flow ---------- */
+const sk={drug:"lec",sym:"0",e:"0",h:"0",ich:"0"};
+$$("[data-sk]").forEach(g=>g.addEventListener("click",ev=>{const b=ev.target.closest("button");if(!b)return;g.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));sk[g.dataset.sk]=b.dataset.v;ariaCalc();effCalc();}));
+const RANK={cont:0,hold:1,holdstop:2,stop:3};
+const SEV=["","軽度","中等度","重度"];
+function ariaCalc(){
+  const don=sk.drug==="don",sym=sk.sym==="1",e=+sk.e,h=+sk.h,ich=sk.ich==="1";const items=[];
+  if(e){let a,t;
+    if(!sym&&e===1){a="cont";t="軽度・無症候性：慎重に臨床評価のうえ投与継続可能。継続時は特に注意深く経過観察";}
+    else if(don&&(e===3||sym)){a="holdstop";t=`${SEV[e]}${sym?"・症候性":""}：投与中断または中止。${sym?"症状と":""}画像所見の消失を確認すれば再開を検討できる`;}
+    else{a="hold";t=`${SEV[e]}${sym?"・症候性":"・無症候性"}：${sym?"症状と":""}画像所見が消失するまで投与中断。再開は慎重な臨床判断で`;}
+    items.push({k:"ARIA-E",a,t,mri:(a==="cont")?"発現から約1〜2カ月後にMRIを考慮（重症化の確認）":"発現から約2〜4カ月後にMRI。消失していなければ追加で撮像"});}
+  if(h){let a,t;
+    if(!sym&&h===1){a="cont";t="軽度・無症候性：慎重に臨床評価のうえ投与継続可能。継続時は特に注意深く経過観察";}
+    else if(don&&(h===3||sym)){a="holdstop";t=`${SEV[h]}${sym?"・症候性":""}：投与中断または中止。${sym?"症状消失と":""}画像所見の安定化を確認すれば再開を検討できる`;}
+    else{a="hold";t=`${SEV[h]}${sym?"・症候性":"・無症候性"}：${sym?"症状消失と":""}画像所見が安定するまで投与中断。再開は慎重な臨床判断で`;}
+    items.push({k:"ARIA-H",a,t,mri:"発現から約2〜4カ月後にMRI。安定化していなければ追加で撮像"});}
+  if(ich){items.push(don?{k:"脳出血（1 cm超）",a:"stop",t:"投与中止",mri:"脳出血として通常どおり管理"}
+                        :{k:"脳出血（1 cm超）",a:"hold",t:`${sym?"症状消失と":""}画像所見が安定するまで投与中断。再開は慎重な臨床判断で（ドナネマブでは中止とされている）`,mri:"約2〜4カ月後にMRI。安定化していなければ追加で撮像"});}
+  const o=$("#ariaout");
+  if(!items.length){o.className="result"+(sym?" warn":" ok");o.innerHTML=sym?`<b class="big">症状あり・ARIAの画像所見なし</b><span style="font-size:14px">速やかに臨床評価し、MRIでARIAを確認。画像の結果を入れてください。</span>`:`<b class="big">ARIAなし</b><span style="font-size:14px">予定どおり継続。定期MRI（${sk.drug==="don"?"2・3・4・7回目の投与前、以後も定期的":"5・7・14回目の投与前（3回目前も望ましい）、以後も定期的"}）。</span>`;return;}
+  const worst=items.reduce((m,x)=>RANK[x.a]>RANK[m]?x.a:m,"cont");
+  const lab={cont:"投与継続可能（慎重に評価）",hold:"投与中断",holdstop:"投与中断または中止",stop:"投与中止"}[worst];
+  o.className="result "+(worst==="cont"?"warn":"bad");
+  o.innerHTML=`<b class="big">${sk.drug==="don"?"ドナネマブ":"レカネマブ"}：${lab}</b>`+items.map(x=>`<div style="font-size:14px"><b>${x.k}</b>：${esc(x.t)}<br><span class="note">MRI：${esc(x.mri)}</span></div>`).join("")+`<span class="note">${items.length>1?"複数の所見があるときは最も厳しい対応に従う。":""}出典：各添付文書 7項（ARIA発現時の対応）</span>`;
+}
+function effCalc(){
+  const don=sk.drug==="don",m=$("#mon").value===""?null:+$("#mon").value,pr=$("#prog").value,pet=$("#pet").value,o=$("#effout");
+  $("#petq").style.display=don?"":"none";
+  const msg=[];let cls="ok",head="継続";
+  if(pr==="mod"||pr==="noeff"){cls="bad";head="投与中止を検討";msg.push(pr==="mod"?"中等度以降に進行した人への継続投与の有効性は確立していない":"有効性が期待できない場合は中止");}
+  if(don){
+    if(pet==="clear"){if(cls!=="bad"){cls="ok";head="投与完了";}msg.push("アミロイドPETでプラーク除去を確認した時点で投与完了");}
+    else if(m!==null&&m>=12&&!pet){if(cls!=="bad"){cls="warn";head="アミロイドPETで評価";}msg.push("開始後12カ月を目安にアミロイドPET（または同等の方法）でプラーク除去を評価");}
+    if(m!==null&&m>=18&&pet!=="clear"){if(cls!=="bad"){cls="warn";head="原則として投与完了";}msg.push("除去が確認されなくても原則最長18カ月で完了。超えて投与するときは副作用・臨床症状・プラークの変化を考慮して慎重に判断");}
+  }else{
+    if(m!==null&&m>=18){if(cls!=="bad"){cls="warn";head="継続の要否を判断";}msg.push("原則18カ月。超えて投与するときは臨床的有効性と安全性を評価して判断（CDR-GS・MMSEの推移、症状、ARIAの有無などを記録）");}
+  }
+  if(m!==null&&!pr&&m>=6&&!(don&&pet==="clear")){if(cls==="ok"){cls="warn";head="6カ月評価が必要";}msg.push("6カ月ごとを目安に認知機能検査と臨床症状の評価を行う");}
+  if(m===null&&!pr&&!pet){o.className="result";o.innerHTML=`<span class="note">月数と直近の評価を入れると判定します。</span>`;return;}
+  if(!msg.length)msg.push("6カ月ごとの評価を続ける");
+  o.className="result "+cls;o.innerHTML=`<b class="big">${head}</b><ul class="list">${msg.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><span class="note">出典：レケンビ 7.2、ケサンラ 7.2〜7.4</span>`;
+}
+["#mon","#prog","#pet"].forEach(s=>{$(s).addEventListener("input",effCalc);$(s).addEventListener("change",effCalc);});
+ariaCalc();effCalc();
+
 /* init */
 loadState(); renderList(); if(!sel.size)renderDx(); abeta(); route();
 })();
