@@ -231,6 +231,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "QCストーリー支援",
+      "short_name": "QCストーリー",
+      "url": "qc/",
+      "icons": [
+        {
+          "src": "qc/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
