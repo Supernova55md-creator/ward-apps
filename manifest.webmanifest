@@ -207,6 +207,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "頭痛ナビ",
+      "short_name": "頭痛ナビ",
+      "url": "ha/",
+      "icons": [
+        {
+          "src": "ha/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

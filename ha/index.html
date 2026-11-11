@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#9b2f4a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="頭痛ナビ">
+<title>頭痛ナビ</title>
+<style>
+:root{
+  /* 頭痛ナビ＝ワインレッド。急性期（橙）・予防（青）で薬効群を色分け */
+  --accent:#9b2f4a; --accent-ink:#fff; --accent-soft:#f8e8ec;
+  --bg:#f7f4f5; --surface:#fff; --ink:#221a1d; --muted:#6a5f63; --line:#e3d9dc;
+  --ap:#9a4f0c; --ap-soft:#fbefe2; --ac:#1f5aa6; --ac-soft:#e6eef9;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --info:#2b5b9a; --info-soft:#e7eef8;
+  --sec:#8a6414; --sec-soft:#faf2df; --na:#6a6f73; --na-soft:#eeeeec;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#ff8fab; --accent-ink:#2a0d15; --accent-soft:#3a1e26;
+  --bg:#151213; --surface:#1f1a1c; --ink:#f1ecee; --muted:#b4a8ad; --line:#3a3135;
+  --ap:#f0b46e; --ap-soft:#33261a; --ac:#8db7f2; --ac-soft:#18263a;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  --sec:#e2c27a; --sec-soft:#30291a; --na:#b3b8bb; --na-soft:#2a2d2f; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:19px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:12.5px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.18)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:16px;margin:0 0 10px;line-height:1.4}
+h3{font-size:14px;margin:12px 0 6px}
+.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.q{margin:0 0 12px}
+.q:last-child{margin-bottom:0}
+.q>.lb{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:14px;line-height:1.3;cursor:pointer;user-select:none;min-height:36px}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chip input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=number],input[type=date],select{font:inherit;font-size:17px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
+select{font-size:15px}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;padding:6px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.abcd{border:1px dashed var(--line);border-radius:10px;padding:10px;margin-top:8px}
+.abcd .row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:4px 0;font-size:14px;border-bottom:1px dotted var(--line)}
+.abcd .row:last-child{border-bottom:0}
+.abcd select{width:auto;max-width:62%;font-size:14px;padding:6px}
+.score{font-family:var(--num);font-size:20px;font-weight:700}
+.hidden{display:none!important}
+.verdict{border-radius:12px;padding:14px;border:1.5px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.verdict.ok{background:var(--ok-soft);border-color:var(--ok)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.crit{background:var(--crit-soft);border-color:var(--crit)}
+.verdict.info{background:var(--info-soft);border-color:var(--info)}
+.pill{align-self:flex-start;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:#fff;background:var(--muted)}
+.verdict.ok .pill{background:var(--ok)}.verdict.warn .pill{background:var(--warn)}.verdict.crit .pill{background:var(--crit)}.verdict.info .pill{background:var(--info)}
+@media (prefers-color-scheme: dark){.pill{color:#111}}
+.big{font-size:18px;font-weight:700;line-height:1.45}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.item{border-left:4px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 11px}
+.item.do{border-left-color:var(--ok)}.item.avoid{border-left-color:var(--crit)}.item.caution{border-left-color:var(--warn)}.item.note{border-left-color:var(--info)}
+.item .t{font-weight:700;font-size:15px}
+.item .d{font-size:14px;margin-top:2px}
+.src{display:inline-flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.src a,.src span{font-size:11.5px;text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:0 6px;color:var(--info);background:var(--surface)}
+.st{font-size:11px;font-weight:700;border-radius:4px;padding:0 6px}
+.st.ok{background:var(--ok-soft);color:var(--ok)}.st.sec{background:var(--sec-soft);color:var(--sec)}.st.na{background:var(--na-soft);color:var(--na)}
+table.tl{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.tl th,table.tl td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+table.tl th{font-size:12px;color:var(--muted);font-weight:700}
+table.tl tr.hl td{background:var(--accent-soft);font-weight:700}
+table.tl td.day{font-family:var(--num);white-space:nowrap}
+.wrapx{overflow-x:auto}
+.dose{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.dose .bx{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.dose .k{font-size:12px;color:var(--muted)}
+.dose .v{font-size:16px;font-weight:700;line-height:1.35}
+.dose .v small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.drugs{display:flex;flex-wrap:wrap;gap:6px}
+.drugs button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:36px}
+.drugs button.ap[aria-pressed="true"]{background:var(--ap);border-color:var(--ap);color:#fff;font-weight:700}
+.drugs button.ac[aria-pressed="true"]{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700}
+.drugs button.oth[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.sheet .row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.sheet .row:last-child{border-bottom:0}
+.sheet .k{font-weight:700;font-size:13.5px}
+.sheet .k small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.sheet .v{font-size:14px;min-width:0;overflow-wrap:anywhere}
+.sheet .row.hl{background:var(--accent-soft);border-radius:8px;padding:10px 8px;margin:4px -8px}
+@media (max-width:520px){.sheet .row{grid-template-columns:minmax(0,1fr)}.sheet .k small{display:inline;margin-left:6px}}
+.ev{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.ev .hd{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.ev .nm{font-weight:800;font-size:15.5px}
+.ev .yr{font-family:var(--num);font-size:12px;color:var(--muted)}
+.ev .tag{font-size:11px;font-weight:700;border-radius:4px;padding:0 6px}
+.tag.dapt{background:var(--ap-soft);color:var(--ap)}.tag.af{background:var(--ac-soft);color:var(--ac)}.tag.peri{background:var(--accent-soft);color:var(--accent)}.tag.bleed{background:var(--crit-soft);color:var(--crit)}.tag.gl{background:var(--ok-soft);color:var(--ok)}
+.ev dl{display:grid;grid-template-columns:52px minmax(0,1fr);gap:2px 8px;margin:6px 0 0;font-size:13.5px}
+.ev dt{color:var(--muted);font-size:12px;padding-top:1px}
+.ev dd{margin:0}
+.ev .take{margin-top:6px;font-size:14px;font-weight:700}
+.ck{display:flex;flex-direction:column;gap:0}
+.ck .it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.ck .it:last-child{border-bottom:0}
+.ck .it .tx{font-size:14px;line-height:1.45}
+.ck .it .tx small{display:block;color:var(--muted);font-size:12px}
+.ck .it.auto .tx::after{content:"自動判定";font-size:10.5px;font-weight:700;color:var(--info);background:var(--info-soft);border-radius:4px;padding:0 5px;margin-left:6px}
+.yn{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex:none}
+.yn button{font:inherit;font-size:13px;border:0;background:var(--bg);color:var(--muted);padding:6px 12px;min-height:34px;cursor:pointer}
+.yn button[aria-pressed="true"].n{background:var(--ok);color:#fff;font-weight:700}
+.yn button[aria-pressed="true"].y{background:var(--crit);color:#fff;font-weight:700}
+.ck.care .yn button[aria-pressed="true"].y{background:var(--warn)}
+.ck .it.hit{background:var(--crit-soft);margin:0 -8px;padding:8px}
+.ck.care .it.hit{background:var(--warn-soft)}
+.ck .it.un .tx{color:var(--ink)}
+.sec-h{font-size:12.5px;font-weight:800;color:var(--muted);margin:12px 0 2px;letter-spacing:.04em}
+.sec-h:first-child{margin-top:0}
+.bulk{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.bulk button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:8px;padding:5px 10px;cursor:pointer}
+.evcat{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+.cat-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 0;position:sticky;top:var(--hh,108px);z-index:3;background:var(--bg);padding:6px 0}
+.cat-h .tag{font-size:15px;padding:4px 10px;border-radius:8px}
+.tp-go{white-space:nowrap;flex:none;font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:999px;padding:4px 10px;cursor:pointer}
+.topic{display:flex;flex-direction:column;gap:6px;border-left:3px solid var(--line);padding-left:10px}
+.evcat.dapt .topic{border-left-color:var(--ap)}.evcat.af .topic{border-left-color:var(--ac)}.evcat.bleed .topic{border-left-color:var(--crit)}.evcat.peri .topic{border-left-color:var(--accent)}.evcat.gl .topic{border-left-color:var(--ok)}
+.tp-h{display:flex;flex-direction:column;line-height:1.4}
+.tp-h b{font-size:14.5px}
+.tp-h span{font-size:12.5px;color:var(--muted)}
+.news{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.news div{border-left:3px solid var(--accent);padding-left:8px}
+.news b{font-family:var(--num);font-size:12px;color:var(--accent);margin-right:6px}
+.fine{font-size:12px;color:var(--muted);line-height:1.7}
+.fine p{margin:0 0 6px}
+.calc{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:14px}
+.calc .out{font-family:var(--num);font-size:20px;font-weight:700;color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+a{color:var(--info)}
+
+.st.bk{background:var(--info-soft);color:var(--info)}
+.tag.gl{background:var(--ok-soft);color:var(--ok)}
+nav.tabs button{font-size:12px}
+@media (max-width:380px){nav.tabs button{font-size:11px;padding:6px 1px}}
+
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>頭痛ナビ</h1><small>鑑別・急性期・予防・使用過多・群発</small></div>
+  <nav class="tabs" role="tablist" aria-label="場面">
+    <button type="button" role="tab" data-v="dx" aria-selected="false">鑑別</button>
+    <button type="button" role="tab" data-v="ac" aria-selected="true">急性期</button>
+    <button type="button" role="tab" data-v="pv" aria-selected="false">予防</button>
+    <button type="button" role="tab" data-v="moh" aria-selected="false">使用<br>過多</button>
+    <button type="button" role="tab" data-v="ch" aria-selected="false">群発<br>特殊</button>
+    <button type="button" role="tab" data-v="dr" aria-selected="false">薬剤</button>
+    <button type="button" role="tab" data-v="ev" aria-selected="false">根拠</button>
+  </nav>
+</header>
+
+<main>
+<!-- ===================== 鑑別 ===================== -->
+<div id="v-dx" class="view hidden">
+  <section class="card">
+    <h2>二次性頭痛の危険信号（SNNOOP10）</h2>
+    <p class="hint" style="margin-top:-4px">1つでも「あり」なら、一次性頭痛と決める前に画像・採血・髄液などを検討する。</p>
+    <div class="ck" id="x-flags"></div>
+    <div class="bulk"><button type="button" data-bulk="x" data-a="0">すべて「なし」</button><button type="button" data-bulk="x" data-a="-1">未入力に戻す</button></div>
+  </section>
+  <div id="x-out"></div>
+  <section class="card">
+    <h2>一次性頭痛の見分け（ICHD-3）</h2>
+    <div class="q"><span class="lb">発作1回の長さ（未治療・治療無効時）</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="x-dur" value="s"><span>数秒〜数分</span></label>
+        <label class="chip"><input type="radio" name="x-dur" value="c"><span>15〜180分</span></label>
+        <label class="chip"><input type="radio" name="x-dur" value="m"><span>4〜72時間</span></label>
+        <label class="chip"><input type="radio" name="x-dur" value="t"><span>30分〜7日</span></label>
+        <label class="chip"><input type="radio" name="x-dur" value="d"><span>ほぼ毎日続く</span></label>
+      </div></div>
+    <div class="q"><span class="lb">痛みの性状</span>
+      <label class="chk"><input type="checkbox" id="x-uni">片側性</label>
+      <label class="chk"><input type="checkbox" id="x-puls">拍動性</label>
+      <label class="chk"><input type="checkbox" id="x-sev">中等度〜重度（日常生活が妨げられる）</label>
+      <label class="chk"><input type="checkbox" id="x-act">階段昇降など日常的な動作で悪化する（動けなくなる）</label>
+      <label class="chk"><input type="checkbox" id="x-press">圧迫感・締めつけ感（非拍動性）</label>
+      <label class="chk"><input type="checkbox" id="x-orb">眼窩・眼窩上・側頭部の激痛</label>
+    </div>
+    <div class="q"><span class="lb">随伴症状</span>
+      <label class="chk"><input type="checkbox" id="x-nv">悪心または嘔吐</label>
+      <label class="chk"><input type="checkbox" id="x-photo">光過敏</label>
+      <label class="chk"><input type="checkbox" id="x-phono">音過敏</label>
+      <label class="chk"><input type="checkbox" id="x-aut">同側の結膜充血・流涙・鼻閉・鼻漏・眼瞼浮腫・縮瞳/眼瞼下垂</label>
+      <label class="chk"><input type="checkbox" id="x-rest">発作中に落ち着かずじっとしていられない</label>
+      <label class="chk"><input type="checkbox" id="x-aura">完全可逆性の視覚・感覚・言語の前兆（5分以上かけて進展、5〜60分）</label>
+      <label class="chk"><input type="checkbox" id="x-n5">同様の発作が5回以上（群発頭痛では5回、緊張型では10回）</label>
+    </div>
+    <p class="hint">簡易スクリーナー（ID Migraine）：「支障」「悪心」「光過敏」のうち2つ以上で片頭痛の可能性が高い。</p>
+  </section>
+  <div id="x-dxout"></div>
+</div>
+
+<!-- ===================== 急性期 ===================== -->
+<div id="v-ac" class="view hidden">
+  <section class="card">
+    <h2>頭痛の種類と今回の発作</h2>
+    <div class="q"><span class="lb">診断</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="a-type" value="mig" checked><span>片頭痛</span></label>
+        <label class="chip"><input type="radio" name="a-type" value="tth"><span>緊張型頭痛</span></label>
+        <label class="chip"><input type="radio" name="a-type" value="ch"><span>群発頭痛</span></label>
+      </div></div>
+    <div id="a-migq">
+    <div class="q"><span class="lb">発作の強さ</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="a-sev" value="mild"><span>軽度〜中等度</span></label>
+        <label class="chip"><input type="radio" name="a-sev" value="sev" checked><span>中等度〜重度</span></label>
+      </div></div>
+    <div class="q"><span class="lb">悪心・嘔吐</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="a-nv" value="0" checked><span>なし</span></label>
+        <label class="chip"><input type="radio" name="a-nv" value="1"><span>悪心あり</span></label>
+        <label class="chip"><input type="radio" name="a-nv" value="2"><span>嘔吐で内服困難</span></label>
+      </div></div>
+    <label class="chk"><input type="checkbox" id="a-late">服用が遅れた・すでに痛みのピーク（アロディニアあり）</label>
+    <label class="chk"><input type="checkbox" id="a-recur">内服で効くが24時間以内に再発しやすい</label>
+    <label class="chk"><input type="checkbox" id="a-nsfail">NSAIDs・アセトアミノフェンで効果不十分だった</label>
+    <label class="chk"><input type="checkbox" id="a-tfail">トリプタン2剤以上で効果不十分・副作用で使えない</label>
+    <label class="chk"><input type="checkbox" id="a-mens">月経時片頭痛（長く重い）</label>
+    <label class="chk"><input type="checkbox" id="a-status">72時間以上続く（片頭痛発作重積）</label>
+    </div>
+    <div class="q"><span class="lb">場面</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="a-set" value="op" checked><span>外来・頓用処方</span></label>
+        <label class="chip"><input type="radio" name="a-set" value="er"><span>救急外来・病棟（注射可）</span></label>
+      </div></div>
+  </section>
+  <section class="card">
+    <h2>患者背景</h2>
+    <div class="sec-h">トリプタン・エルゴタミンの禁忌</div>
+    <label class="chk"><input type="checkbox" id="a-ihd">虚血性心疾患（既往・症状・徴候を含む）</label>
+    <label class="chk"><input type="checkbox" id="a-cvd">脳梗塞・TIAの既往</label>
+    <label class="chk"><input type="checkbox" id="a-pad">末梢血管障害</label>
+    <label class="chk"><input type="checkbox" id="a-htn">コントロールされていない高血圧</label>
+    <label class="chk"><input type="checkbox" id="a-hemi">片麻痺性片頭痛・脳幹性前兆を伴う片頭痛</label>
+    <label class="chk"><input type="checkbox" id="a-liver">重度の肝機能障害</label>
+    <div class="sec-h">腎機能・妊娠</div>
+    <label class="chk"><input type="checkbox" id="a-renal">重度腎機能障害・透析</label>
+    <div class="q" style="margin-top:6px"><span class="lb">妊娠・授乳</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="a-preg" value="no" checked><span>該当なし</span></label>
+        <label class="chip"><input type="radio" name="a-preg" value="p1"><span>妊娠中（〜27週）</span></label>
+        <label class="chip"><input type="radio" name="a-preg" value="p3"><span>妊娠28週以降</span></label>
+        <label class="chip"><input type="radio" name="a-preg" value="lac"><span>授乳中</span></label>
+      </div></div>
+    <div class="sec-h">併用薬・生活</div>
+    <label class="chk"><input type="checkbox" id="a-prop">プロプラノロール内服中</label>
+    <label class="chk"><input type="checkbox" id="a-maoi">MAO阻害薬内服中・中止2週間以内（セレギリン・ラサギリン・サフィナミドを含む）</label>
+    <label class="chk"><input type="checkbox" id="a-cyp">HIVプロテアーゼ阻害薬・強いCYP3A4阻害薬（クラリスロマイシン、イトラコナゾール等）</label>
+    <label class="chk"><input type="checkbox" id="a-ssri">SSRI・SNRI内服中</label>
+    <label class="chk"><input type="checkbox" id="a-asthma">アスピリン喘息・NSAIDs過敏</label>
+    <label class="chk"><input type="checkbox" id="a-gi">消化性潰瘍の既往・抗血栓薬内服中</label>
+    <label class="chk"><input type="checkbox" id="a-drive">服用後に車を運転する予定がある・運転が仕事</label>
+    <div class="grid" style="margin-top:8px">
+      <label class="f">急性期薬を飲む日（日/月）<input type="number" id="a-days" inputmode="numeric" min="0" max="31" placeholder="例 8"></label>
+    </div>
+  </section>
+  <div id="a-out"></div>
+</div>
+
+<!-- ===================== 予防 ===================== -->
+<div id="v-pv" class="view hidden">
+  <section class="card">
+    <h2>頭痛の頻度（最近3か月の平均）</h2>
+    <div class="grid">
+      <label class="f">頭痛のある日（日/月）<input type="number" id="p-hd" inputmode="numeric" min="0" max="31" placeholder="例 10"></label>
+      <label class="f">片頭痛の日（日/月）<input type="number" id="p-mmd" inputmode="numeric" min="0" max="31" placeholder="例 6"></label>
+      <label class="f">急性期薬を飲む日（日/月）<input type="number" id="p-amd" inputmode="numeric" min="0" max="31" placeholder="例 6"></label>
+    </div>
+    <label class="chk" style="margin-top:6px"><input type="checkbox" id="p-dis">非薬物療法・急性期治療をしても日常生活に支障がある</label>
+    <label class="chk"><input type="checkbox" id="p-noacute">急性期治療薬が使えない・効かない</label>
+    <label class="chk"><input type="checkbox" id="p-spec">片麻痺性片頭痛・脳幹性前兆・遷延性前兆など</label>
+  </section>
+  <section class="card">
+    <h2>併存症・背景（薬の選び分けに使う）</h2>
+    <div class="sec-h">あると選びやすい薬がある</div>
+    <label class="chk"><input type="checkbox" id="p-htn">高血圧</label>
+    <label class="chk"><input type="checkbox" id="p-anx">不安・緊張しやすい・動悸・本態性振戦</label>
+    <label class="chk"><input type="checkbox" id="p-dep">うつ・不眠・緊張型頭痛の併存・慢性疼痛</label>
+    <label class="chk"><input type="checkbox" id="p-epi">てんかん・双極性障害</label>
+    <label class="chk"><input type="checkbox" id="p-obese">肥満（体重を増やしたくない）</label>
+    <label class="chk"><input type="checkbox" id="p-ae">副作用をとても心配している・初めての予防薬</label>
+    <label class="chk"><input type="checkbox" id="p-daily">毎日飲むのが難しい（注射の方がよい）</label>
+    <div class="sec-h">避けたい薬がある</div>
+    <label class="chk"><input type="checkbox" id="p-asthma">喘息・COPD</label>
+    <label class="chk"><input type="checkbox" id="p-brady">徐脈・房室ブロック・心不全</label>
+    <label class="chk"><input type="checkbox" id="p-hypo">低血圧・立ちくらみ</label>
+    <label class="chk"><input type="checkbox" id="p-glau">閉塞隅角緑内障・前立腺肥大・QT延長</label>
+    <label class="chk"><input type="checkbox" id="p-stone">尿路結石の既往・やせ</label>
+    <label class="chk"><input type="checkbox" id="p-liver">肝機能障害</label>
+    <label class="chk"><input type="checkbox" id="p-ckd">CrCl 30 mL/分未満・透析</label>
+    <label class="chk"><input type="checkbox" id="p-vasc">虚血性脳卒中・虚血性心疾患・レイノー現象</label>
+    <label class="chk"><input type="checkbox" id="p-const">便秘が強い</label>
+    <label class="chk"><input type="checkbox" id="p-cyp">強いCYP3A4阻害薬（クラリスロマイシン、イトラコナゾール等）</label>
+    <label class="chk"><input type="checkbox" id="p-old">65歳以上</label>
+    <div class="q" style="margin-top:6px"><span class="lb">妊娠</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="p-preg" value="no" checked><span>該当なし・男性</span></label>
+        <label class="chip"><input type="radio" name="p-preg" value="cb"><span>妊娠の可能性がある年代</span></label>
+        <label class="chip"><input type="radio" name="p-preg" value="plan"><span>妊娠を希望</span></label>
+        <label class="chip"><input type="radio" name="p-preg" value="preg"><span>妊娠中</span></label>
+        <label class="chip"><input type="radio" name="p-preg" value="lac"><span>授乳中</span></label>
+      </div></div>
+  </section>
+  <section class="card">
+    <h2>これまでの予防薬</h2>
+    <p class="hint" style="margin-top:-4px">効果不十分・忍容性が低い・禁忌のいずれかで使えなかった薬にチェック。</p>
+    <label class="chk"><input type="checkbox" id="p-f-lom">ロメリジン</label>
+    <label class="chk"><input type="checkbox" id="p-f-pro">プロプラノロール</label>
+    <label class="chk"><input type="checkbox" id="p-f-vpa">バルプロ酸</label>
+    <label class="chk"><input type="checkbox" id="p-f-ami">アミトリプチリン</label>
+    <label class="chk"><input type="checkbox" id="p-f-oth">その他の経口予防薬（ベラパミル、トピラマート、カンデサルタン等）</label>
+    <label class="chk"><input type="checkbox" id="p-f-gep">ゲパント（リメゲパント・アトゲパント）</label>
+    <label class="chk"><input type="checkbox" id="p-f-mab">CGRP関連抗体薬</label>
+  </section>
+  <div id="p-out"></div>
+</div>
+
+<!-- ===================== 薬剤の使用過多 ===================== -->
+<div id="v-moh" class="view hidden">
+  <section class="card">
+    <h2>薬剤の使用過多による頭痛（ICHD-3 8.2）</h2>
+    <div class="grid">
+      <label class="f">頭痛のある日（日/月）<input type="number" id="m-hd" inputmode="numeric" min="0" max="31" placeholder="例 20"></label>
+    </div>
+    <label class="chk" style="margin-top:6px"><input type="checkbox" id="m-3m">その使い方が3か月を超えて続いている</label>
+    <label class="chk"><input type="checkbox" id="m-prior">もともと片頭痛・緊張型頭痛などの頭痛がある</label>
+    <h3>服用日数（日/月）</h3>
+    <div class="grid">
+      <label class="f">トリプタン<input type="number" id="m-trip" inputmode="numeric" min="0" max="31"></label>
+      <label class="f">複合鎮痛薬（市販薬の多く）<input type="number" id="m-comb" inputmode="numeric" min="0" max="31"></label>
+      <label class="f">単一の鎮痛薬（アセトアミノフェン・NSAIDs）<input type="number" id="m-simp" inputmode="numeric" min="0" max="31"></label>
+      <label class="f">エルゴタミン<input type="number" id="m-erg" inputmode="numeric" min="0" max="31"></label>
+      <label class="f">オピオイド（トラマドール・コデイン）<input type="number" id="m-opi" inputmode="numeric" min="0" max="31"></label>
+      <label class="f">ラスミジタン・急性期のゲパント<input type="number" id="m-new" inputmode="numeric" min="0" max="31"></label>
+      <label class="f">上記の合計日数（重複は1日）<input type="number" id="m-tot" inputmode="numeric" min="0" max="31"></label>
+    </div>
+    <div class="sec-h" style="margin-top:12px">背景</div>
+    <label class="chk"><input type="checkbox" id="m-psy">うつ・不安・依存傾向がある</label>
+    <label class="chk"><input type="checkbox" id="m-opiuse">オピオイド・バルビツール酸・ベンゾジアゼピンの乱用</label>
+    <label class="chk"><input type="checkbox" id="m-fail">外来での離脱に失敗したことがある</label>
+  </section>
+  <div id="m-out"></div>
+</div>
+
+<!-- ===================== 群発・特殊 ===================== -->
+<div id="v-ch" class="view hidden">
+  <section class="card">
+    <div class="chips" id="c-filter">
+      <label class="chip"><input type="radio" name="c-f" value="ch" checked><span>群発頭痛</span></label>
+      <label class="chip"><input type="radio" name="c-f" value="tac"><span>その他のTACs</span></label>
+      <label class="chip"><input type="radio" name="c-f" value="er"><span>救急・重積</span></label>
+      <label class="chip"><input type="radio" name="c-f" value="preg"><span>妊娠・授乳</span></label>
+      <label class="chip"><input type="radio" name="c-f" value="old"><span>高齢者・小児</span></label>
+      <label class="chip"><input type="radio" name="c-f" value="tth"><span>緊張型頭痛</span></label>
+    </div>
+  </section>
+  <div id="c-ch-in" class="hidden">
+    <section class="card">
+      <h2>群発頭痛：ベラパミルの増量チェック</h2>
+      <div class="grid">
+        <label class="f">現在のベラパミル（mg/日）<input type="number" id="c-vd" inputmode="numeric" min="0" max="960" step="40" placeholder="例 120"></label>
+        <label class="f">心拍数（/分）<input type="number" id="c-hr" inputmode="numeric" min="20" max="200" placeholder="例 68"></label>
+        <label class="f">PR間隔（ms）<input type="number" id="c-pr" inputmode="numeric" min="80" max="400" placeholder="例 170"></label>
+      </div>
+      <label class="chk" style="margin-top:6px"><input type="checkbox" id="c-av2">II度以上の房室ブロック・洞房ブロック・洞不全</label>
+      <label class="chk"><input type="checkbox" id="c-hf">うっ血性心不全</label>
+      <label class="chk"><input type="checkbox" id="c-bb">β遮断薬・ジゴキシン・強いCYP3A4阻害薬を併用</label>
+      <div id="c-vout"></div>
+    </section>
+  </div>
+  <div id="c-out"></div>
+</div>
+
+<!-- ===================== 薬剤 ===================== -->
+<div id="v-dr" class="view hidden">
+  <section class="card">
+    <div class="sec-h">急性期</div>
+    <div class="drugs" id="d-ac"></div>
+    <div class="sec-h" style="margin-top:12px">予防</div>
+    <div class="drugs" id="d-pv"></div>
+    <div class="sec-h" style="margin-top:12px">群発頭痛・その他</div>
+    <div class="drugs" id="d-ot"></div>
+  </section>
+  <div id="d-out"></div>
+</div>
+
+<!-- ===================== 根拠 ===================== -->
+<div id="v-ev" class="view hidden">
+  <section class="card">
+    <h2>この1年ほどの主な更新</h2>
+    <div class="news" id="e-news"></div>
+  </section>
+  <section class="card">
+    <div class="chips" id="e-filter">
+      <label class="chip"><input type="radio" name="e-f" value="all" checked><span>すべて</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="gl"><span>ガイドライン</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="ac"><span>急性期</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="pv"><span>予防</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="moh"><span>使用過多</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="ch"><span>群発</span></label>
+      <label class="chip"><input type="radio" name="e-f" value="lab"><span>添付文書・通知</span></label>
+    </div>
+  </section>
+  <div id="e-list" style="display:flex;flex-direction:column;gap:8px"></div>
+  <section class="card fine">
+    <p><span class="st ok">原本で確認</span> PubMed抄録・PMDA添付文書・厚労省通知・学会文書の原本で記載を直接確認。<span class="st bk">成書で確認</span> 『頭痛治療薬の考え方、使い方』（中外医学社、2016年 第2版）で確認。改訂がありうるので処方前に最新の添付文書を見る。<span class="st sec">二次資料のみ</span> 解説記事・総説・一般的な知識による。</p>
+    <p>保険上の扱い（適応・審査上認める・適応外）は2026年11月時点の把握で、地域の審査で異なることがあります。</p>
+    <p>判断の参考資料です。最終判断は主治医が行い、院内の取り決めがあればそちらを優先してください。データ作成：Claude（2026年11月11日）。</p>
+  </section>
+</div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 文献 ============ */
+const PM=id=>"https://pubmed.ncbi.nlm.nih.gov/"+id+"/";
+const DOI=d=>"https://doi.org/"+d;
+const R={
+ GL21:{s:"頭痛の診療GL 2021",t:"日本神経学会・日本頭痛学会・日本神経治療学会 監修. 頭痛の診療ガイドライン2021. 医学書院; 2021",u:"https://www.jhsnet.net/pdf/guideline_2021.pdf"},
+ JHSPS:{s:"頭痛学会 2025/10",t:"成人の片頭痛予防療法におけるCGRP関連抗体薬の使用に関する日本頭痛学会のポジションステートメント（2025年10月27日）",u:"https://www.jhsnet.net/pdf/guideline_cgrp.pdf"},
+ JHSRIM:{s:"頭痛学会 CQ-10",t:"日本頭痛学会. CQ-10 CGRP受容体拮抗薬リメゲパントを片頭痛治療においてどのように使用するか",u:"https://www.jhsnet.net/GUIDELINE/CGRP/14.pdf"},
+ JHSATO:{s:"頭痛学会 アトゲパント",t:"日本頭痛学会. CGRP受容体拮抗薬アトゲパントを片頭痛治療においてどのように使用するか",u:"https://jhsnet.net/GUIDELINE/CGRP/15.pdf"},
+ GLEPT:{s:"最適使用推進GL（案）",t:"最適使用推進ガイドライン エプチネズマブ（遺伝子組換え）（中医協 総-3-1、2026年11月6日）",u:"https://www.mhlw.go.jp/content/10808000/001766356.pdf"},
+ L_rim:{s:"ナルティーク添付文書",t:"ナルティークOD錠75mg 電子添文（PMDA）",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/672212_1190035F1027_1_02"},
+ L_rimrev:{s:"ナルティーク審査報告書",t:"ナルティークOD錠75mg 審査報告書（PMDA）",u:"https://www.pmda.go.jp/drugs/2025/P20250922005/672212000_30700AMX00243_A100_1.pdf"},
+ L_eptrev:{s:"ビエプチ審査報告書",t:"ビエプチ点滴静注100mg 審議結果報告書・審査報告書（2026年8月）",u:"https://www.pmda.go.jp/drugs/2026/P20261008001/860023000_30800AMX00340_A100_1.pdf"},
+ L_las:{s:"レイボー添付文書",t:"レイボー錠50mg/100mg 電子添文（PMDA）",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/530471_1190030F1024_1_03"},
+ L_lasdrv:{s:"レイボー 運転",t:"Lilly Answers：ラスミジタンの自動車運転への影響（運転シミュレータ試験）",u:"https://medical.lilly.com/jp/answers/154936"},
+ L_ere:{s:"アイモビーグ添付文書",t:"アイモビーグ皮下注70mgペン 電子添文（PMDA）",u:"https://www.pmda.go.jp/PmdaSearch/iyakuDetail/112292_1190406G1029_2_03"},
+ L_cle:{s:"クリアミンIF",t:"クリアミン配合錠A1.0/S0.5 インタビューフォーム（2026年4月改訂 第11版）",u:"https://pins.japic.or.jp/pdf/medical_interview/IF00007819.pdf"},
+ HOT:{s:"群発頭痛HOT",t:"日本頭痛学会ニュースレター33号：群発頭痛の在宅酸素療法（平成30年度診療報酬改定で保険適用）",u:"https://jhsnet.net/pdf/newsletter_033.pdf"},
+ BOOK:{s:"頭痛治療薬の考え方、使い方",t:"『頭痛治療薬の考え方、使い方』第2版（中外医学社、2016年）",u:""},
+ IHSA:{s:"IHS 2024 急性期",t:"Puledda F, et al. International Headache Society global practice recommendations for the acute pharmacological treatment of migraine. Cephalalgia 2024;44(8)",u:DOI("10.1177/03331024241252666")},
+ IHSP:{s:"IHS 2024 予防",t:"Puledda F, et al. International Headache Society Global Practice Recommendations for Preventive Pharmacological Treatment of Migraine. Cephalalgia 2024;44(9)",u:PM(39262214)},
+ AHS24:{s:"AHS 2024",t:"Charles AC, et al. CGRP-targeting therapies are a first-line option for the prevention of migraine: AHS position statement update. Headache 2024;64:333-341",u:PM(38466028)},
+ EHF22:{s:"EHF 2022",t:"Sacco S, et al. European Headache Federation guideline on the use of monoclonal antibodies targeting the CGRP pathway for migraine prevention – 2022 update. J Headache Pain 2022;23:67",u:DOI("10.1186/s10194-022-01431-x")},
+ LIPTON19:{s:"Study 301",t:"Lipton RB, et al. Rimegepant, an oral CGRP receptor antagonist, for migraine. N Engl J Med 2019;381:142-149",u:PM(31291516)},
+ CROOP19:{s:"Study 303",t:"Croop R, et al. Rimegepant ODT for the acute treatment of migraine. Lancet 2019;394:737-745",u:PM(31311674)},
+ CROOP21:{s:"Rimegepant 予防",t:"Croop R, et al. Oral rimegepant for preventive treatment of migraine: a phase 2/3 trial. Lancet 2021;397:51-60",u:PM(33338437)},
+ ADVANCE:{s:"ADVANCE",t:"Ailani J, et al. Atogepant for the preventive treatment of migraine. N Engl J Med 2021;385:695-706",u:PM(34407343)},
+ PROGRESS:{s:"PROGRESS",t:"Pozo-Rosich P, et al. Atogepant for the preventive treatment of chronic migraine (PROGRESS). Lancet 2023;402:775-785",u:DOI("10.1016/S0140-6736(23)01049-8")},
+ ELEVATE:{s:"ELEVATE",t:"Tassorelli C, et al. Atogepant in adults for whom conventional oral preventives have failed (ELEVATE). Lancet Neurol 2024;23:382-392",u:PM(38364831)},
+ MONONOFU:{s:"MONONOFU",t:"Sakai F, et al. Phase 2 randomized placebo-controlled study of lasmiditan in Japanese patients. Headache 2021;61:755-765",u:PM(33990951)},
+ SUNRISE:{s:"SUNRISE",t:"Yu S, Matsumori Y, Kim BK, et al. Efficacy and safety of eptinezumab in a predominantly Asian population with chronic migraine (SUNRISE). Cephalalgia 2025",u:"https://practicalneurology.com/news/treatment-with-vyepti-significantly-reduced-monthly-migraine-days-in-adults-with-chronic-migraine/2484558"},
+ CARLSEN:{s:"Carlsen 2020",t:"Carlsen LN, et al. Comparison of 3 treatment strategies for medication overuse headache. JAMA Neurol 2020;77:1069-1078",u:PM(32453406)},
+ COHEN:{s:"Cohen 2009",t:"Cohen AS, et al. High-flow oxygen for treatment of cluster headache: a randomized trial. JAMA 2009;302:2451-2457",u:PM(19996400)},
+ PREDCH:{s:"PredCH",t:"Obermann M, et al. Prednisone versus placebo in short-term prevention of episodic cluster headache. Lancet Neurol 2021;20:29-37",u:PM(33245858)},
+ SNNOOP:{s:"SNNOOP10",t:"Do TP, et al. Red and orange flags for secondary headaches in clinical practice: SNNOOP10 list. Neurology 2019;92:134-144",u:PM(30587518)},
+ ICHD3:{s:"ICHD-3",t:"Headache Classification Committee of the IHS. The International Classification of Headache Disorders, 3rd edition. Cephalalgia 2018;38:1-211",u:"https://ichd-3.org/"}
+};
+const STL={ok:"原本で確認",bk:"成書で確認",sec:"二次資料のみ",na:"未確認"};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function src(keys,st){
+  const a=(keys||[]).filter(k=>R[k]).map(k=>R[k].u?`<a href="${esc(R[k].u)}" target="_blank" rel="noopener" title="${esc(R[k].t)}">${esc(R[k].s)}</a>`:`<span title="${esc(R[k].t)}">${esc(R[k].s)}</span>`).join("");
+  return `<div class="src">${st?`<span class="st ${st}">${STL[st]}</span>`:""}${a}</div>`;
+}
+function item(cls,t,d,keys,st){return `<li class="item ${cls}"><div class="t">${t}</div>${d?`<div class="d">${d}</div>`:""}${keys||st?src(keys,st):""}</li>`}
+function verdict(cls,pill,big,body){return `<section class="verdict ${cls}"><span class="pill">${pill}</span><div class="big">${big}</div>${body||""}</section>`}
+function card(h,inner){return `<section class="card">${h?`<h2>${h}</h2>`:""}${inner}</section>`}
+function ul(a){return a.length?`<ul class="list">${a.join("")}</ul>`:""}
+const $=id=>document.getElementById(id);
+const val=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:""};
+const num=id=>{const e=$(id);if(!e)return null;const v=parseFloat(e.value);return isNaN(v)?null:v};
+const ck=id=>{const e=$(id);return !!(e&&e.checked)};
+
+/* ============ タブ ============ */
+let curTab="ac";
+function setTab(v){
+  curTab=v;
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v?"true":"false"));
+  document.querySelectorAll(".view").forEach(d=>d.classList.toggle("hidden",d.id!=="v-"+v));
+}
+
+/* ============ 保存 ============ */
+const KEY="ha-nav-v1";
+let XF={}, dDrug="rim";
+function save(){
+  try{
+    const o={tab:curTab,xf:XF,dd:dDrug,f:{}};
+    document.querySelectorAll("main input,main select").forEach(el=>{
+      if(!el.id&&!el.name)return;
+      if(el.type==="radio"){if(el.checked)o.f["r:"+el.name]=el.value}
+      else if(el.type==="checkbox")o.f["c:"+el.id]=el.checked;
+      else if(el.id)o.f["v:"+el.id]=el.value;
+    });
+    localStorage.setItem(KEY,JSON.stringify(o));
+  }catch(e){}
+}
+function load(){
+  try{
+    const o=JSON.parse(localStorage.getItem(KEY)||"null");if(!o)return;
+    for(const [k,v] of Object.entries(o.f||{})){
+      const t=k.slice(0,1),n=k.slice(2);
+      if(t==="r"){const e=document.querySelector(`input[name="${n}"][value="${v}"]`);if(e)e.checked=true}
+      else if(t==="c"){const e=$(n);if(e)e.checked=!!v}
+      else{const e=$(n);if(e)e.value=v}
+    }
+    if(o.xf)XF=o.xf; if(o.dd&&DR[o.dd])dDrug=o.dd; if(o.tab)curTab=o.tab;
+  }catch(e){}
+}
+
+/* ============ 鑑別 ============ */
+const FLAGS=[
+ {k:"S1",t:"発熱・体重減少などの全身症状",s:"髄膜炎・脳炎・血管炎・巨細胞性動脈炎"},
+ {k:"N1",t:"悪性腫瘍の既往",s:"脳転移・髄膜癌腫症"},
+ {k:"N2",t:"神経脱落症状・意識障害・けいれん",s:"脳卒中・腫瘍・膿瘍・静脈洞血栓症"},
+ {k:"O1",t:"突然発症（1分以内にピーク）＝雷鳴頭痛",s:"くも膜下出血・RCVS・解離・下垂体卒中・静脈洞血栓症"},
+ {k:"O2",t:"50歳以上（文献により65歳以上）で新たに始まった",s:"巨細胞性動脈炎・腫瘍・硬膜下血腫"},
+ {k:"P1",t:"頭痛のパターンの変化・最近始まった頭痛",s:"腫瘍・静脈洞血栓症・薬剤の使用過多"},
+ {k:"P2",t:"体位で変わる（立位で悪化／臥位で悪化）",s:"脳脊髄液漏出症・特発性頭蓋内圧亢進症"},
+ {k:"P3",t:"咳・くしゃみ・いきみ・運動で誘発される",s:"後頭蓋窩病変・キアリ奇形"},
+ {k:"P4",t:"乳頭浮腫",s:"頭蓋内圧亢進"},
+ {k:"P5",t:"進行性・非典型的な経過",s:"腫瘍・慢性硬膜下血腫"},
+ {k:"P6",t:"妊娠中・産褥期",s:"静脈洞血栓症・子癇・RCVS・PRES・下垂体卒中"},
+ {k:"P7",t:"眼痛と自律神経症状（視力低下・充血）",s:"急性閉塞隅角緑内障・海綿静脈洞病変"},
+ {k:"P8",t:"外傷後に始まった",s:"硬膜下・硬膜外血腫"},
+ {k:"P9",t:"HIVなど免疫不全",s:"日和見感染"},
+ {k:"P10",t:"鎮痛薬の使いすぎ・新しい薬で始まった",s:"薬剤の使用過多・薬剤性頭痛"}
+];
+function ynRow(st,k,t,s){
+  const v=st[k];
+  return `<div class="it${v===1?" hit":""}"><div class="tx">${esc(t)}${s?`<small>${esc(s)}</small>`:""}</div><div class="yn"><button type="button" class="n" data-x="${k}" data-a="0" aria-pressed="${v===0}">なし</button><button type="button" class="y" data-x="${k}" data-a="1" aria-pressed="${v===1}">あり</button></div></div>`;
+}
+function renderDx(){
+  $("x-flags").innerHTML=FLAGS.map(f=>ynRow(XF,f.k,f.t,f.s)).join("");
+  const hit=FLAGS.filter(f=>XF[f.k]===1), done=FLAGS.filter(f=>XF[f.k]!==undefined).length;
+  let v;
+  if(hit.length){
+    const thunder=XF.O1===1;
+    v=verdict("crit","二次性頭痛を疑う",thunder?"雷鳴頭痛：すぐに頭部CT、陰性でも髄液検査またはMRI/MRA（RCVS・解離・静脈洞血栓症）":"一次性頭痛と決める前に検査する",
+      ul(hit.map(f=>item("avoid",esc(f.t),"考える疾患："+esc(f.s))))+
+      ul([item("note","検査の目安","頭部CT（急性・外傷・意識障害）、MRI（造影・MRV・MRAを含む）、赤沈・CRP（50歳以上は巨細胞性動脈炎）、髄液検査（感染・SAH・癌性髄膜炎・低髄圧の圧測定）。",["SNNOOP","GL21"],"ok")]));
+  }else if(done===FLAGS.length){
+    v=verdict("ok","危険信号なし","一次性頭痛として診断を進めてよい",`<p class="hint" style="margin:0">経過中に新しい特徴が出たら見直す。</p>`);
+  }else{
+    v=verdict("info","未入力あり",`${FLAGS.length-done}項目が未入力`,"");
+  }
+  $("x-out").innerHTML=v;
+
+  /* 一次性頭痛 */
+  const dur=val("x-dur");
+  const uni=ck("x-uni"),puls=ck("x-puls"),sev=ck("x-sev"),act=ck("x-act"),press=ck("x-press"),orb=ck("x-orb");
+  const nv=ck("x-nv"),ph=ck("x-photo"),pn=ck("x-phono"),aut=ck("x-aut"),rest=ck("x-rest"),aura=ck("x-aura"),n5=ck("x-n5");
+  const c2m=[uni,puls,sev,act].filter(Boolean).length;
+  const migD=c2m>=2&&(nv||(ph&&pn));
+  const c2t=[!uni,press||!puls,!sev,!act].filter(Boolean).length;
+  const tthD=c2t>=2&&!nv&&!(ph&&pn);
+  const chD=orb&&sev&&(aut||rest);
+  const id=[sev,nv,ph].filter(Boolean).length;
+  const res=[];
+  if(dur==="m"){
+    if(migD) res.push(item("do",`前兆のない片頭痛（1.1）の基準を満たす${n5?"":"（発作回数5回以上を確認）"}`,`特徴 ${c2m}/4（2以上が必要）、随伴症状あり。${aura?"前兆の記載があり、前兆のある片頭痛（1.2）も合わせて考える。":""}`,["ICHD3"],"ok"));
+    else res.push(item("caution",`片頭痛の基準に届かない（特徴 ${c2m}/4、随伴症状 ${nv||(ph&&pn)?"あり":"なし"}）`,"1項目足りない場合は「片頭痛の疑い（1.5）」。頭痛ダイアリーで発作を確認する。",["ICHD3"],"ok"));
+  }else if(dur==="t"){
+    if(tthD) res.push(item("do","緊張型頭痛（2）の基準を満たす","両側性・圧迫感・軽度〜中等度・動作で悪化しないのうち2つ以上、悪心・嘔吐なし、光過敏/音過敏は1つまで。頻度で稀発・頻発・慢性に分ける。",["ICHD3"],"ok"));
+    else res.push(item("caution","緊張型頭痛の基準に合わない","悪心や光・音過敏が両方あるときは片頭痛を考える。片頭痛を緊張型頭痛と誤らない。",["ICHD3"],"ok"));
+  }else if(dur==="c"){
+    if(chD) res.push(item("do","群発頭痛（3.1）の基準に合う","15〜180分の片側眼窩周囲の激痛に自律神経症状か落ち着きのなさ。頻度は2日に1回〜1日8回。群発期は数週〜数か月。",["ICHD3"],"ok"));
+    else res.push(item("caution","群発頭痛には眼窩周囲の重度の片側痛と、自律神経症状または落ち着きのなさが必要","短時間でインドメタシンが効くなら発作性片側頭痛を考える（群発・特殊タブ）。",["ICHD3"],"ok"));
+  }else if(dur==="s"){
+    res.push(item("note","秒〜分単位の頭痛","一次性穿刺様頭痛、SUNCT/SUNA（1秒〜10分、自律神経症状）、三叉神経痛（誘発点）、咳頭痛（後頭蓋窩病変を除外）を考える。",["ICHD3"],"ok"));
+  }else if(dur==="d"){
+    res.push(item("caution","毎日続く頭痛","慢性片頭痛（月15日以上、うち8日以上が片頭痛）、慢性緊張型頭痛、薬剤の使用過多、持続性片側頭痛（インドメタシンが著効）、新規発症持続性連日性頭痛（NDPH）を区別する。二次性（低髄圧・頭蓋内圧亢進・静脈洞血栓症）を必ず除外。",["ICHD3"],"ok"));
+  }
+  if(id>=2&&dur!=="c") res.push(item("note",`ID Migraine ${id}/3`,"2つ以上で片頭痛の可能性が高い（簡易スクリーナー）。",["GL21"],"sec"));
+  $("x-dxout").innerHTML=res.length?card("見分けの結果",ul(res)):"";
+}
+
+/* ============ 急性期 ============ */
+function triptanCI(){
+  const a=[];
+  if(ck("a-ihd"))a.push("虚血性心疾患");
+  if(ck("a-cvd"))a.push("脳梗塞・TIA");
+  if(ck("a-pad"))a.push("末梢血管障害");
+  if(ck("a-htn"))a.push("コントロール不良の高血圧");
+  if(ck("a-hemi"))a.push("片麻痺性・脳幹性前兆");
+  if(ck("a-liver"))a.push("重度肝障害");
+  return a;
+}
+function renderAc(){
+  const type=val("a-type")||"mig";
+  $("a-migq").classList.toggle("hidden",type!=="mig");
+  const preg=val("a-preg")||"no", set=val("a-set")||"op";
+  const days=num("a-days");
+  const ci=triptanCI();
+    const out=[];
+  const warnMoh=days!==null&&days>=10;
+  const nsaidNG=ck("a-asthma")||preg==="p3";
+  const nsaidCare=ck("a-gi")||ck("a-renal")||ck("a-ihd")||ck("a-cvd");
+
+  if(type==="ch"){
+    out.push(verdict("info","群発頭痛の発作","スマトリプタン皮下注 3 mg と 100%酸素（7〜12 L/分、15分）",
+      ul([item("do","スマトリプタン皮下注 3 mg（イミグラン注・キット皮下注）","群発頭痛に保険適用。追加は1時間以上あけ、1日2回（6 mg）まで。自己注射を指導する。"+(ci.length?`<br><b style="color:var(--crit)">禁忌あり：${esc(ci.join("・"))}</b>`:""),["BOOK","GL21"],"bk"),
+          item("do","純酸素 7〜12 L/分、リザーバー付きフェイスマスクで15分","鼻カニューラ・低流量・スポーツ用酸素は効かない。在宅酸素療法（HOT）が群発頭痛に保険適用（2018年度〜）。COPDでCO₂貯留がある人は避ける。",["COHEN","HOT","BOOK"],"ok"),
+          item("caution","経口トリプタン・NSAIDsは発作に間に合わないことが多い","ゾルミトリプタン 5 mg 経口が使われることはあるが適応外。",["BOOK"],"bk"),
+          item("note","予防（ベラパミル・ステロイド）は「群発・特殊」タブへ","",[],"")])));
+    $("a-out").innerHTML=out.join("");return;
+  }
+  if(type==="tth"){
+    const L=[];
+    if(!nsaidNG) L.push(item("do","NSAIDs（イブプロフェン 200〜400 mg、ロキソプロフェン 60 mg、ナプロキセン 100〜300 mg など）","頓用。"+(nsaidCare?"消化管・腎・心血管リスクがあるので短期・最小量で。":""),["BOOK","GL21"],"bk"));
+    L.push(item("do","アセトアミノフェン 500〜1000 mg","妊娠中・授乳中・NSAIDsが使えない人の第一選択。1日4000 mgまで。",["BOOK","GL21"],"bk"));
+    L.push(item("caution","カフェイン配合の市販薬は効くが使いすぎに注意","月15日以上（複合鎮痛薬は10日以上）で薬剤の使用過多による頭痛になりうる。",["BOOK"],"bk"));
+    L.push(item("avoid","トリプタンは緊張型頭痛には効かない","片頭痛が混在していないか頭痛ダイアリーで確認する。",["GL21"],"sec"));
+    if(warnMoh) L.push(item("avoid",`急性期薬が月${days}日`,"使用過多タブで評価。月に頭痛が多い場合は予防（アミトリプチリン）を考える。",["BOOK"],"bk"));
+    $("a-out").innerHTML=card("緊張型頭痛の急性期",ul(L));return;
+  }
+
+  /* 片頭痛 */
+  const sev=val("a-sev")||"sev", nv=+(val("a-nv")||0);
+  const late=ck("a-late"),recur=ck("a-recur"),nsfail=ck("a-nsfail"),tfail=ck("a-tfail"),mens=ck("a-mens"),status=ck("a-status");
+  const tri=[], other=[], care=[], avoid=[];
+  /* トリプタンの可否と剤選び */
+  const tripOK=ci.length===0;
+  const pick=[];
+  if(tripOK){
+    const exclude={};
+    if(ck("a-prop"))exclude.riz="プロプラノロール併用で禁忌";
+    if(ck("a-maoi")){exclude.sum="MAO阻害薬で禁忌";exclude.zol="MAO阻害薬で禁忌";exclude.riz="MAO阻害薬で禁忌";}
+    if(ck("a-cyp"))exclude.ele="HIVプロテアーゼ阻害薬で禁忌・強いCYP3A4阻害薬で併用注意";
+    if(ck("a-renal")){exclude.nar="重度腎障害で禁忌";exclude.riz=(exclude.riz?exclude.riz+"・":"")+"透析中は禁忌";}
+    const T={
+      sumSC:["スマトリプタン皮下注 3 mg（イミグランキット皮下注）","最も速い（Tmax約10分）。追加は1時間以上あけ1日6 mgまで。"],
+      sumNS:["スマトリプタン点鼻 20 mg（イミグラン点鼻液）","嘔吐時に。追加は2時間以上あけ1日40 mgまで。"],
+      riz:["リザトリプタン 10 mg（マクサルト錠・RPD錠）","立ち上がりが速い。水なしで飲めるRPD錠あり。追加2時間後、1日20 mgまで。"],
+      ele:["エレトリプタン 20 mg（レルパックス錠）","再発が少なめ、副作用が少ない。効果不十分なら次の発作から40 mg。1日40 mgまで。"],
+      zol:["ゾルミトリプタン 2.5 mg（ゾーミッグ錠・RM錠）","効果不十分なら次回5 mg。追加2時間後、1日10 mgまで。"],
+      sum:["スマトリプタン 50 mg（イミグラン錠）","効果不十分なら次回100 mg。追加2時間後、1日200 mgまで。"],
+      nar:["ナラトリプタン 2.5 mg（アマージ錠）","半減期約5時間と長く、再発しやすい発作・月経時片頭痛に。効きはゆっくり。追加4時間後、1日5 mgまで。"]
+    };
+    let order;
+    if(nv===2) order=["sumNS","sumSC"];
+    else if(late||status) order=["sumSC","sumNS","riz"];
+    else if(recur||mens) order=["nar","ele","sum"];
+    else order=["riz","ele","zol","sum","nar"];
+    if(set==="er"&&!order.includes("sumSC")) order.unshift("sumSC");
+    order.forEach(k=>{
+      const base=k.startsWith("sum")?"sum":k;
+      if(exclude[base]){avoid.push(item("avoid",T[k][0]+"は使わない",exclude[base],["BOOK"],"bk"));return}
+      pick.push(item("do",T[k][0],T[k][1],["BOOK"],"bk"));
+    });
+    if(ck("a-ssri"))care.push(item("caution","SSRI/SNRIとトリプタン","セロトニン症候群は理論上の注意。併用は通常可能だが、初回は症状（発汗・振戦・興奮）を説明する。",["GL21"],"sec"));
+  }else{
+    avoid.push(item("avoid","トリプタン・エルゴタミンは使わない",esc(ci.join("・"))+"は禁忌。",["BOOK","GL21"],"bk"));
+  }
+  /* 軽症・NSAIDs */
+  const nsaid=item("do","NSAIDs（ナプロキセン 300 mg、イブプロフェン 400 mg、ロキソプロフェン 60〜120 mg、ジクロフェナク 25〜50 mg）"+(nv?"＋制吐薬":""),"痛みが軽いうちに。"+(nv===2?"ジクロフェナク坐剤 25〜50 mg も。":"")+(nsaidCare?"<br>消化管・腎・心血管リスクがあり短期・最小量で。":""),["BOOK","GL21"],"bk");
+  const apap=item("do","アセトアミノフェン 1000 mg（体重に応じ500〜1000 mg）","1日4000 mgまで。妊娠・授乳中の第一選択。",["BOOK","GL21"],"bk");
+  const antiem=item("do","制吐薬を先に（メトクロプラミド 5〜10 mg、ドンペリドン 10 mg）","胃の動きを戻しトリプタン・NSAIDsの吸収を助ける。"+(preg!=="no"&&preg!=="lac"?"ドンペリドンは妊婦に禁忌、メトクロプラミドを使う。":""),["BOOK"],"bk");
+  /* 新薬 */
+  const rim=item("do","リメゲパント 75 mg（ナルティークOD錠）","CGRP受容体拮抗薬。血管収縮がなくトリプタン禁忌例にも使える。1日75 mgまで（予防で隔日服用中ならその日は追加しない）。"+(ck("a-cyp")?"<br><b style=\"color:var(--warn)\">強いCYP3A4阻害薬で血中濃度上昇（併用注意）</b>":"")+(ck("a-liver")?"<br><b style=\"color:var(--warn)\">重度肝障害（Child-Pugh C）では避ける</b>":"")+(ck("a-renal")?"<br><b style=\"color:var(--warn)\">末期腎不全（eGFR 15未満）では避ける</b>":""),["L_rim","JHSRIM","LIPTON19"],"ok");
+  const las=item(ck("a-drive")?"caution":"do","ラスミジタン 100 mg（レイボー錠、50/200 mgも可）","5-HT1F作動薬。血管収縮がない。24時間で200 mgまで。めまい・眠気が多い。<b>服用後は運転させない</b>（試験では投与8時間後以降は影響なし）。"+(ck("a-drive")?"<br><b style=\"color:var(--warn)\">運転予定があり使いにくい</b>":""),["L_las","L_lasdrv","MONONOFU"],"ok");
+
+  /* 妊娠・授乳 */
+  if(preg==="p1"||preg==="p3"){
+    other.push(apap);
+    if(preg==="p1"&&!ck("a-asthma")) other.push(item("caution","NSAIDsは妊娠中期まで短期に限る","妊娠後期（28週以降）は禁忌（動脈管収縮）。妊娠20週以降は羊水過少にも注意。",["GL21"],"sec"));
+    else if(preg==="p3") avoid.push(item("avoid","NSAIDs（妊娠28週以降）","動脈管の早期閉鎖のため禁忌。",["GL21"],"sec"));
+    other.push(item("do","メトクロプラミド 10 mg","悪心・嘔吐に。ドンペリドンは妊婦禁忌。",["BOOK"],"bk"));
+    if(tripOK) other.push(item("caution","トリプタンは有益性が上回るときに（スマトリプタンの情報が最も多い）","妊娠初期の使用で奇形の増加は報告されていない。",["BOOK","GL21"],"bk"));
+    avoid.push(item("avoid","エルゴタミン（妊婦禁忌）、ラスミジタン・リメゲパント（データ不足）","",["L_cle","L_rim","L_las"],"ok"));
+    $("a-out").innerHTML=verdict("warn","妊娠中","アセトアミノフェンを第一に、必要ならスマトリプタン","")+card("使える薬",ul(other))+card("避ける薬",ul(avoid));return;
+  }
+  if(preg==="lac"){
+    other.push(apap);
+    other.push(item("do","イブプロフェン 200〜400 mg","乳汁移行が少ない。",["GL21"],"sec"));
+    if(tripOK) other.push(item("do","スマトリプタン・エレトリプタン","乳汁移行は少ない。スマトリプタンは添付文書に服用後の授乳を控える期間（12時間）の記載がある（最新版を確認）。",["BOOK"],"bk"));
+    other.push(item("caution","リメゲパント","乳汁中の相対的乳児投与量は1%未満。授乳継続の可否を有益性で判断。",["L_rim"],"ok"));
+    $("a-out").innerHTML=verdict("info","授乳中","アセトアミノフェン・イブプロフェン、必要ならスマトリプタン","")+card("使える薬",ul(other))+(avoid.length?card("避ける薬",ul(avoid)):"");return;
+  }
+
+  /* 救急 */
+  let er="";
+  if(set==="er"||status){
+    const E=[];
+    E.push(item("do","輸液＋メトクロプラミド 10 mg 静注","まず嘔吐と脱水を止める。アカシジアに注意。",["BOOK","GL21"],"bk"));
+    if(tripOK&&!ck("a-maoi")) E.push(item("do","スマトリプタン 3 mg 皮下注","24時間以内にトリプタン・エルゴタミンを使っていないことを確認。",["BOOK"],"bk"));
+    E.push(item("do","アセトアミノフェン 1000 mg 静注（アセリオ、15分）","体重50 kg未満は15 mg/kg。",["BOOK"],"bk"));
+    E.push(item("caution","プロクロルペラジン 5 mg 筋注、クロルプロマジン 10 mg 筋注","眠気・低血圧・錐体外路症状に注意。",["BOOK"],"bk"));
+    E.push(item("do","デキサメタゾン 6.6〜9.9 mg 静注（単回）","72時間以内の再発を減らす（痛み自体はとらない）。重積・再発例に。",["BOOK","GL21"],"sec"));
+    E.push(item("avoid","オピオイド・ペンタゾシン","効果が乏しく使用過多・依存の原因。",["GL21"],"sec"));
+    E.push(item("note","帰宅時","今回の誘因、急性期薬の使い方、予防の要否を見直す。重積・頻回受診は予防を始める。",[],""));
+    er=card(status?"片頭痛発作重積・救急での対応":"救急外来・病棟での対応",ul(E));
+  }
+
+  /* 層別 */
+  let big,cls="ok";
+  if(!tripOK){
+    big="トリプタンは使えない：NSAIDs・アセトアミノフェン、効かなければラスミジタンかリメゲパント";cls="warn";
+    other.push(...(nsaidNG?[]:[nsaid]),apap,rim,las); if(nv) other.push(antiem);
+  }else if(tfail){
+    big="トリプタン無効例：リメゲパント・ラスミジタン、またはトリプタン＋NSAIDsの併用";cls="warn";
+    other.push(rim,las,item("do","トリプタン＋NSAIDs（例：スマトリプタン 50 mg＋ナプロキセン 300 mg）","単剤より効果・再発抑制がよい。服用タイミング（痛みが軽いうち、1時間以内）と剤型を見直す。",["GL21","BOOK"],"sec"));
+    if(nv) other.push(antiem);
+  }else if(sev==="mild"&&!nsfail&&!late&&nv<2){
+    big="軽度〜中等度：NSAIDs（またはアセトアミノフェン）。効かない発作にはトリプタン";
+    if(!nsaidNG) other.push(nsaid); other.push(apap); if(nv) other.push(antiem);
+  }else{
+    big=nv===2?"嘔吐で飲めない：スマトリプタン点鼻・皮下注（＋制吐薬）":late?"ピークを過ぎた発作：スマトリプタン皮下注":"中等度〜重度：トリプタンを早めに（痛みが軽いうち）";
+    if(nv) other.push(antiem);
+    if(!nsaidNG) other.push(item("note","効果不十分ならNSAIDsを併用","ナプロキセン・ロキソプロフェンなど。",["GL21"],"sec"));
+    other.push(rim);
+  }
+  if(nsaidNG&&preg==="no") avoid.push(item("avoid","NSAIDs","アスピリン喘息・NSAIDs過敏。アセトアミノフェンも高用量で交差反応がありうる（1回300 mg以下から）。",["GL21"],"sec"));
+  if(warnMoh) care.push(item("avoid",`急性期薬が月${days}日`,"トリプタン・複合鎮痛薬は月10日以上、単一鎮痛薬は15日以上で使用過多になりうる。予防療法を始める（予防タブ）。",["ICHD3","BOOK"],"ok"));
+  else if(days!==null&&days>=6) care.push(item("caution",`急性期薬が月${days}日`,"月6日以上で予防療法を考える目安。",["BOOK"],"bk"));
+  if(mens) care.push(item("note","月経時片頭痛","ナラトリプタンなど半減期の長いトリプタン。月経周期が規則的なら月経2日前から5〜6日間の短期予防（ナラトリプタン 1日2回など、適応外）もある。",["BOOK"],"bk"));
+  care.push(item("note","効果判定は3回の発作で","1回で無効と決めない。服用タイミング・用量・剤型を変えてから他剤へ。",["BOOK"],"bk"));
+
+  $("a-out").innerHTML=verdict(cls,"片頭痛の急性期",big,"")+er+
+    (pick.length?card("トリプタン（この順に試す）",ul(pick)):"")+
+    (other.length?card(tripOK?"併用・代わりの薬":"使える薬",ul(other)):"")+
+    (care.length?card("注意すること",ul(care)):"")+
+    (avoid.length?card("使わない薬",ul(avoid)):"");
+}
+
+/* ============ 予防 ============ */
+function lvl(v,a,b){if(v===null)return -1;return v>=b?2:v>=a?1:0}
+function renderPv(){
+  const hd=num("p-hd"),mmd=num("p-mmd"),amd=num("p-amd");
+  const dis=ck("p-dis"),noac=ck("p-noacute"),spec=ck("p-spec");
+  const preg=val("p-preg")||"no";
+  const L=[lvl(hd,5,15),lvl(mmd,3,8),lvl(amd,3,10)];
+  let lev=Math.max(...L);
+  if(noac||spec) lev=Math.max(lev,2);
+  const cm=hd!==null&&mmd!==null&&hd>=15&&mmd>=8;
+  let v;
+  if(lev<0&&!noac&&!spec) v=verdict("info","頻度を入力","頭痛日数・片頭痛日数・服薬日数（最近3か月の平均）を入れると判定します","");
+  else if(lev===2) v=verdict("crit","予防療法の適応","予防療法を行う"+(cm?"（慢性片頭痛：月15日以上、うち8日以上が片頭痛）":""),`<p class="hint" style="margin:0">${noac?"急性期治療薬が使えない・効かない。":""}${spec?"永続的な神経障害のおそれがある特殊な片頭痛。":""}</p>`);
+  else if(lev===1) v=verdict("warn","相対適応","予防療法を検討（支障の程度と希望で決める）",dis?`<p class="hint" style="margin:0">日常生活に支障があり、始めることを勧める。</p>`:"");
+  else v=verdict("ok","予防は不要","急性期治療の最適化と誘因の調整","");
+  const tbl=`<div class="wrapx"><table class="tl"><tr><th></th><th>不要</th><th>相対適応</th><th>絶対適応</th></tr>
+   <tr${L[0]>=0?"":""}><td>頭痛日数/月</td><td>5未満</td><td>5〜14</td><td>15以上</td></tr>
+   <tr><td>片頭痛日数/月</td><td>3未満</td><td>3〜7</td><td>8以上</td></tr>
+   <tr><td>服薬日数/月</td><td>3未満</td><td>3〜9</td><td>10以上</td></tr></table></div>
+   <p class="hint">竹島の基準（最近3か月の平均）。急性期治療薬が使えない場合は例外。GL2021は月2回以上または6日以上で予防を検討。</p>${src(["BOOK","GL21"],"bk")}`;
+
+  /* 候補 */
+  const C=[];const X=[];
+  const isPreg=preg==="preg",plan=preg==="plan",cb=preg==="cb",lac=preg==="lac";
+  const add=(score,cls,t,d,keys,st,tag)=>C.push({score,html:item(cls,t+(tag?` <span class="st ${tag[0]}" style="margin-left:4px">${tag[1]}</span>`:""),d,keys,st)});
+  const rej=(t,d,keys,st)=>X.push(item("avoid",t,d,keys,st));
+  const INS=["ok","保険適用"],SHI=["sec","審査上認める"],OFF=["na","適応外"],GL=["ok","最適使用推進GL"];
+  /* ロメリジン */
+  if(isPreg) rej("ロメリジン","妊婦に禁忌。",["BOOK"],"bk");
+  else if(!ck("p-f-lom")) add(3+(ck("p-ae")?3:0)+(ck("p-asthma")?1:0)+(ck("p-old")?1:0),"do","ロメリジン 5 mg 1日2回（ミグシス・テラナス、最大20 mg/日）","副作用が少なく最初の予防薬にしやすい。効果はおだやか。眠気・めまい。2か月で判定。",["BOOK","GL21"],"bk",INS);
+  /* プロプラノロール */
+  const proNG=ck("p-asthma")||ck("p-brady");
+  if(proNG) rej("プロプラノロール",(ck("p-asthma")?"喘息・COPD":"徐脈・房室ブロック・心不全")+"で避ける（喘息は禁忌）。",["BOOK"],"bk");
+  else if(!ck("p-f-pro")) add(3+(ck("p-htn")?3:0)+(ck("p-anx")?3:0)-(ck("p-dep")?1:0)-(ck("p-hypo")?2:0)+(isPreg||lac?2:0),"do","プロプラノロール 1日20〜30 mg 分2〜3から、60 mgまで（インデラル）","高血圧・不安・動悸・振戦がある人に。リザトリプタンと併用禁忌（急性期薬を変える）。抑うつ・倦怠感、急な中止は避ける。"+(isPreg?"妊娠中も使えるが胎児発育不全・新生児徐脈に注意。":""),["BOOK","GL21"],"bk",INS);
+  /* バルプロ酸 */
+  if(isPreg) rej("バルプロ酸","片頭痛予防目的では妊婦に禁忌（催奇形性・児の認知機能低下）。",["BOOK"],"bk");
+  else if(ck("p-liver")) rej("バルプロ酸","肝機能障害で避ける。",["BOOK"],"bk");
+  else if(!ck("p-f-vpa")) add(3+(ck("p-epi")?3:0)-(ck("p-obese")?2:0)-((plan||cb)?3:0),(plan||cb)?"caution":"do","バルプロ酸 400〜600 mg/日 分2（デパケンR・セレニカR、1日1000 mgまで）","前兆のある片頭痛・てんかん・双極性障害の併存に。体重増加・振戦・脱毛・肝障害、カルバペネム系と併用禁忌。"+((plan||cb)?"<br><b style=\"color:var(--warn)\">妊娠の可能性がある女性では原則避け、使うなら確実な避妊と説明が必要。</b>":""),["BOOK","GL21"],"bk",INS);
+  /* アミトリプチリン */
+  if(ck("p-glau")) rej("アミトリプチリン","閉塞隅角緑内障・前立腺肥大（尿閉）・QT延長で避ける。",["BOOK"],"bk");
+  else if(!ck("p-f-ami")) add(2+(ck("p-dep")?4:0)-(ck("p-old")?1:0)-(ck("p-obese")?1:0)+(isPreg?1:0),"do","アミトリプチリン 5〜10 mg 就寝前から、10〜30 mg（60 mgまで）（トリプタノール）","不眠・うつ・緊張型頭痛の併存に。眠気・口渇・便秘・体重増加。少量でも効く。"+(ck("p-old")?"高齢者は5 mgから、転倒・せん妄に注意。":""),["BOOK","GL21"],"bk",SHI);
+  /* ベラパミル */
+  if(ck("p-brady")) rej("ベラパミル","徐脈・房室ブロック・心不全で避ける。",["BOOK"],"bk");
+  else add(1+(ck("p-htn")?1:0)+(ck("p-asthma")?1:0),"do","ベラパミル 80〜240 mg/日（ワソラン）","喘息でβ遮断薬が使えない人に。便秘・徐脈。",["BOOK"],"bk",SHI);
+  /* トピラマート */
+  if(isPreg||plan) rej("トピラマート","催奇形性（口唇口蓋裂）、妊娠を希望・妊娠中は避ける。",["GL21"],"sec");
+  else if(ck("p-stone")) rej("トピラマート","尿路結石・やせ（体重減少）で避ける。",["GL21"],"sec");
+  else add(1+(ck("p-obese")?3:0)+(ck("p-epi")?1:0)-(ck("p-dep")?2:0)+(cm?1:0),"caution","トピラマート 25 mgから、50〜100 mg/日 分2（トピナ）","慢性片頭痛にもエビデンス。体重減少・しびれ・認知機能低下・抑うつ・尿路結石・緑内障。経口避妊薬の効果を下げる。",["GL21","BOOK"],"sec",OFF);
+  /* カンデサルタン */
+  if(isPreg||plan) rej("カンデサルタン","妊婦に禁忌。",["BOOK"],"bk");
+  else if(ck("p-hypo")) rej("カンデサルタン","低血圧で使いにくい。",["BOOK"],"bk");
+  else add(1+(ck("p-htn")?3:0)+(ck("p-ae")?1:0),"do","カンデサルタン 4〜8 mg/日（ブロプレス、試験は16 mg）","高血圧の併存に。副作用が少ない。腎機能・カリウム。",["BOOK","CARLSEN"],"bk",OFF);
+  /* ゲパント */
+  const gepNG=isPreg||ck("p-f-gep");
+  if(isPreg) rej("ゲパント・CGRP関連抗体薬","妊娠中の安全性は確立していない（有益性が上回る場合のみ）。妊娠を希望したら計画的に中止。",["L_rim","JHSATO"],"ok");
+  else{
+    const lr=(mmd===null||mmd>=2)&&(dis||lev>=1);
+    if(!ck("p-f-gep")){
+      if(ck("p-ckd")) X.push(item("caution","リメゲパント","末期腎不全（eGFR 15未満）では避ける。アトゲパントはCrCl 30未満で10 mg。",["JHSRIM","JHSATO"],"ok"));
+      add(2+(lr?2:0)+(ck("p-vasc")?0:1)+(cm?0:1)+(ck("p-old")?1:0)-(ck("p-const")?1:0)-(ck("p-cyp")?1:0)-(plan?3:0),"do","アトゲパント 60 mg 1日1回（アクイプタ錠、2026年4月発売）","経口CGRP受容体拮抗薬。前治療の失敗は不要。便秘・悪心・食欲低下。"+(ck("p-ckd")?"<b> CrCl 30未満で10 mg。</b>":"")+(ck("p-cyp")?"<b> 強いCYP3A阻害薬で10 mg、OATP阻害薬（シクロスポリン等）で30 mg。</b>":"")+"3か月で判定。",["JHSATO","ADVANCE","PROGRESS","ELEVATE"],"ok",INS);
+      add(2+(lr?2:0)+(cm?-1:1)+(ck("p-daily")?0:0)-(ck("p-cyp")?1:0)-(plan?3:0),"do","リメゲパント 75 mg 隔日（ナルティークOD錠、2025年12月発売）","同じ薬で急性期にも使える（1日75 mgまで、予防の服用日は追加しない）。慢性片頭痛のエビデンスは限られる。"+(ck("p-ckd")?"<b> 末期腎不全では避ける。</b>":""),["JHSRIM","L_rim","CROOP21"],"ok",INS);
+    }
+  }
+  /* CGRP関連抗体薬の適格性 */
+  const fails=["p-f-lom","p-f-pro","p-f-vpa","p-f-ami","p-f-oth","p-f-gep"].filter(ck).length;
+  const fApproved=["p-f-lom","p-f-pro","p-f-vpa","p-f-gep"].filter(ck).length;
+  const g1=mmd!==null?mmd>=4:null;
+  const g2=dis;
+  const g3=fApproved>0;
+  const conds=[
+    ["片頭痛発作が月に複数回以上、または慢性片頭痛（ICHD-3で確認）",mmd!==null?mmd>=2:null],
+    ["投与開始前3か月以上、片頭痛日数が平均4日/月以上",g1],
+    ["非薬物療法・急性期治療をしても日常生活に支障がある",g2],
+    ["既承認の予防薬（プロプラノロール・バルプロ酸・ロメリジン等）のいずれかが、効果不十分・忍容性不良・禁忌や安全性の懸念で使えない",g3]
+  ];
+  const allOK=conds.every(c=>c[1]===true);
+  const mabRows=conds.map(([t,ok])=>`<div class="it${ok===false?" hit":""}"><div class="tx">${esc(t)}</div><span class="st ${ok===true?"ok":ok===false?"na":"sec"}">${ok===true?"満たす":ok===false?"満たさない":"未入力"}</span></div>`).join("");
+  const mabList=ul([
+    item("do","ガルカネズマブ（エムガルティ皮下注120 mg）","初回240 mg、以降1か月ごとに120 mg。",["GL21"],"sec"),
+    item("do","フレマネズマブ（アジョビ皮下注225 mg）","4週ごと225 mg、または12週ごと675 mg。",["GL21"],"sec"),
+    item("do","エレヌマブ（アイモビーグ皮下注70 mgペン）","4週ごと70 mg。CGRP受容体抗体。便秘・高血圧に注意（RMP）。",["L_ere"],"ok"),
+    item("do","エプチネズマブ（ビエプチ点滴静注100 mg）","12週ごと100 mg点滴。投与翌日から効く。2026年9月承認、11月時点で薬価収載・発売の手続き中（発売日は要確認）。",["L_eptrev","GLEPT","SUNRISE"],"ok")
+  ]);
+  const mabCard=`<section class="card"><h2>CGRP関連抗体薬の投与対象（最適使用推進GL）</h2><div class="ck">${mabRows}</div>
+    ${verdict(allOK?"ok":ck("p-f-mab")?"warn":"info",allOK?"対象":"要件",allOK?"保険診療で投与できる（医師・施設要件も満たすこと）":ck("p-f-mab")?"抗体薬1剤が無効：別の抗体薬（リガンド⇔受容体の切替など）への変更を検討":"未充足または未入力の項目がある","")}
+    <p class="hint">医師要件：初期研修後に頭痛診療5年以上、かつ神経学会・頭痛学会・総合内科・脳神経外科のいずれかの専門医。効果判定は3か月（点滴は3〜6か月）、改善がなければ中止を考慮。日本頭痛学会は2025年10月、抗体薬を他の予防薬と同等に第一選択に含めると表明したが、保険上の前治療要件（4番目）は残る。</p>
+    ${src(["GLEPT","JHSPS","AHS24","EHF22"],"ok")}${mabList}</section>`;
+  if(ck("p-vasc")) X.push(item("caution","CGRP関連薬（抗体・ゲパント）と虚血性血管疾患","CGRPは虚血時の側副血行に関わる。虚血性脳卒中・心疾患・脳小血管病・レイノー現象では有益性を慎重に。ゲパントと抗体の併用は特に慎重に。",["JHSRIM"],"ok"));
+  if(ck("p-const")) X.push(item("caution","便秘","エレヌマブ・アトゲパント・ベラパミル・アミトリプチリンで悪化しうる。",["L_ere","JHSATO"],"ok"));
+
+  C.sort((a,b)=>b.score-a.score);
+  const head=card("適応の判定",tbl);
+  let pregCard="";
+  if(isPreg||plan) pregCard=card("妊娠中・妊娠希望の予防",ul([
+    item("do","まず非薬物療法（睡眠・食事・誘因の回避・頭痛体操）","妊娠中は多くの人で片頭痛が軽くなる（特に前兆のない片頭痛）。",["BOOK"],"bk"),
+    item("caution","薬が必要ならプロプラノロール（少量）またはアミトリプチリン（少量）","",["BOOK","GL21"],"bk"),
+    item("avoid","バルプロ酸・トピラマート・カンデサルタン・ロメリジンは避ける","",["BOOK"],"bk"),
+    item("caution","CGRP関連抗体は半減期が約1か月で、体内から消えるまで数か月かかる","妊娠を計画するときは早めに中止を相談。ゲパントは半減期が短い（リメゲパント約11時間）。",["EHF22","CROOP21"],"sec")]));
+  $("p-out").innerHTML=v+head+pregCard+
+    card("候補（背景に合わせた順）",ul(C.map(c=>c.html))+`<p class="hint">始め方：単剤・少量から、副作用がなければ十分量までゆっくり増量し、2〜3か月で判定。効けば6〜12か月続け、ゆっくり減量。</p>${src(["BOOK","GL21","IHSP"],"bk")}`)+
+    mabCard+(X.length?card("避ける・注意する",ul(X)):"");
+}
+
+/* ============ 使用過多 ============ */
+function renderMoh(){
+  const hd=num("m-hd"),m3=ck("m-3m"),pr=ck("m-prior");
+  const g=id=>num(id)||0;
+  const trip=g("m-trip"),comb=g("m-comb"),simp=g("m-simp"),erg=g("m-erg"),opi=g("m-opi"),nw=g("m-new"),tot=g("m-tot");
+  const types=[];
+  if(erg>=10)types.push("8.2.1 エルゴタミン乱用頭痛");
+  if(trip>=10)types.push("8.2.2 トリプタン乱用頭痛");
+  if(simp>=15)types.push("8.2.3 単純鎮痛薬乱用頭痛");
+  if(opi>=10)types.push("8.2.4 オピオイド乱用頭痛");
+  if(comb>=10)types.push("8.2.5 複合鎮痛薬乱用頭痛");
+  if(nw>=10)types.push("8.2.8 その他の治療薬による（ラスミジタン等）");
+  if(!types.length&&tot>=10)types.push("8.2.6 単独では乱用に該当しない複数医薬品による");
+  const anyIn=hd!==null||trip||comb||simp||erg||opi||nw||tot;
+  let v;
+  if(!anyIn){$("m-out").innerHTML=verdict("info","入力待ち","頭痛日数と薬ごとの服用日数を入れると判定します","")+mohCards(false);return}
+  const crit=hd!==null&&hd>=15&&m3&&pr&&types.length>0;
+  if(crit) v=verdict("crit","薬剤の使用過多による頭痛","ICHD-3の基準を満たす",ul(types.map(t=>item("avoid",esc(t),"",[],""))));
+  else if(types.length) v=verdict("warn","乱用の閾値を超えている",(hd!==null&&hd<15?"頭痛は月15日未満：使用過多の予備群":"頭痛日数・3か月超・もとの頭痛の確認が必要"),ul(types.map(t=>item("caution",esc(t),"",[],""))));
+  else v=verdict("ok","閾値未満","今の使い方は乱用の閾値に届かない","<p class=\"hint\" style=\"margin:0\">トリプタン・複合鎮痛薬・エルゴタミン・オピオイドは月10日未満、単一鎮痛薬は15日未満を守る。</p>");
+  const thr=`<div class="wrapx"><table class="tl"><tr><th>薬</th><th>乱用の閾値</th></tr>
+   <tr><td>トリプタン・エルゴタミン・オピオイド・複合鎮痛薬</td><td class="day">10日/月以上</td></tr>
+   <tr><td>単一の鎮痛薬（アセトアミノフェン・NSAIDs）</td><td class="day">15日/月以上</td></tr>
+   <tr><td>複数の薬の合計（単独では閾値未満）</td><td class="day">10日/月以上</td></tr></table></div>
+   <p class="hint">いずれも3か月を超えて定期的に使い、頭痛が月15日以上あること。もとの頭痛と別に診断する。</p>${src(["ICHD3","BOOK"],"ok")}`;
+  $("m-out").innerHTML=v+card("ICHD-3の閾値",thr)+mohCards(crit||types.length>0);
+}
+function mohCards(on){
+  const cx=ck("m-psy")||ck("m-opiuse")||ck("m-fail");
+  const L=[
+    item("do","説明と教育がいちばん効く","しくみを説明し、頭痛ダイアリーで服薬日数を記録。単純型は説明だけで改善することが多い。",["BOOK","GL21"],"bk"),
+    item("do","原因薬を中止し、同時に予防薬を始める","離脱＋開始時からの予防が、離脱のみ・予防のみより慢性から反復性への移行・治癒率がよかった（Carlsen 2020）。",["CARLSEN"],"ok"),
+    item("do","予防薬の選択","慢性片頭痛としての予防：CGRP関連抗体薬（乱用があっても効く）、トピラマート、アミトリプチリン、バルプロ酸、プロプラノロール、アトゲパント。",["GL21","EHF22","JHSATO"],"sec"),
+    item("caution","離脱中の頭痛（反跳頭痛）への対処","制吐薬、それまで使っていない系統のNSAIDsを短期間、数日のステロイド（エビデンスは弱い）。トリプタン乱用は数日〜2週、鎮痛薬は長引きやすい。",["BOOK"],"bk"),
+    item("note","離脱後の急性期薬","本来の片頭痛発作にはトリプタンを月10日未満で。ゲパントは使用過多を起こしにくいとされるが、頻回なら方針を見直す。",["JHSRIM","BOOK"],"ok"),
+    item(cx?"caution":"note","複雑型（うつ・不安・依存、オピオイド乱用、外来で失敗）"+(cx?"：該当":""),"入院での離脱、精神科との連携を考える。再発は1年以内に多い（約3〜4割）ので1年はダイアリーで管理。",["BOOK"],"bk")
+  ];
+  return card("治療の進め方",ul(L));
+}
+
+/* ============ 群発・特殊 ============ */
+const CH={
+ ch:()=>card("群発頭痛",
+   `<div class="sec-h">発作（急性期）</div>`+ul([
+     item("do","スマトリプタン皮下注 3 mg","1日2回（6 mg）まで。自己注射キット。",["BOOK"],"bk"),
+     item("do","100%酸素 7〜12 L/分、リザーバー付きマスク、15分","在宅酸素療法が保険適用（2018年度〜）。",["COHEN","HOT"],"ok"),
+     item("caution","スマトリプタン点鼻 20 mg、ゾルミトリプタン 5 mg 経口","群発頭痛には適応外。皮下注が使えないとき。",["BOOK"],"bk")])+
+   `<div class="sec-h">つなぎ（群発期の始めに短期間）</div>`+ul([
+     item("do","プレドニゾロン 60〜100 mg/日で開始し、2〜3週で漸減","例：PredCH試験は100 mg×5日、以後3日ごとに20 mgずつ減量。国内の経験例は60 mg 分2×7日→30 mg×4日→15 mg×3日。PPIを併用。",["PREDCH","BOOK"],"ok"),
+     item("caution","大後頭神経ブロック（リドカイン＋ステロイド）","薬が効かない・使えないときのつなぎ。",["BOOK"],"bk")])+
+   `<div class="sec-h">予防（群発期のあいだ）</div>`+ul([
+     item("do","ベラパミル 120〜240 mg/日から（国内は360 mgまで、海外は960 mgまで）","審査上認められている。効くまで1〜2週。増量前ごとに心電図（PR延長・房室ブロック）。下の増量チェックを使う。",["BOOK","GL21"],"bk"),
+     item("caution","炭酸リチウム 600〜900 mg/日","ベラパミル無効時。血中濃度・甲状腺・腎機能を測る。",["BOOK"],"bk"),
+     item("caution","トピラマート・バルプロ酸・ガバペンチン・メラトニン","エビデンスは弱い。",["BOOK"],"bk"),
+     item("note","CGRP関連抗体（ガルカネズマブ）","海外では反復性群発頭痛に承認がある国があるが、国内では適応がない。",["GL21"],"sec")])+
+   `<div class="sec-h">生活</div>`+ul([
+     item("avoid","群発期の飲酒・昼寝・ニトログリセリン","発作を誘発する。禁煙を勧める。",["BOOK"],"bk")])),
+ tac:()=>card("その他の三叉神経・自律神経性頭痛（TACs）など",ul([
+     item("do","発作性片側頭痛（2〜30分、1日5回以上）・持続性片側頭痛：インドメタシン","インドメタシンが著効することが診断基準。経口製剤の国内流通は要確認（坐剤は使える）。胃粘膜保護を併用。",["BOOK","ICHD3"],"bk"),
+     item("do","SUNCT/SUNA（1秒〜10分、1日数十〜数百回）：ラモトリギン","ほかにトピラマート・ガバペンチン、発作群発時はリドカイン静注。下垂体病変・後頭蓋窩の血管圧迫を画像で除外。",["BOOK"],"bk"),
+     item("do","一次性穿刺様頭痛：多くは治療不要、頻回ならインドメタシン・メラトニン","",["BOOK"],"bk"),
+     item("do","睡眠時頭痛（50歳以上、睡眠中に起きる）：就寝前のカフェイン（コーヒー1杯）","ほかにリチウム・インドメタシン・メラトニン。睡眠時無呼吸・夜間高血圧を除外。",["BOOK"],"bk"),
+     item("caution","可逆性脳血管攣縮症候群（RCVS）：誘因薬（SSRI・血管作動薬・大麻）中止、ニモジピン/ベラパミル","トリプタン・エルゴタミンは避ける。ステロイドは転帰を悪くするので使わない。",["BOOK"],"bk"),
+     item("do","三叉神経痛：カルバマゼピン 100〜200 mgから","効かない・使えないときはオクスカルバゼピン（適応外）、ラモトリギン、バクロフェン。MRIで血管圧迫・MS・腫瘍を確認し、微小血管減圧術を検討。",["BOOK"],"bk"),
+     item("caution","新規発症持続性連日性頭痛（NDPH）","発症日を覚えている連日性頭痛。低髄圧・静脈洞血栓症・感染後などを除外し、表現型（片頭痛様・緊張型様）に応じて予防。",["BOOK"],"bk")])),
+ er:()=>card("救急・片頭痛重積（72時間以上）",ul([
+     item("do","輸液、メトクロプラミド 10 mg 静注","",["BOOK"],"bk"),
+     item("do","スマトリプタン 3 mg 皮下注（24時間以内にトリプタン・エルゴタミン未使用）","",["BOOK"],"bk"),
+     item("do","アセトアミノフェン 1000 mg 静注、またはNSAIDs（坐剤・静注）","",["BOOK"],"bk"),
+     item("caution","クロルプロマジン・プロクロルペラジン筋注、ジアゼパム静注","鎮静・低血圧に注意。ジアゼパムは不安・興奮の強い重積に。",["BOOK"],"bk"),
+     item("do","デキサメタゾン静注（6.6〜9.9 mg 単回）、重積にはステロイドの短期投与","再発予防。",["BOOK","GL21"],"sec"),
+     item("caution","マグネシウム静注（硫酸マグネシウム 1〜2 g）","前兆のある片頭痛で効果の報告。適応外。",["BOOK"],"sec"),
+     item("avoid","オピオイド・ペンタゾシン","",["GL21"],"sec"),
+     item("note","雷鳴頭痛・神経症状・発熱・意識障害","まず二次性頭痛を除外（鑑別タブ）。",["SNNOOP"],"ok")])),
+ preg:()=>card("妊娠・授乳中",
+   `<div class="sec-h">妊娠中</div>`+ul([
+     item("do","急性期：アセトアミノフェン、メトクロプラミド","",["BOOK","GL21"],"bk"),
+     item("caution","スマトリプタン：有益性が上回るとき","妊娠初期の使用で奇形増加は報告されていない。",["BOOK"],"bk"),
+     item("caution","NSAIDs：妊娠中期まで短期のみ","28週以降は禁忌。",["GL21"],"sec"),
+     item("avoid","エルゴタミン、バルプロ酸、トピラマート、カンデサルタン・ACE阻害薬、ロメリジン、ドンペリドン","",["BOOK","L_cle"],"bk"),
+     item("caution","予防が必要なら少量のプロプラノロールまたはアミトリプチリン","",["BOOK"],"bk"),
+     item("avoid","妊娠中の新しい頭痛・増悪・前兆の初発","静脈洞血栓症・子癇前症・PRES・RCVS・下垂体卒中を考える。血圧と尿蛋白を測る。",["SNNOOP"],"ok"),
+     item("caution","群発頭痛：酸素とスマトリプタン皮下注、予防はステロイド短期、ベラパミルは慎重に","",["BOOK"],"bk")])+
+   `<div class="sec-h">授乳中</div>`+ul([
+     item("do","アセトアミノフェン、イブプロフェン","",["GL21"],"sec"),
+     item("do","スマトリプタン（乳汁移行が少ない）・エレトリプタン","スマトリプタンの添付文書の授乳の記載は最新版で確認。",["BOOK"],"bk"),
+     item("caution","リメゲパント：相対的乳児投与量1%未満","有益性で判断。",["L_rim"],"ok"),
+     item("caution","予防：プロプラノロール、アミトリプチリン（少量）","",["BOOK"],"bk")])),
+ old:()=>card("高齢者・小児",
+   `<div class="sec-h">高齢者</div>`+ul([
+     item("avoid","50歳以上の新しい頭痛は二次性を先に","巨細胞性動脈炎（赤沈・CRP、側頭動脈）、硬膜下血腫、腫瘍、緑内障、薬剤性（硝酸薬・Ca拮抗薬など）。",["SNNOOP","BOOK"],"ok"),
+     item("caution","トリプタンは心血管リスクを確認してから","リスクがあればラスミジタン（転倒に注意）・リメゲパントを考える。",["L_las","JHSRIM"],"ok"),
+     item("caution","NSAIDsは腎・消化管・心不全、アミトリプチリンは抗コリン作用（せん妄・転倒・尿閉）","",["BOOK"],"bk"),
+     item("do","予防：ロメリジン、カンデサルタン（高血圧）、少量から","",["BOOK"],"bk")])+
+   `<div class="sec-h">小児・思春期</div>`+ul([
+     item("do","アセトアミノフェン 10〜15 mg/kg/回（4〜6時間あけ）、イブプロフェン 5〜10 mg/kg/回","アセトアミノフェンが第一選択。",["BOOK"],"bk"),
+     item("caution","トリプタン：国内は小児の適応なし","思春期にはスマトリプタン点鼻・リザトリプタンが海外で使われる。",["BOOK"],"bk"),
+     item("caution","ラスミジタン・ゲパント・CGRP関連抗体：国内は成人のみ","",["L_rim","L_las","JHSATO"],"ok"),
+     item("do","予防：まず生活指導（睡眠・朝食・水分・スクリーン時間）。薬は少量のアミトリプチリン、プロプラノロール、シプロヘプタジン等","",["BOOK"],"bk"),
+     item("caution","親の服薬行動が子どもの使用過多のリスクになる","",["BOOK"],"bk")])),
+ tth:()=>card("緊張型頭痛",ul([
+     item("do","急性期：アセトアミノフェン、NSAIDs（頓用）","月15日（複合鎮痛薬は10日）以上の使用を避ける。",["BOOK","GL21"],"bk"),
+     item("do","予防（頻発・慢性）：アミトリプチリン 10 mgから","ほかにミルタザピン・ベンラファキシン（適応外）。",["BOOK","GL21"],"bk"),
+     item("caution","チザニジン（テルネリン）・エペリゾン","筋緊張を伴う例に。エビデンスは限られる。チザニジンはフルボキサミン・シプロフロキサシンと併用禁忌。",["BOOK"],"bk"),
+     item("do","非薬物療法：頭痛体操、姿勢、運動、認知行動療法、鍼","",["BOOK"],"bk"),
+     item("note","漢方","呉茱萸湯（片頭痛にも）、葛根湯（肩こり）、釣藤散（高齢者の朝の頭痛）など。",["BOOK"],"bk")]))
+};
+function renderVer(){
+  const vd=num("c-vd"),hr=num("c-hr"),pr=num("c-pr");
+  const L=[];
+  let cls="info",big="現在量・心拍数・PR間隔を入れると判定します";
+  if(ck("c-av2")||ck("c-hf")){cls="crit";big="ベラパミルは禁忌：中止・減量して循環器と相談";}
+  else if(vd!==null||hr!==null||pr!==null){
+    const bad=[];
+    if(hr!==null&&hr<50)bad.push("心拍数50未満");
+    if(pr!==null&&pr>=240)bad.push("PR 240 ms以上");
+    const mild=pr!==null&&pr>200&&pr<240;
+    if(bad.length){cls="crit";big="増量しない（"+bad.join("・")+"）：減量して循環器と相談";}
+    else if(mild){cls="warn";big="PR延長（I度房室ブロック）：増量は慎重に、同量で経過を見る";}
+    else{
+      const nx=vd===null?120:vd<240?vd+40:vd<360?vd+40:null;
+      cls="ok";
+      big=nx===null?"国内の上限（360 mg/日）に到達：無効なら他の予防へ":`増量してよい：次は ${nx} mg/日（増量は1〜2週ごとに40〜80 mg）`;
+      if(vd!==null&&vd>=360)cls="warn";
+    }
+  }
+  if(ck("c-bb"))L.push(item("caution","併用薬","β遮断薬・ジゴキシンで徐脈が強まる。強いCYP3A4阻害薬でベラパミル濃度が上昇。シンバスタチン・コルヒチンの濃度も上がる。",["BOOK"],"sec"));
+  L.push(item("note","増量のたびに心電図","開始前、増量前、維持量で定期的に。便秘・浮腫・歯肉腫脹。",["BOOK"],"bk"));
+  $("c-vout").innerHTML=verdict(cls,"ベラパミル",big,"")+ul(L);
+}
+function renderCh(){
+  const f=val("c-f")||"ch";
+  $("c-ch-in").classList.toggle("hidden",f!=="ch");
+  $("c-out").innerHTML=CH[f]();
+  if(f==="ch")renderVer();
+}
+
+/* ============ 薬剤 ============ */
+const DR={
+ sum:{g:"ac",c:"ap",n:"スマトリプタン",b:"イミグラン錠50・点鼻液20・注3・キット皮下注3mg",cls:"トリプタン",
+  dose:"錠50 mg（効果不十分なら次回100 mg）／点鼻20 mg／皮下注3 mg",max:"錠：追加は2時間以上あけ1日200 mg／点鼻：2時間以上あけ1日40 mg／皮下注：1時間以上あけ1日6 mg",
+  ci:"共通禁忌（虚血性心疾患、脳血管障害、末梢血管障害、コントロール不良の高血圧、重度肝障害、片麻痺性・脳幹性前兆、24時間以内のエルゴタミン・他のトリプタン）＋MAO阻害薬（中止2週間以内）",
+  pt:"嘔吐には点鼻、ピーク後・群発頭痛には皮下注。群発頭痛の適応は注射剤。授乳は添付文書の記載（投与後12時間）を確認。",src:["BOOK"],st:"bk"},
+ zol:{g:"ac",c:"ap",n:"ゾルミトリプタン",b:"ゾーミッグ錠2.5mg・RM錠2.5mg",cls:"トリプタン",dose:"2.5 mg（効果不十分なら次回から5 mg）",max:"追加は2時間以上あけ、1日10 mgまで",ci:"共通禁忌＋MAO阻害薬",pt:"口腔内崩壊錠あり。中枢移行がよく、めまい・眠気。",src:["BOOK"],st:"bk"},
+ ele:{g:"ac",c:"ap",n:"エレトリプタン",b:"レルパックス錠20mg",cls:"トリプタン",dose:"20 mg（効果不十分なら次回から40 mg）",max:"追加は2時間以上あけ、1日40 mgまで",ci:"共通禁忌＋HIVプロテアーゼ阻害薬",pt:"副作用・再発が少なめ。強いCYP3A4阻害薬（マクロライド・アゾール）は併用注意。",src:["BOOK"],st:"bk"},
+ riz:{g:"ac",c:"ap",n:"リザトリプタン",b:"マクサルト錠10mg・RPD錠10mg",cls:"トリプタン",dose:"10 mg",max:"追加は2時間以上あけ、1日20 mgまで",ci:"共通禁忌＋MAO阻害薬、プロプラノロール、透析中",pt:"効きが速い。RPD錠は水なしで。プロプラノロールで予防中の人には使わない。",src:["BOOK"],st:"bk"},
+ nar:{g:"ac",c:"ap",n:"ナラトリプタン",b:"アマージ錠2.5mg",cls:"トリプタン",dose:"2.5 mg",max:"追加は4時間以上あけ、1日5 mgまで",ci:"共通禁忌＋重度腎障害",pt:"半減期約5時間。効きはゆっくりだが再発が少なく、月経時片頭痛・持続の長い発作に。",src:["BOOK"],st:"bk"},
+ las:{g:"ac",c:"ap",n:"ラスミジタン",b:"レイボー錠50mg・100mg",cls:"5-HT1F作動薬（ジタン）",dose:"1回100 mg（状態に応じ50 mgまたは200 mg）",max:"再発時は再投与可、24時間で200 mgまで",ci:"成分への過敏症のみ",pt:"血管収縮がなくトリプタン禁忌例にも。めまい・眠気・倦怠感が多い。服用後は自動車運転をさせない（試験では8時間後以降に影響なし）。予防的に使わない。片頭痛と確定した例のみ。腎・肝障害（軽〜中等度）の用量調整なし。",src:["L_las","L_lasdrv","MONONOFU"],st:"ok"},
+ rim:{g:"ac",c:"ap",n:"リメゲパント",b:"ナルティークOD錠75mg（2025年9月承認・12月発売）",cls:"CGRP受容体拮抗薬（ゲパント）",dose:"急性期：発作時に75 mg／発症抑制：75 mg 隔日",max:"1日75 mgまで（予防の服用日は急性期の追加不可。服用日以外の発作は1錠まで）",ci:"成分への過敏症",pt:"国内初の急性期と予防の両方の適応。血管収縮なし。主にCYP3A4代謝・P-gp基質：強いCYP3A4阻害薬などは併用注意。重度肝障害（Child-Pugh C）・末期腎不全では避ける。トリプタン・ラスミジタン・NSAIDsと併用可、CGRP抗体との併用は虚血性血管疾患がなければ大きな問題はないが個別に判断。18歳以上。授乳：相対的乳児投与量1%未満。",src:["L_rim","JHSRIM","LIPTON19","CROOP21"],st:"ok"},
+ apap:{g:"ac",c:"ap",n:"アセトアミノフェン",b:"カロナール錠ほか、アセリオ静注液1000mg",cls:"解熱鎮痛薬",dose:"500〜1000 mg／回（小児10〜15 mg/kg）",max:"1日4000 mg（小児は1日60 mg/kg、成人量を超えない）",ci:"重篤な肝障害（添付文書）",pt:"妊娠・授乳・小児の第一選択。月15日以上で使用過多。",src:["BOOK"],st:"bk"},
+ nsaid:{g:"ac",c:"ap",n:"NSAIDs",b:"ナイキサン、ブルフェン、ロキソニン、ボルタレン（坐剤あり）など",cls:"非ステロイド性抗炎症薬",dose:"ナプロキセン300 mg、イブプロフェン200〜400 mg、ロキソプロフェン60〜120 mg、ジクロフェナク25〜50 mg",max:"各添付文書の1日量",ci:"アスピリン喘息、消化性潰瘍、重篤な腎・肝・心障害、妊娠後期",pt:"軽度〜中等度の発作、トリプタンとの併用。月15日以上で使用過多。",src:["BOOK","GL21"],st:"bk"},
+ antiem:{g:"ac",c:"ap",n:"制吐薬",b:"プリンペラン（メトクロプラミド）、ナウゼリン（ドンペリドン）、ノバミン（プロクロルペラジン）",cls:"ドパミン受容体拮抗薬",dose:"メトクロプラミド5〜10 mg 内服・10 mg 静注／ドンペリドン10 mg 内服・60 mg 坐剤／プロクロルペラジン5 mg 筋注",max:"",ci:"ドンペリドンは妊婦禁忌",pt:"鎮痛薬の前に服用して吸収を助ける。錐体外路症状・アカシジア。",src:["BOOK"],st:"bk"},
+ erg:{g:"ac",c:"ap",n:"エルゴタミン配合剤",b:"クリアミン配合錠A1.0（エルゴタミン1 mg・カフェイン・イソプロピルアンチピリン）",cls:"麦角アルカロイド",dose:"1回1錠、前兆時に1〜2錠を頓用",max:"1週間に10錠まで",ci:"妊婦、虚血性心疾患・末梢血管障害、トリプタン（24時間以上あける）、強いCYP3A4阻害薬（マクロライド・アゾール・HIVプロテアーゼ阻害薬）など",pt:"いまはほとんど使わない。使用過多を起こしやすい。",src:["L_cle","BOOK"],st:"ok"},
+ lom:{g:"pv",c:"ac",n:"ロメリジン",b:"ミグシス錠5mg、テラナス錠5mg",cls:"Ca拮抗薬（保険適用）",dose:"5 mg 1日2回",max:"1日20 mgまで",ci:"頭蓋内出血またはその疑い、脳梗塞急性期、妊婦",pt:"副作用が少なく最初の予防薬に。眠気・めまい。",src:["BOOK"],st:"bk"},
+ pro:{g:"pv",c:"ac",n:"プロプラノロール",b:"インデラル錠10mg",cls:"β遮断薬（保険適用）",dose:"1日20〜30 mg 分2〜3から",max:"1日60 mgまで",ci:"気管支喘息、高度徐脈・房室ブロック、心不全、リザトリプタン併用",pt:"高血圧・不安・振戦の併存に。抑うつ・倦怠感。急に止めない。",src:["BOOK"],st:"bk"},
+ vpa:{g:"pv",c:"ac",n:"バルプロ酸",b:"デパケン錠・R錠、セレニカR",cls:"抗てんかん薬（保険適用）",dose:"400〜600 mg/日 分2（徐放錠）",max:"1日1000 mgまで",ci:"片頭痛予防目的での妊婦、重篤な肝障害、尿素サイクル異常、カルバペネム系併用",pt:"妊娠可能な女性は原則避ける。体重増加・振戦・脱毛・高アンモニア血症。",src:["BOOK"],st:"bk"},
+ ami:{g:"pv",c:"ac",n:"アミトリプチリン",b:"トリプタノール錠10mg",cls:"三環系抗うつ薬（審査上認める）",dose:"5〜10 mg 就寝前から",max:"10〜30 mg（60 mgまで）",ci:"閉塞隅角緑内障、心筋梗塞の回復初期、尿閉、MAO阻害薬",pt:"緊張型頭痛・不眠・うつの併存に。眠気・口渇・便秘・体重増加。",src:["BOOK"],st:"bk"},
+ ver:{g:"pv",c:"ac",n:"ベラパミル",b:"ワソラン錠40mg",cls:"Ca拮抗薬（片頭痛・群発頭痛で審査上認める）",dose:"片頭痛80〜240 mg/日、群発頭痛120〜240 mg/日から",max:"国内360 mg/日",ci:"II度以上の房室ブロック・洞房ブロック、うっ血性心不全",pt:"群発頭痛の予防の第一選択。増量ごとに心電図。便秘。",src:["BOOK"],st:"bk"},
+ top:{g:"pv",c:"ac",n:"トピラマート",b:"トピナ錠",cls:"抗てんかん薬（片頭痛は適応外）",dose:"25 mgから、1週ごとに25 mg増量",max:"50〜100 mg/日 分2（試験は100 mg）",ci:"（添付文書上の禁忌は過敏症）妊娠・妊娠希望は避ける",pt:"体重減少、しびれ、認知機能低下、抑うつ、尿路結石、急性緑内障、代謝性アシドーシス。",src:["GL21","BOOK"],st:"sec"},
+ can:{g:"pv",c:"ac",n:"カンデサルタン",b:"ブロプレス錠",cls:"ARB（片頭痛は適応外）",dose:"4〜8 mg/日",max:"試験は16 mg/日",ci:"妊婦、アリスキレン併用の糖尿病",pt:"高血圧の併存に。副作用が少ない。",src:["BOOK","CARLSEN"],st:"bk"},
+ ato:{g:"pv",c:"ac",n:"アトゲパント",b:"アクイプタ錠（2026年2月承認・4月発売）",cls:"CGRP受容体拮抗薬（ゲパント）",dose:"60 mg 1日1回",max:"CrCl 30 mL/分未満・強いCYP3A阻害薬併用：10 mg／OATP阻害薬併用：30 mg",ci:"成分への過敏症",pt:"予防専用（急性期の適応は2025年12月に申請中）。便秘・悪心・食欲低下。重度肝障害（Child-Pugh C）は避ける。ベラパミル（P-gp阻害）に注意。前治療の失敗は不要。3か月で判定。18歳以上。",src:["JHSATO","ADVANCE","PROGRESS","ELEVATE"],st:"ok"},
+ gal:{g:"pv",c:"ac",n:"ガルカネズマブ",b:"エムガルティ皮下注120mg（オートインジェクター・シリンジ）",cls:"抗CGRP抗体（最適使用推進GL）",dose:"初回240 mg、以降1か月ごとに120 mg 皮下注",max:"",ci:"重篤な過敏症の既往",pt:"在宅自己注射可。注射部位反応、過敏症（遅発性あり）。",src:["GL21","JHSPS"],st:"sec"},
+ fre:{g:"pv",c:"ac",n:"フレマネズマブ",b:"アジョビ皮下注225mg（シリンジ・オートインジェクター）",cls:"抗CGRP抗体（最適使用推進GL）",dose:"4週ごとに225 mg、または12週ごとに675 mg 皮下注",max:"",ci:"重篤な過敏症の既往",pt:"3か月ごと投与を選べる。",src:["GL21","JHSPS"],st:"sec"},
+ ere:{g:"pv",c:"ac",n:"エレヌマブ",b:"アイモビーグ皮下注70mgペン",cls:"抗CGRP受容体抗体（最適使用推進GL）",dose:"4週ごとに70 mg 皮下注",max:"",ci:"成分への過敏症",pt:"重篤な便秘・高血圧はRMPの安全性検討事項。リガンド抗体が無効の例で効くことがある。",src:["L_ere"],st:"ok"},
+ ept:{g:"pv",c:"ac",n:"エプチネズマブ",b:"ビエプチ点滴静注100mg（2026年9月承認）",cls:"抗CGRP抗体・静注（最適使用推進GL）",dose:"12週ごとに100 mg 点滴静注",max:"",ci:"重篤な過敏症の既往",pt:"投与翌日から効く。アナフィラキシー・血管性浮腫に注意。効果判定は3か月（1回後）または6か月（2回後）。2026年11月時点で薬価収載・発売の手続き中。",src:["GLEPT","L_eptrev","SUNRISE"],st:"ok"},
+ o2:{g:"ot",c:"oth",n:"酸素（群発頭痛）",b:"在宅酸素療法（2018年度から群発頭痛に保険適用）",cls:"",dose:"100%酸素 7〜12 L/分、リザーバー付きフェイスマスク、15分",max:"",ci:"CO₂貯留のあるCOPDでは避ける",pt:"鼻カニューラ・低流量は効かない。",src:["COHEN","HOT"],st:"ok"},
+ pred:{g:"ot",c:"oth",n:"プレドニゾロン（群発頭痛のつなぎ）",b:"プレドニン錠ほか",cls:"副腎皮質ステロイド",dose:"60〜100 mg/日で開始",max:"2〜3週で漸減終了",ci:"",pt:"ベラパミルが効くまでのつなぎ。血糖・胃粘膜・不眠。PPI併用。",src:["PREDCH","BOOK"],st:"ok"},
+ li:{g:"ot",c:"oth",n:"炭酸リチウム",b:"リーマス錠",cls:"気分安定薬（群発頭痛は適応外）",dose:"600〜900 mg/日",max:"血中濃度で調整",ci:"重篤な腎障害・心疾患、脱水、妊婦（禁忌）",pt:"NSAIDs・ARB・利尿薬で濃度上昇。甲状腺・腎機能。",src:["BOOK"],st:"bk"},
+ tiz:{g:"ot",c:"oth",n:"チザニジン",b:"テルネリン錠",cls:"中枢性筋弛緩薬",dose:"1〜3 mg/日 分3",max:"",ci:"フルボキサミン・シプロフロキサシン併用、重篤な肝障害",pt:"筋緊張を伴う緊張型頭痛に。眠気・低血圧。",src:["BOOK"],st:"bk"},
+ cbz:{g:"ot",c:"oth",n:"カルバマゼピン（三叉神経痛）",b:"テグレトール錠",cls:"抗てんかん薬",dose:"100〜200 mg/日から",max:"600〜800 mg/日（添付文書は1200 mgまで）",ci:"重篤な血液障害、房室ブロック・高度徐脈、ボリコナゾール等の併用",pt:"HLA-A*31:01でSJS/TEN・DIHSのリスク。低Na、肝障害、多くの薬物相互作用（CYP3A4誘導）。",src:["BOOK"],st:"bk"}
+};
+function renderDr(){
+  const btn=(k,d)=>`<button type="button" class="${d.c}" data-d="${k}" aria-pressed="${k===dDrug}">${esc(d.n)}</button>`;
+  ["ac","pv","ot"].forEach(g=>{$("d-"+g).innerHTML=Object.entries(DR).filter(([k,d])=>d.g===g).map(([k,d])=>btn(k,d)).join("")});
+  const d=DR[dDrug];
+  const row=(k,v,hl)=>v?`<div class="row${hl?" hl":""}"><div class="k">${k}</div><div class="v">${v}</div></div>`:"";
+  $("d-out").innerHTML=`<section class="card sheet"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><h2 style="margin:0">${esc(d.n)}</h2><span class="hint" style="margin:0">${esc(d.b)}</span></div>
+    ${row("分類",esc(d.cls))}${row("用量",esc(d.dose),true)}${row("上限・間隔",esc(d.max))}${row("禁忌",esc(d.ci))}${row("使いどころ・注意",esc(d.pt))}
+    ${src(d.src,d.st)}</section>`;
+}
+
+/* ============ 根拠 ============ */
+const NEWS=[
+ ["2026/11","エプチネズマブ（ビエプチ点滴静注）の最適使用推進GLが中医協に提示。12週ごと100 mg点滴、既存予防薬の前治療要件は他の抗体薬と同じ"],
+ ["2026/09","ビエプチ（エプチネズマブ）承認。国内初の静注CGRP抗体（アジア中心の慢性片頭痛試験SUNRISEが根拠）"],
+ ["2026/04","アクイプタ（アトゲパント）発売。経口・連日の予防専用ゲパント（2月承認）。急性期の適応は2025年12月に申請"],
+ ["2025/12","ナルティーク（リメゲパント）発売。国内初の急性期と予防の両方に使えるゲパント（9月承認）"],
+ ["2025/11","日本頭痛学会がリメゲパント・アトゲパントの使い方（CQ）を公開"],
+ ["2025/10","日本頭痛学会ポジションステートメント：CGRP関連抗体薬を他の予防薬と同等に第一選択に含める（保険上の前治療要件は存続）"],
+ ["2024","IHSの急性期・予防の国際推奨、米国頭痛学会がCGRP標的治療を予防の第一選択の一つと表明"]
+];
+const EV=[
+ {c:"gl",r:"GL21",nm:"頭痛の診療ガイドライン2021",y:2021,ds:"国内GL",pop:"一次性・二次性頭痛全般",res:"トリプタンは片頭痛急性期の第一選択（NSAIDsより2時間後の頭痛消失率が高く再発が少ない）。片麻痺性・脳幹性前兆では非推奨",tk:"国内診療の基本。CGRP関連薬の登場以降の内容は頭痛学会の追加文書で補う",st:"sec"},
+ {c:"gl",r:"JHSPS",nm:"日本頭痛学会ポジションステートメント",y:2025,ds:"学会声明（2025/10/27）",pop:"成人の片頭痛予防",res:"CGRP関連抗体薬を既承認の予防薬（ゲパント含む）と同等に第一選択に含める",tk:"保険診療では最適使用推進GLの4要件（既存予防薬の前治療を含む）を確認する",st:"ok"},
+ {c:"gl",r:"IHSP",nm:"IHS 予防の国際推奨",y:2024,ds:"国際推奨",pop:"片頭痛予防",res:"月4日以上の頭痛・急性期治療の効果不十分などで予防を考慮。50%以上の減少（慢性片頭痛は30%）で有効",tk:"判定の目安を国際的にそろえた",st:"ok"},
+ {c:"gl",r:"IHSA",nm:"IHS 急性期の国際推奨",y:2024,ds:"国際推奨",pop:"片頭痛急性期",res:"NSAIDs・トリプタンを基本に、無効・禁忌でゲパントやラスミジタン",tk:"ゲパント・ジタンの位置づけ",st:"sec"},
+ {c:"gl",r:"AHS24",nm:"AHS ポジションステートメント",y:2024,ds:"学会声明",pop:"片頭痛予防",res:"CGRP標的治療（抗体・ゲパント）を前治療の失敗なしに第一選択の一つとする",tk:"国際的な流れ",st:"ok"},
+ {c:"gl",r:"EHF22",nm:"EHF ガイドライン",y:2022,ds:"欧州GL",pop:"CGRP抗体",res:"反復性・慢性片頭痛、使用過多を伴う例にも推奨",tk:"抗体の切替・中止の考え方",st:"sec"},
+ {c:"ac",r:"LIPTON19",nm:"Study 301（リメゲパント）",y:2019,ds:"RCT",pop:"片頭痛発作 1186例",res:"2時間後の頭痛消失 19.6% vs 12.0%",tk:"急性期の効果はトリプタンより控えめだが血管収縮がない",st:"ok"},
+ {c:"ac",r:"CROOP19",nm:"Study 303（リメゲパントOD錠）",y:2019,ds:"RCT",pop:"片頭痛発作",res:"2時間後の頭痛消失 21% vs 11%",tk:"国内製剤と同じOD錠",st:"ok"},
+ {c:"ac",r:"MONONOFU",nm:"MONONOFU（ラスミジタン）",y:2021,ds:"国内RCT",pop:"日本人片頭痛 846例",res:"100・200 mgで2時間後の頭痛消失がプラセボより多い",tk:"国内承認の根拠",st:"ok"},
+ {c:"pv",r:"CROOP21",nm:"リメゲパント隔日投与",y:2021,ds:"RCT",pop:"反復性・慢性片頭痛（米国）",res:"9〜12週の片頭痛日数 −4.3 vs −3.5日",tk:"予防効果は控えめ、急性期と兼用できる",st:"ok"},
+ {c:"pv",r:"ADVANCE",nm:"ADVANCE（アトゲパント）",y:2021,ds:"RCT",pop:"反復性片頭痛",res:"10〜60 mgで12週の片頭痛日数がプラセボより減少",tk:"反復性片頭痛の経口予防",st:"ok"},
+ {c:"pv",r:"PROGRESS",nm:"PROGRESS（アトゲパント）",y:2023,ds:"RCT（日本含む）",pop:"慢性片頭痛 778例",res:"60 mg 1日1回で −6.9 vs −5.1日。便秘・悪心",tk:"慢性片頭痛にも使える",st:"sec"},
+ {c:"pv",r:"ELEVATE",nm:"ELEVATE（アトゲパント）",y:2024,ds:"RCT",pop:"経口予防薬2〜4種類が無効の反復性片頭痛",res:"前治療失敗例でも有効",tk:"難治例の経口選択肢",st:"ok"},
+ {c:"pv",r:"SUNRISE",nm:"SUNRISE（エプチネズマブ）",y:2025,ds:"RCT（アジア中心）",pop:"慢性片頭痛 983例",res:"1〜12週の片頭痛日数 100 mg −7.2、300 mg −7.5 vs −4.8日",tk:"国内承認の根拠（国内は100 mg）",st:"sec"},
+ {c:"moh",r:"CARLSEN",nm:"Carlsen 2020",y:2020,ds:"非盲検RCT",pop:"薬剤の使用過多による頭痛 120例",res:"離脱＋開始時からの予防で、反復性への移行74%、治癒97%（他群より多い）",tk:"離脱と同時に予防を始める",st:"ok"},
+ {c:"ch",r:"COHEN",nm:"高流量酸素",y:2009,ds:"RCT",pop:"群発頭痛",res:"12 L/分15分で15分後の消失・軽快 78% vs 20%（空気）",tk:"高流量・マスクで",st:"ok"},
+ {c:"ch",r:"PREDCH",nm:"PredCH",y:2021,ds:"RCT",pop:"反復性群発頭痛 116例",res:"プレドニゾン100 mg×5日→漸減で1週目の発作 7.1 vs 9.5回",tk:"ベラパミル増量中のつなぎ",st:"ok"},
+ {c:"gl",r:"SNNOOP",nm:"SNNOOP10",y:2019,ds:"総説",pop:"二次性頭痛の危険信号",res:"15項目のred/orange flags",tk:"鑑別タブのチェックリスト",st:"ok"},
+ {c:"lab",r:"GLEPT",nm:"最適使用推進GL（エプチネズマブ）",y:2026,ds:"厚労省（中医協資料）",pop:"抗CGRP抗体の投与対象",res:"月4日以上・支障・既存予防薬の前治療・専門医要件",tk:"抗体4剤で共通の要件",st:"ok"},
+ {c:"lab",r:"L_rim",nm:"ナルティーク添付文書",y:2025,ds:"PMDA",pop:"",res:"急性期75 mg、予防75 mg隔日、1日75 mgまで",tk:"",st:"ok"},
+ {c:"lab",r:"JHSATO",nm:"頭痛学会 アトゲパントの使い方",y:2026,ds:"学会文書",pop:"",res:"60 mg 1日1回、腎機能・相互作用で10/30 mg",tk:"",st:"ok"},
+ {c:"lab",r:"L_las",nm:"レイボー添付文書",y:2022,ds:"PMDA",pop:"",res:"100 mg（50/200 mg）、運転に従事させない",tk:"",st:"ok"},
+ {c:"lab",r:"HOT",nm:"群発頭痛の在宅酸素療法",y:2018,ds:"診療報酬改定",pop:"",res:"群発頭痛に在宅酸素療法が保険適用",tk:"",st:"ok"},
+ {c:"lab",r:"BOOK",nm:"頭痛治療薬の考え方、使い方（第2版）",y:2016,ds:"成書",pop:"",res:"既存薬の用量・禁忌・使い分け、各頭痛の治療戦略",tk:"2016年時点。CGRP関連薬の項は発売前の情報",st:"bk"}
+];
+function renderEv(){
+  $("e-news").innerHTML=NEWS.map(([d,t])=>`<div><b>${d}</b>${esc(t)}</div>`).join("");
+  const f=val("e-f")||"all";
+  $("e-list").innerHTML=EV.filter(e=>f==="all"||e.c===f).sort((a,b)=>b.y-a.y).map(e=>`<article class="ev">
+    <div class="hd"><span class="nm">${esc(e.nm)}</span><span class="yr">${e.y}</span><span class="hint" style="margin:0;font-size:12px">${esc(e.ds)}</span></div>
+    <dl>${e.pop?`<dt>対象</dt><dd>${esc(e.pop)}</dd>`:""}<dt>内容</dt><dd>${esc(e.res)}</dd></dl>
+    ${e.tk?`<div class="take">→ ${esc(e.tk)}</div>`:""}${src([e.r],e.st)}
+    <div class="hint" style="font-size:11.5px">${esc(R[e.r].t)}</div></article>`).join("");
+}
+
+/* ============ 共通 ============ */
+function renderAll(){renderDx();renderAc();renderPv();renderMoh();renderCh();renderDr();renderEv()}
+document.addEventListener("input",e=>{if(e.target.closest("main")){renderAll();save()}});
+document.addEventListener("change",e=>{if(e.target.closest("main")){renderAll();save()}});
+document.addEventListener("click",e=>{
+  const t=e.target.closest("nav.tabs button");if(t){setTab(t.dataset.v);save();window.scrollTo({top:0});return}
+  const x=e.target.closest("[data-x]");if(x){const k=x.dataset.x,a=+x.dataset.a;if(XF[k]===a)delete XF[k];else XF[k]=a;renderDx();save();return}
+  const bk=e.target.closest("[data-bulk]");if(bk){const a=+bk.dataset.a;FLAGS.forEach(f=>{if(a<0)delete XF[f.k];else XF[f.k]=a});renderDx();save();return}
+  const d=e.target.closest("[data-d]");if(d){dDrug=d.dataset.d;renderDr();save();return}
+});
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),3500)}
+load(); setTab(curTab); renderAll();
+
+</script>
+<script>
+function hh(){try{document.documentElement.style.setProperty('--hh',document.querySelector('header.top').offsetHeight+'px')}catch(e){}}hh();addEventListener('resize',hh);
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["ha-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+</body>
+</html>
