@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#4338ca">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="院内内線">
+<title>院内内線</title>
+<style>
+:root{
+  --accent:#4338ca;--accent-ink:#fff;--accent-soft:#eceafd;
+  --bg:#f4f5fa;--surface:#fff;--ink:#1b1f2a;--muted:#5d6475;--line:#d9dce6;
+  --crit:#b3122e;--crit-soft:#fde4e7;--ok:#1f7a4d;--ok-soft:#e5f4ec;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  color-scheme:light}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#a5b4fc;--accent-ink:#14163a;--accent-soft:#22254a;
+  --bg:#111318;--surface:#1a1d24;--ink:#e9ebf1;--muted:#a6acba;--line:#333846;
+  --crit:#ff6b80;--crit-soft:#3d1a21;--ok:#5fd39a;--ok-soft:#173326;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:10;background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 10px calc(12px + env(safe-area-inset-left))}
+header .bar{display:flex;align-items:center;gap:8px;min-height:34px}
+header h1{font-size:17px;margin:0;flex:1;white-space:nowrap}
+header h1 small{font-size:11px;font-weight:400;opacity:.85;margin-left:6px}
+.sbox{margin-top:8px;display:flex;gap:6px}
+.sbox input{flex:1;font:inherit;font-size:17px;padding:10px 12px;border-radius:10px;border:0;background:var(--surface);color:var(--ink);min-width:0}
+.sbox button,.btn{font:inherit;font-size:14px;border-radius:10px;padding:9px 12px;min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn.dg{color:var(--crit);border-color:var(--crit)}
+main{padding:10px calc(10px + env(safe-area-inset-right)) 10px calc(10px + env(safe-area-inset-left));max-width:760px;margin:0 auto}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.card h2{font-size:16px;margin:0 0 8px}
+.card p{margin:0 0 10px;font-size:14px;color:var(--muted)}
+label.f{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
+input[type=password],input[type=text].w,textarea{width:100%;font:inherit;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+textarea{min-height:160px;font-size:13px;font-family:ui-monospace,Menlo,monospace}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:10px}
+.chk input{width:20px;height:20px}
+.err{color:var(--crit);font-size:14px;margin-top:8px;min-height:1em}
+.okm{color:var(--ok);font-size:14px;margin-top:8px}
+.meta{font-size:12px;color:var(--muted);margin:2px 4px 8px;display:flex;justify-content:space-between;gap:8px}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.it{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
+.it:first-child{border-top:0}
+.it .nm{flex:1;min-width:0}
+.it .nm b{display:block;font-size:15.5px;overflow-wrap:anywhere}
+.it .nm span{display:block;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.nums{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.num{font:700 19px/1.1 ui-monospace,Menlo,monospace;background:var(--accent-soft);color:var(--accent);border:0;border-radius:8px;padding:7px 9px;min-height:36px;cursor:pointer;white-space:nowrap}
+.num i{font:400 10.5px var(--font);margin-right:4px;opacity:.8;font-style:normal}
+.rk{font-size:10.5px;color:var(--muted);line-height:1;margin-top:-2px}
+.rkA{color:var(--ok)}
+.star{border:0;background:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px;min-width:36px;min-height:36px}
+.star.on{color:#e0a100}
+mark{background:#fff3a3;color:inherit;border-radius:2px}
+@media (prefers-color-scheme: dark){mark{background:#5a4b00}}
+details.grp{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+details.grp summary{padding:12px;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+details.grp summary::after{content:"＋";color:var(--muted)}
+details.grp[open] summary::after{content:"−"}
+details.grp .list{border:0;border-top:1px solid var(--line);border-radius:0;margin:0}
+.sec{font-size:13px;font-weight:700;color:var(--muted);margin:14px 4px 6px}
+.empty{text-align:center;color:var(--muted);padding:24px 8px;font-size:14px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:90%}
+#toast.on{opacity:1}
+.hide{display:none!important}
+small.note{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar"><h1>院内内線<small id="hdrMeta"></small></h1></div>
+  <div class="sbox hide" id="sbox">
+    <input id="q" type="search" inputmode="search" placeholder="部署・名前・かな・番号で検索" autocomplete="off" enterkeyhint="search" aria-label="検索">
+    <button type="button" id="setBtn" aria-label="設定">設定</button>
+  </div>
+</header>
+<main>
+  <!-- 初回：データの取り込み -->
+  <section id="vImport" class="hide">
+    <div class="card">
+      <h2>内線データを取り込む（初回のみ）</h2>
+      <p>内線データは暗号化したファイルで配ります。取り込むとこの端末の中だけに保存され、以後はオフラインで使えます。</p>
+      <div class="row" id="dlRow">
+        <button type="button" class="btn pri" id="dlBtn">ダウンロードして取り込む</button>
+      </div>
+      <div class="row">
+        <label class="btn" for="fileIn" style="display:inline-flex;align-items:center">ファイルを選ぶ</label>
+        <input type="file" id="fileIn" accept=".enc,.json,application/json,application/octet-stream" class="hide">
+        <span id="fileName" style="font-size:13px;color:var(--muted)"></span>
+      </div>
+      <div id="impPass" class="hide">
+        <label class="f" for="pass1">パスフレーズ</label>
+        <input type="password" id="pass1" autocomplete="current-password">
+        <label class="chk"><input type="checkbox" id="rem1" checked>この端末で記憶する（次回からパスフレーズ不要）</label>
+        <div class="row"><button type="button" class="btn pri" id="impGo">取り込む</button><button type="button" class="btn hide" id="impCancel">やめる</button></div>
+      </div>
+      <div class="err" id="impErr" role="alert"></div>
+    </div>
+  </section>
+
+  <!-- 起動時のロック解除 -->
+  <section id="vLock" class="hide">
+    <div class="card">
+      <h2>パスフレーズを入力</h2>
+      <p>この端末には暗号化した内線データが保存されています。</p>
+      <input type="password" id="pass2" autocomplete="current-password" aria-label="パスフレーズ">
+      <label class="chk"><input type="checkbox" id="rem2">この端末で記憶する</label>
+      <div class="row"><button type="button" class="btn pri" id="unlockGo">開く</button></div>
+      <div class="err" id="lockErr" role="alert"></div>
+    </div>
+  </section>
+
+  <!-- 検索 -->
+  <section id="vMain" class="hide">
+    <div class="meta"><span id="cnt"></span><span id="upd"></span></div>
+    <div id="res"></div>
+  </section>
+
+  <!-- 設定 -->
+  <section id="vSet" class="hide">
+    <div class="card">
+      <h2>データ</h2>
+      <p id="setInfo"></p>
+      <div class="row">
+        <button type="button" class="btn" id="updBtn">新しいデータに更新</button>
+        <button type="button" class="btn" id="lockBtn">記憶を消してロック</button>
+      </div>
+      <div class="row"><button type="button" class="btn dg" id="wipeBtn">この端末のデータを全部消す</button></div>
+      <small class="note">端末を手放すとき・人に貸すときは「全部消す」を使ってください。</small>
+    </div>
+    <div class="card">
+      <h2>データファイルを作る（管理用）</h2>
+      <p>1行目に見出し（部署, 名称, かな, 内線, PHS, ランク, 場所, 備考）を置いた表を、Excel からコピーして貼り付けてください。タブ区切り・カンマ区切りのどちらでも読めます。</p>
+      <textarea id="src" spellcheck="false" placeholder="部署&#9;名称&#9;かな&#9;内線&#9;PHS&#9;場所&#9;備考"></textarea>
+      <label class="f" for="bTitle">表題（任意）</label>
+      <input type="text" class="w" id="bTitle" placeholder="例：院内内線表">
+      <label class="f" for="bDate">版の日付</label>
+      <input type="text" class="w" id="bDate" placeholder="例：2026-11">
+      <label class="f" for="bp1">パスフレーズ（12文字以上。長い文にすると安全）</label>
+      <input type="password" id="bp1" autocomplete="new-password">
+      <label class="f" for="bp2">もう一度</label>
+      <input type="password" id="bp2" autocomplete="new-password">
+      <div class="row"><button type="button" class="btn pri" id="buildBtn">暗号化ファイルを作る</button></div>
+      <div class="err" id="bErr" role="alert"></div>
+      <div class="okm" id="bOk"></div>
+    </div>
+    <div class="row"><button type="button" class="btn" id="backBtn">検索に戻る</button></div>
+  </section>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const ITER=600000;
+const FIELDS=[["d","部署"],["n","名称"],["k","かな"],["t","内線"],["p","PHS"],["r","ランク"],["f","場所"],["m","備考"]];
+const RANK={A:"外線0発信",C:"外線は9→交換"};
+const LS_Q="ext-q", LS_FAV="ext-fav";
+let DATA=null, pending=null;
+
+/* ---------- IndexedDB（暗号化データと、記憶した鍵を置く） ---------- */
+function db(){return new Promise((res,rej)=>{const r=indexedDB.open("ext-db",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function kvGet(k){const d=await db();return new Promise((res,rej)=>{const r=d.transaction("kv").objectStore("kv").get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function kvSet(k,v){const d=await db();return new Promise((res,rej)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});}
+async function kvDel(k){const d=await db();return new Promise((res,rej)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").delete(k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});}
+
+/* ---------- 暗号（AES-256-GCM、鍵は PBKDF2-SHA256） ---------- */
+const b64e=u=>{let s="";u=new Uint8Array(u);for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s);};
+const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function deriveKey(pass,salt,it,usage){
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass.normalize("NFC")),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",hash:"SHA-256",salt,iterations:it},base,{name:"AES-GCM",length:256},false,usage);
+}
+async function decryptWith(key,enc){
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64d(enc.iv)},key,b64d(enc.ct));
+  const obj=JSON.parse(new TextDecoder().decode(pt));
+  if(!obj||!Array.isArray(obj.rows))throw new Error("format");
+  return obj;
+}
+function checkEnc(enc){
+  if(!enc||enc.v!==1||enc.kdf!=="PBKDF2-SHA256"||!enc.salt||!enc.iv||!enc.ct)throw new Error("このファイルは内線データではありません");
+  return enc;
+}
+async function unlock(enc,pass,remember){
+  const key=await deriveKey(pass,b64d(enc.salt),enc.it||ITER,["decrypt"]);
+  let obj;
+  try{obj=await decryptWith(key,enc);}catch(e){throw new Error("パスフレーズが違います");}
+  if(remember)await kvSet("key",key);else await kvDel("key");
+  return obj;
+}
+
+/* ---------- 文字のゆれを吸収（全角半角・カナ→かな・空白） ---------- */
+function norm(s){
+  return String(s||"").normalize("NFKC").toLowerCase()
+    .replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60))
+    .replace(/[\s\-‐－ー・()（）]/g,"");
+}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+/* ---------- 画面 ---------- */
+function show(v){["vImport","vLock","vMain","vSet"].forEach(x=>$(x).classList.toggle("hide",x!==v));$("sbox").classList.toggle("hide",!(v==="vMain"));}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2400);}
+function favs(){try{return JSON.parse(localStorage.getItem(LS_FAV)||"[]");}catch(e){return [];}}
+function rowId(r){return [r.d,r.n,r.t,r.p].join("|");}
+
+function prep(obj){
+  obj.rows.forEach(r=>{r._id=rowId(r);r._s=norm([r.d,r.n,r.k,r.t,r.p,r.f,r.m,r.c==="phs"?"phs":"内線"].join(" "));r._num=norm([r.t,r.p].join(" "));});
+  DATA=obj;
+  $("hdrMeta").textContent=obj.updated?obj.updated+"版":"";
+  $("upd").textContent=obj.title||"";
+  show("vMain");render();
+}
+
+function hl(text,terms){
+  let h=esc(text);if(!terms.length||!text)return h;
+  // 正規化前の文字列でも一致すれば強調（数字・漢字の部分一致）
+  terms.forEach(t=>{const raw=t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");if(!raw)return;try{h=h.replace(new RegExp("("+raw+")","gi"),"<mark>$1</mark>");}catch(e){}});
+  return h;
+}
+function itemHTML(r,terms,fav){
+  const sub=[r.d!==r.n?r.d:"",r.f,r.m].filter(Boolean).join("　");
+  const nums=[];
+  if(r.t)nums.push(`<button type="button" class="num" data-c="${esc(r.t)}"><i>内線</i>${hl(r.t,terms)}</button>`+(RANK[r.r]?`<small class="rk rk${r.r}">${RANK[r.r]}</small>`:""));
+  if(r.p)nums.push(`<button type="button" class="num" data-c="${esc(r.p)}"><i>PHS</i>${hl(r.p,terms)}</button>`);
+  return `<div class="it"><button type="button" class="star${fav.has(r._id)?" on":""}" data-f="${esc(r._id)}" aria-label="お気に入り">${fav.has(r._id)?"★":"☆"}</button>
+  <div class="nm"><b>${hl(r.n||r.d,terms)}</b>${sub?`<span>${hl(sub,terms)}</span>`:""}</div><div class="nums">${nums.join("")}</div></div>`;
+}
+function render(){
+  if(!DATA)return;
+  const qv=$("q").value;
+  const terms=qv.split(/[\s　]+/).filter(Boolean);
+  const nterms=terms.map(norm).filter(Boolean);
+  const fav=new Set(favs());
+  const rows=DATA.rows;
+  let html="";
+  if(nterms.length){
+    const isNum=nterms.every(t=>/^\d+$/.test(t));
+    let hit=rows.filter(r=>nterms.every(t=>r._s.includes(t)));
+    // 番号で引いたときは、番号の先頭一致を上に
+    const score=r=>{let s=0;if(isNum&&nterms.some(t=>(" "+r._num).includes(t)))s-=2;if(isNum&&(r.t===terms[0]||r.p===terms[0]))s-=5;if(fav.has(r._id))s-=1;return s;};
+    hit.sort((a,b)=>score(a)-score(b));
+    $("cnt").textContent=hit.length+"件";
+    html=hit.length?`<div class="list">${hit.slice(0,300).map(r=>itemHTML(r,terms,fav)).join("")}</div>`+(hit.length>300?`<div class="empty">ほか ${hit.length-300}件。語を足して絞り込んでください。</div>`:""):`<div class="empty">見つかりません。かな・部署名の一部・番号でも探せます。</div>`;
+  }else{
+    $("cnt").textContent="全"+rows.length+"件";
+    const fr=rows.filter(r=>fav.has(r._id));
+    if(fr.length)html+=`<div class="sec">★ お気に入り</div><div class="list">${fr.map(r=>itemHTML(r,[],fav)).join("")}</div>`;
+    const secs=[["内線（場所・部署別）",rows.filter(r=>r.c!=="phs")],["PHS（部署別）",rows.filter(r=>r.c==="phs")]];
+    secs.forEach(([title,list0])=>{
+      if(!list0.length)return;
+      const groups=new Map();list0.forEach(r=>{const g=r.g||r.d||"その他";if(!groups.has(g))groups.set(g,[]);groups.get(g).push(r);});
+      html+=`<div class="sec">${title}</div>`;
+      groups.forEach((list,g)=>{html+=`<details class="grp"><summary>${esc(g)}<span style="font-weight:400;color:var(--muted);margin-left:auto;margin-right:8px">${list.length}</span></summary><div class="list">${list.map(r=>itemHTML(r,[],fav)).join("")}</div></details>`;});
+    });
+  }
+  $("res").innerHTML=html;
+}
+
+$("res").addEventListener("click",async e=>{
+  const n=e.target.closest(".num");
+  if(n){const c=n.dataset.c;try{await navigator.clipboard.writeText(c);toast(c+" をコピーしました");}catch(_){toast(c);}return;}
+  const s=e.target.closest(".star");
+  if(s){const id=s.dataset.f;let f=favs();f=f.includes(id)?f.filter(x=>x!==id):f.concat(id);try{localStorage.setItem(LS_FAV,JSON.stringify(f));}catch(_){}render();}
+});
+let qt;$("q").addEventListener("input",()=>{clearTimeout(qt);qt=setTimeout(()=>{try{localStorage.setItem(LS_Q,$("q").value);}catch(_){}render();},80);});
+
+/* ---------- 取り込み ---------- */
+function startImport(updating){
+  pending=null;$("impPass").classList.add("hide");$("impErr").textContent="";$("fileName").textContent="";$("pass1").value="";
+  $("impCancel").classList.toggle("hide",!updating);
+  show("vImport");
+  // ward-apps に data.enc が置いてあるときだけ「ダウンロード」を出す
+  $("dlRow").classList.add("hide");
+  fetch("data.enc",{cache:"no-cache"}).then(r=>{if(r.ok)$("dlRow").classList.remove("hide");}).catch(()=>{});
+}
+function gotEnc(enc,label){
+  try{pending=checkEnc(enc);}catch(e){$("impErr").textContent=e.message;return;}
+  $("fileName").textContent=label;$("impErr").textContent="";
+  $("impPass").classList.remove("hide");$("pass1").focus();
+}
+$("dlBtn").addEventListener("click",async()=>{
+  $("impErr").textContent="";
+  try{const r=await fetch("data.enc",{cache:"no-cache"});if(!r.ok)throw 0;gotEnc(await r.json(),"ダウンロードしました");}
+  catch(e){$("impErr").textContent="ダウンロードできませんでした。通信できる場所でもう一度試すか、ファイルを選んでください。";}
+});
+$("fileIn").addEventListener("change",async()=>{
+  const f=$("fileIn").files[0];if(!f)return;
+  try{gotEnc(JSON.parse(await f.text()),f.name);}catch(e){$("impErr").textContent="このファイルは読めません";}
+  $("fileIn").value="";
+});
+$("impGo").addEventListener("click",async()=>{
+  if(!pending)return;const b=$("impGo");b.disabled=true;$("impErr").textContent="確認しています…";
+  try{const obj=await unlock(pending,$("pass1").value,$("rem1").checked);await kvSet("blob",pending);$("pass1").value="";pending=null;toast("取り込みました（"+obj.rows.length+"件）");prep(obj);}
+  catch(e){$("impErr").textContent=e.message;}
+  finally{b.disabled=false;}
+});
+$("pass1").addEventListener("keydown",e=>{if(e.key==="Enter")$("impGo").click();});
+$("impCancel").addEventListener("click",()=>{DATA?show("vMain"):boot();});
+
+/* ---------- ロック解除 ---------- */
+$("unlockGo").addEventListener("click",async()=>{
+  const b=$("unlockGo");b.disabled=true;$("lockErr").textContent="確認しています…";
+  try{const enc=await kvGet("blob");const obj=await unlock(enc,$("pass2").value,$("rem2").checked);$("pass2").value="";$("lockErr").textContent="";prep(obj);}
+  catch(e){$("lockErr").textContent=e.message;}
+  finally{b.disabled=false;}
+});
+$("pass2").addEventListener("keydown",e=>{if(e.key==="Enter")$("unlockGo").click();});
+
+/* ---------- 設定 ---------- */
+$("setBtn").addEventListener("click",async()=>{
+  const key=await kvGet("key").catch(()=>null);
+  $("setInfo").textContent=DATA?`${DATA.title||"内線データ"}　${DATA.updated||""}　${DATA.rows.length}件。パスフレーズは${key?"この端末に記憶しています":"記憶していません（起動のたびに入力）"}。`:"";
+  show("vSet");
+});
+$("backBtn").addEventListener("click",()=>show("vMain"));
+$("updBtn").addEventListener("click",()=>startImport(true));
+$("lockBtn").addEventListener("click",async()=>{await kvDel("key");DATA=null;$("res").innerHTML="";$("hdrMeta").textContent="";toast("ロックしました");boot();});
+$("wipeBtn").addEventListener("click",async()=>{
+  if(!confirm("この端末の内線データ・記憶したパスフレーズ・お気に入りを消します。よろしいですか？"))return;
+  await kvDel("blob");await kvDel("key");try{localStorage.removeItem(LS_FAV);localStorage.removeItem(LS_Q);}catch(_){}
+  DATA=null;$("res").innerHTML="";$("q").value="";$("hdrMeta").textContent="";toast("消しました");boot();
+});
+
+/* ---------- データファイルを作る ---------- */
+function parseTable(txt){
+  txt=txt.replace(/^﻿/,"").replace(/\r\n?/g,"\n").trim();if(!txt)return [];
+  const delim=txt.split("\n")[0].includes("\t")?"\t":",";
+  const rows=[];let cur=[""],q=false;
+  for(let i=0;i<txt.length;i++){const c=txt[i];
+    if(q){if(c==='"'){if(txt[i+1]==='"'){cur[cur.length-1]+='"';i++;}else q=false;}else cur[cur.length-1]+=c;}
+    else if(c==='"'&&cur[cur.length-1]==="")q=true;
+    else if(c===delim)cur.push("");
+    else if(c==="\n"){rows.push(cur);cur=[""];}
+    else cur[cur.length-1]+=c;}
+  rows.push(cur);return rows;
+}
+$("buildBtn").addEventListener("click",async()=>{
+  $("bErr").textContent="";$("bOk").textContent="";
+  const t=parseTable($("src").value);
+  if(t.length<2){$("bErr").textContent="見出し行とデータ行を貼り付けてください";return;}
+  const head=t[0].map(h=>norm(h));
+  const map={};FIELDS.forEach(([k,lab])=>{let i=head.indexOf(norm(lab));if(i<0&&k==="d")i=head.indexOf(norm("区分"));if(i>=0)map[k]=i;});
+  if(map.n==null&&map.d==null){$("bErr").textContent="見出しに「部署」か「名称」が必要です";return;}
+  if(map.t==null&&map.p==null){$("bErr").textContent="見出しに「内線」か「PHS」が必要です";return;}
+  const rows=t.slice(1).map(c=>{const r={};Object.entries(map).forEach(([k,i])=>{const v=(c[i]||"").trim();if(v)r[k]=k==="t"||k==="p"||k==="r"?v.normalize("NFKC").toUpperCase():v;});if(r.p&&!r.t&&map.r==null)r.c="phs";return r;}).filter(r=>(r.n||r.d)&&(r.t||r.p));
+  const p1=$("bp1").value,p2=$("bp2").value;
+  if(p1.length<12){$("bErr").textContent="パスフレーズは12文字以上にしてください";return;}
+  if(p1!==p2){$("bErr").textContent="2つのパスフレーズが一致しません";return;}
+  const b=$("buildBtn");b.disabled=true;
+  try{
+    const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+    const key=await deriveKey(p1,salt,ITER,["encrypt"]);
+    const payload={title:$("bTitle").value.trim()||"院内内線表",updated:$("bDate").value.trim(),rows};
+    const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,new TextEncoder().encode(JSON.stringify(payload)));
+    const enc={v:1,kdf:"PBKDF2-SHA256",it:ITER,salt:b64e(salt),iv:b64e(iv),ct:b64e(ct)};
+    const blob=new Blob([JSON.stringify(enc)],{type:"application/octet-stream"});
+    const file=new File([blob],"ext-data.enc",{type:"application/octet-stream"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]}).catch(()=>{});}
+    else{const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="ext-data.enc";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);}
+    $("bOk").textContent=rows.length+"件を暗号化しました（ext-data.enc）。";
+    $("bp1").value="";$("bp2").value="";
+  }catch(e){$("bErr").textContent="作成できませんでした："+e.message;}
+  finally{b.disabled=false;}
+});
+
+/* ---------- 起動 ---------- */
+async function boot(){
+  if(!window.crypto||!crypto.subtle){show("vImport");$("impErr").textContent="この環境では暗号機能が使えません（https で開いてください）";return;}
+  try{$("q").value=localStorage.getItem(LS_Q)||"";}catch(_){}
+  let enc=null,key=null;
+  try{enc=await kvGet("blob");key=await kvGet("key");}catch(e){}
+  if(!enc){startImport(false);return;}
+  if(key){try{prep(await decryptWith(key,enc));return;}catch(e){await kvDel("key").catch(()=>{});}}
+  $("lockErr").textContent="";show("vLock");
+}
+boot();
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==='https:'||h==='localhost'||h==='127.0.0.1';
+    var onClaude=/(^|\.)claude\.ai$/.test(h)||/claudeusercontent|claude\.site/.test(h)||!!window.claude;
+    if(!('serviceWorker' in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound',function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener('statechange',function(){
+          if(w.state==='installed'&&navigator.serviceWorker.controller)toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["ext-q"];
+  try{document.querySelectorAll("header .bar").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+</body>
+</html>

@@ -279,6 +279,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "院内内線",
+      "short_name": "院内内線",
+      "url": "ext/",
+      "icons": [
+        {
+          "src": "ext/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
