@@ -287,7 +287,15 @@ $("res").addEventListener("click",async e=>{
   const n=e.target.closest(".num");
   if(n){const c=n.dataset.c;try{await navigator.clipboard.writeText(c);toast(c+" をコピーしました");}catch(_){toast(c);}return;}
   const s=e.target.closest(".star");
-  if(s){const id=s.dataset.f;let f=favs();f=f.includes(id)?f.filter(x=>x!==id):f.concat(id);try{localStorage.setItem(LS_FAV,JSON.stringify(f));}catch(_){}render();}
+  if(s){
+    /* 一覧を描き直さずにその場で切り替える（開いている部署やスクロール位置を保つ） */
+    const id=s.dataset.f;let f=favs();const on=!f.includes(id);
+    f=on?f.concat(id):f.filter(x=>x!==id);
+    try{localStorage.setItem(LS_FAV,JSON.stringify(f));}catch(_){}
+    document.querySelectorAll("#res .star").forEach(el=>{if(el.dataset.f===id){el.classList.toggle("on",on);el.textContent=on?"★":"☆";}});
+    $("favN").textContent=f.length?String(f.length):"";
+    toast(on?"お気に入りに入れました":"お気に入りから外しました");
+  }
 });
 $("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;TAB=b.dataset.tab;try{localStorage.setItem(LS_TAB,TAB);}catch(_){}window.scrollTo(0,0);render();});
 let qt;$("q").addEventListener("input",()=>{clearTimeout(qt);qt=setTimeout(()=>{try{localStorage.setItem(LS_Q,$("q").value);}catch(_){}render();},80);});
