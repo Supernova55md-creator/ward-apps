@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#6b4a9e">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="妊娠授乳ナビ">
+<title>妊娠・授乳と神経疾患薬ナビ</title>
+<style>
+:root{
+  /* 妊娠・授乳ナビ＝ラベンダー。妊娠（P）と授乳（L）は5段階で色分け */
+  --accent:#6b4a9e; --accent-ink:#fff; --accent-soft:#efe9f7;
+  --bg:#f6f4f9; --surface:#fff; --ink:#1f1b26; --muted:#655e70; --line:#ded8e7;
+  --l1:#1f7a4d; --l1s:#e4f4eb; --l2:#1f5aa6; --l2s:#e6eef9; --l3:#9b5d00; --l3s:#fdf1dc; --l4:#c0392b; --l4s:#fde6e3; --l5:#7a0f22; --l5s:#f6d9de;
+  --info:#2b5b9a; --info-soft:#e7eef8; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --ok:#1f7a4d; --ok-soft:#e5f4ec;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#c3a6ef; --accent-ink:#201530; --accent-soft:#2c2340;
+  --bg:#141218; --surface:#1d1a23; --ink:#efeaf5; --muted:#b0a7bd; --line:#363044;
+  --l1:#5fd39a; --l1s:#173326; --l2:#8db7f2; --l2s:#18263a; --l3:#f2b85b; --l3s:#3a2a12; --l4:#ff8a7a; --l4s:#3d1d1a; --l5:#ff6b85; --l5s:#45151f;
+  --info:#8db7f2; --info-soft:#18263a; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --ok:#5fd39a; --ok-soft:#173326;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:18px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:12px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.2)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:16px;margin:0 0 10px;line-height:1.4}
+h3{font-size:14px;margin:12px 0 6px}
+h3:first-child{margin-top:0}
+.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.lb{font-size:13px;font-weight:700;color:var(--muted);margin:0 0 6px;display:block}
+.q{margin:0 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 11px;font-size:13.5px;line-height:1.3;cursor:pointer;user-select:none;min-height:34px}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chip input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
+input[type=search],input[type=number],select{font:inherit;font-size:16px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);width:100%}
+input[type=number]{font-variant-numeric:tabular-nums;max-width:140px}
+.row2{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hidden{display:none!important}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 8px;line-height:1.5;white-space:nowrap;border:1px solid transparent}
+.b1{background:var(--l1s);color:var(--l1);border-color:var(--l1)}
+.b2{background:var(--l2s);color:var(--l2);border-color:var(--l2)}
+.b3{background:var(--l3s);color:var(--l3);border-color:var(--l3)}
+.b4{background:var(--l4s);color:var(--l4);border-color:var(--l4)}
+.b5{background:var(--l5);color:#fff;border-color:var(--l5)}
+@media (prefers-color-scheme: dark){.b5{color:#1a0b10}}
+.dl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.dl>li{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.dl>li>button.hd{all:unset;box-sizing:border-box;display:flex;gap:8px;align-items:center;justify-content:space-between;width:100%;padding:10px 12px;cursor:pointer}
+.dl>li>button.hd:focus-visible{outline:3px solid var(--info);outline-offset:-3px}
+.nm{font-weight:700;font-size:15px;line-height:1.35}
+.nm small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.bdg{display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex:none}
+.bd{padding:2px 12px 12px;border-top:1px dashed var(--line);font-size:14.5px}
+.bd h4{font-size:13px;margin:10px 0 3px;color:var(--muted)}
+.bd p{margin:0 0 4px}
+.tri{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:start;margin:4px 0}
+.tri .t{font-size:12px;font-weight:700;color:var(--muted);padding-top:2px}
+.rid{font-family:var(--num);font-size:13px}
+.lnk{color:var(--accent);text-decoration:underline;cursor:pointer;background:none;border:0;font:inherit;padding:0}
+.alts{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.alts button{font:inherit;font-size:13px;border:1px solid var(--accent);color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 10px;cursor:pointer}
+.refs{font-size:12px;color:var(--muted);margin-top:8px}
+.refs a{color:inherit}
+.legend{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:12px;color:var(--muted)}
+.alert{border-radius:10px;padding:10px 12px;border:1.5px solid var(--line);font-size:14.5px;margin:0 0 8px}
+.alert b{display:block;margin-bottom:2px}
+.alert.crit{background:var(--crit-soft);border-color:var(--crit)}
+.alert.warn{background:var(--warn-soft);border-color:var(--warn)}
+.alert.info{background:var(--info-soft);border-color:var(--info)}
+.alert.ok{background:var(--ok-soft);border-color:var(--ok)}
+.alert ul{margin:4px 0 0;padding-left:1.2em}
+.medlist{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.medlist button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 10px;cursor:pointer}
+.medlist button::after{content:" ×";color:var(--muted)}
+.sugg{list-style:none;margin:4px 0 0;padding:0;border:1px solid var(--line);border-radius:9px;max-height:260px;overflow:auto;background:var(--surface)}
+.sugg li button{all:unset;box-sizing:border-box;display:flex;justify-content:space-between;gap:8px;width:100%;padding:9px 11px;cursor:pointer;border-bottom:1px solid var(--line);font-size:14.5px}
+.sugg li:last-child button{border-bottom:0}
+.sugg li button:hover,.sugg li button:focus-visible{background:var(--accent-soft)}
+.res{display:flex;flex-direction:column;gap:8px}
+.rc{border-left:5px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 11px;font-size:14.5px}
+.rc.v1{border-left-color:var(--l1)}.rc.v2{border-left-color:var(--l2)}.rc.v3{border-left-color:var(--l3)}.rc.v4{border-left-color:var(--l4)}.rc.v5{border-left-color:var(--l5)}
+.rc .h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:3px}
+.rc .h b{font-size:15px}
+table.tb{width:100%;border-collapse:collapse;font-size:13.5px}
+table.tb th,table.tb td{border-bottom:1px solid var(--line);padding:6px 5px;text-align:left;vertical-align:top}
+table.tb th{font-size:12px;color:var(--muted);font-weight:700;background:var(--bg)}
+.tbw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+ul.pl{margin:4px 0 0;padding-left:1.15em}
+ul.pl li{margin:2px 0}
+details.dz{border:1px solid var(--line);border-radius:10px;background:var(--surface);margin:0}
+details.dz>summary{cursor:pointer;padding:11px 12px;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.dz>summary::-webkit-details-marker{display:none}
+details.dz>summary::after{content:"＋";color:var(--muted)}
+details.dz[open]>summary::after{content:"－"}
+details.dz .in{padding:0 12px 12px;font-size:14.5px}
+details.dz .in h4{font-size:13px;color:var(--accent);margin:10px 0 2px}
+.drow{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.drow .k{font-size:12px;font-weight:700;color:var(--muted);width:100%}
+.dbtn{font:inherit;font-size:13px;border-radius:999px;padding:3px 10px;cursor:pointer;border:1px solid}
+.cnt{font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1}
+.note{font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);margin-top:10px;padding-top:8px}
+@media (max-width:420px){nav.tabs button{font-size:11px}}
+@media print{header.top{position:static}nav.tabs{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>妊娠・授乳と神経疾患薬ナビ</h1>
+    <small>脳神経内科の薬の妊娠・授乳の扱い／2026年11月時点</small>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="drug">薬を<br>調べる</button>
+    <button role="tab" data-tab="pt">患者で<br>考える</button>
+    <button role="tab" data-tab="dz">疾患別</button>
+    <button role="tab" data-tab="pre">妊娠前<br>・避妊</button>
+    <button role="tab" data-tab="ex">検査・<br>分娩・児</button>
+    <button role="tab" data-tab="lac">授乳</button>
+    <button role="tab" data-tab="ref">根拠</button>
+  </nav>
+</header>
+<main>
+
+<!-- 薬を調べる -->
+<div id="t-drug" class="tabp">
+  <section class="card">
+    <input type="search" id="q" placeholder="薬の名前（一般名・商品名・英名）で検索" autocomplete="off" aria-label="薬の検索">
+    <div class="q" style="margin-top:10px"><span class="lb">分類</span><div class="chips" id="cats"></div></div>
+    <div class="q" style="margin:0"><span class="lb">しぼり込み</span><div class="chips" id="flt"></div></div>
+    <div class="legend" style="margin-top:10px" id="legend"></div>
+  </section>
+  <div class="cnt" id="cnt"></div>
+  <ul class="dl" id="dlist"></ul>
+</div>
+
+<!-- 患者で考える -->
+<div id="t-pt" class="tabp hidden">
+  <section class="card">
+    <h2>1. いまの段階</h2>
+    <div class="chips" id="stages"></div>
+    <div id="gaBox" class="row2 hidden" style="margin-top:10px">
+      <label for="ga" class="lb" style="margin:0">妊娠週数</label>
+      <input type="number" id="ga" min="0" max="42" step="1" inputmode="numeric" placeholder="週">
+      <span id="triLbl" class="cnt"></span>
+    </div>
+    <div id="lacBox" class="row2 hidden" style="margin-top:10px">
+      <span class="lb" style="margin:0">児</span>
+      <div class="chips" id="infant"></div>
+    </div>
+  </section>
+  <section class="card">
+    <h2>2. 疾患（複数可）</h2>
+    <div class="chips" id="ptdz"></div>
+  </section>
+  <section class="card">
+    <h2>3. 使っている薬・使いたい薬</h2>
+    <input type="search" id="mq" placeholder="薬の名前を入れて候補から追加" autocomplete="off" aria-label="薬を追加">
+    <ul class="sugg hidden" id="msugg"></ul>
+    <div class="medlist" id="meds"></div>
+    <p class="hint">患者の氏名などの個人情報は入れないでください。入力はこの端末内にだけ保存されます。</p>
+  </section>
+  <section class="card" id="ptOut"></section>
+</div>
+
+<!-- 疾患別 -->
+<div id="t-dz" class="tabp hidden">
+  <section class="card"><p class="hint" style="margin:0">疾患ごとに、妊娠前・妊娠中・分娩・産後授乳の要点と薬の選び方をまとめています。薬の名前を押すと詳細を開きます。</p></section>
+  <div id="dzlist" style="display:flex;flex-direction:column;gap:8px"></div>
+</div>
+
+<!-- 妊娠前・避妊 -->
+<div id="t-pre" class="tabp hidden"></div>
+
+<!-- 検査・分娩・児 -->
+<div id="t-ex" class="tabp hidden"></div>
+
+<!-- 授乳 -->
+<div id="t-lac" class="tabp hidden"></div>
+
+<!-- 根拠 -->
+<div id="t-ref" class="tabp hidden"></div>
+
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ===== データ（2026年11月時点。数値は代表的な報告値で、最新の電子添文・文献で確認すること） =====
+ p：妊娠  1 使える／2 使用可（データ限定・条件付き）／3 慎重（利益が上回るときに）／4 避ける（切替を検討）／5 禁忌
+ l：授乳  1 授乳可／2 可（児の観察・データ限定）／3 慎重（代替を検討）／4 避ける／5 授乳不可
+ tr：三半期ごとの上書き {1:[段階,文],2:[…],3:[…]}
+ f：ind=酵素誘導（避妊薬に影響）, est=エストロゲンで濃度低下, tdm=妊娠中の血中濃度測定, cx=妊娠可能年齢で確実な避妊が必要, bcell=児のB細胞, nn=新生児の観察 */
+const CATS=[
+ ["aed","抗てんかん薬・救急"],["mig","頭痛"],["ms","MS・NMOSD"],["mg","MG・神経筋"],["imm","免疫療法（共通）"],
+ ["st","脳卒中・抗血栓"],["bp","降圧・子癇"],["pd","PD・不随意運動"],["slp","睡眠・RLS・過眠"],["pain","鎮痛・痛み"],
+ ["gi","めまい・制吐"],["psy","精神"],["inf","感染症"],["oth","その他の神経疾患"],["img","造影剤・補充"]
+];
+const PL={1:"使える",2:"使用可（データ限定）",3:"慎重",4:"避ける",5:"禁忌"};
+const LL={1:"授乳可",2:"可（児の観察）",3:"慎重",4:"避ける",5:"授乳不可"};
+const DRUGS=[
+/* ---------- 抗てんかん薬 ---------- */
+{id:"lev",c:"aed",n:"レベチラセタム",b:"イーケプラ",e:"levetiracetam LEV",p:1,l:1,rid:"3〜8%",f:["tdm"],
+ pt:"大奇形はEURAPで2.8%と非曝露と同程度。神経発達への悪影響は示されていない。妊娠中はクリアランスが上がり血中濃度が3〜6割下がるため、妊娠前の基準濃度を測っておき、三半期ごと（発作があれば随時）に確認して増量する。産後は数週かけて妊娠前の量へ戻す。",
+ lt:"乳児の血中濃度は母の約5%（MONEAD）で多くは測定限界未満。授乳可。傾眠・哺乳不良だけ観察。",
+ pre:"妊娠可能年齢の第一選択候補。最小有効量に整え、妊娠前に血中濃度の基準値を測る。葉酸0.4mg/日を開始。",
+ alt:["ltg"],r:["eurap","bjork","birn"]},
+{id:"ltg",c:"aed",n:"ラモトリギン",b:"ラミクタール",e:"lamotrigine LTG",p:1,l:2,rid:"9〜18%",f:["tdm","est"],
+ pt:"大奇形はEURAPで2.9%（325mg/日以下2.5%、超4.3%）。神経発達への悪影響はない（NEAD・北欧・米国研究）。妊娠中はグルクロン酸抱合が亢進し血中濃度が半分以下になりうる→発作増悪の主因。毎月の血中濃度で増量する。産後は2〜3週で妊娠前の量へ減らす（めまい・複視・失調に注意）。",
+ lt:"乳児血中濃度は母の約3割（MONEAD中央値28.9%）。授乳可とされるが、発疹・傾眠・哺乳不良・まれに無呼吸を観察。母の減量が遅れると児の濃度も上がる。",
+ pre:"第一選択候補。全般てんかんではバルプロ酸からの切替先になる（ミオクロニーは悪化することがある）。",
+ ct:"エストロゲン含有の経口避妊薬でLTG濃度が約半分に下がり、休薬週に上がる。開始・中止時は濃度を確認。",
+ alt:["lev"],r:["eurap","nead","hd24","birn"]},
+{id:"vpa",c:"aed",n:"バルプロ酸",b:"デパケン、セレニカR",e:"valproate VPA",p:4,l:1,rid:"1〜6%",f:["cx","nn"],
+ pt:"最も催奇形性が高い。EURAPで10.3%、用量依存（650mg/日以下6.3%、650〜1450mg 11.3%、1450mg超 25.2%）。神経管閉鎖不全・心奇形・尿道下裂・口唇口蓋裂。妊娠中の曝露でIQが7〜10点低く（NEAD）、自閉スペクトラム症が約3倍（デンマーク）。神経発達への影響は時期を問わない。妊娠中に判明した場合も急な中止で重積を起こさないよう、専門医と相談して切替を急ぐ。",
+ lt:"乳汁移行は少なく授乳可。まれに児の血小板減少・肝障害の報告があり、黄疸・出血斑に注意。",
+ jp:"片頭痛発作の発症抑制には妊婦禁忌。てんかん・躁病でも他剤で代えられないときに限る。",
+ pre:"妊娠可能年齢では原則選ばない。服用中なら妊娠前にLEV・LTGなどへ切り替える。どうしても続ける場合は最小量（目安500〜600mg/日以下）を徐放剤で分割し、葉酸を併用。",
+ ct:"確実な避妊（IUD・IUS など）を説明・記録する。男性も、EMAは2024年に父親の服用で児の神経発達障害がわずかに増える可能性を示し、避妊を勧めている。",
+ nn:"新生児の離脱症状・低血糖・血小板減少",
+ alt:["lev","ltg"],r:["eurap","nead","chr13","bjork","hd24"]},
+{id:"cbz",c:"aed",n:"カルバマゼピン",b:"テグレトール",e:"carbamazepine CBZ",p:3,l:2,rid:"4〜6%",f:["ind","nn"],
+ pt:"大奇形はEURAPで5.5%、700mg/日超で増える（神経管閉鎖不全・口唇口蓋裂）。神経発達への影響は明らかでない。焦点てんかんでコントロール良好なら最小量で継続も選択肢。",
+ lt:"授乳可とされる。まれに児の胆汁うっ滞・傾眠。",
+ pre:"切替が可能ならLTG・LEVを検討。継続するなら最小量に。",
+ ct:"酵素誘導：低用量ピル・プロゲスチン単剤・インプラントの効果が落ちる。銅付加IUD・LNG-IUS（ミレーナ）を勧める。緊急避妊はレボノルゲストレル倍量（3mg）か銅付加IUD。",
+ nn:"ビタミンK欠乏性出血（新生児のビタミンK投与を確実に）",alt:["ltg","lev","oxc"],r:["eurap"]},
+{id:"oxc",c:"aed",n:"オクスカルバゼピン",b:"オクノベル",e:"oxcarbazepine OXC",p:2,l:2,rid:"1〜2%",f:["ind","tdm"],
+ pt:"大奇形はEURAPで3.0%（333例）とLTG・LEVに近い。妊娠中は活性代謝物（MHD）の濃度が下がる。",
+ lt:"乳児の血中濃度は母の約0.3%（MONEAD）。授乳可。",
+ ct:"用量依存で酵素誘導があり、ホルモン避妊薬の効果が落ちる。",alt:["ltg","lev"],r:["eurap","birn"]},
+{id:"pht",c:"aed",n:"フェニトイン",b:"アレビアチン、ヒダントール",e:"phenytoin PHT",p:3,l:2,rid:"1〜8%",f:["ind","tdm","nn"],
+ pt:"大奇形はEURAPで6.4%（少数例）。胎児ヒダントイン症候群。妊娠中は遊離型が増えるため、総濃度だけで増量しない（アルブミン補正・遊離濃度）。",
+ lt:"授乳可とされる。児の傾眠・哺乳不良を観察。",
+ ct:"酵素誘導：ホルモン避妊薬の効果が落ちる。",nn:"ビタミンK欠乏性出血",alt:["lev","ltg"],r:["eurap"]},
+{id:"fos",c:"aed",n:"ホスフェニトイン（静注）",b:"ホストイン",e:"fosphenytoin",p:3,l:2,f:["ind"],
+ pt:"重積では妊娠中でも躊躇しない（母体の重積・低酸素の方が胎児に危険）。心電図・血圧を監視。妊娠20週以降・産後の痙攣はまず子癇を考え、硫酸マグネシウムを優先。",
+ lt:"授乳可とされる。",alt:["lev","mgso4"],r:["eurap"]},
+{id:"pb",c:"aed",n:"フェノバルビタール",b:"フェノバール、ノーベルバール（静注）",e:"phenobarbital PB",p:3,l:3,rid:"約24%",f:["ind","nn"],
+ pt:"大奇形はEURAPで6.5%、80mg/日超で増える。認知への影響が示唆される。重積の二次・三次治療としての短期使用は可。",
+ lt:"児で蓄積しやすく、傾眠・哺乳不良・体重増加不良がありうる。授乳するなら児の観察と必要時の血中濃度測定。",
+ ct:"酵素誘導：ホルモン避妊薬の効果が落ちる。",nn:"新生児の傾眠・離脱症状、ビタミンK欠乏性出血",alt:["lev","ltg"],r:["eurap"]},
+{id:"tpm",c:"aed",n:"トピラマート",b:"トピナ",e:"topiramate TPM",p:4,l:2,f:["cx"],
+ pt:"口唇口蓋裂が数倍（約1〜1.5%）、在胎不当過小が増える。神経発達は、北欧研究で自閉スペクトラム症・知的障害が増加（aHR 2.8・3.5）、米国研究では調整後に増加なし（HR 0.96）と結論が割れている。英国・EUは2023〜24年に妊娠可能女性への妊娠予防措置を導入。片頭痛予防目的なら妊娠前に中止。",
+ lt:"乳児の血中濃度は母の約17%（MONEAD）。授乳可。下痢・傾眠・哺乳不良を観察。",
+ pre:"妊娠を考えるなら他剤へ。てんかんで代替が難しい場合は最小量で。",
+ ct:"200mg/日以上でエストロゲン系避妊薬の効果が落ちる。",alt:["lev","ltg","prop"],r:["bjork","hd24","birn"]},
+{id:"zns",c:"aed",n:"ゾニサミド",b:"エクセグラン、トレリーフ（PD）",e:"zonisamide ZNS",p:3,l:3,f:[],
+ pt:"ヒトのデータが少ない（登録では大奇形率は低めだが、在胎不当過小の報告）。動物で催奇形性。国内での使用経験は比較的多い。",
+ lt:"乳児の血中濃度が比較的高い（MONEAD 乳児/母 約44%）。傾眠・哺乳不良・体重増加不良を観察。",alt:["lev","ltg"],r:["birn"]},
+{id:"lcm",c:"aed",n:"ラコサミド",b:"ビムパット",e:"lacosamide LCM",p:2,l:2,f:[],
+ pt:"妊娠登録の症例は数百例規模で、現時点で明らかな大奇形の増加は示されていない（データ限定）。PR延長に注意。",
+ lt:"データ限定。乳汁移行は中等度とされ、児の傾眠を観察。",alt:["lev","ltg"],r:["lactmed"]},
+{id:"brv",c:"aed",n:"ブリーバラセタム",b:"ブリィビアクト",e:"brivaracetam BRV",p:3,l:2,f:[],
+ pt:"ヒトのデータが乏しい。LEVで足りるならLEVを優先。",lt:"データなし（LEVに準じると推定）。児の傾眠を観察。",alt:["lev"],r:["lactmed"]},
+{id:"per",c:"aed",n:"ペランパネル",b:"フィコンパ",e:"perampanel PER",p:3,l:3,f:["ind"],
+ pt:"ヒトのデータが乏しい。半減期が長い（約105時間）。",lt:"データなし。半減期が長く蓄積の可能性。児の傾眠を観察。",
+ ct:"12mg/日でレボノルゲストレルの効果が落ちる。",alt:["lev","ltg"],r:["lactmed"]},
+{id:"clb",c:"aed",n:"クロバザム",b:"マイスタン",e:"clobazam",p:3,l:3,f:["nn"],
+ pt:"ベンゾジアゼピン系。第1三半期の曝露で大奇形の明らかな増加はないとする報告が多い。妊娠後期の連用で新生児の筋緊張低下（floppy infant）・離脱症状。",
+ lt:"傾眠・無呼吸・哺乳不良に注意。単回や短期は可。",nn:"筋緊張低下・呼吸抑制・離脱症状",alt:["lev"],r:["lactmed"]},
+{id:"czp",c:"aed",n:"クロナゼパム",b:"リボトリール、ランドセン",e:"clonazepam",p:3,l:3,rid:"約3%",f:["nn"],
+ pt:"ベンゾジアゼピン系。RLSでは第2・第3三半期の低用量（0.25〜1mg就寝前）を考慮しうる（IRLSSG）。後期連用で新生児の筋緊張低下・離脱。",
+ lt:"半減期が長い。児の傾眠・無呼吸の報告。少量なら観察しつつ可。",nn:"筋緊張低下・呼吸抑制・離脱症状",r:["picch","lactmed"]},
+{id:"esm",c:"aed",n:"エトスクシミド",b:"ザロンチン、エピレオプチマル",e:"ethosuximide",p:3,l:3,rid:"30%超",f:[],
+ pt:"データが少ない。欠神発作で必要なら継続。",lt:"乳児濃度が高くなりうる（相対乳児用量30%超）。傾眠・哺乳不良を観察。",r:["lactmed"]},
+{id:"gbp",c:"aed",n:"ガバペンチン",b:"ガバペン",e:"gabapentin",p:2,l:1,rid:"1〜7%",f:[],
+ pt:"データは限られるが明らかな大奇形の増加は示されていない。RLS・痛み目的なら必要性を見直す。",lt:"授乳可（相対乳児用量1〜7%）。",r:["bjork","lactmed"]},
+{id:"dzp",c:"aed",n:"ジアゼパム",b:"セルシン・ホリゾン（静注）、ダイアップ（坐剤）",e:"diazepam",p:2,l:3,f:["nn"],
+ pt:"重積・群発発作の救急使用はためらわない。連用は妊娠後期の新生児抑制・離脱の原因になる。",
+ lt:"単回は可。連用は活性代謝物が長く残り児の傾眠につながる。",nn:"筋緊張低下・呼吸抑制（分娩前の投与時）",alt:["lzp","mdz"],r:["lactmed"]},
+{id:"lzp",c:"aed",n:"ロラゼパム（静注）",b:"ロラピタ",e:"lorazepam",p:2,l:1,f:[],
+ pt:"重積の第一選択として妊娠中も使う。",lt:"単回・短期は授乳可。",r:["lactmed"]},
+{id:"mdz",c:"aed",n:"ミダゾラム",b:"ミダフレッサ（静注）、ブコラム（口腔用）",e:"midazolam",p:2,l:1,f:[],
+ pt:"重積の救急使用は可。",lt:"半減期が短く、単回投与後は授乳可。",r:["lactmed"]},
+{id:"acz",c:"oth",n:"アセタゾラミド",b:"ダイアモックス",e:"acetazolamide",p:3,l:1,f:[],
+ tr:{1:[3,"動物で四肢の奇形。第1三半期は可能なら避ける（IIHの報告ではヒトで明らかな増加なし）。"],2:[2,"IIHで視力が危ないときは使用可。"],3:[2,"使用可。電解質に注意。"]},
+ pt:"IIH（特発性頭蓋内圧亢進症）・周期性麻痺などで使用。",lt:"乳汁移行が少なく授乳可。",r:["lactmed"]},
+
+/* ---------- 頭痛 ---------- */
+{id:"apap",c:"mig",n:"アセトアミノフェン",b:"カロナール",e:"acetaminophen paracetamol",p:1,l:1,f:[],
+ pt:"妊娠の全期間で鎮痛の第一選択。長期・頻回使用と神経発達の関連を示す観察研究はあるが因果は確立していない（日本産科婦人科学会も2025年に関連を示す根拠はないと表明）。必要量を必要な期間だけ使う。",
+ lt:"授乳可（乳児用量より少ない）。",r:["amund","lactmed"]},
+{id:"ibu",w20:1,c:"mig",n:"イブプロフェン",b:"ブルフェン",e:"ibuprofen NSAID",p:3,l:1,rid:"0.4%以下",f:[],
+ tr:{1:[2,"必要時の短期使用は可（流産との関連を示す報告があり常用は避ける）。"],2:[3,"妊娠20週以降は胎児の腎機能低下による羊水過少・動脈管収縮のおそれ。使うなら最小量・短期で、羊水量・動脈管を確認（2024年の添付文書改訂）。"],3:[5,"妊娠後期は禁忌（動脈管早期閉鎖）。"]},
+ pt:"片頭痛の急性期薬（アセトアミノフェンが効かないとき）。",lt:"授乳中のNSAIDの第一選択（移行がごく少ない）。",r:["amund","lactmed"]},
+{id:"lox",w20:1,c:"mig",n:"ロキソプロフェン",b:"ロキソニン",e:"loxoprofen NSAID",p:3,l:1,f:[],
+ tr:{1:[2,"必要時の短期使用は可。"],2:[3,"妊娠20週以降は羊水過少・動脈管収縮のおそれ。最小量・短期で。"],3:[5,"妊娠後期は禁忌。"]},
+ pt:"NSAIDに共通の注意（イブプロフェン参照）。",lt:"半減期が短く授乳可。",r:["lactmed"]},
+{id:"nap",w20:1,c:"mig",n:"ナプロキセン",b:"ナイキサン",e:"naproxen NSAID",p:3,l:2,f:[],
+ tr:{1:[2,"必要時の短期使用は可。"],2:[3,"妊娠20週以降は羊水過少・動脈管収縮のおそれ。"],3:[5,"妊娠後期は禁忌。"]},
+ pt:"NSAIDに共通の注意。",lt:"半減期が長い。短期は可、長期はイブプロフェンを優先。",alt:["ibu"],r:["lactmed"]},
+{id:"suma",c:"mig",n:"スマトリプタン",b:"イミグラン（錠・点鼻・注射・キット）",e:"sumatriptan triptan",p:2,l:1,rid:"約3.5%",f:[],
+ pt:"トリプタンで最もデータが多い。妊娠登録・メタ解析で大奇形の増加なし。アセトアミノフェンで不十分な片頭痛・群発頭痛に使用可。",
+ lt:"授乳可（経口の生体利用率が低い）。通常は授乳間隔の調整は不要。",r:["amund","lactmed"]},
+{id:"ele",c:"mig",n:"エレトリプタン",b:"レルパックス",e:"eletriptan triptan",p:2,l:1,f:[],
+ pt:"データはスマトリプタンより少ないが、大奇形の増加は報告されていない。",lt:"乳汁移行がきわめて少ない。授乳可。",r:["amund","lactmed"]},
+{id:"riz",c:"mig",n:"リザトリプタン",b:"マクサルト",e:"rizatriptan triptan",p:2,l:2,f:[],pt:"データは限定的だが大奇形の増加は報告されていない。",lt:"データ限定。スマトリプタン・エレトリプタンを優先。",alt:["suma","ele"],r:["amund"]},
+{id:"zol",c:"mig",n:"ゾルミトリプタン",b:"ゾーミッグ",e:"zolmitriptan triptan",p:2,l:2,f:[],pt:"データは限定的。",lt:"データ限定。",alt:["suma","ele"],r:["amund"]},
+{id:"nar",c:"mig",n:"ナラトリプタン",b:"アマージ",e:"naratriptan triptan",p:2,l:2,f:[],pt:"データは限定的。",lt:"データ限定。",alt:["suma","ele"],r:["amund"]},
+{id:"lasm",c:"mig",n:"ラスミジタン",b:"レイボー",e:"lasmiditan",p:3,l:3,f:[],pt:"ヒトのデータがない。妊娠中は他剤を優先。",lt:"データなし。他剤を優先。",alt:["apap","suma"],r:["lactmed"]},
+{id:"erg",c:"mig",n:"エルゴタミン",b:"クリアミン",e:"ergotamine",p:5,l:5,f:[],
+ pt:"子宮収縮・血管収縮作用。妊婦禁忌。",lt:"乳汁分泌を抑え、児の嘔吐・下痢・痙攣の報告。授乳中は使わない。",alt:["apap","suma"],r:["amund"]},
+{id:"mcp",c:"gi",n:"メトクロプラミド",b:"プリンペラン",e:"metoclopramide",p:1,l:1,f:[],
+ pt:"大規模研究で大奇形の増加なし。悪心を伴う片頭痛発作・妊娠悪阻に使用可。錐体外路症状に注意。",lt:"授乳可（乳汁分泌が増えることがある）。",r:["amund","lactmed"]},
+{id:"dom",c:"gi",n:"ドンペリドン",b:"ナウゼリン",e:"domperidone",p:4,l:1,f:[],
+ jp:"国内添付文書は妊婦禁忌。",
+ pt:"国内の妊娠と薬情報センターの解析では大奇形の増加は示されておらず、知らずに服用していても過度な心配は不要。ただし妊娠中はメトクロプラミドなどを使う。",
+ lt:"授乳可（乳汁分泌を増やす目的で海外では使われる）。",alt:["mcp"],r:["ncchd","lactmed"]},
+{id:"pcz",c:"gi",n:"プロクロルペラジン",b:"ノバミン",e:"prochlorperazine",p:2,l:2,f:["nn"],pt:"古くから使われ大奇形の明らかな増加なし。後期連用で新生児の錐体外路症状。",lt:"短期は可。児の傾眠を観察。",nn:"錐体外路症状・傾眠（後期連用時）",r:["lactmed"]},
+{id:"prop",c:"mig",n:"プロプラノロール",b:"インデラル",e:"propranolol beta blocker",p:2,l:1,rid:"0.3〜0.5%",f:["nn"],
+ pt:"妊娠中に予防薬が必要な片頭痛の第一選択。胎児発育不全との関連が指摘され、分娩前後は新生児の徐脈・低血糖を観察。",
+ lt:"授乳可（移行がごく少ない）。",nn:"徐脈・低血糖",r:["amund","lactmed"]},
+{id:"meto",c:"mig",n:"メトプロロール",b:"セロケン、ロプレソール",e:"metoprolol beta blocker",p:2,l:1,f:["nn"],
+ pt:"プロプラノロールの代わりの予防薬。国内では2024年に一部β遮断薬の妊婦禁忌が削除された（各薬の電子添文で確認）。",lt:"授乳可。",nn:"徐脈・低血糖",alt:["prop"],r:["lactmed","pmda"]},
+{id:"ami",c:"mig",n:"アミトリプチリン",b:"トリプタノール",e:"amitriptyline",p:2,l:2,rid:"1〜3%",f:["nn"],
+ pt:"妊娠中の片頭痛予防の第二選択（不眠・うつの合併時に）。少量（10〜25mg）で。",lt:"可。児の傾眠を観察。",nn:"新生児の適応障害（易刺激・哺乳不良）",r:["amund","lactmed"]},
+{id:"lome",c:"mig",n:"ロメリジン",b:"ミグシス",e:"lomerizine",p:4,l:3,f:[],jp:"国内添付文書は妊婦禁忌（動物で催奇形性）。",pt:"ヒトのデータがない。妊娠を考えるなら中止し、必要ならプロプラノロールへ。",lt:"データなし。",alt:["prop"],r:["pmda"]},
+{id:"vera",c:"mig",n:"ベラパミル",b:"ワソラン",e:"verapamil",p:2,l:1,f:[],pt:"群発頭痛の予防。不整脈治療で妊娠中の使用経験がある。徐脈・低血圧・便秘に注意。",lt:"授乳可（移行が少ない）。",r:["lactmed"]},
+{id:"cand",c:"mig",n:"カンデサルタン（ARB）",b:"ブロプレス（ARB全般）",e:"candesartan ARB",p:5,l:2,f:[],
+ tr:{1:[4,"第1三半期の曝露は判明時点で中止すればよい（大奇形の増加は小さい）。"],2:[5,"第2・第3三半期は禁忌：胎児腎障害・羊水過少・頭蓋骨形成不全・新生児腎不全。"],3:[5,"禁忌。"]},
+ pt:"片頭痛予防・降圧で使う。妊娠が分かった時点で中止。",lt:"データが少ない。授乳中の降圧はエナラプリル・ニフェジピンなどを優先。",alt:["prop","nif"],r:["pmda"]},
+{id:"ere",c:"mig",n:"エレヌマブ（抗CGRP受容体抗体）",b:"アイモビーグ",e:"erenumab CGRP",p:3,l:2,f:[],
+ pt:"IgG2抗体で第2三半期以降に胎盤を通る。ヒトのデータが乏しい。妊娠を希望するなら中止（半減期約28日、5半減期で約4〜5か月）。",
+ lt:"大きな分子で乳汁移行は少なく経口吸収もほぼないと推定（初乳期は慎重に）。データ限定。",alt:["prop","ami"],r:["lactmed"]},
+{id:"gal",c:"mig",n:"ガルカネズマブ（抗CGRP抗体）",b:"エムガルティ",e:"galcanezumab CGRP",p:3,l:2,f:[],
+ pt:"ヒトのデータが乏しい。半減期約27日で、中止後約5か月で体内から消える。妊娠希望なら計画的に中止。",lt:"エレヌマブと同様（データ限定）。",alt:["prop","ami"],r:["lactmed"]},
+{id:"fre",c:"mig",n:"フレマネズマブ（抗CGRP抗体）",b:"アジョビ",e:"fremanezumab CGRP",p:3,l:2,f:[],
+ pt:"ヒトのデータが乏しい。半減期約31日で、中止後約5〜6か月。",lt:"エレヌマブと同様（データ限定）。",alt:["prop","ami"],r:["lactmed"]},
+{id:"btx",c:"mig",n:"A型ボツリヌス毒素",b:"ボトックス",e:"botulinum toxin onabotulinumtoxinA",p:2,l:2,f:[],
+ pt:"局所投与で全身移行はほとんどない。症例の蓄積では大奇形の増加なし。慢性片頭痛・痙縮・ジストニアで必要性を個別に判断。",lt:"全身移行がほとんどなく授乳可と考えられる。",r:["lactmed"]},
+
+/* ---------- MS・NMOSD ---------- */
+{id:"ifn",c:"ms",n:"インターフェロンβ",b:"アボネックス、ベタフェロン",e:"interferon beta",p:1,l:1,f:[],
+ pt:"大規模な妊娠登録で大奇形・流産の増加なし。EUでは2019年から必要なら妊娠中の継続が可能になった。",lt:"大きな分子で経口吸収もなく授乳可。",r:["dobson"]},
+{id:"ga",c:"ms",n:"グラチラマー酢酸塩",b:"コパキソン",e:"glatiramer",p:1,l:1,f:[],pt:"妊娠中の継続も可とされる。",lt:"授乳可。",r:["dobson"]},
+{id:"dmf",c:"ms",n:"フマル酸ジメチル",b:"テクフィデラ",e:"dimethyl fumarate",p:2,l:3,f:[],
+ pt:"妊娠判明時点で中止すればよい（登録で大奇形の増加なし）。",lt:"データ限定（小分子）。授乳中は抗CD20抗体・インターフェロンβなどを検討。",r:["dobson"]},
+{id:"fty",c:"ms",n:"フィンゴリモド",b:"イムセラ、ジレニア",e:"fingolimod S1P",p:5,l:4,f:["cx"],
+ jp:"国内添付文書は妊婦禁忌。",
+ pt:"心奇形などの先天異常の報告。中止後2か月は避妊。中止後に重いリバウンドが起こりうるため、妊娠希望時は抗CD20抗体・ナタリズマブへ計画的に切り替える。",
+ lt:"小分子で移行の可能性。授乳中は使わない。",pre:"妊娠希望なら中止2か月前に切替を計画（リバウンド対策）。",alt:["ofa","rtx","ntz"],r:["dobson"]},
+{id:"sip",c:"ms",n:"シポニモド",b:"メーゼント",e:"siponimod S1P",p:5,l:4,f:["cx"],pt:"動物で胚・胎児毒性。中止後10日以上の避妊（海外添付文書）。リバウンドに注意。",lt:"授乳中は使わない。",alt:["ofa"],r:["dobson"]},
+{id:"ofa",c:"ms",n:"オファツムマブ（抗CD20抗体）",b:"ケシンプタ",e:"ofatumumab anti-CD20",p:3,l:2,f:["bcell"],
+ tr:{1:[2,"第1三半期はIgG1の胎盤移行がほぼない。妊娠判明時に中止。"],2:[3,"第2・第3三半期の曝露で児のB細胞減少。必要なら出生時にB細胞を測り、生ワクチンを延期。"],3:[3,"同上。"]},
+ pt:"受胎直前までの投与を許容する見解が増えている（海外添付文書は中止後6か月の避妊）。",
+ lt:"乳汁移行はごく少なく経口吸収もほぼない。授乳中の再開を許容する見解が増えている（データ限定）。",r:["schwake","dobson"]},
+{id:"ntz",c:"ms",n:"ナタリズマブ",b:"タイサブリ",e:"natalizumab",p:3,l:2,f:[],
+ pt:"高活動例では妊娠中も継続（6週間隔へ延長し30〜34週まで）すると再発・中止後リバウンドを防げる。第3三半期の曝露で新生児の貧血・血小板減少→出生時に血算。産後は早期に再開。",
+ lt:"乳汁移行は少ない。授乳中の再開を許容する報告がある。",nn:"貧血・血小板減少（第3三半期曝露時）",r:["dobson"]},
+{id:"ecu",c:"ms",n:"エクリズマブ（補体C5阻害）",b:"ソリリス",e:"eculizumab complement",p:2,l:2,f:[],
+ pt:"PNH・aHUSで妊娠中の使用経験が蓄積し、胎児への移行は少ない。NMOSD・全身型MGでも必要なら継続を検討。髄膜炎菌ワクチン（4価結合型は妊娠中も接種可）。",
+ lt:"PNHの授乳例で乳汁中にほぼ検出されない。",r:["maodr","vuk"]},
+{id:"rav",c:"ms",n:"ラブリズマブ（補体C5阻害）",b:"ユルトミリス",e:"ravulizumab complement",p:3,l:2,f:[],pt:"妊娠データは限定的（エクリズマブに準じると推定）。",lt:"データ限定。",alt:["ecu"],r:["vuk"]},
+{id:"sat",c:"ms",n:"サトラリズマブ（抗IL-6受容体抗体）",b:"エンスプリング",e:"satralizumab IL-6",p:3,l:2,f:[],pt:"ヒトのデータが乏しい（同系統のトシリズマブでは大きな問題の報告なし）。",lt:"データなし。大きな分子で移行は少ないと推定。",r:["maodr","vuk"]},
+{id:"ine",c:"ms",n:"イネビリズマブ（抗CD19抗体）",b:"ユプリズナ",e:"inebilizumab CD19",p:3,l:2,f:["bcell"],pt:"妊娠中の曝露で児のB細胞減少の可能性。海外添付文書は中止後6か月の避妊。",lt:"データなし。抗CD20抗体と同様に移行は少ないと推定。",r:["maodr","vuk"]},
+{id:"rtx",c:"imm",n:"リツキシマブ（抗CD20抗体）",b:"リツキサン",e:"rituximab anti-CD20",p:2,l:2,f:["bcell"],
+ tr:{1:[2,"第1三半期は胎盤移行がほぼない。受胎直前までの投与は安全性データが蓄積。"],2:[3,"第2・第3三半期の投与は児のB細胞枯渇（多くは数か月で回復）。出生時にB細胞を測り、BCG・ロタなど生ワクチンを延期。"],3:[3,"同上。"]},
+ pt:"NMOSD（国内適応あり）・MS・自己免疫性脳炎・MGで使う。妊娠前に投与しておくと妊娠中の再発予防になる。",
+ lt:"乳汁移行はごく少なく経口吸収もほぼない。授乳可とする報告が多い。",nn:"B細胞枯渇（第2・第3三半期の曝露時）→生ワクチン延期",r:["schwake","maodr","vuk"]},
+{id:"toc",c:"imm",n:"トシリズマブ",b:"アクテムラ",e:"tocilizumab IL-6",p:3,l:2,f:[],pt:"関節リウマチ等での妊娠例で大奇形の明らかな増加なし（データ限定）。",lt:"移行は少ないと推定。",r:["vuk"]},
+
+/* ---------- MG・神経筋 ---------- */
+{id:"pyr",c:"mg",n:"ピリドスチグミン",b:"メスチノン",e:"pyridostigmine",p:1,l:1,f:[],
+ pt:"妊娠中も継続する。静注は子宮収縮を誘発しうるので避ける。",lt:"授乳可。",r:["mgc"]},
+{id:"amb",c:"mg",n:"アンベノニウム",b:"マイテラーゼ",e:"ambenonium",p:2,l:2,f:[],pt:"データは少ないがピリドスチグミンに準じる。",lt:"データ限定。",alt:["pyr"],r:["mgc"]},
+{id:"efg",c:"mg",n:"エフガルチギモド（FcRn阻害）",b:"ウィフガート",e:"efgartigimod FcRn",p:3,l:3,f:[],
+ pt:"母体のIgGを下げるため、胎児に移る感染防御抗体も減りうる。ヒトのデータが乏しく、妊娠中の増悪は原則IVIG・血漿交換で対応。",lt:"データなし。",alt:["ivig"],r:["mgc"]},
+{id:"roz",c:"mg",n:"ロザノリキシズマブ（FcRn阻害）",b:"リスティーゴ",e:"rozanolixizumab FcRn",p:3,l:3,f:[],pt:"エフガルチギモドと同様（データなし）。",lt:"データなし。",alt:["ivig"],r:["mgc"]},
+{id:"zil",c:"mg",n:"ジルコプラン（補体C5阻害）",b:"ジルビスク",e:"zilucoplan complement",p:3,l:3,f:[],pt:"ペプチド製剤。ヒトのデータなし。",lt:"データなし。",alt:["ecu"],r:["mgc"]},
+{id:"ivig",c:"imm",n:"免疫グロブリン大量静注（IVIG）",b:"献血ヴェノグロブリンIH、献血グロベニン-I など",e:"IVIG immunoglobulin",p:1,l:1,f:[],
+ pt:"妊娠中のMG増悪・GBS・CIDP・自己免疫性脳炎で使える。血栓症（妊娠で上乗せ）と容量負荷に注意。",lt:"授乳可。",r:["mgc"]},
+{id:"mex",c:"mg",n:"メキシレチン",b:"メキシチール",e:"mexiletine myotonia",p:2,l:2,f:[],pt:"不整脈で妊娠中の使用経験あり。筋強直性疾患で必要なら使用。",lt:"移行はあるが児の問題の報告は少ない。観察。",r:["lactmed"]},
+
+/* ---------- 免疫療法（共通） ---------- */
+{id:"psl",c:"imm",n:"プレドニゾロン",b:"プレドニン",e:"prednisolone steroid",p:1,l:1,rid:"2〜5%",f:[],
+ pt:"胎盤の酵素で大部分が不活化され胎児への移行は少ない。第1三半期の高用量で口唇裂がわずかに増えるとした古い報告がある（近年の研究では明らかでない）。妊娠糖尿病・高血圧・前期破水に注意。長期服用者は分娩時のステロイドカバーを考慮。",
+ lt:"授乳可。20mg/日を超える量では服用後4時間ほどあけると児の曝露が減る。",r:["mgc","dobson","lactmed"]},
+{id:"mpsl",c:"imm",n:"メチルプレドニゾロン（パルス）",b:"ソル・メドロール",e:"methylprednisolone pulse",p:2,l:2,f:[],
+ tr:{1:[3,"第1三半期は可能なら避けるか必要性を吟味（重い再発では使用）。"],2:[2,"再発時のパルス療法は可。血糖・血圧を監視。"],3:[2,"同上。"]},
+ pt:"MS・NMOSD・MGの増悪で使う。",lt:"1gパルスでも授乳継続可とする見解が多い。気になる場合は投与後2〜8時間あける。",r:["dobson","lactmed"]},
+{id:"dex",c:"imm",n:"デキサメタゾン・ベタメタゾン",b:"デカドロン、リンデロン",e:"dexamethasone betamethasone",p:3,l:2,f:[],
+ pt:"胎盤をよく通る（胎児肺成熟の目的では有用）。母体の神経疾患の維持療法にはプレドニゾロンを優先。細菌性髄膜炎のデキサメタゾンは妊娠中も使う。",lt:"短期は可。",alt:["psl"],r:["lactmed"]},
+{id:"aza",c:"imm",n:"アザチオプリン",b:"イムラン、アザニン",e:"azathioprine",p:2,l:1,rid:"1%未満",f:[],
+ jp:"2018年に国内の妊婦禁忌が削除された。",
+ pt:"移植・IBD・SLEで多数の妊娠例があり大奇形の増加なし。NMOSD・MGで妊娠中も継続できる。ミコフェノール酸からの切替先。",lt:"授乳可。",r:["mhlw","mgc","maodr"]},
+{id:"tac",c:"imm",n:"タクロリムス",b:"プログラフ",e:"tacrolimus",p:2,l:1,rid:"0.1〜0.5%",f:["tdm"],
+ jp:"2018年に国内の妊婦禁忌が削除された。",
+ pt:"移植で妊娠例が多い。妊娠糖尿病・高血圧・高カリウム血症、血中濃度の変動に注意。",lt:"授乳可。",r:["mhlw","mgc"]},
+{id:"cya",c:"imm",n:"シクロスポリン",b:"ネオーラル",e:"ciclosporin cyclosporine",p:2,l:2,f:["tdm"],jp:"2018年に国内の妊婦禁忌が削除された。",pt:"移植で妊娠例が多い。",lt:"移行は少ないが、児の血中濃度測定を勧める意見もある。",r:["mhlw","lactmed"]},
+{id:"mmf",c:"imm",n:"ミコフェノール酸モフェチル",b:"セルセプト",e:"mycophenolate MMF",p:5,l:4,f:["cx"],
+ pt:"流産と特徴的な奇形（小耳症・外耳道閉鎖・口唇口蓋裂・四肢・心臓）。妊娠の6週間以上前に中止し、アザチオプリンへ切り替える。",
+ lt:"データなし。授乳中は避ける。",ct:"服用中〜中止後6週は確実な避妊。男性は服用中〜終了後90日コンドーム。",alt:["aza"],r:["mgc"]},
+{id:"mtx",c:"imm",n:"メトトレキサート",b:"リウマトレックス",e:"methotrexate",p:5,l:4,f:["cx"],pt:"催奇形・流産。妊娠の1〜3か月前に中止し葉酸を補う。",lt:"低用量でも組織に蓄積するため原則避ける。",alt:["aza"],r:["mgc"]},
+{id:"cpa",c:"imm",n:"シクロホスファミド",b:"エンドキサン",e:"cyclophosphamide",p:5,l:5,f:["cx"],
+ tr:{1:[5,"催奇形性。"],2:[4,"母体の生命に関わる場合に限り使用例がある。"],3:[4,"同上。"]},pt:"重症の自己免疫疾患で検討されることがある。",lt:"授乳不可。",r:["lactmed"]},
+
+/* ---------- 脳卒中・抗血栓 ---------- */
+{id:"asa",c:"st",n:"低用量アスピリン",b:"バイアスピリン",e:"aspirin low dose",p:1,l:1,f:[],
+ tr:{1:[1,"使える。"],2:[1,"使える。子癇前症の高リスク妊婦では予防投与が国際的に推奨。"],3:[3,"国内添付文書では出産予定日12週以内の妊婦は禁忌。海外では36週前後まで続けるのが一般的。産科と方針を決める。"]},
+ pt:"脳梗塞の二次予防で妊娠中の抗血小板薬の第一選択。",lt:"低用量は授乳可。",r:["aha26","lactmed"]},
+{id:"clo",c:"st",n:"クロピドグレル",b:"プラビックス",e:"clopidogrel",p:3,l:3,f:[],pt:"ヒトのデータは症例報告レベル。必要時（ステント留置後など）は使用。区域麻酔・分娩の7日前に中止を検討。",lt:"データなし。可能ならアスピリン単剤。",alt:["asa"],r:["aha26"]},
+{id:"pra",c:"st",n:"プラスグレル",b:"エフィエント",e:"prasugrel",p:3,l:3,f:[],pt:"データがほとんどない。",lt:"データなし。",alt:["asa"],r:["aha26"]},
+{id:"tica",c:"st",n:"チカグレロル",b:"ブリリンタ",e:"ticagrelor",p:3,l:3,f:[],pt:"データがほとんどない。",lt:"データなし。",alt:["asa"],r:["aha26"]},
+{id:"cil",c:"st",n:"シロスタゾール",b:"プレタール",e:"cilostazol",p:4,l:4,f:[],jp:"国内添付文書は妊婦禁忌（動物で催奇形性・胎児毒性）。",pt:"妊娠を考えるならアスピリンへ。",lt:"データなし。",alt:["asa"],r:["pmda"]},
+{id:"ufh",c:"st",n:"ヘパリン（未分画）",b:"ヘパリンNa、ヘパリンCa（皮下注）",e:"heparin unfractionated",p:1,l:1,f:[],
+ pt:"胎盤を通らない。妊娠中の抗凝固の基本。国内では皮下注の在宅自己注射が保険で使える。HIT・骨粗鬆症に注意。区域麻酔は予防量で投与後4〜6時間、治療量ではAPTT確認後。",lt:"授乳可（経口吸収されない）。",r:["aha26"]},
+{id:"enox",c:"st",n:"低分子ヘパリン（エノキサパリン）",b:"クレキサン",e:"enoxaparin LMWH",p:1,l:1,f:[],
+ pt:"胎盤を通らない。国際的には妊娠中の脳静脈血栓症・VTEの第一選択（国内の適応は限られる）。区域麻酔は予防量で12時間、治療量で24時間あける。",lt:"授乳可。",r:["aha26"]},
+{id:"war",c:"st",n:"ワルファリン",b:"ワーファリン",e:"warfarin",p:5,l:1,f:["cx"],
+ tr:{1:[5,"妊娠6〜12週の曝露でワルファリン胎芽病（鼻骨低形成・点状軟骨異形成）。妊娠が分かったらすぐヘパリンへ。"],2:[4,"中枢神経の異常・胎児出血。"],3:[4,"胎児の頭蓋内出血。分娩前は必ずヘパリンへ。"]},
+ pt:"機械弁の妊婦は循環器内科と個別に方針を決める。",lt:"乳汁にほとんど移らず授乳可。産後の抗凝固の選択肢。",alt:["ufh","enox"],r:["aha26","lactmed"]},
+{id:"doac",c:"st",n:"DOAC（ダビガトラン・リバーロキサバン・アピキサバン・エドキサバン）",b:"プラザキサ、イグザレルト、エリキュース、リクシアナ",e:"DOAC dabigatran rivaroxaban apixaban edoxaban",p:4,l:4,f:["cx"],
+ pt:"胎盤を通る。ヒトのデータが少なく妊娠中は避ける。妊娠が分かったらヘパリンへ切替（意図しない第1三半期の曝露で大奇形の明らかな増加は示されていない）。",
+ lt:"データが少なく避ける（アピキサバン・リバーロキサバンは少量の移行の報告）。授乳中はワルファリンか低分子ヘパリンへ。",alt:["ufh","enox","war"],r:["aha26"]},
+{id:"tpa",c:"st",n:"アルテプラーゼ（rt-PA）",b:"グルトパ、アクチバシン",e:"alteplase tPA thrombolysis",p:2,l:1,f:[],
+ pt:"分子量が大きく胎盤を通らない。AHA声明（2026）は、妊娠を理由に血栓溶解・血栓回収を遅らせないとした。母体側のリスクは子宮出血・胎盤早期剥離。分娩直後（とくに帝王切開後）は出血リスクが高く、大血管閉塞なら血栓回収を優先して検討。国内の適正治療指針の該当項目も確認する。",
+ lt:"半減期が短く経口吸収もない。授乳可。",r:["aha26"]},
+{id:"arg",c:"st",n:"アルガトロバン",b:"ノバスタン、スロンノン",e:"argatroban",p:3,l:3,f:[],pt:"データが乏しい（HITでの症例報告）。",lt:"データなし。",alt:["ufh"],r:["aha26"]},
+{id:"eda",c:"st",n:"エダラボン",b:"ラジカット（注・内用懸濁液）",e:"edaravone",p:3,l:3,f:[],pt:"ヒトのデータがない。脳梗塞急性期・ALSで必要性を慎重に判断。",lt:"データなし。",r:["pmda"]},
+{id:"oza",c:"st",n:"オザグレル",b:"カタクロット、キサンボン",e:"ozagrel",p:3,l:3,f:[],pt:"ヒトのデータがない。",lt:"データなし。",r:["pmda"]},
+{id:"sta",c:"st",n:"スタチン（アトルバスタチン・ロスバスタチン・プラバスタチン等）",b:"リピトール、クレストール、メバロチン 等",e:"statin atorvastatin rosuvastatin pravastatin",p:4,l:4,f:[],
+ jp:"国内添付文書は妊婦禁忌（米FDAは2021年に禁忌表示を撤廃。国内の改訂状況は最新の電子添文で確認）。",
+ pt:"脳梗塞の二次予防でも妊娠中は原則中止。知らずに服用していても大奇形の明らかな増加は示されていない。",lt:"授乳中は原則中止。",r:["pmda"]},
+{id:"eze",c:"st",n:"エゼチミブ",b:"ゼチーア",e:"ezetimibe",p:3,l:3,f:[],pt:"データが乏しい。妊娠中は中止が基本。",lt:"データなし。",r:["pmda"]},
+
+/* ---------- 降圧・子癇 ---------- */
+{id:"nica",c:"bp",n:"ニカルジピン（静注）",b:"ペルジピン注",e:"nicardipine",p:1,l:1,f:[],pt:"重症高血圧（160/110mmHg以上）・脳出血・子癇前症の降圧に国内で広く使う。反射性頻脈・頭痛。",lt:"授乳可（移行が少ない）。",r:["aha26"]},
+{id:"lab",c:"bp",n:"ラベタロール",b:"トランデート",e:"labetalol",p:1,l:1,f:["nn"],pt:"妊娠高血圧の経口第一選択の一つ。",lt:"授乳可。",nn:"徐脈・低血糖",r:["aha26","lactmed"]},
+{id:"mdp",c:"bp",n:"メチルドパ",b:"アルドメット",e:"methyldopa",p:1,l:1,f:[],pt:"長期の安全性データがある。眠気。",lt:"授乳可（産後うつを悪化させうる）。",r:["lactmed"]},
+{id:"nif",c:"bp",n:"ニフェジピン",b:"アダラートCR",e:"nifedipine",p:1,l:1,f:[],jp:"2022年12月に国内の妊婦禁忌が削除された。",pt:"妊娠高血圧の経口第一選択の一つ。",lt:"授乳可。",r:["pmda","lactmed"]},
+{id:"aml",c:"bp",n:"アムロジピン",b:"ノルバスク、アムロジン",e:"amlodipine",p:2,l:1,f:[],jp:"2022年12月に国内の妊婦禁忌が削除された。",pt:"ニフェジピンよりデータは少ない。",lt:"授乳可。",r:["pmda","lactmed"]},
+{id:"hyd",c:"bp",n:"ヒドララジン",b:"アプレゾリン",e:"hydralazine",p:1,l:1,f:[],pt:"妊娠中の降圧で長い使用経験。",lt:"授乳可。",r:["lactmed"]},
+{id:"acei",c:"bp",n:"ACE阻害薬（エナラプリル等）",b:"レニベース 等",e:"ACE inhibitor enalapril captopril",p:5,l:1,f:[],
+ tr:{1:[4,"判明時点で中止（第1三半期の大奇形の増加は小さい）。"],2:[5,"禁忌：胎児腎障害・羊水過少・頭蓋骨形成不全。"],3:[5,"禁忌。"]},
+ pt:"妊娠を考える降圧はニフェジピン・ラベタロールへ。",lt:"エナラプリル・カプトプリルは授乳可（産後の降圧に使える）。",alt:["nif","lab"],r:["lactmed"]},
+{id:"mgso4",c:"bp",n:"硫酸マグネシウム",b:"マグセント、マグネゾール",e:"magnesium sulfate eclampsia",p:1,l:1,f:[],
+ pt:"子癇の予防と治療の第一選択。妊娠20週以降と産後の痙攣はまず子癇を疑う。5〜7日を超える連用で胎児の骨脱灰。重症筋無力症では筋力低下・クリーゼを起こすので原則使わない。",
+ lt:"授乳可。",r:["mgc","aha26"]},
+
+/* ---------- PD・不随意運動 ---------- */
+{id:"ldc",c:"pd",n:"レボドパ・カルビドパ",b:"ネオドパストン、メネシット、デュオドーパ",e:"levodopa carbidopa",p:2,l:2,f:[],
+ pt:"PDの妊娠は少ないが、PD治療薬の中で最も経験が多い。カルビドパ配合剤を優先（ベンセラジドは動物で骨格異常）。",
+ lt:"プロラクチンを抑え乳汁分泌が減ることがある。少量の移行。授乳の報告あり。",r:["lactmed"]},
+{id:"ldb",c:"pd",n:"レボドパ・ベンセラジド",b:"マドパー、イーシー・ドパール",e:"levodopa benserazide",p:3,l:2,f:[],pt:"ベンセラジドは動物で骨格異常の報告。妊娠中はカルビドパ配合剤へ。",lt:"レボドパ・カルビドパと同様。",alt:["ldc"],r:["lactmed"]},
+{id:"prami",c:"pd",n:"プラミペキソール",b:"ビ・シフロール、ミラペックス",e:"pramipexole dopamine agonist",p:3,l:4,f:[],pt:"データが乏しい（少数例で問題の報告なし）。",lt:"プロラクチンを抑え乳汁分泌が減る。授乳中は避ける。",alt:["ldc"],r:["lactmed"]},
+{id:"ropi",c:"pd",n:"ロピニロール",b:"レキップ",e:"ropinirole dopamine agonist",p:3,l:4,f:[],pt:"データが乏しい。",lt:"乳汁分泌を抑える。授乳中は避ける。",alt:["ldc"],r:["lactmed"]},
+{id:"roti",c:"pd",n:"ロチゴチン",b:"ニュープロパッチ",e:"rotigotine dopamine agonist",p:3,l:4,f:[],pt:"データが乏しい。",lt:"乳汁分泌を抑える。授乳中は避ける。",alt:["ldc"],r:["lactmed"]},
+{id:"cab",c:"pd",n:"カベルゴリン",b:"カバサール",e:"cabergoline",p:2,l:5,f:[],pt:"プロラクチノーマでの妊娠初期の曝露データは安心材料（PDの高用量は心臓弁膜症に注意）。",lt:"乳汁分泌を止める（断乳に使う）。授乳を続けるなら使わない。",r:["lactmed"]},
+{id:"bro",c:"pd",n:"ブロモクリプチン",b:"パーロデル",e:"bromocriptine",p:2,l:5,f:[],pt:"プロラクチノーマで妊娠初期の曝露データあり。",lt:"乳汁分泌を抑える。産褥期の脳卒中・心筋梗塞の報告がある。",r:["lactmed"]},
+{id:"ama",c:"pd",n:"アマンタジン",b:"シンメトレル",e:"amantadine",p:4,l:4,f:[],pt:"心奇形の報告。妊娠中は避ける。",lt:"乳汁分泌を抑え、児の嘔吐・発疹の報告。避ける。",alt:["ldc"],r:["lactmed"]},
+{id:"maob",c:"pd",n:"MAO-B阻害薬（セレギリン・ラサギリン・サフィナミド）",b:"エフピー、アジレクト、エクフィナ",e:"MAO-B selegiline rasagiline safinamide",p:4,l:4,f:[],pt:"ヒトのデータがほとんどない。",lt:"データなし。",alt:["ldc"],r:["lactmed"]},
+{id:"comt",c:"pd",n:"COMT阻害薬（エンタカポン・オピカポン）",b:"コムタン、スタレボ、オンジェンティス",e:"COMT entacapone opicapone",p:3,l:3,f:[],pt:"データが乏しい。",lt:"データなし。",alt:["ldc"],r:["lactmed"]},
+{id:"ist",c:"pd",n:"イストラデフィリン",b:"ノウリアスト",e:"istradefylline",p:5,l:4,f:[],jp:"国内添付文書は妊婦禁忌（動物で催奇形性）。",pt:"妊娠可能年齢では避妊を確認。",lt:"データなし。",alt:["ldc"],r:["pmda"]},
+{id:"thp",c:"pd",n:"トリヘキシフェニジル",b:"アーテン",e:"trihexyphenidyl anticholinergic",p:3,l:3,f:[],pt:"データが乏しい（ジストニアで使用例）。",lt:"乳汁分泌を抑える可能性。",r:["lactmed"]},
+{id:"tbz",c:"pd",n:"テトラベナジン",b:"コレアジン",e:"tetrabenazine",p:3,l:4,f:[],pt:"データが乏しい。抑うつに注意。",lt:"データなし。",r:["lactmed"]},
+
+/* ---------- 睡眠・RLS・過眠 ---------- */
+{id:"feo",c:"slp",n:"鉄剤（経口）",b:"フェロミア、フェルム 等",e:"iron oral ferrous",p:1,l:1,f:[],pt:"妊娠中のRLSでフェリチン75µg/L未満なら経口鉄を（IRLSSG）。",lt:"授乳可。",r:["picch"]},
+{id:"fei",c:"slp",n:"鉄剤（静注：カルボキシマルトース鉄・デルイソマルトース鉄）",b:"フェインジェクト、モノヴァー",e:"iron IV ferric carboxymaltose",p:2,l:1,f:[],
+ tr:{1:[3,"第1三半期は避ける。"],2:[2,"経口で不十分な重症RLS・鉄欠乏で使用可（低リン血症に注意）。"],3:[2,"同上。"]},pt:"",lt:"授乳可。",r:["picch"]},
+{id:"zpd",c:"slp",n:"ゾルピデム",b:"マイスリー",e:"zolpidem",p:3,l:2,rid:"0.02〜0.2%",f:["nn"],pt:"大奇形の明らかな増加はない。妊娠後期の連用で新生児の傾眠・呼吸抑制。",lt:"移行が少ない。児の傾眠を観察。",nn:"傾眠・呼吸抑制（後期連用時）",r:["lactmed"]},
+{id:"dora",c:"slp",n:"オレキシン受容体拮抗薬（スボレキサント・レンボレキサント・ダリドレキサント）",b:"ベルソムラ、デエビゴ、クービビック",e:"orexin suvorexant lemborexant daridorexant",p:3,l:3,f:[],pt:"ヒトのデータがない。",lt:"データなし。",r:["lactmed"]},
+{id:"ram",c:"slp",n:"ラメルテオン",b:"ロゼレム",e:"ramelteon",p:3,l:3,f:[],pt:"ヒトのデータがない。",lt:"データなし。",r:["lactmed"]},
+{id:"gen",c:"slp",n:"ガバペンチン エナカルビル",b:"レグナイト",e:"gabapentin enacarbil",p:3,l:3,f:[],pt:"データが乏しい。RLSではまず鉄補充・非薬物療法。",lt:"ガバペンチン本体は授乳可だがエナカルビルのデータなし。",alt:["gbp","feo"],r:["picch"]},
+{id:"mod",c:"slp",n:"モダフィニル",b:"モディオダール",e:"modafinil narcolepsy",p:4,l:3,f:["ind"],pt:"米国の妊娠登録で大奇形の増加が示唆された（2019年に注意喚起）。妊娠を考えるなら中止。",lt:"データ限定。",ct:"ホルモン避妊薬の効果を落とす（服用中〜中止後2か月）。銅付加IUD・LNG-IUSを。",r:["lactmed"]},
+{id:"mph",c:"slp",n:"メチルフェニデート",b:"リタリン、コンサータ",e:"methylphenidate",p:3,l:2,f:[],pt:"大奇形の明らかな増加なしとする研究が多い（心奇形のわずかな増加の報告）。",lt:"移行が少ない。児の不眠・哺乳不良を観察。",r:["lactmed"]},
+
+/* ---------- 鎮痛・痛み ---------- */
+{id:"pgb",c:"pain",n:"プレガバリン",b:"リリカ",e:"pregabalin",p:3,l:2,rid:"約7%",f:[],pt:"大規模研究で大奇形の有意な増加はないが、増加を示した研究もある。痛み目的なら減量・中止を検討。",lt:"児の傾眠を観察。",alt:["apap"],r:["bjork","lactmed"]},
+{id:"miro",c:"pain",n:"ミロガバリン",b:"タリージェ",e:"mirogabalin",p:3,l:3,f:[],pt:"ヒトのデータがない。",lt:"データなし。",alt:["apap","gbp"],r:["lactmed"]},
+{id:"dlx",c:"pain",n:"デュロキセチン",b:"サインバルタ",e:"duloxetine SNRI",p:3,l:2,rid:"0.1〜1%",f:["nn"],pt:"大奇形の明らかな増加なし。妊娠後期は新生児の適応障害・分娩後出血のリスクが上がる。",lt:"移行が少なく授乳可とされる。",nn:"新生児の適応障害（易刺激・哺乳不良・呼吸）",r:["lactmed"]},
+{id:"tra",c:"pain",n:"トラマドール",b:"トラマール、トラムセット",e:"tramadol opioid",p:3,l:4,f:["nn"],pt:"後期の連用で新生児の離脱症状。",lt:"超迅速代謝型（CYP2D6）の母では児の呼吸抑制の危険。米FDAは授乳中の使用を推奨しない。",nn:"離脱症状・呼吸抑制",alt:["apap"],r:["lactmed"]},
+{id:"bac",c:"oth",n:"バクロフェン",b:"リオレサール、ギャバロン（髄注）",e:"baclofen spasticity",p:3,l:2,f:["nn"],pt:"経口の高用量連用で新生児の離脱（痙攣）の報告。髄注は全身移行が少なく継続可。",lt:"経口は少量移行（観察）。髄注は授乳可。",nn:"離脱症状（経口高用量時）",r:["lactmed"]},
+{id:"tiz",c:"oth",n:"チザニジン",b:"テルネリン",e:"tizanidine",p:3,l:3,f:[],pt:"データが乏しい。",lt:"データなし。",r:["lactmed"]},
+{id:"dan",c:"oth",n:"ダントロレン",b:"ダントリウム",e:"dantrolene",p:3,l:3,f:[],pt:"データが乏しい（悪性高熱の救急使用は可）。",lt:"データ限定。",r:["lactmed"]},
+{id:"epe",c:"oth",n:"エペリゾン",b:"ミオナール",e:"eperisone",p:3,l:3,f:[],pt:"ヒトのデータがない。",lt:"データなし。",r:["pmda"]},
+
+/* ---------- めまい・制吐 ---------- */
+{id:"bet",c:"gi",n:"ベタヒスチン",b:"メリスロン",e:"betahistine",p:3,l:3,f:[],pt:"データが乏しい。",lt:"データなし。",r:["pmda"]},
+{id:"dph",c:"gi",n:"ジフェンヒドラミン・ジプロフィリン",b:"トラベルミン",e:"diphenhydramine antihistamine",p:2,l:2,f:[],pt:"古くから使われ大奇形の明らかな増加なし。",lt:"児の傾眠・乳汁分泌の減少に注意。短期は可。",r:["lactmed"]},
+{id:"ond",c:"gi",n:"オンダンセトロン",b:"ゾフラン",e:"ondansetron",p:2,l:1,f:[],
+ tr:{1:[3,"口唇口蓋裂のわずかな増加を示す研究がある（絶対リスクは小さい）。"],2:[2,"使用可。"],3:[2,"使用可。"]},pt:"",lt:"授乳可。",r:["lactmed"]},
+{id:"dif",c:"gi",n:"ジフェニドール",b:"セファドール",e:"difenidol",p:3,l:3,f:[],pt:"データが乏しい。",lt:"データなし。",r:["pmda"]},
+
+/* ---------- 精神 ---------- */
+{id:"ser",c:"psy",n:"セルトラリン",b:"ジェイゾロフト",e:"sertraline SSRI",p:2,l:1,rid:"0.4〜2%",f:["nn"],pt:"SSRIの中でデータが多い。後期の曝露で新生児の適応障害、まれに新生児遷延性肺高血圧。",lt:"授乳中のSSRIの第一選択（移行がごく少ない）。",nn:"新生児の適応障害、まれに遷延性肺高血圧",r:["lactmed"]},
+{id:"esc",c:"psy",n:"エスシタロプラム",b:"レクサプロ",e:"escitalopram SSRI",p:2,l:2,rid:"5〜8%",f:["nn"],pt:"セルトラリンに準じる。",lt:"可。児の傾眠を観察。",nn:"新生児の適応障害",r:["lactmed"]},
+{id:"par",c:"psy",n:"パロキセチン",b:"パキシル",e:"paroxetine SSRI",p:3,l:1,f:["nn"],pt:"第1三半期の曝露で心奇形の増加を示す報告。妊娠を計画するなら他剤へ（急な中止は避ける）。",lt:"移行が少なく授乳可。",nn:"新生児の適応障害",alt:["ser"],r:["lactmed"]},
+{id:"mir",c:"psy",n:"ミルタザピン",b:"リフレックス、レメロン",e:"mirtazapine",p:2,l:2,f:["nn"],pt:"大奇形の明らかな増加なし。悪阻・不眠に使われることもある。",lt:"可。児の傾眠を観察。",nn:"新生児の適応障害",r:["lactmed"]},
+{id:"li",c:"psy",n:"炭酸リチウム",b:"リーマス",e:"lithium",p:3,l:3,f:["tdm","nn"],
+ jp:"2026年6月に国内の妊婦禁忌の削除が指示された（「治療上やむを得ない場合を除き投与しない」）。",
+ pt:"エブスタイン奇形など心奇形の相対リスクが上がる（絶対リスクは小さい）。妊娠中は腎クリアランス上昇で濃度が下がり、分娩時に急上昇する→分娩前後は減量・濃度測定。群発頭痛の予防にも使う。",
+ lt:"相対乳児用量0〜30%と幅がある。授乳するなら児の血中濃度・甲状腺・腎機能を確認できる体制で。",nn:"筋緊張低下・甲状腺機能低下・腎性尿崩症",r:["lactmed","pmda"]},
+
+/* ---------- 感染症 ---------- */
+{id:"acv",c:"inf",n:"アシクロビル",b:"ゾビラックス",e:"acyclovir aciclovir",p:1,l:1,f:[],pt:"HSV脳炎では妊娠中も通常量。大奇形の増加なし。",lt:"授乳可。",r:["lactmed"]},
+{id:"vacv",c:"inf",n:"バラシクロビル",b:"バルトレックス",e:"valacyclovir",p:1,l:1,f:[],pt:"顔面神経麻痺（ハント症候群）・帯状疱疹で使用可。",lt:"授乳可。",r:["lactmed"]},
+{id:"abpc",c:"inf",n:"アンピシリン",b:"ビクシリン",e:"ampicillin listeria",p:1,l:1,f:[],pt:"妊婦の細菌性髄膜炎の経験的治療ではリステリアに備えて加える。",lt:"授乳可。",r:["lactmed"]},
+{id:"ctrx",c:"inf",n:"セフトリアキソン",b:"ロセフィン",e:"ceftriaxone",p:1,l:1,f:[],pt:"髄膜炎の経験的治療に使用可。",lt:"授乳可。",r:["lactmed"]},
+{id:"vcm",c:"inf",n:"バンコマイシン（静注）",b:"塩酸バンコマイシン",e:"vancomycin",p:2,l:1,f:["tdm"],pt:"髄膜炎の経験的治療で使用可。腎毒性・耳毒性に注意し濃度測定。",lt:"経口吸収されず授乳可。",r:["lactmed"]},
+
+/* ---------- その他の神経疾患 ---------- */
+{id:"ril",c:"oth",n:"リルゾール",b:"リルテック",e:"riluzole ALS",p:3,l:4,f:[],pt:"ヒトのデータがない（動物で毒性）。",lt:"データなし。避ける。",r:["pmda"]},
+{id:"nus",c:"oth",n:"ヌシネルセン",b:"スピンラザ（髄注）",e:"nusinersen SMA",p:3,l:3,f:[],pt:"データが乏しい。",lt:"データなし。",r:["pmda"]},
+{id:"ris",c:"oth",n:"リスジプラム",b:"エブリスディ",e:"risdiplam SMA",p:5,l:4,f:["cx"],pt:"動物で催奇形性。",ct:"服用中〜終了後1か月は避妊。男性は終了後4か月まで避妊（精子への影響）。",lt:"授乳中は使わない。",r:["pmda"]},
+{id:"taf",c:"oth",n:"タファミジス",b:"ビンダケル、ビンマック",e:"tafamidis ATTR",p:4,l:4,f:["cx"],pt:"動物で毒性。服用中〜中止後1か月は避妊。",lt:"授乳中は使わない。",r:["pmda"]},
+{id:"sirna",c:"oth",n:"TTR siRNA製剤（パチシラン・ブトリシラン）",b:"オンパットロ、アムヴトラ",e:"patisiran vutrisiran ATTR",p:3,l:3,f:[],pt:"ヒトのデータがない。血清ビタミンAが下がる（胎児にはビタミンAの不足も過剰も有害）→妊娠時は中止し、ビタミンA値を確認。",lt:"データなし。",r:["pmda"]},
+{id:"dpa",c:"oth",n:"ペニシラミン",b:"メタルカプターゼ",e:"penicillamine Wilson",p:3,l:3,f:[],pt:"ウィルソン病では中止しない（肝不全の危険）。高用量で皮膚弛緩症の報告があり、妊娠中は減量（目安1g/日以下、帝王切開予定なら後期に500mg/日程度）。",lt:"データ限定。",alt:["zn"],r:["lactmed"]},
+{id:"tri",c:"oth",n:"トリエンチン",b:"メタライト",e:"trientine Wilson",p:2,l:3,f:[],pt:"ウィルソン病で妊娠中も継続（減量を検討）。",lt:"データ限定。",r:["lactmed"]},
+{id:"zn",c:"oth",n:"酢酸亜鉛",b:"ノベルジン",e:"zinc acetate Wilson",p:1,l:1,f:[],pt:"ウィルソン病の妊娠中の維持療法で使いやすい。",lt:"授乳可（児の亜鉛欠乏に注意する見解も）。",r:["lactmed"]},
+
+/* ---------- 造影剤・補充 ---------- */
+{id:"gd",c:"img",n:"ガドリニウム造影剤",b:"ガドビスト、プロハンス、マグネスコープ 等",e:"gadolinium contrast MRI",p:3,l:1,f:[],
+ pt:"必要なときだけ（妊娠中の曝露で死産・新生児死亡、リウマチ性・炎症性皮膚疾患の増加と関連：Ray 2016）。使うならマクロ環状型を最小量で。非造影MRIは第1三半期も安全。",
+ lt:"乳汁へは投与量の0.04%未満、児の経口吸収も1%未満。授乳を中断する必要はない。",r:["ray"]},
+{id:"iod",c:"img",n:"ヨード造影剤",b:"イオパミロン、オムニパーク 等",e:"iodinated contrast CT",p:2,l:1,f:[],pt:"必要なCT造影・血管撮影は行う。胎児甲状腺への影響は理論上のもの。新生児の甲状腺機能は通常の新生児スクリーニングで確認。",lt:"授乳を中断する必要はない。",r:["aha26"]},
+{id:"fa",c:"img",n:"葉酸",b:"フォリアミン 等",e:"folic acid folate",p:1,l:1,f:[],
+ pt:"妊娠1か月以上前から0.4mg/日（国内の基本量）。抗てんかん薬の服用中も0.4〜1mg/日が現実的。高用量（平均4.3mg）で児のがんが増えた北欧の報告がある（Vegrim 2022）。",
+ lt:"授乳可。",r:["vegrim","nead"]},
+{id:"vk",c:"img",n:"ビタミンK（児）",b:"ケイツーシロップ（児に投与）",e:"vitamin K newborn",p:1,l:1,f:[],pt:"酵素誘導の抗てんかん薬（CBZ・PHT・PB）を服用中の母から生まれた児は、新生児のビタミンK投与を確実に行う（国内では全新生児に投与）。",lt:"―",r:["eurap"]}
+];
+
+/* ===== 疾患別 ===== */
+const DZ=[
+{id:"epi",t:"てんかん",
+ sum:"妊娠中に発作が増えるのは約2〜3割。全身けいれんは母体外傷・胎児低酸素・SUDEPの危険があり、薬を自己中断させないことが最優先。",
+ pre:["妊娠可能年齢ではバルプロ酸を避け、LEV・LTGを軸に単剤・最小有効量へ","妊娠前に血中濃度の基準値を測る（LTG・LEV・OXC）","葉酸0.4mg/日（〜1mg/日）を妊娠1か月以上前から","酵素誘導薬・トピラマート・ペランパネル高用量ではホルモン避妊薬が効きにくい→IUD・IUS"],
+ preg:["LTG・LEVは毎月〜三半期ごとに濃度を確認し増量（とくにLTG）","睡眠不足・悪阻での飲み忘れ・嘔吐に注意","第2三半期に胎児超音波（形態）","妊娠20週以降・産後のけいれんはまず子癇（硫酸マグネシウム）。てんかん重積はロラゼパム・ジアゼパム→ホスフェニトイン・LEV"],
+ del:["多くは経腟分娩可。分娩中も内服を続ける（経口できなければ静注へ）","分娩中・産後24時間は発作が起こりやすい"],
+ post:["産後数週でLTG・LEVを妊娠前量へ減量（中毒症状に注意）","授乳は原則可。睡眠を確保できる授乳体制（夜間は家族が搾乳で）","入浴・おむつ替えは床で、抱っこ紐の使い方など児の安全指導"],
+ first:["lev","ltg"],ok:["oxc","lcm","cbz","fa"],avoid:["vpa","tpm","pb","pht"]},
+{id:"mig",t:"片頭痛",
+ sum:"妊娠中は第2三半期以降に軽くなることが多い（前兆のある片頭痛は改善しにくい）。新しい頭痛・パターンの変化は二次性頭痛（子癇前症、脳静脈血栓症、RCVS、下垂体卒中）を必ず除外。",
+ pre:["バルプロ酸・トピラマート・ロメリジン・カンデサルタン・CGRP関連抗体は妊娠前に中止（抗体は中止後約5か月）","非薬物療法（睡眠・食事・トリガー回避）"],
+ preg:["急性期：アセトアミノフェン→スマトリプタン（必要なら）。メトクロプラミドで悪心を","NSAIDは第1・第2三半期前半の短期のみ、20週以降は避け、後期は禁忌","予防が必要な重症例：プロプラノロール→アミトリプチリン少量。後頭神経ブロック（局所麻酔薬）も選択肢","前兆のある片頭痛は子癇前症・脳卒中のリスク因子。血圧を確認"],
+ del:["特別な制限なし"],
+ post:["産後1か月以内に再発しやすい","授乳中：イブプロフェン・アセトアミノフェン・スマトリプタン・エレトリプタン","産後の雷鳴頭痛・持続する頭痛はPRES・RCVS・脳静脈血栓症・硬膜穿刺後頭痛を除外"],
+ first:["apap","suma","mcp","prop"],ok:["ibu","ele","ami","btx"],avoid:["vpa","tpm","erg","cand","lome","ere","gal","fre","lasm"]},
+{id:"clu",t:"群発頭痛",
+ sum:"妊娠中のデータは少ない。酸素吸入（100%、12〜15L/分、15分）は妊娠・授乳中の第一選択。",
+ pre:["リチウム・トピラマート・バルプロ酸は計画的に中止・切替"],
+ preg:["発作時：酸素、スマトリプタン皮下注","予防：ベラパミル（心電図）、短期のプレドニゾロン、後頭神経ブロック"],
+ del:["特別な制限なし"],post:["授乳中も酸素・スマトリプタン・ベラパミル・プレドニゾロンは可"],
+ first:["suma","vera","psl"],ok:["li"],avoid:["erg","tpm","vpa"]},
+{id:"ms",t:"多発性硬化症（MS）",
+ sum:"妊娠中、とくに第3三半期は再発が減り、産後3か月に増える。妊娠しても長期の障害は悪化しない。妊娠のために疾患修飾薬の開始を遅らせない。",
+ pre:["病勢が落ち着いてから計画（目安：1年再発なし）","妊娠中も続けられる薬（インターフェロンβ・グラチラマー）か、受胎前に投与しておける薬（抗CD20抗体）を選ぶ","フィンゴリモド・シポニモドは中止2か月前に切替（リバウンド対策）","ビタミンD"],
+ preg:["再発時はメチルプレドニゾロン・パルス（第1三半期は慎重に）","高活動例はナタリズマブを30〜34週まで継続（6週間隔）","MRIは非造影で（ガドリニウムは避ける）"],
+ del:["経腟分娩・硬膜外麻酔・帝王切開とも制限なし"],
+ post:["産後早期に疾患修飾薬を再開（抗CD20抗体・ナタリズマブ・インターフェロンβ・グラチラマーは授乳と両立しうる）","産後の再発はステロイドで（授乳継続可）","授乳単独で再発予防になるとの報告もあるが、高活動例は治療再開を優先"],
+ first:["ifn","ga","ofa","rtx"],ok:["ntz","dmf","mpsl","psl"],avoid:["fty","sip","mmf","mtx"]},
+{id:"nmo",t:"NMOSD・MOGAD",
+ sum:"MSと違い妊娠中・産後に再発が増え、流産・子癇前症も増えるとされる。治療は妊娠中も継続するのが原則。",
+ pre:["病勢が落ち着いてから計画","アザチオプリン・プレドニゾロン・タクロリムスは継続可。ミコフェノール酸・メトトレキサートは中止して切替","リツキシマブ（国内適応あり）は受胎前に投与しておく","補体阻害薬は髄膜炎菌ワクチンを妊娠前に"],
+ preg:["維持療法を中止しない（プレドニゾロン少量の併用も）","再発時：メチルプレドニゾロン・パルス、血漿交換、IVIG","第2・第3三半期のリツキシマブ投与は児のB細胞を確認"],
+ del:["経腟分娩・区域麻酔とも可"],
+ post:["産後3か月の再発予防を強化（ステロイドの上乗せ・治療の早期再開）","授乳中：アザチオプリン・プレドニゾロン・タクロリムス・リツキシマブは両立しうる"],
+ first:["aza","psl","rtx"],ok:["tac","ecu","sat","ine","ivig","mpsl"],avoid:["mmf","mtx","cpa"]},
+{id:"mg",t:"重症筋無力症（MG）",
+ sum:"妊娠中は不変・改善・悪化がほぼ3分の1ずつ。第1三半期と産後1か月に悪化しやすい。新生児一過性MGが10〜20%。",
+ pre:["病勢の安定（できれば寛解）後に計画。胸腺摘除は妊娠前に","ミコフェノール酸・メトトレキサートは中止（アザチオプリンへ）","補体阻害薬は髄膜炎菌ワクチン"],
+ preg:["ピリドスチグミン（経口）・プレドニゾロン・アザチオプリン・タクロリムスは継続","増悪時：IVIG・血漿交換","避ける薬：硫酸マグネシウム（子癇前症ではレベチラセタム等で代用）、アミノグリコシド、高用量β遮断薬、キノロン・マクロライド","FcRn阻害薬は妊娠中は原則使わない"],
+ del:["子宮筋は平滑筋なので第1期は影響を受けない。第2期のいきみで疲れやすい→吸引・鉗子の準備","区域麻酔（硬膜外）を勧める。全身麻酔では筋弛緩薬に注意"],
+ post:["新生児一過性MG：生後72時間（〜数日）に哺乳不良・弱い啼泣・呼吸障害。小児科と観察","抗AChR抗体高値の母では胎児の関節拘縮（胎動低下）に注意","授乳はおおむね可（ピリドスチグミン・プレドニゾロン・アザチオプリン・タクロリムス）"],
+ first:["pyr","psl","aza","ivig"],ok:["tac","cya","ecu"],avoid:["mgso4","mmf","mtx","efg","roz"]},
+{id:"gbs",t:"GBS・CIDP",
+ sum:"GBSは産後1か月にやや多い。CIDPは妊娠中・産後に再発することがある。",
+ pre:["CIDPの維持療法（IVIG・ステロイド）は継続可"],
+ preg:["治療はIVIGか血漿交換（妊娠中も可）。呼吸・自律神経を監視","下肢の静脈血栓予防にヘパリン"],
+ del:["区域麻酔は個別に判断（GBS急性期は血行動態に注意）"],post:["授乳可（IVIG・プレドニゾロン）"],
+ first:["ivig","psl","ufh"],ok:["mpsl"],avoid:[]},
+{id:"ae",t:"自己免疫性脳炎",
+ sum:"抗NMDA受容体脳炎は若年女性に多く、妊娠中の発症・卵巣奇形腫の合併がある。母体の抗体が胎盤を通り、新生児に一過性の症状が出ることがある。",
+ pre:["寛解後の妊娠計画。ミコフェノール酸は中止"],
+ preg:["第一選択：メチルプレドニゾロン・パルス、IVIG、血漿交換","第二選択：リツキシマブ（第2・第3三半期は児のB細胞を確認）。シクロホスファミドは原則避ける","卵巣奇形腫は妊娠中でも摘出を検討（産科と）"],
+ del:["精神症状・不随意運動の強い時期は全身麻酔下の帝王切開になることもある"],post:["新生児の神経症状を観察"],
+ first:["mpsl","ivig","rtx"],ok:["psl","aza"],avoid:["cpa","mmf"]},
+{id:"str",t:"脳梗塞・脳出血・脳静脈血栓症",
+ sum:"妊娠関連脳卒中は第3三半期〜産後6週（とくに産後早期）に多い。妊娠高血圧症候群が背景の約半数。妊娠を理由に急性期治療（静注血栓溶解・血栓回収）を遅らせない（AHA 2026）。",
+ pre:["脳梗塞の既往：原因に応じた二次予防を妊娠前に整える（スタチン・シロスタゾール・DOAC・ワルファリンは切替）","血栓性素因・抗リン脂質抗体症候群の評価"],
+ preg:["二次予防：低用量アスピリン（国内添付文書は出産予定日12週以内は禁忌）。抗凝固はヘパリン・低分子ヘパリン","画像：CT・CTA・非造影MRIはいずれも可。腹部を遮蔽","重症高血圧（160/110以上）はすぐ降圧：ニカルジピン静注・ラベタロール・ニフェジピン。子癇には硫酸マグネシウム","脳静脈血栓症：ヘパリン（未分画または低分子）"],
+ del:["脳卒中だけでは帝王切開の適応にならない。経腟分娩が可能なら経腟（第2期短縮を考慮）","抗凝固と区域麻酔の間隔を麻酔科と決める","未治療の脳動脈瘤・AVMは産科・脳外科と分娩方法を相談"],
+ post:["産後は降圧と血圧測定を継続（産後早期が最も危険）","産後のPRES・RCVSを念頭に","授乳中の抗凝固：ワルファリン・ヘパリンは可、DOACは避ける","脳静脈血栓症の既往では次回妊娠で低分子ヘパリン予防を検討"],
+ first:["asa","ufh","enox","nica","lab","nif","mgso4"],ok:["tpa","clo","war","hyd"],avoid:["doac","sta","cil","acei","cand"]},
+{id:"pd",t:"パーキンソン病・ジストニア",
+ sum:"若年発症PDの妊娠はまれでデータが少ない。PDの悪化は妊娠中にみられることがある。",
+ pre:["レボドパ・カルビドパを中心に整理。アマンタジン・MAO-B阻害薬・イストラデフィリンは中止","遺伝性（PRKN 等）の遺伝カウンセリング"],
+ preg:["レボドパ・カルビドパを継続（ベンセラジド配合剤から切替）","ボツリヌス毒素は局所なら使用を検討しうる"],
+ del:["特別な制限なし"],post:["ドパミンアゴニスト・アマンタジンは乳汁分泌を抑える。授乳を希望するならレボドパ中心に"],
+ first:["ldc"],ok:["btx","thp"],avoid:["ama","maob","ist","prami","ropi","roti"]},
+{id:"rls",t:"むずむず脚症候群（RLS）",
+ sum:"妊娠中に約5人に1人。第3三半期に多く、分娩後に多くは消える。まず鉄欠乏の補正。",
+ pre:["ドパミンアゴニスト・α2δリガンドは妊娠前に中止・減量"],
+ preg:["非薬物療法（運動・マッサージ・カフェイン/抗ヒスタミン薬の回避）","フェリチン75µg/L未満で経口鉄、第2三半期以降は静注鉄も","難治例（第2・第3三半期）：クロナゼパム少量、レボドパ少量、ごく難治では低用量オキシコドン（IRLSSG）"],
+ del:["特別な制限なし"],post:["授乳中はガバペンチン・鉄・低用量クロナゼパム（観察）を検討"],
+ first:["feo","fei"],ok:["czp","ldc","gbp"],avoid:["prami","ropi","roti","gen"]},
+{id:"bell",t:"顔面神経麻痺（ベル麻痺）",
+ sum:"妊娠第3三半期〜産後早期に多く、子癇前症・妊娠高血圧と関連。高度麻痺の割合が高く回復が悪い傾向。",
+ pre:[],preg:["発症72時間以内のプレドニゾロン（約1mg/kg/日、短期）は妊娠中も可。血糖・血圧を確認","重症例・ハント症候群ではバラシクロビル併用","血圧・尿蛋白を確認（子癇前症の合併）"],
+ del:["特別な制限なし"],post:["授乳可（プレドニゾロン・バラシクロビル）"],
+ first:["psl","vacv"],ok:["acv"],avoid:[]},
+{id:"iih",t:"特発性頭蓋内圧亢進症（IIH）",
+ sum:"妊娠で発症・悪化することがある。視力を守ることが目的。",
+ pre:["体重管理。トピラマートは中止"],
+ preg:["視野・乳頭浮腫を定期的に評価","アセタゾラミドは第1三半期は可能なら避け、視力が危うければ使用","視力低下が進むときは腰椎穿刺の反復、視神経鞘開窓・シャント・静脈洞ステント"],
+ del:["経腟分娩・区域麻酔とも可（帝王切開の適応にはならない）"],post:["授乳中のアセタゾラミドは可"],
+ first:["acz"],ok:["apap"],avoid:["tpm"]},
+{id:"wil",t:"ウィルソン病",
+ sum:"治療を中断すると肝不全・神経症状の悪化の危険があり、妊娠中も継続する。",
+ pre:["治療が安定してから計画"],preg:["キレート薬（ペニシラミン・トリエンチン）は減量して継続、または亜鉛へ","銅・肝機能を定期確認"],
+ del:["帝王切開では創傷治癒のため後期にキレート薬を減量"],post:["亜鉛は授乳可。キレート薬はデータ限定"],
+ first:["zn"],ok:["tri","dpa"],avoid:[]},
+{id:"nmd",t:"ALS・SMA・ATTR・筋強直性ジストロフィー",
+ sum:"妊娠のデータが少ない疾患群。呼吸機能・心機能の評価が要。",
+ pre:["リスジプラム（女性1か月・男性4か月）、タファミジス（1か月）など避妊期間を確認","筋強直性ジストロフィーは遺伝カウンセリング（先天型の可能性）"],
+ preg:["呼吸機能（%FVC）を追跡。筋強直性ジストロフィーは流早産・羊水過多・分娩停止が多い","メキシレチンは必要なら継続"],
+ del:["筋強直性ジストロフィーは麻酔薬への感受性・弛緩出血に注意。麻酔科と事前に相談"],post:["産後の呼吸・嚥下を観察"],
+ first:[],ok:["mex","nus"],avoid:["ris","taf","ril"]},
+{id:"slp",t:"ナルコレプシー・睡眠障害",
+ sum:"過眠症の薬は妊娠データが乏しい。運転・転倒・育児中の事故への配慮が要。",
+ pre:["モダフィニルは妊娠前に中止（避妊薬の効果も落とす）","計画的な仮眠"],preg:["必要ならメチルフェニデートを最小量で（データ限定）","不眠は認知行動療法が先。短期ならゾルピデム"],
+ del:["特別な制限なし"],post:["夜間授乳の分担。添い寝時の傾眠に注意"],
+ first:[],ok:["mph","zpd"],avoid:["mod","dora"]}
+];
+
+/* ===== 文献 ===== */
+const REFS={
+ eurap:{t:"Tomson T, et al. Comparative risk of major congenital malformations with eight different antiepileptic drugs: a prospective cohort study of the EURAP registry. Lancet Neurol. 2018;17:530-538.",u:"https://pubmed.ncbi.nlm.nih.gov/29680205/",k:"PMID 29680205"},
+ nead:{t:"Meador KJ, et al. Fetal antiepileptic drug exposure and cognitive outcomes at age 6 years (NEAD study): a prospective observational study. Lancet Neurol. 2013;12:244-252.",u:"https://pubmed.ncbi.nlm.nih.gov/23352199/",k:"PMID 23352199"},
+ chr13:{t:"Christensen J, et al. Prenatal valproate exposure and risk of autism spectrum disorders and childhood autism. JAMA. 2013;309:1696-1703.",u:"https://pubmed.ncbi.nlm.nih.gov/23613074/",k:"PMID 23613074"},
+ bjork:{t:"Bjørk MH, et al. Association of prenatal exposure to antiseizure medication with risk of autism and intellectual disability. JAMA Neurol. 2022;79:672-681.",u:"https://doi.org/10.1001/jamaneurol.2022.1269",k:"doi:10.1001/jamaneurol.2022.1269"},
+ hd24:{t:"Hernández-Díaz S, et al. Risk of autism after prenatal topiramate, valproate, or lamotrigine exposure. N Engl J Med. 2024;390:1069-1079.",u:"https://pubmed.ncbi.nlm.nih.gov/38507750/",k:"PMID 38507750"},
+ vegrim:{t:"Vegrim HM, et al. Cancer risk in children of mothers with epilepsy and high-dose folic acid use during pregnancy. JAMA Neurol. 2022;79(11).",u:"https://doi.org/10.1001/jamaneurol.2022.2977",k:"doi:10.1001/jamaneurol.2022.2977"},
+ birn:{t:"Birnbaum AK, et al. Antiepileptic drug exposure in infants of breastfeeding mothers with epilepsy. JAMA Neurol. 2020;77:441-450.",u:"https://pubmed.ncbi.nlm.nih.gov/31886825/",k:"PMID 31886825"},
+ dobson:{t:"Dobson R, et al. UK consensus on pregnancy in multiple sclerosis: 'Association of British Neurologists' guidelines. Pract Neurol. 2019;19:106-114.",u:"https://pubmed.ncbi.nlm.nih.gov/30612100/",k:"PMID 30612100"},
+ schwake:{t:"Schwake C, et al. Neonatal B-cell levels and infant health in newborns potentially exposed to anti-CD20 monoclonal antibodies during pregnancy or lactation. Neurol Neuroimmunol Neuroinflamm. 2024;11:e200264.",u:"https://pubmed.ncbi.nlm.nih.gov/38870458/",k:"PMID 38870458"},
+ maodr:{t:"Mao-Draayer Y, et al. Neuromyelitis optica spectrum disorders and pregnancy: therapeutic considerations. Nat Rev Neurol. 2020;16(3).",u:"https://pubmed.ncbi.nlm.nih.gov/32080393/",k:"PMID 32080393"},
+ vuk:{t:"Vukusic S, et al. Pregnancy and neuromyelitis optica spectrum disorders: 2022 recommendations from the French Multiple Sclerosis Society. Mult Scler. 2023;29:37-51.",u:"https://pubmed.ncbi.nlm.nih.gov/36345839/",k:"PMID 36345839"},
+ mgc:{t:"Narayanaswami P, et al. International consensus guidance for management of myasthenia gravis: 2020 update. Neurology. 2021;96:114-122.",u:"https://pubmed.ncbi.nlm.nih.gov/33144515/",k:"PMID 33144515"},
+ amund:{t:"Amundsen S, et al. Pharmacological treatment of migraine during pregnancy and breastfeeding. Nat Rev Neurol. 2015;11:209-219.",u:"https://doi.org/10.1038/nrneurol.2015.29",k:"doi:10.1038/nrneurol.2015.29"},
+ picch:{t:"Picchietti DL, et al. Consensus clinical practice guidelines for the diagnosis and treatment of restless legs syndrome/Willis-Ekbom disease during pregnancy and lactation. Sleep Med Rev. 2015;22:64-77.",u:"https://pubmed.ncbi.nlm.nih.gov/25553600/",k:"PMID 25553600"},
+ ray:{t:"Ray JG, et al. Association between MRI exposure during pregnancy and fetal and childhood outcomes. JAMA. 2016;316:952-961.",u:"https://pubmed.ncbi.nlm.nih.gov/27599330/",k:"PMID 27599330"},
+ aha26:{t:"Miller EC, et al. Prevention and treatment of maternal stroke in pregnancy and postpartum: a scientific statement from the American Heart Association. Stroke. 2026.",u:"https://doi.org/10.1161/STR.0000000000000514",k:"doi:10.1161/STR.0000000000000514"},
+ lactmed:{t:"Drugs and Lactation Database (LactMed). National Library of Medicine（薬ごとの授乳データ）",u:"https://www.ncbi.nlm.nih.gov/books/NBK501922/",k:"NCBI Bookshelf"},
+ ncchd:{t:"国立成育医療研究センター 妊娠と薬情報センター（相談窓口・授乳中に使える薬の情報）",u:"https://www.ncchd.go.jp/kusuri/",k:"ncchd.go.jp"},
+ mhlw:{t:"厚生労働省「妊娠と薬情報センター」・妊婦・授乳婦を対象とした薬の適正使用推進事業（免疫抑制剤の妊婦禁忌の見直しなど）",u:"https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iyakuhin/ninshin_00002.html",k:"mhlw.go.jp"},
+ pmda:{t:"PMDA 医療用医薬品 情報検索（最新の電子添文で妊婦・授乳婦の項を確認）",u:"https://www.pmda.go.jp/PmdaSearch/iyakuSearch/",k:"pmda.go.jp"},
+ mead14:{t:"Meador KJ, et al. Breastfeeding in children of women taking antiepileptic drugs: cognitive outcomes at age 6 years. JAMA Pediatr. 2014;168:729-736.",u:"https://doi.org/10.1001/jamapediatrics.2014.118",k:"doi:10.1001/jamapediatrics.2014.118"}
+};
+
+/* ===== 画面 ===== */
+const $=id=>document.getElementById(id);
+const BY={};DRUGS.forEach(d=>BY[d.id]=d);
+const CATN={};CATS.forEach(c=>CATN[c[0]]=c[1]);
+const KEY="preg-nav-v1";
+let S={tab:"drug",q:"",cat:"",flt:"",stage:"",ga:"",inf:"",dz:[],meds:[]};
+const open=new Set();
+function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)S=Object.assign(S,o);}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function norm(s){return String(s||"").toLowerCase().replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60)).replace(/[\s・（）()、,ー\-]/g,"");}
+function pB(v,pre){return '<span class="badge b'+v+'">'+(pre||"妊")+" "+esc(PL[v])+"</span>";}
+function lB(v){return '<span class="badge b'+v+'">授 '+esc(LL[v])+"</span>";}
+function refLinks(r){if(!r||!r.length)return"";return '<div class="refs">根拠：'+r.map(k=>REFS[k]?'<a href="'+REFS[k].u+'" target="_blank" rel="noopener">'+esc(shortRef(k))+"</a>":"").join("、")+"</div>";}
+function shortRef(k){const t=REFS[k].t;const m=t.match(/^([^,.]+)[^.]*\.\s.*?(\d{4})/);if(k==="lactmed")return"LactMed";if(k==="ncchd")return"妊娠と薬情報センター";if(k==="mhlw")return"厚労省";if(k==="pmda")return"PMDA電子添文";return m?m[1].replace(/ [A-Z]+$/,"")+" "+m[2]:k;}
+function altBtns(a){if(!a||!a.length)return"";return '<h4>代わりの候補</h4><div class="alts">'+a.filter(x=>BY[x]).map(x=>'<button type="button" data-go="'+x+'">'+esc(BY[x].n)+"</button>").join("")+"</div>";}
+function triText(d){if(!d.tr)return"";const lab={1:"第1三半期",2:d.w20?"第2三半期（20週以降）":"第2三半期",3:"第3三半期"};return '<div class="tri">'+[1,2,3].filter(k=>d.tr[k]).map(k=>'<span class="t">'+lab[k]+"</span><span>"+pB(d.tr[k][0],"")+" "+esc(d.tr[k][1])+"</span>").join("")+"</div>";}
+function detail(d){
+  let h='<div class="bd">';
+  h+="<h4>妊娠</h4>"+triText(d)+(d.pt?"<p>"+esc(d.pt)+"</p>":"");
+  h+="<h4>授乳"+(d.rid?' <span class="rid">（相対乳児用量 '+esc(d.rid)+"）</span>":"")+"</h4><p>"+esc(d.lt)+"</p>";
+  if(d.jp)h+="<h4>国内の添付文書</h4><p>"+esc(d.jp)+"</p>";
+  if(d.pre)h+="<h4>妊娠を計画するとき</h4><p>"+esc(d.pre)+"</p>";
+  if(d.ct)h+="<h4>避妊</h4><p>"+esc(d.ct)+"</p>";
+  if(d.nn)h+="<h4>新生児の観察（妊娠後期の曝露）</h4><p>"+esc(d.nn)+"</p>";
+  h+=altBtns(d.alt)+refLinks(d.r)+"</div>";return h;}
+function item(d){
+  const o=open.has(d.id);
+  return '<li id="d-'+d.id+'"><button type="button" class="hd" data-tog="'+d.id+'" aria-expanded="'+o+'"><span class="nm">'+esc(d.n)+"<small>"+esc(d.b)+" ／ "+esc(CATN[d.c])+'</small></span><span class="bdg">'+pB(d.p)+lB(d.l)+"</span></button>"+(o?detail(d):"")+"</li>";}
+
+/* ---- 薬を調べる ---- */
+const FLT=[["","すべて"],["p4","妊娠で避ける・禁忌"],["p12","妊娠で使える"],["l4","授乳で避ける以上"],["l1","授乳可"],["cx","避妊が必要"],["ind","酵素誘導"]];
+function renderCats(){
+  $("cats").innerHTML=[["","すべて"]].concat(CATS).map(c=>'<label class="chip"><input type="radio" name="cat" value="'+c[0]+'"'+(S.cat===c[0]?" checked":"")+"><span>"+esc(c[1])+"</span></label>").join("");
+  $("flt").innerHTML=FLT.map(c=>'<label class="chip"><input type="radio" name="flt" value="'+c[0]+'"'+(S.flt===c[0]?" checked":"")+"><span>"+esc(c[1])+"</span></label>").join("");
+  $("legend").innerHTML="妊娠："+[1,2,3,4,5].map(v=>pB(v,"")).join(" ")+"<br>授乳："+[1,2,3,4,5].map(v=>'<span class="badge b'+v+'">'+LL[v]+"</span>").join(" ");
+}
+function match(d,q){if(!q)return true;const t=norm(d.n+d.b+d.e+(d.id));return t.indexOf(q)>=0;}
+function renderList(){
+  const q=norm(S.q);
+  const L=DRUGS.filter(d=>(!S.cat||d.c===S.cat)&&match(d,q)&&(
+    !S.flt||(S.flt==="p4"&&d.p>=4)||(S.flt==="p12"&&d.p<=2)||(S.flt==="l4"&&d.l>=4)||(S.flt==="l1"&&d.l===1)||(S.flt==="cx"&&d.f.indexOf("cx")>=0)||(S.flt==="ind"&&d.f.indexOf("ind")>=0)));
+  $("cnt").textContent=L.length+"件（全"+DRUGS.length+"件）。名前を押すと詳細が開きます。";
+  $("dlist").innerHTML=L.map(item).join("")||'<li style="padding:12px">該当なし</li>';
+}
+function goDrug(id){
+  S.q="";S.cat="";S.flt="";$("q").value="";open.add(id);setTab("drug");renderCats();renderList();
+  setTimeout(()=>{const e=$("d-"+id);if(e){const y=e.getBoundingClientRect().top+scrollY-(document.querySelector("header.top").offsetHeight+8);scrollTo({top:y,behavior:"smooth"});}},30);
+}
+
+/* ---- 患者で考える ---- */
+const STAGES=[["repro","妊娠可能年齢（予定なし）"],["plan","妊娠を計画中"],["preg","妊娠中"],["lact","授乳中"]];
+function tri(d){const g=parseFloat(S.ga);if(isNaN(g))return 0;if(d&&d.w20){if(g<20)return 1;if(g<28)return 2;return 3;}return g<14?1:g<28?2:3;}
+function verdict(d){
+  if(S.stage==="lact")return{v:d.l,t:d.lt+(S.inf==="neo"&&d.l>=2?"（新生児・早産児は代謝が未熟で影響が出やすい。観察を密に。）":""),lbl:LL[d.l],k:"授"};
+  if(S.stage==="preg"){const t=tri(d);if(d.tr&&t&&d.tr[t])return{v:d.tr[t][0],t:d.tr[t][1]+(d.pt?" "+d.pt:""),lbl:PL[d.tr[t][0]],k:"妊"};return{v:d.p,t:d.pt,lbl:PL[d.p],k:"妊"};}
+  if(S.stage==="plan")return{v:d.p,t:(d.pre?d.pre+" ":"")+(d.pt||""),lbl:PL[d.p],k:"妊"};
+  return{v:d.p,t:(d.ct?"【避妊】"+d.ct+" ":"")+(d.pre?d.pre:d.pt),lbl:PL[d.p],k:"妊娠時"};
+}
+function renderPtInputs(){
+  $("stages").innerHTML=STAGES.map(s=>'<label class="chip"><input type="radio" name="stage" value="'+s[0]+'"'+(S.stage===s[0]?" checked":"")+"><span>"+s[1]+"</span></label>").join("");
+  $("gaBox").classList.toggle("hidden",S.stage!=="preg");
+  $("lacBox").classList.toggle("hidden",S.stage!=="lact");
+  $("ga").value=S.ga||"";
+  const g=parseFloat(S.ga);$("triLbl").textContent=isNaN(g)?"":(g<14?"第1三半期":g<28?"第2三半期":"第3三半期")+(g>=20?"・20週以降":"");
+  $("infant").innerHTML=[["neo","新生児・早産児"],["older","生後1か月以降"]].map(s=>'<label class="chip"><input type="radio" name="inf" value="'+s[0]+'"'+(S.inf===s[0]?" checked":"")+"><span>"+s[1]+"</span></label>").join("");
+  $("ptdz").innerHTML=DZ.map(z=>'<label class="chip"><input type="checkbox" value="'+z.id+'"'+(S.dz.indexOf(z.id)>=0?" checked":"")+"><span>"+esc(z.t)+"</span></label>").join("");
+  $("meds").innerHTML=S.meds.filter(id=>BY[id]).map(id=>'<button type="button" data-rm="'+id+'" aria-label="'+esc(BY[id].n)+'を外す">'+esc(BY[id].n)+"</button>").join("");
+}
+function renderSugg(){
+  const q=norm($("mq").value);const ul=$("msugg");
+  if(!q){ul.classList.add("hidden");ul.innerHTML="";return;}
+  const L=DRUGS.filter(d=>match(d,q)&&S.meds.indexOf(d.id)<0).slice(0,12);
+  ul.innerHTML=L.map(d=>'<li><button type="button" data-add="'+d.id+'"><span>'+esc(d.n)+'<br><small class="cnt">'+esc(d.b)+"</small></span>"+pB(d.p)+"</button></li>").join("")||'<li style="padding:9px 11px" class="cnt">候補なし</li>';
+  ul.classList.remove("hidden");
+}
+function li(a){return"<ul>"+a.map(x=>"<li>"+x+"</li>").join("")+"</ul>";}
+function renderPt(){
+  const out=$("ptOut");
+  if(!S.stage){out.innerHTML='<h2>4. 判定</h2><p class="hint">段階を選ぶと、薬ごとの扱いと注意点がここに出ます。</p>';return;}
+  const meds=S.meds.filter(id=>BY[id]).map(id=>BY[id]);
+  const T=tri(null);const g=parseFloat(S.ga);
+  let h="<h2>4. 判定："+esc(STAGES.find(s=>s[0]===S.stage)[1])+(S.stage==="preg"&&!isNaN(g)?"（"+g+"週）":"")+"</h2>";
+  if(S.stage==="preg"&&isNaN(g))h+='<div class="alert info">妊娠週数を入れると三半期ごとの扱い（NSAID・ワルファリン・抗CD20抗体など）に切り替わります。</div>';
+  const A=[];
+  const vs=meds.map(d=>[d,verdict(d)]);
+  const bad=vs.filter(x=>x[1].v>=4);
+  if(bad.length)A.push(["crit",S.stage==="lact"?"授乳中は避けたい薬があります":"妊娠中は避ける・禁忌の薬があります",li(bad.map(x=>"<b style='display:inline'>"+esc(x[0].n)+"</b>（"+esc(x[1].lbl)+"）"+(x[0].alt&&x[0].alt.length?" → 候補："+x[0].alt.filter(a=>BY[a]).map(a=>esc(BY[a].n)).join("・"):"")))]);
+  const has=f=>meds.filter(d=>d.f.indexOf(f)>=0);
+  if(S.stage==="repro"||S.stage==="plan"){
+    const ind=has("ind");if(ind.length)A.push(["warn","ホルモン避妊薬が効きにくくなる薬",li([ind.map(d=>esc(d.n)).join("・")+"：低用量ピル・プロゲスチン単剤・インプラントの効果が落ちる","勧める方法：銅付加IUD、LNG-IUS（ミレーナ）","緊急避妊はレボノルゲストレル倍量（3mg）か銅付加IUD"])]);
+    const est=has("est");if(est.length)A.push(["info","エストロゲンで濃度が下がる薬",li(["ラモトリギン：エストロゲン含有の避妊薬で濃度が約半分に。開始・中止時に濃度を確認"])]);
+    const cx=has("cx");if(cx.length&&S.stage==="repro")A.push(["warn","確実な避妊を説明・記録すべき薬",li(cx.map(d=>esc(d.n)+(d.ct?"："+esc(d.ct):"")))]);
+  }
+  if(S.stage==="plan"||(S.stage==="preg"&&(isNaN(g)||g<12))||meds.some(d=>d.c==="aed"&&d.id!=="dzp"&&d.id!=="lzp"&&d.id!=="mdz"))if(S.stage!=="lact")A.push(["info","葉酸",li(["妊娠1か月以上前から0.4mg/日（妊娠12週まで）","抗てんかん薬の服用中も0.4〜1mg/日が現実的。高用量（平均4.3mg）で児のがんが増えた報告（Vegrim 2022）"])]);
+  if(S.stage==="plan"){const ws=meds.filter(d=>WASH[d.id]);if(ws.length)A.push(["warn","妊娠前に中止・切替の期間が要る薬",li(ws.map(d=>"<b style='display:inline'>"+esc(d.n)+"</b>："+esc(WASH[d.id])))]);}
+  const tdm=has("tdm");if(tdm.length&&(S.stage==="plan"||S.stage==="preg"))A.push(["info","血中濃度を測る",li([tdm.map(d=>esc(d.n)).join("・")+"：妊娠前の基準値→妊娠中は毎月〜三半期ごと、産後は数週で減量"])]);
+  if(S.stage==="preg"){
+    const nn=meds.filter(d=>d.nn);if(nn.length&&(isNaN(g)||g>=24))A.push(["info","出生後に観察すること（小児科へ申し送り）",li(nn.map(d=>esc(d.n)+"："+esc(d.nn)))]);
+    const bc=has("bcell");if(bc.length&&(isNaN(g)||g>=14))A.push(["warn","児のB細胞",li([bc.map(d=>esc(d.n)).join("・")+"：第2・第3三半期の曝露で児のB細胞が減ることがある","出生時（臍帯血）にCD19を確認し、BCG・ロタウイルスなど生ワクチンは小児科と相談して延期・見送り"])]);
+    if(meds.some(d=>d.id==="ntz")&&(isNaN(g)||g>=28))A.push(["info","ナタリズマブの第3三半期曝露",li(["出生時に血算（貧血・血小板減少）"])]);
+    if(meds.some(d=>d.f.indexOf("ind")>=0))A.push(["info","ビタミンK",li(["酵素誘導の抗てんかん薬：新生児のビタミンK投与を確実に"])]);
+  }
+  if(S.dz.indexOf("mg")>=0&&S.stage==="preg")A.push(["warn","MGの妊娠",li(["子癇前症になっても硫酸マグネシウムは原則使わない","分娩は区域麻酔を勧める","新生児一過性MG（10〜20%）：生後72時間〜数日の哺乳・呼吸を観察"])]);
+  if(S.dz.indexOf("epi")>=0&&S.stage==="preg"&&!isNaN(g)&&g>=20)A.push(["crit","20週以降のけいれん",li(["まず子癇を考える：硫酸マグネシウム・降圧、産科へ","子癇でなければ通常の重積治療（ロラゼパム／ジアゼパム→ホスフェニトイン・LEV）"])]);
+  h+=A.map(a=>'<div class="alert '+a[0]+'"><b>'+a[1]+"</b>"+a[2]+"</div>").join("");
+  if(meds.length){
+    h+='<div class="res">'+vs.map(x=>{const d=x[0],v=x[1];return '<div class="rc v'+v.v+'"><div class="h"><b>'+esc(d.n)+'</b><span class="badge b'+v.v+'">'+v.k+" "+esc(v.lbl)+"</span></div><div>"+esc(v.t)+'</div><div style="margin-top:4px"><button type="button" class="lnk" data-go="'+d.id+'">詳細を開く</button></div></div>';}).join("")+"</div>";
+  }else h+='<p class="hint">薬を追加すると、ここに薬ごとの扱いが出ます。</p>';
+  if(S.dz.length){
+    const key=S.stage==="lact"?"post":S.stage==="preg"?"preg":"pre";
+    const kl={pre:"妊娠前",preg:"妊娠中",post:"産後・授乳"}[key];
+    h+="<h3 style='margin-top:14px'>疾患の要点（"+kl+"）</h3>";
+    S.dz.forEach(id=>{const z=DZ.find(x=>x.id===id);if(!z)return;
+      const items=(z[key]||[]).concat(S.stage==="preg"?z.del.map(x=>"分娩："+x):[]);
+      const sug=(z.first||[]).filter(x=>BY[x]&&S.meds.indexOf(x)<0);
+      h+='<div class="alert info"><b>'+esc(z.t)+"</b>"+(items.length?li(items.map(esc)):"<p>"+esc(z.sum)+"</p>")+(sug.length?'<div class="alts" style="margin-top:6px">'+sug.map(x=>'<button type="button" data-add="'+x+'">＋'+esc(BY[x].n)+"</button>").join("")+"</div>":"")+"</div>";});
+  }
+  h+='<p class="note">判定は一般的な目安です。用量・病勢・代替の有無で変わります。最新の電子添文と産科・小児科・薬剤部と合わせて判断し、必要なら妊娠と薬情報センターへの相談を案内してください。</p>';
+  out.innerHTML=h;
+}
+
+/* ---- 疾患別 ---- */
+function dbtn(id,lvl){const d=BY[id];if(!d)return"";const v=lvl==="l"?d.l:d.p;return '<button type="button" class="dbtn badge b'+v+'" data-go="'+id+'">'+esc(d.n)+"</button>";}
+function renderDz(){
+  $("dzlist").innerHTML=DZ.map(z=>'<details class="dz" id="z-'+z.id+'"><summary>'+esc(z.t)+'</summary><div class="in"><p>'+esc(z.sum)+"</p>"+
+   (z.pre.length?"<h4>妊娠前</h4>"+'<ul class="pl">'+z.pre.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>":"")+
+   "<h4>妊娠中</h4>"+'<ul class="pl">'+z.preg.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>"+
+   "<h4>分娩</h4>"+'<ul class="pl">'+z.del.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>"+
+   "<h4>産後・授乳</h4>"+'<ul class="pl">'+z.post.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>"+
+   "<h4>薬（色は妊娠中の扱い）</h4>"+
+   (z.first.length?'<div class="drow"><span class="k">まず使う</span>'+z.first.map(x=>dbtn(x)).join("")+"</div>":"")+
+   (z.ok.length?'<div class="drow"><span class="k">条件付きで使う</span>'+z.ok.map(x=>dbtn(x)).join("")+"</div>":"")+
+   (z.avoid.length?'<div class="drow"><span class="k">避ける・切替</span>'+z.avoid.map(x=>dbtn(x)).join("")+"</div>":"")+
+   "</div></details>").join("");
+}
+
+/* ---- 妊娠前・避妊 ---- */
+const WASH={
+ vpa:"妊娠計画前に他剤へ（数か月かけて切替、発作の安定を確認してから）",tpm:"妊娠計画前に他剤へ",
+ fty:"中止後2か月は避妊。リバウンド対策に抗CD20抗体・ナタリズマブへ切替",sip:"中止後10日以上（海外添付文書）",
+ mmf:"妊娠の6週間以上前に中止（アザチオプリンへ）",mtx:"妊娠の1〜3か月前に中止",cpa:"妊娠前に中止（専門医と期間を決める）",
+ ere:"約4〜5か月前に中止（5半減期）",gal:"約5か月前に中止",fre:"約5〜6か月前に中止",
+ ofa:"受胎直前までの投与を許容する見解（海外添付文書は6か月）",rtx:"受胎前に投与しておく（第1三半期は胎盤移行がほぼない）",ine:"海外添付文書は中止後6か月",
+ war:"計画前にヘパリンへ、遅くとも妊娠6週までに切替",doac:"計画前にヘパリンへ（判明したらすぐ切替）",
+ sta:"計画時に中止",cand:"計画時に他の降圧薬へ",acei:"計画時に他の降圧薬へ",lome:"計画時に中止",cil:"計画時にアスピリンへ",
+ ris:"終了後1か月（男性は4か月）",taf:"中止後1か月",mod:"計画時に中止（避妊薬への影響は中止後2か月）",
+ ist:"計画時に中止",ama:"計画時に中止",maob:"計画時に中止",par:"計画時に他のSSRIへ（急な中止は避ける）",li:"精神科と継続・減量を相談",
+ ntz:"中止せず継続も選択肢（30〜34週まで）",ldb:"カルビドパ配合剤へ"
+};
+function renderPre(){
+  const rows=Object.keys(WASH).filter(k=>BY[k]).map(k=>"<tr><td>"+dbtn(k)+"</td><td>"+esc(WASH[k])+"</td></tr>").join("");
+  $("t-pre").innerHTML=
+  '<section class="card"><h2>妊娠前相談のチェック</h2><ul class="pl">'+
+  ["妊娠は計画して：病勢が落ち着いた時期に（MS・NMOSD・MGは目安1年安定）","催奇形性のある薬を切り替え、切替後の安定を確認してから","葉酸0.4mg/日を妊娠1か月以上前から（抗てんかん薬服用中も0.4〜1mg/日）","血中濃度の基準値を測る（LTG・LEV・OXC・リチウム・タクロリムス）","生ワクチン（麻疹・風疹・水痘・おたふく）は妊娠前に。接種後2か月は避妊。免疫抑制療法の開始前に済ませる","補体阻害薬の予定があれば髄膜炎菌ワクチン","遺伝性疾患（筋強直性ジストロフィー、遺伝性PD、ATTR、SMA など）は遺伝カウンセリング","妊娠と薬情報センター（国立成育医療研究センター）・拠点病院での相談を案内できる"].map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul></section>"+
+  '<section class="card"><h2>妊娠前に中止・切替の期間が要る薬</h2><div class="tbw"><table class="tb"><tr><th>薬</th><th>目安</th></tr>'+rows+'</table></div><p class="hint">期間は代表的な目安です。添付文書・最新の推奨で確認してください。</p></section>'+
+  '<section class="card"><h2>避妊と神経疾患の薬</h2><div class="tbw"><table class="tb"><tr><th>状況</th><th>影響と勧める方法</th></tr>'+
+  [["酵素誘導の薬（CBZ・PHT・PB・OXC、TPM 200mg/日以上、PER 12mg/日、モダフィニル）","低用量ピル・プロゲスチン単剤・インプラントの効果が落ちる。銅付加IUD・LNG-IUS（ミレーナ）を勧める。緊急避妊はレボノルゲストレル倍量（3mg）か銅付加IUD"],
+   ["ラモトリギン","エストロゲン含有薬で濃度が約半分に（休薬週に上昇）。プロゲスチン単剤・IUSは影響が小さい"],
+   ["前兆のある片頭痛","エストロゲン含有の避妊薬（低用量ピル）は脳梗塞のリスクが上がるため使わない"],
+   ["脳梗塞・脳静脈血栓症の既往、血栓性素因、抗リン脂質抗体","エストロゲン含有薬は使わない。銅付加IUD・LNG-IUS"],
+   ["催奇形性の高い薬（バルプロ酸・ミコフェノール酸・メトトレキサート・フィンゴリモド・リスジプラム など）","確実な避妊（IUD・IUS）を説明し、カルテに記録"],
+   ["MS・NMOSD・MG（上記の薬を除く）","避妊法の制限は基本的にない"]].map(r=>"<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td></tr>").join("")+"</table></div></section>"+
+  '<section class="card"><h2>男性の服用で注意する薬</h2><ul class="pl">'+
+  ["バルプロ酸：EMAは2024年、父親の服用で児の神経発達障害がわずかに増える可能性を示し、説明と避妊を勧めた（因果は未確定）","ミコフェノール酸：服用中〜終了後90日はコンドーム","リスジプラム：終了後4か月は避妊","シクロホスファミド・メトトレキサート：添付文書の記載を確認し、必要なら精子保存も相談"].map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul></section>"+
+  '<section class="card"><h2>予防接種</h2><ul class="pl">'+
+  ["生ワクチン（MMR・水痘）は妊娠中は不可。免疫抑制療法・抗CD20抗体・S1P受容体調節薬の使用中も不可→治療開始前に","不活化ワクチン（インフルエンザ・新型コロナ）は妊娠中も接種可","補体阻害薬：髄膜炎菌ワクチン（4価結合型は妊娠中も可）","妊娠中に抗CD20抗体などを使った母から生まれた児は、BCG・ロタウイルスなど生ワクチンの時期を小児科と相談"].map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul></section>";
+}
+
+/* ---- 検査・分娩・児 ---- */
+function renderEx(){
+  const nn=DRUGS.filter(d=>d.nn);
+  $("t-ex").innerHTML=
+  '<section class="card"><h2>検査・処置</h2><div class="tbw"><table class="tb"><tr><th>検査</th><th>妊娠中</th><th>授乳中</th></tr>'+
+  [["非造影MRI","全期間で可（第1三半期も胎児への害は示されていない）","可"],
+   ["ガドリニウム造影MRI","原則避ける。母体に必要なときだけ（マクロ環状型を最小量）","授乳を中断する必要はない"],
+   ["頭部CT・CTA","可。頭部CTの胎児線量はごくわずか。腹部を遮蔽","可（ヨード造影剤でも授乳継続）"],
+   ["脳血管撮影・血栓回収","可。遮蔽し透視時間を短く","可"],
+   ["腰椎穿刺","可（頭蓋内占拠病変の除外は通常どおり）","可"],
+   ["脳波・神経伝導・筋電図","可","可"],
+   ["血漿交換","可。20週以降は左側臥位で大静脈圧迫を避け、低血圧・低Ca・容量変動・凝固因子低下に注意","可"],
+   ["IVIG","可。血栓症（妊娠で上乗せ）・容量負荷に注意","可"]].map(r=>"<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td></tr>").join("")+"</table></div>"+refLinks(["ray","aha26"])+"</section>"+
+  '<section class="card"><h2>妊娠中・産後のけいれん</h2><ul class="pl">'+
+  ["妊娠20週以降と産後（とくに48時間以内）のけいれんは、まず子癇を考える：硫酸マグネシウム（例：4g静注後1〜2g/時）、重症高血圧の降圧、産科へ","子癇でなければ通常の重積治療：ロラゼパム／ジアゼパム→ホスフェニトイン・レベチラセタム（妊娠を理由に減量しない）","左側臥位・酸素投与・胎児心拍モニター。低血糖・低Na・脳静脈血栓症・PRES・RCVSを画像と検査で確認","てんかんの既往がある妊婦は、飲み忘れ・嘔吐・睡眠不足・LTG/LEVの濃度低下を確認"].map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>"+refLinks(["aha26","eurap"])+"</section>"+
+  '<section class="card"><h2>分娩の注意（疾患別）</h2><div class="tbw"><table class="tb"><tr><th>疾患</th><th>分娩</th></tr>'+DZ.map(z=>"<tr><td>"+esc(z.t)+"</td><td>"+z.del.map(esc).join("<br>")+"</td></tr>").join("")+"</table></div>"+
+  '<p class="hint">抗凝固中の区域麻酔：未分画ヘパリン予防量は投与後4〜6時間、低分子ヘパリンは予防量12時間・治療量24時間あける（施設の麻酔科の基準を優先）。</p></section>'+
+  '<section class="card"><h2>新生児に申し送ること</h2><div class="tbw"><table class="tb"><tr><th>母の薬・疾患</th><th>観察すること</th></tr>'+
+  nn.map(d=>"<tr><td>"+dbtn(d.id)+"</td><td>"+esc(d.nn)+"</td></tr>").join("")+
+  "<tr><td>重症筋無力症（抗AChR・MuSK抗体）</td><td>新生児一過性MG（10〜20%）：生後72時間〜数日の哺乳不良・弱い啼泣・呼吸障害</td></tr>"+
+  "<tr><td>抗NMDA受容体脳炎など抗体介在性疾患</td><td>移行抗体による一過性の神経症状</td></tr>"+
+  "<tr><td>酵素誘導の抗てんかん薬</td><td>新生児のビタミンK投与を確実に</td></tr>"+
+  "</table></div></section>";
+}
+
+/* ---- 授乳 ---- */
+function renderLac(){
+  let h='<section class="card"><h2>授乳中の薬の考え方</h2><ul class="pl">'+
+  ["母親に必要な治療を優先する。神経疾患の薬の多くは授乳と両立できる","相対乳児用量（RID：児が母乳から受ける量÷母の体重あたり投与量）が10%未満なら一般に許容","注意が要る児：新生児（とくに生後1か月未満）・早産児・黄疸のある児・病気の児","注意が要る薬：鎮静作用（ベンゾジアゼピン・バルビツール・オピオイド）、半減期が長く蓄積する薬、乳汁分泌を抑える薬（ドパミンアゴニスト・アマンタジン・カベルゴリン・エルゴタミン）","観察項目：傾眠・哺乳不良・体重増加・発疹・黄疸・易刺激性","工夫：授乳の直後に服用。高用量ステロイド（プレドニゾロン20mg/日超）は服用後4時間あける","抗てんかん薬を服用中の母の授乳は、6歳時の認知に悪影響を示さなかった（NEAD）。MONEADでも児の血中濃度は低い"].map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>"+refLinks(["birn","mead14","lactmed","ncchd"])+"</section>";
+  [1,2,3,4,5].forEach(v=>{const L=DRUGS.filter(d=>d.l===v&&d.id!=="vk");if(!L.length)return;
+    h+='<section class="card"><h2><span class="badge b'+v+'">'+LL[v]+"</span>（"+L.length+"件）</h2>"+CATS.map(c=>{const M=L.filter(d=>d.c===c[0]);return M.length?'<div class="drow"><span class="k">'+esc(c[1])+"</span>"+M.map(d=>dbtn(d.id,"l")).join("")+"</div>":"";}).join("")+"</section>";});
+  $("t-lac").innerHTML=h;
+}
+
+/* ---- 根拠 ---- */
+function renderRef(){
+  $("t-ref").innerHTML='<section class="card"><h2>文献・情報源</h2><ol style="padding-left:1.3em;margin:0;font-size:14px">'+
+   Object.keys(REFS).map(k=>'<li style="margin-bottom:6px">'+esc(REFS[k].t)+' <a href="'+REFS[k].u+'" target="_blank" rel="noopener">'+esc(REFS[k].k)+"</a></li>").join("")+"</ol></section>"+
+   '<section class="card"><h2>国内の添付文書で最近変わった点</h2><ul class="pl">'+
+   ["2018年7月：タクロリムス・シクロスポリン・アザチオプリンの妊婦禁忌を削除（厚労省の薬の適正使用推進事業）","2022年12月：ニフェジピン・アムロジピンの妊婦禁忌を削除","2024年4月：β遮断薬3成分の妊婦禁忌を削除（「特定の背景を有する患者に関する注意」へ）","2024年10月：NSAID（全身作用）に、妊婦で胎児動脈管収縮を疑う所見を適宜確認する旨を追記","2026年6月：炭酸リチウムの妊婦禁忌の削除を指示"].map(x=>"<li>"+esc(x)+"</li>").join("")+
+   '</ul><p class="hint">各薬の最新の記載はPMDAの電子添文で確認してください。</p></section>'+
+   '<section class="card"><h2>このアプリについて</h2><ul class="pl">'+
+   ["自分用の診療補助ツールです。判定は一般的な目安で、個別の判断（用量・病勢・代替の有無）を置き換えません","数値（大奇形率・相対乳児用量）は代表的な報告値です","入力した内容はこの端末内（ブラウザの保存領域）にだけ保存し、外部へ送りません","2026年11月時点の情報で作成"].map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul></section>";
+}
+
+/* ---- タブ・イベント ---- */
+function setTab(t){S.tab=t;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false"));
+  document.querySelectorAll(".tabp").forEach(p=>p.classList.toggle("hidden",p.id!=="t-"+t));save();scrollTo(0,0);}
+document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(b)setTab(b.dataset.tab);});
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]");if(g){e.preventDefault();goDrug(g.dataset.go);return;}
+  const t=e.target.closest("[data-tog]");if(t){const id=t.dataset.tog;open.has(id)?open.delete(id):open.add(id);const li=$("d-"+id);if(li)li.outerHTML=item(BY[id]);return;}
+  const a=e.target.closest("[data-add]");if(a){if(S.meds.indexOf(a.dataset.add)<0)S.meds.push(a.dataset.add);$("mq").value="";renderSugg();save();renderPtInputs();renderPt();return;}
+  const r=e.target.closest("[data-rm]");if(r){S.meds=S.meds.filter(x=>x!==r.dataset.rm);save();renderPtInputs();renderPt();return;}
+});
+$("q").addEventListener("input",()=>{S.q=$("q").value;save();renderList();});
+$("cats").addEventListener("change",e=>{S.cat=e.target.value;save();renderList();});
+$("flt").addEventListener("change",e=>{S.flt=e.target.value;save();renderList();});
+$("stages").addEventListener("change",e=>{S.stage=e.target.value;save();renderPtInputs();renderPt();});
+$("infant").addEventListener("change",e=>{S.inf=e.target.value;save();renderPt();});
+$("ga").addEventListener("input",()=>{S.ga=$("ga").value;save();const g=parseFloat(S.ga);$("triLbl").textContent=isNaN(g)?"":(g<14?"第1三半期":g<28?"第2三半期":"第3三半期")+(g>=20?"・20週以降":"");renderPt();});
+$("ptdz").addEventListener("change",()=>{S.dz=Array.from($("ptdz").querySelectorAll("input:checked")).map(i=>i.value);save();renderPt();});
+$("mq").addEventListener("input",renderSugg);
+$("mq").addEventListener("keydown",e=>{if(e.key==="Enter"){const b=$("msugg").querySelector("[data-add]");if(b){e.preventDefault();b.click();}}});
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),3500);}
+load();$("q").value=S.q||"";renderCats();renderList();renderPtInputs();renderPt();renderDz();renderPre();renderEx();renderLac();renderRef();setTab(S.tab||"drug");
+
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["preg-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>
