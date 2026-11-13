@@ -29,6 +29,186 @@
   ],
   "shortcuts": [
     {
+      "name": "ER業務支援ナビ",
+      "short_name": "ERナビ",
+      "url": "er/",
+      "icons": [
+        {
+          "src": "er/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "再開通療法 適応チェッカー（rt-PA・血栓回収）",
+      "short_name": "再開通ナビ",
+      "url": "rpt/",
+      "icons": [
+        {
+          "src": "rpt/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "NIHSS評価",
+      "short_name": "NIHSS",
+      "url": "nih/",
+      "icons": [
+        {
+          "src": "nih/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "抗血栓薬ナビ（脳卒中二次予防）",
+      "short_name": "抗血栓薬ナビ",
+      "url": "atn/",
+      "icons": [
+        {
+          "src": "atn/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "神経診察チェック",
+      "short_name": "神経診察",
+      "url": "exam/",
+      "icons": [
+        {
+          "src": "exam/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "神経病巣局在ナビ",
+      "short_name": "病巣局在ナビ",
+      "url": "loc/",
+      "icons": [
+        {
+          "src": "loc/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "MMTナビ",
+      "short_name": "MMTナビ",
+      "url": "mmt/",
+      "icons": [
+        {
+          "src": "mmt/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "神経局在トレーニング",
+      "short_name": "局在トレーニング",
+      "url": "ltr/",
+      "icons": [
+        {
+          "src": "ltr/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "抗てんかん薬ナビ",
+      "short_name": "抗てんかん薬",
+      "url": "aed/",
+      "icons": [
+        {
+          "src": "aed/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "頭痛ナビ",
+      "short_name": "頭痛ナビ",
+      "url": "ha/",
+      "icons": [
+        {
+          "src": "ha/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "神経免疫治療ナビ",
+      "short_name": "神経免疫ナビ",
+      "url": "imm/",
+      "icons": [
+        {
+          "src": "imm/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "自己免疫性脳炎・脳症 鑑別ナビ",
+      "short_name": "脳炎鑑別ナビ",
+      "url": "enc/",
+      "icons": [
+        {
+          "src": "enc/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "認知症外来ナビ",
+      "short_name": "認知症ナビ",
+      "url": "dementia/",
+      "icons": [
+        {
+          "src": "dementia/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "MDS-UPDRS 評価ツール",
+      "short_name": "UPDRS評価",
+      "url": "updrs/",
+      "icons": [
+        {
+          "src": "updrs/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "妊娠・授乳と神経疾患薬ナビ",
+      "short_name": "妊娠授乳ナビ",
+      "url": "preg/",
+      "icons": [
+        {
+          "src": "preg/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "糖尿病治療ナビ（病棟用）",
       "short_name": "糖尿病ナビ",
       "url": "dm/",
@@ -65,78 +245,6 @@
       ]
     },
     {
-      "name": "神経病巣局在ナビ",
-      "short_name": "病巣局在ナビ",
-      "url": "loc/",
-      "icons": [
-        {
-          "src": "loc/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "NIHSS評価",
-      "short_name": "NIHSS",
-      "url": "nih/",
-      "icons": [
-        {
-          "src": "nih/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "脳神経クリニック紹介先検索",
-      "short_name": "神経紹介先",
-      "url": "referral/",
-      "icons": [
-        {
-          "src": "referral/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "MDS-UPDRS 評価ツール",
-      "short_name": "UPDRS評価",
-      "url": "updrs/",
-      "icons": [
-        {
-          "src": "updrs/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "認知症外来ナビ",
-      "short_name": "認知症ナビ",
-      "url": "dementia/",
-      "icons": [
-        {
-          "src": "dementia/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "MMTナビ",
-      "short_name": "MMTナビ",
-      "url": "mmt/",
-      "icons": [
-        {
-          "src": "mmt/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
       "name": "感染症治療ナビ",
       "short_name": "感染症ナビ",
       "url": "inf/",
@@ -161,96 +269,12 @@
       ]
     },
     {
-      "name": "神経免疫治療ナビ",
-      "short_name": "神経免疫ナビ",
-      "url": "imm/",
-      "icons": [
-        {
-          "src": "imm/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "自己免疫性脳炎・脳症 鑑別ナビ",
-      "short_name": "脳炎鑑別ナビ",
-      "url": "enc/",
-      "icons": [
-        {
-          "src": "enc/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "抗血栓薬ナビ（脳卒中二次予防）",
-      "short_name": "抗血栓薬ナビ",
-      "url": "atn/",
-      "icons": [
-        {
-          "src": "atn/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "抗てんかん薬ナビ",
-      "short_name": "抗てんかん薬",
-      "url": "aed/",
-      "icons": [
-        {
-          "src": "aed/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "頭痛ナビ",
-      "short_name": "頭痛ナビ",
-      "url": "ha/",
-      "icons": [
-        {
-          "src": "ha/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
       "name": "指定難病・制度ナビ",
       "short_name": "難病・制度ナビ",
       "url": "nan/",
       "icons": [
         {
           "src": "nan/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "QCストーリー支援",
-      "short_name": "QCストーリー",
-      "url": "qc/",
-      "icons": [
-        {
-          "src": "qc/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "神経診察チェック",
-      "short_name": "神経診察",
-      "url": "exam/",
-      "icons": [
-        {
-          "src": "exam/icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -281,6 +305,18 @@
       ]
     },
     {
+      "name": "脳神経クリニック紹介先検索",
+      "short_name": "神経紹介先",
+      "url": "referral/",
+      "icons": [
+        {
+          "src": "referral/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "院内内線",
       "short_name": "院内内線",
       "url": "ext/",
@@ -293,48 +329,12 @@
       ]
     },
     {
-      "name": "ER業務支援ナビ",
-      "short_name": "ERナビ",
-      "url": "er/",
+      "name": "QCストーリー支援",
+      "short_name": "QCストーリー",
+      "url": "qc/",
       "icons": [
         {
-          "src": "er/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "再開通療法 適応チェッカー（rt-PA・血栓回収）",
-      "short_name": "再開通ナビ",
-      "url": "rpt/",
-      "icons": [
-        {
-          "src": "rpt/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "神経局在トレーニング",
-      "short_name": "局在トレーニング",
-      "url": "ltr/",
-      "icons": [
-        {
-          "src": "ltr/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "妊娠・授乳と神経疾患薬ナビ",
-      "short_name": "妊娠授乳ナビ",
-      "url": "preg/",
-      "icons": [
-        {
-          "src": "preg/icon-192.png",
+          "src": "qc/icon-192.png",
           "sizes": "192x192",
           "type": "image/png"
         }

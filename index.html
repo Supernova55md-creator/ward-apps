@@ -14,7 +14,8 @@
 <style>
 body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;margin:0;background:#f4f7fb;color:#1b2430}
 h1{font-size:18px;margin:0;padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 16px calc(16px + env(safe-area-inset-left));background:#0b5cad;color:#fff}
-ul{list-style:none;margin:0;padding:12px calc(12px + env(safe-area-inset-right)) 12px calc(12px + env(safe-area-inset-left))}
+h2{font-size:13px;color:#0b5cad;margin:0;padding:14px calc(16px + env(safe-area-inset-right)) 0 calc(16px + env(safe-area-inset-left));letter-spacing:.04em}
+ul{list-style:none;margin:0;padding:8px calc(12px + env(safe-area-inset-right)) 12px calc(12px + env(safe-area-inset-left))}
 li a{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #d7dee7;border-radius:12px;padding:12px;margin-bottom:10px;text-decoration:none;color:inherit;font-weight:700}
 li img{width:44px;height:44px;border-radius:10px}
 p{font-size:12px;color:#5a6675;padding:0 16px;margin:0 0 8px}
@@ -22,35 +23,51 @@ footer{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
 #msg{font-size:12px;color:#0b5cad;padding:0 16px}
 </style></head><body>
 <h1>病棟アプリ</h1>
+<h2>救急・脳卒中</h2>
+<ul>
+<li><a href="er/"><img src="er/icon-192.png" alt="">ER業務支援ナビ（主訴別の初期対応・薬剤・スコア）</a></li>
+<li><a href="rpt/"><img src="rpt/icon-192.png" alt="">再開通療法 適応チェッカー（rt-PA・血栓回収）</a></li>
+<li><a href="nih/"><img src="nih/icon-192.png" alt="">NIHSS評価</a></li>
+<li><a href="atn/"><img src="atn/icon-192.png" alt="">抗血栓薬ナビ（脳卒中二次予防）</a></li>
+</ul>
+<h2>神経診察・局在</h2>
+<ul>
+<li><a href="exam/"><img src="exam/icon-192.png" alt="">神経診察チェック（カルテ定型文・局在ナビ連携）</a></li>
+<li><a href="loc/"><img src="loc/icon-192.png" alt="">神経病巣局在ナビ</a></li>
+<li><a href="mmt/"><img src="mmt/icon-192.png" alt="">MMTナビ（徒手筋力テスト・神経支配）</a></li>
+<li><a href="ltr/"><img src="ltr/icon-192.png" alt="">神経局在トレーニング（症候から病巣を当てる）</a></li>
+</ul>
+<h2>神経疾患の治療</h2>
+<ul>
+<li><a href="aed/"><img src="aed/icon-192.png" alt="">抗てんかん薬ナビ（重積の推奨・薬の選択）</a></li>
+<li><a href="ha/"><img src="ha/icon-192.png" alt="">頭痛ナビ（急性期・予防・CGRP関連薬）</a></li>
+<li><a href="imm/"><img src="imm/icon-192.png" alt="">神経免疫治療ナビ（MG・NMOSD・CIDP）</a></li>
+<li><a href="enc/"><img src="enc/icon-192.png" alt="">自己免疫性脳炎・脳症 鑑別ナビ</a></li>
+<li><a href="dementia/"><img src="dementia/icon-192.png" alt="">認知症外来ナビ</a></li>
+<li><a href="updrs/"><img src="updrs/icon-192.png" alt="">MDS-UPDRS 評価ツール</a></li>
+<li><a href="preg/"><img src="preg/icon-192.png" alt="">妊娠・授乳と神経疾患薬ナビ</a></li>
+</ul>
+<h2>内科・全身管理</h2>
 <ul>
 <li><a href="dm/"><img src="dm/icon-192.png" alt="">糖尿病治療ナビ（病棟用）</a></li>
 <li><a href="htn/"><img src="htn/icon-192.png" alt="">高血圧治療ナビ（病棟用）</a></li>
 <li><a href="lipid/"><img src="lipid/icon-192.png" alt="">脂質異常症治療ナビ</a></li>
-<li><a href="loc/"><img src="loc/icon-192.png" alt="">神経病巣局在ナビ</a></li>
-<li><a href="exam/"><img src="exam/icon-192.png" alt="">神経診察チェック（カルテ定型文・局在ナビ連携）</a></li>
-<li><a href="nih/"><img src="nih/icon-192.png" alt="">NIHSS評価</a></li>
-<li><a href="referral/"><img src="referral/icon-192.png" alt="">脳神経クリニック紹介先検索</a></li>
-<li><a href="updrs/"><img src="updrs/icon-192.png" alt="">MDS-UPDRS 評価ツール</a></li>
-<li><a href="dementia/"><img src="dementia/icon-192.png" alt="">認知症外来ナビ</a></li>
-<li><a href="mmt/"><img src="mmt/icon-192.png" alt="">MMTナビ（徒手筋力テスト・神経支配）</a></li>
 <li><a href="inf/"><img src="inf/icon-192.png" alt="">感染症治療ナビ</a></li>
 <li><a href="kampo/"><img src="kampo/icon-192.png" alt="">漢方ナビ</a></li>
-<li><a href="imm/"><img src="imm/icon-192.png" alt="">神経免疫治療ナビ（MG・NMOSD・CIDP）</a></li>
-<li><a href="enc/"><img src="enc/icon-192.png" alt="">自己免疫性脳炎・脳症 鑑別ナビ</a></li>
-<li><a href="rpt/"><img src="rpt/icon-192.png" alt="">再開通療法 適応チェッカー（rt-PA・血栓回収）</a></li>
-<li><a href="atn/"><img src="atn/icon-192.png" alt="">抗血栓薬ナビ（脳卒中二次予防）</a></li>
-<li><a href="aed/"><img src="aed/icon-192.png" alt="">抗てんかん薬ナビ（重積の推奨・薬の選択）</a></li>
-<li><a href="ha/"><img src="ha/icon-192.png" alt="">頭痛ナビ（急性期・予防・CGRP関連薬）</a></li>
+</ul>
+<h2>書類・制度・紹介</h2>
+<ul>
 <li><a href="nan/"><img src="nan/icon-192.png" alt="">指定難病・制度ナビ（重症度・臨個票・介護保険・身障手帳）</a></li>
-<li><a href="qc/"><img src="qc/icon-192.png" alt="">QCストーリー支援（パレート図・特性要因図・効果確認）</a></li>
 <li><a href="iken/"><img src="iken/icon-192.png" alt="">主治医意見書 自立度判定（寝たきり度・認知症自立度）</a></li>
 <li><a href="shi/"><img src="shi/icon-192.png" alt="">肢体不自由 等級判定ナビ（身障手帳 診断書1枚目の下書き）</a></li>
-<li><a href="ext/"><img src="ext/icon-192.png" alt="">院内内線（データは暗号化して端末内のみ）</a></li>
-<li><a href="er/"><img src="er/icon-192.png" alt="">ER業務支援ナビ（主訴別の初期対応・薬剤・スコア）</a></li>
-<li><a href="ltr/"><img src="ltr/icon-192.png" alt="">神経局在トレーニング（症候から病巣を当てる）</a></li>
-<li><a href="preg/"><img src="preg/icon-192.png" alt="">妊娠・授乳と神経疾患薬ナビ</a></li>
-<!-- 新しいアプリはここに1行ずつ追加（sw.js の APPS にも slug を足し、VERSION を変える） -->
+<li><a href="referral/"><img src="referral/icon-192.png" alt="">脳神経クリニック紹介先検索</a></li>
 </ul>
+<h2>院内業務</h2>
+<ul>
+<li><a href="ext/"><img src="ext/icon-192.png" alt="">院内内線（データは暗号化して端末内のみ）</a></li>
+<li><a href="qc/"><img src="qc/icon-192.png" alt="">QCストーリー支援（パレート図・特性要因図・効果確認）</a></li>
+</ul>
+<!-- 新しいアプリは該当する見出しの<ul>に1行追加（manifest.webmanifest の shortcuts と sw.js の APPS にも足し、VERSION を変える） -->
 <footer>
 <p>Android：このページで Chrome のメニュー →「アプリをインストール」を1回行えば、全アプリがオフラインで使えます。アイコンを長押しすると各アプリへのショートカットが出ます。</p>
 <p>iPhone：このページ、または各アプリを開いて 共有 →「ホーム画面に追加」。</p>
