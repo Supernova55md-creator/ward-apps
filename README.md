@@ -7,6 +7,7 @@
 ```
 ward-apps/
 ├─ index.html            … アプリ一覧（入口）
+├─ share.js              … 共通のQR表示（右上「QR」ボタン。各アプリの </body> 直前で読み込む）
 ├─ dm/                   … 糖尿病治療ナビ
 │  ├─ index.html
 │  ├─ manifest.webmanifest
@@ -83,6 +84,7 @@ ward-apps/
 2. 直下の index.html の <ul> に1行追加。
 3. 直下の manifest.webmanifest の shortcuts に1件追加。
 4. 直下の sw.js の APPS に slug を足し、VERSION を変える。
+5. index.html の </body> 直前に <script src="../share.js" defer></script> を置く（右上にQRボタンが出る）。
 
 ### アプリを更新したとき
 - 直下の sw.js の VERSION を必ず変える（各アプリの sw.js ではない）。

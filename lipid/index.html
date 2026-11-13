@@ -787,7 +787,7 @@ window.__lipid={compute:compute,hisayama:hisayama,blank:blank};
 <script>
 (function(){
   var KEYS=["lipidNavi.v2", "lipidNavi.v1"];
-  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
   var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
   function close(){dlg.classList.remove("on");}
   btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
@@ -821,5 +821,6 @@ window.__lipid={compute:compute,hisayama:hisayama,blank:blank};
 })();
 </script>
 <!-- wc-clear:end -->
+<script src="../share.js" defer></script>
 </body>
 </html>
