@@ -303,6 +303,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "再開通療法 適応チェッカー（rt-PA・血栓回収）",
+      "short_name": "再開通ナビ",
+      "url": "rpt/",
+      "icons": [
+        {
+          "src": "rpt/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
