@@ -49,6 +49,10 @@ textarea{min-height:160px;font-size:13px;font-family:ui-monospace,Menlo,monospac
 .okm{color:var(--ok);font-size:14px;margin-top:8px}
 .meta{font-size:12px;color:var(--muted);margin:2px 4px 8px;display:flex;justify-content:space-between;gap:8px}
 .list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.tabs{display:flex;gap:6px;margin-top:8px}
+.tabs button{flex:1;font:inherit;font-size:14px;padding:7px 8px;min-height:38px;border-radius:999px;border:1px solid currentColor;background:transparent;color:var(--accent-ink);cursor:pointer;opacity:.9}
+.tabs button.on{background:var(--surface);color:var(--ink);border-color:var(--surface);font-weight:700;opacity:1}
+.tabs #favN{font-weight:400;margin-left:4px;font-size:12px}
 .it{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
 .it:first-child{border-top:0}
 .it .nm{flex:1;min-width:0}
@@ -82,6 +86,10 @@ small.note{display:block;font-size:12px;color:var(--muted);margin-top:6px}
   <div class="sbox hide" id="sbox">
     <input id="q" type="search" inputmode="search" placeholder="部署・名前・かな・番号で検索" autocomplete="off" enterkeyhint="search" aria-label="検索">
     <button type="button" id="setBtn" aria-label="設定">設定</button>
+  </div>
+  <div class="tabs hide" id="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="all">すべて</button>
+    <button type="button" role="tab" data-tab="fav">★ お気に入り<span id="favN"></span></button>
   </div>
 </header>
 <main>
@@ -165,7 +173,8 @@ const $=id=>document.getElementById(id);
 const ITER=600000;
 const FIELDS=[["d","部署"],["n","名称"],["k","かな"],["t","内線"],["p","PHS"],["r","ランク"],["f","場所"],["m","備考"]];
 const RANK={A:"外線0発信",C:"外線は9→交換"};
-const LS_Q="ext-q", LS_FAV="ext-fav";
+const LS_Q="ext-q", LS_FAV="ext-fav", LS_TAB="ext-tab";
+let TAB="all";try{TAB=localStorage.getItem(LS_TAB)==="fav"?"fav":"all";}catch(_){}
 let DATA=null, pending=null;
 
 /* ---------- IndexedDB（暗号化データと、記憶した鍵を置く） ---------- */
@@ -208,7 +217,7 @@ function norm(s){
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
 /* ---------- 画面 ---------- */
-function show(v){["vImport","vLock","vMain","vSet"].forEach(x=>$(x).classList.toggle("hide",x!==v));$("sbox").classList.toggle("hide",!(v==="vMain"));}
+function show(v){["vImport","vLock","vMain","vSet"].forEach(x=>$(x).classList.toggle("hide",x!==v));$("sbox").classList.toggle("hide",!(v==="vMain"));$("tabs").classList.toggle("hide",!(v==="vMain"));}
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2400);}
 function favs(){try{return JSON.parse(localStorage.getItem(LS_FAV)||"[]");}catch(e){return [];}}
 function rowId(r){return [r.d,r.n,r.t,r.p].join("|");}
@@ -241,8 +250,12 @@ function render(){
   const terms=qv.split(/[\s　]+/).filter(Boolean);
   const nterms=terms.map(norm).filter(Boolean);
   const fav=new Set(favs());
-  const rows=DATA.rows;
+  const fr0=DATA.rows.filter(r=>fav.has(r._id));
+  $("favN").textContent=fr0.length?String(fr0.length):"";
+  document.querySelectorAll("#tabs button").forEach(b=>{const on=b.dataset.tab===TAB;b.classList.toggle("on",on);b.setAttribute("aria-selected",on);});
+  const rows=TAB==="fav"?fr0:DATA.rows;
   let html="";
+  if(TAB==="fav"&&!rows.length){$("cnt").textContent="0件";$("res").innerHTML=`<div class="empty">まだありません。「すべて」で各行の左の ☆ を押すと、ここに集まります。</div>`;return;}
   if(nterms.length){
     const isNum=nterms.every(t=>/^\d+$/.test(t));
     let hit=rows.filter(r=>nterms.every(t=>r._s.includes(t)));
@@ -252,6 +265,10 @@ function render(){
     $("cnt").textContent=hit.length+"件";
     html=hit.length?`<div class="list">${hit.slice(0,300).map(r=>itemHTML(r,terms,fav)).join("")}</div>`+(hit.length>300?`<div class="empty">ほか ${hit.length-300}件。語を足して絞り込んでください。</div>`:""):`<div class="empty">見つかりません。かな・部署名の一部・番号でも探せます。</div>`;
   }else{
+    if(TAB==="fav"){
+      $("cnt").textContent="お気に入り "+rows.length+"件";
+      $("res").innerHTML=`<div class="list">${rows.map(r=>itemHTML(r,[],fav)).join("")}</div>`;return;
+    }
     $("cnt").textContent="全"+rows.length+"件";
     const fr=rows.filter(r=>fav.has(r._id));
     if(fr.length)html+=`<div class="sec">★ お気に入り</div><div class="list">${fr.map(r=>itemHTML(r,[],fav)).join("")}</div>`;
@@ -272,6 +289,7 @@ $("res").addEventListener("click",async e=>{
   const s=e.target.closest(".star");
   if(s){const id=s.dataset.f;let f=favs();f=f.includes(id)?f.filter(x=>x!==id):f.concat(id);try{localStorage.setItem(LS_FAV,JSON.stringify(f));}catch(_){}render();}
 });
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;TAB=b.dataset.tab;try{localStorage.setItem(LS_TAB,TAB);}catch(_){}window.scrollTo(0,0);render();});
 let qt;$("q").addEventListener("input",()=>{clearTimeout(qt);qt=setTimeout(()=>{try{localStorage.setItem(LS_Q,$("q").value);}catch(_){}render();},80);});
 
 /* ---------- 取り込み ---------- */
@@ -327,7 +345,7 @@ $("updBtn").addEventListener("click",()=>startImport(true));
 $("lockBtn").addEventListener("click",async()=>{await kvDel("key");DATA=null;$("res").innerHTML="";$("hdrMeta").textContent="";toast("ロックしました");boot();});
 $("wipeBtn").addEventListener("click",async()=>{
   if(!confirm("この端末の内線データ・記憶したパスフレーズ・お気に入りを消します。よろしいですか？"))return;
-  await kvDel("blob");await kvDel("key");try{localStorage.removeItem(LS_FAV);localStorage.removeItem(LS_Q);}catch(_){}
+  await kvDel("blob");await kvDel("key");try{localStorage.removeItem(LS_FAV);localStorage.removeItem(LS_Q);localStorage.removeItem(LS_TAB);TAB="all";}catch(_){}
   DATA=null;$("res").innerHTML="";$("q").value="";$("hdrMeta").textContent="";toast("消しました");boot();
 });
 
