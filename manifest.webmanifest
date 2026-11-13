@@ -291,6 +291,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "ER業務支援ナビ",
+      "short_name": "ERナビ",
+      "url": "er/",
+      "icons": [
+        {
+          "src": "er/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
