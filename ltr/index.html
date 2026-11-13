@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>神経局在トレーニング</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0F766E">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="局在トレーニング">
+<style>
+:root{
+  --bg:#F3F6F5; --surface:#FFFFFF; --ink:#1A2422; --muted:#5A6865; --line:#D9E2DF;
+  --accent:#0F766E; --accent-strong:#0B5650; --accent-soft:#E1F2EF; --on-accent:#FFFFFF;
+  --ok:#2E7D4F; --ok-soft:#E3F3E9; --ng:#B42318; --ng-soft:#FDE8E6; --warn-soft:#FFF4DB;
+  --font:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#121716; --surface:#1B2220; --ink:#E7EEEC; --muted:#9FB0AC; --line:#2D3835;
+    --accent:#2DBFAF; --accent-strong:#6FDCCF; --accent-soft:#16332F; --on-accent:#06201D;
+    --ok:#5CC48A; --ok-soft:#163323; --ng:#F27A6E; --ng-soft:#3B1C1A; --warn-soft:#3A3017; color-scheme:dark}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+.app{max-width:680px;margin:0 auto;padding:0 calc(14px + env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;border:5px solid var(--accent);flex:none}
+.brand h1{font-size:19px;font-weight:900}
+.brand small{color:var(--muted);font-size:11px;margin-left:auto;text-align:right;line-height:1.3}
+.summary{margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 9px}
+.tile .k{font-size:11px;color:var(--muted);display:block}
+.tile .v{font-size:17px;font-weight:700;display:block}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:6px}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sm{min-height:36px;padding:5px 11px;font-size:14px}
+.btn:disabled{opacity:.55;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.set>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details.set>summary::-webkit-details-marker{display:none}
+details.set>summary::after{content:"＋";margin-left:auto;color:var(--muted);font-weight:400}
+details.set[open]>summary::after{content:"－"}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input{margin:0;accent-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px}
+input[type=search]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;min-height:44px}
+.sw{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--accent)}
+/* 出題 */
+.qhead{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.lv{letter-spacing:1px;color:var(--accent)}
+.regtag{margin-left:auto;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:1px 10px;font-weight:700}
+.pt{font-size:15.5px;margin:0 0 8px}
+ul.fd{margin:0;padding:0;list-style:none}
+ul.fd li{position:relative;padding:7px 0 7px 18px;border-top:1px dashed var(--line);font-size:15.5px;line-height:1.5}
+ul.fd li:first-child{border-top:0}
+ul.fd li::before{content:"";position:absolute;left:3px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.ask{font-weight:700;margin:12px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;font-size:15.5px;line-height:1.45;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:11px;padding:11px 12px;min-height:48px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ng{border-color:var(--ng);background:var(--ng-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.result{border-radius:10px;padding:9px 12px;font-weight:700;margin-bottom:10px}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.ng{background:var(--ng-soft);color:var(--ng)}
+.result .ans{display:block;color:var(--ink);font-size:17px;margin-top:2px}
+.result .syn{display:block;color:var(--muted);font-weight:400;font-size:13.5px}
+.ex h3{font-size:14.5px;margin:12px 0 4px;color:var(--accent-strong)}
+.why{margin:0;padding:0;list-style:none}
+.why li{padding:7px 0;border-top:1px dashed var(--line);font-size:15px;line-height:1.5}
+.why li:first-child{border-top:0}
+.why .f{display:block}
+.why .w{display:block;color:var(--muted);font-size:13.5px;padding-left:1.2em;text-indent:-1.2em}
+.why .w::before{content:"→ ";color:var(--accent)}
+.why .dn{font-weight:700;display:block}
+.pearl{background:var(--warn-soft);border-radius:10px;padding:9px 12px;font-size:14.5px;margin-top:12px}
+.pearl b{display:block;font-size:13px;color:var(--muted)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.nav .btn{flex:1 1 140px}
+/* 一覧 */
+details.site{border-top:1px solid var(--line)}
+details.site:first-of-type{border-top:0}
+details.site>summary{cursor:pointer;padding:9px 0;list-style:none}
+details.site>summary::-webkit-details-marker{display:none}
+details.site>summary b{display:block;font-size:15px}
+details.site>summary span{display:block;font-size:13px;color:var(--muted)}
+.lvb{font-size:11px;color:var(--accent);margin-left:6px;font-weight:400}
+.sub{font-size:12.5px;color:var(--muted);margin:8px 0 2px;font-weight:700}
+/* 成績 */
+table.st{width:100%;border-collapse:collapse;font-size:14.5px}
+table.st td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+table.st td.num{text-align:right;white-space:nowrap;width:1%}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{color:var(--muted);font-size:14px}
+/* タブ */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+nav.tabs .in{display:flex;max-width:680px;width:100%}
+nav.tabs button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:9px 0 10px;min-height:56px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;display:none;max-width:90%}
+.toast.on{display:block}
+.foot{font-size:11.5px;color:var(--muted);margin:16px 2px 0}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><h1>神経局在トレーニング</h1><small>症候から病巣を当てる<br>病棟アプリ</small></div>
+  <div class="summary">
+    <div class="tile"><span class="k">回答数</span><span class="v" id="sN">0</span></div>
+    <div class="tile"><span class="k">正答率</span><span class="v" id="sR">—</span></div>
+    <div class="tile"><span class="k">連続正解</span><span class="v" id="sS">0</span></div>
+  </div>
+</header>
+
+<section class="view active" id="v-q" aria-label="出題">
+  <details class="card set" id="setBox">
+    <summary>出題範囲・設定 <span class="hint" id="setSum" style="margin:0 0 0 4px"></span></summary>
+    <div class="chips" id="regChips"></div>
+    <div class="row"><button class="btn sm" id="regAll" type="button">すべて</button><button class="btn sm" id="regNone" type="button">すべて外す</button></div>
+    <div class="row" style="margin-top:10px">
+      <label for="lvSel" style="font-size:14px">難易度</label>
+      <select id="lvSel"><option value="1">基本のみ</option><option value="2">標準まで</option><option value="3">応用まで（すべて）</option></select>
+    </div>
+    <label class="sw"><input type="checkbox" id="hideOpt">選択肢を隠して、先に自分で考える</label>
+    <label class="sw"><input type="checkbox" id="weakOpt">間違えた部位・まだ解いていない部位を優先</label>
+    <p class="hint">症例は部位ごとの所見から毎回組み立てます（左右・提示する所見・年齢が変わります）。</p>
+  </details>
+  <div id="qArea"></div>
+</section>
+
+<section class="view" id="v-a" aria-label="部位一覧">
+  <div class="card">
+    <h2>部位一覧（局在の要点）</h2>
+    <input type="search" id="aQ" placeholder="部位名・所見で絞り込み（例：Horner、下垂足）" aria-label="絞り込み">
+    <p class="hint">「同側」「対側」は病巣からみた側です。各部位から、その部位の問題を出せます。</p>
+  </div>
+  <div id="aList"></div>
+</section>
+
+<section class="view" id="v-s" aria-label="成績">
+  <div id="sArea"></div>
+</section>
+
+<p class="foot">自分用の学習ツールです。所見の組み合わせは典型例の要約で、実際の症例では画像・経過で確認してください。入力と成績はこの端末内にのみ保存されます。</p>
+</div>
+
+<nav class="tabs" role="tablist" aria-label="画面切替"><div class="in">
+  <button role="tab" aria-selected="true" data-v="v-q" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg>出題</button>
+  <button role="tab" aria-selected="false" data-v="v-a" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg>一覧</button>
+  <button role="tab" aria-selected="false" data-v="v-s" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>成績</button>
+</div></nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* 出題データ
+   name/hx の {S}=病巣側、所見の {I}=病巣と同側、{C}=病巣と反対側。
+   所見は [所見, 局在上の意味, (任意)病巣側条件 "L"/"R"]。
+   near は誤答選択肢にする近い部位。":C" は病巣と反対側、":L"/":R" は側を固定、無指定は同側（非側性の正解ならランダム）。 */
+const REGIONS = {
+  cx: "大脳皮質・皮質下",
+  dc: "基底核・視床・内包",
+  bs: "脳幹",
+  cb: "小脳",
+  cn: "脳神経・眼球運動",
+  vis: "視覚路",
+  sc: "脊髄",
+  rt: "神経根・神経叢",
+  pn: "末梢神経",
+  nm: "神経筋接合部・筋・びまん性"
+};
+const SITES = [
+/* ───── 大脳 ───── */
+{id:"cx_broca",reg:"cx",lvl:1,name:"左下前頭回後部（Broca野）〜中心前回下部",
+ hx:"心房細動で抗凝固薬を自己中断していた。会話中に突然言葉が出なくなった。",
+ req:[["発語が少なく努力性でたどたどしい（非流暢）。単語レベルの理解は比較的保たれる","非流暢＋理解比較的保持＝前方（運動性）失語。優位半球下前頭回後部"],
+      ["復唱も障害される","復唱障害があるので超皮質性失語ではなくBroca型"],
+      ["右顔面下部と右上肢の筋力低下（下肢は軽度）","顔・上肢優位＝中心前回外側（中大脳動脈上枝領域）。下肢領域は内側で保たれやすい"]],
+ opt:[["自分の言い誤りに気づき、もどかしそうにする","病識の保持はBroca型の特徴"],
+      ["発症直後は両眼が左へ共同偏視","前頭眼野の障害で眼は病巣側を向く"],
+      ["右手で書く文も文法が崩れる（失書）","失語には書字障害を伴う"]],
+ near:["cx_wernicke","cx_cond","dc_ic:L","cx_aca:L"],
+ sig:"非流暢・復唱障害＋右顔面・上肢優位の麻痺",
+ pearl:"失語の型は『流暢性・理解・復唱』の3軸で分ける。復唱が保たれれば超皮質性（分水嶺・前大脳動脈領域）を考える。"},
+{id:"cx_wernicke",reg:"cx",lvl:1,name:"左上側頭回後部（Wernicke野）",
+ hx:"高血圧の既往。家族が『話がかみ合わない』と連れて来た。",
+ req:[["多弁で流暢だが内容が乏しく、錯語・新造語が多い","流暢＋錯語＝後方（感覚性）失語"],
+      ["口頭命令の理解が著しく悪く、復唱もできない","理解障害＋復唱障害＝Wernicke型（優位半球上側頭回後部）"],
+      ["四肢の麻痺はない","中心前回・内包から離れた後方病変。麻痺がないため精神疾患・せん妄と誤られやすい"]],
+ opt:[["本人は困っている様子がない（病識の欠如）","Wernicke失語の特徴"],
+      ["右上1/4の同名性視野欠損","側頭葉を通るMeyer係蹄の障害（対側上四分盲）"]],
+ near:["cx_broca","cx_cond","cx_angular","vis_meyer:L"],
+ sig:"流暢・理解障害・復唱障害、麻痺なし",
+ pearl:"急な『錯乱』に見えて麻痺がない時は流暢性失語を疑い、命令理解と復唱を確かめる。"},
+{id:"cx_cond",reg:"cx",lvl:3,name:"左縁上回〜弓状束（伝導失語）",
+ hx:"脂質異常症の既往。急に言い間違いが増えた。",
+ req:[["流暢に話し、理解は良好","流暢＋理解保持で、Broca野・Wernicke野は保たれる"],
+      ["復唱が著しく障害され、音韻性錯語（『とけい』→『とてい』）が目立つ","復唱の選択的障害＝伝導失語（縁上回皮質下・弓状束）"],
+      ["言い誤りを自分で何度も修正しようとする（接近行為）","音韻の自己修正は伝導失語の特徴"]],
+ opt:[["右上肢の軽い感覚低下","中心後回下部・頭頂弁蓋部の近傍"],
+      ["口・舌の観念運動失行","縁上回近傍の病変で合併しやすい"]],
+ near:["cx_broca","cx_wernicke","cx_angular","cx_aca:L"],
+ sig:"流暢・理解良好・復唱だけ障害",
+ pearl:"復唱だけが障害されるのが伝導失語、逆に復唱だけ保たれるのが超皮質性失語。"},
+{id:"cx_angular",reg:"cx",lvl:2,name:"左角回（下頭頂小葉）",
+ hx:"右利き。計算ができず、字が書けないと訴えて受診。",
+ req:[["失書（字が思い出せない）","優位半球角回"],
+      ["失算","Gerstmann症候群の一つ"],
+      ["手指の名前を言えず指せない（手指失認）","Gerstmann症候群の一つ"],
+      ["左右の区別ができない","4徴がそろえば優位半球角回"]],
+ opt:[["読字も障害される（失読失書）","角回は文字の形と音・意味をつなぐ"],
+      ["四肢の麻痺・感覚障害はない","中心前回・中心後回から離れた病変"]],
+ near:["cx_wernicke","cx_rpar","cx_pca:L","cx_cond"],
+ sig:"失書・失算・手指失認・左右失認（Gerstmann）",
+ pearl:"失読失書は左角回、書字が保たれる純粋失読は左後頭葉＋脳梁膨大。"},
+{id:"cx_rpar",reg:"cx",lvl:1,name:"右下頭頂小葉（劣位半球頭頂葉）",
+ hx:"高血圧の既往。食事で左側の皿だけ手をつけないことに家族が気づいた。",
+ req:[["左半側空間無視（線分二等分で右へ偏る、左側を見落とす）","劣位（右）半球の頭頂葉・側頭頭頂接合部"],
+      ["左片麻痺があっても『動く』と言う（病態失認）","右頭頂葉病変で生じやすい"]],
+ opt:[["着衣失行（服の左右・裏表がわからない）","劣位半球頭頂葉"],
+      ["両側同時に触れると左を感じない（消去現象）","頭頂葉の注意障害"],
+      ["左下1/4の同名性視野欠損","頭頂葉を通る視放線上部（対側下四分盲）"],
+      ["立方体の模写ができない（構成障害）","右頭頂葉で目立つ"]],
+ near:["cx_angular","cx_pca:R","dc_thal:R","dc_put:R"],
+ sig:"左半側空間無視・病態失認・着衣失行",
+ pearl:"無視は右半球病変で目立ち、左半球病変の右無視は軽く短い。左同名半盲（後頭葉）とは、注意を向けさせると見えるかどうかで区別する。"},
+{id:"cx_handknob",reg:"cx",lvl:3,lat:1,name:"{S}中心前回の手の領域（hand knob）",
+ hx:"高血圧・喫煙歴。朝から{C}手の指が動かしにくい。",
+ req:[["{C}の手指伸展・手関節背屈の筋力低下（下垂手様）","手の領域に限局した皮質病変は末梢神経障害に似た分布をとる（偽性末梢性麻痺）"],
+      ["感覚障害はない","橈骨神経障害なら手背第1指間の感覚低下を伴いやすい"],
+      ["腕橈骨筋・上腕三頭筋の筋力は保たれる","橈骨神経・C7根の分布に一致しない"]],
+ opt:[["{C}上肢の腱反射がやや亢進","上位運動ニューロン障害を示唆"],
+      ["{C}の口角がわずかに下がる","顔面の運動野が近接している"],
+      ["突然の発症で、腕の圧迫などの誘因がない","血管性の発症様式"]],
+ near:["pn_radial:C","rt_c7:C","pn_pin:C","dc_ic"],
+ sig:"対側の手に限局した筋力低下、感覚正常",
+ pearl:"急な下垂手・下垂指で感覚障害がなく、単一神経の分布に合わない時は hand knob の梗塞を考え、拡散強調像を撮る。"},
+{id:"cx_aca",reg:"cx",lvl:2,lat:1,name:"{S}前大脳動脈領域（前頭葉内側）",
+ hx:"高血圧の既往。急に{C}脚が動かなくなった。",
+ req:[["{C}下肢優位の筋力低下（上肢・顔面は軽度）","中心前回内側（傍中心小葉）は下肢の運動野"],
+      ["{C}下肢の感覚低下","中心後回内側の下肢領域"]],
+ opt:[["自発性が低く反応が遅い（無為）","前頭葉内側・帯状回"],
+      ["{C}手の把握反射","補足運動野・前頭葉内側の障害"],
+      ["尿失禁","傍中心小葉の排尿の中枢"],
+      ["話し始めが乏しいが復唱は保たれる（超皮質性運動失語）","左の補足運動野近傍","L"],
+      ["{C}手が意図に反して動く（他人の手徴候）","補足運動野〜脳梁前部の障害"]],
+ near:["dc_ic","sc_bs:C","cx_broca","bs_pbase"],
+ sig:"対側下肢優位の麻痺・感覚障害＋無為・尿失禁",
+ pearl:"片麻痺が下肢優位なら前大脳動脈領域か脊髄を考え、顔面・前頭葉徴候・感覚レベルの有無で分ける。"},
+{id:"cx_pca",reg:"cx",lvl:1,lat:1,name:"{S}後大脳動脈領域（後頭葉）",
+ hx:"心房細動の既往。急に{C}側が見えにくい。",
+ req:[["{C}同名半盲（黄斑回避あり）","後頭葉一次視覚野。後頭極は中大脳動脈との二重支配で黄斑部が回避されやすい"],
+      ["両眼の欠損の形が一致している（調和性）","視放線後部〜後頭葉ほど調和性が高い"],
+      ["対光反射は正常","対光反射の線維は外側膝状体の手前で視蓋前域へ分かれる"]],
+ opt:[["四肢の麻痺はない","中大脳動脈領域・内包の病変ではない"],
+      ["字が読めないが書くことはできる（純粋失読）","左後頭葉＋脳梁膨大で、右半球の視覚情報が言語野に届かない","L"],
+      ["色の区別がつきにくい（大脳性色覚障害）","紡錘状回・舌状回"],
+      ["よく知った人の顔がわからない（相貌失認）","右紡錘状回","R"]],
+ near:["vis_tract","vis_meyer","cx_rpar","vis_anton"],
+ sig:"対側の調和性同名半盲（黄斑回避）、麻痺なし",
+ pearl:"同名半盲で麻痺がなければ後大脳動脈領域。視索病変は不調和性でRAPDを伴う点で区別する。"},
+{id:"vis_anton",reg:"vis",lvl:2,name:"両側後頭葉（皮質盲）",
+ hx:"心臓手術の翌日、『部屋が暗い』と言いながら物にぶつかる。",
+ req:[["両眼の視力がほぼ失われている","両側の一次視覚野"],
+      ["対光反射・眼底は正常","網膜〜視索は正常"],
+      ["見えていないことを否認し、作話する（Anton症候群）","両側後頭葉病変の病態失認"]],
+ opt:[["急に目の前に手をかざしても瞬目しない","視覚情報が皮質に届かない"],
+      ["脳底動脈先端部の塞栓、または術中の低灌流","両側後大脳動脈領域"]],
+ near:["vis_chiasm","vis_on","cx_pca","dc_pm"],
+ sig:"両眼の視力消失＋対光反射正常＋病態否認",
+ pearl:"視力がないのに対光反射が保たれていれば外側膝状体より後方（皮質盲）。"},
+/* ───── 基底核・視床・内包 ───── */
+{id:"dc_ic",reg:"dc",lvl:1,lat:1,name:"{S}内包後脚",
+ hx:"高血圧・糖尿病。朝起きたら{C}半身が動かしにくい。",
+ req:[["{C}の顔面・上肢・下肢が同程度に脱力","皮質脊髄路・皮質延髄路が密集する内包後脚では顔・上肢・下肢が均等に障害される"],
+      ["感覚障害はない","視床・視床皮質路は保たれる"],
+      ["失語・半側空間無視・視野障害はない","皮質症状がない＝皮質下（ラクナ）病変"]],
+ opt:[["構音障害","皮質延髄路の障害"],["{C}の足底反射が伸展","錐体路徴候"]],
+ near:["bs_pbase","cx_broca","bs_medmed","dc_thal"],
+ sig:"顔・上肢・下肢が均等な純粋運動性片麻痺",
+ pearl:"純粋運動性片麻痺は放線冠・内包後脚・橋底部・延髄錐体で起こる。顔面が保たれ舌が偏位すれば延髄内側を考える。"},
+{id:"dc_thal",reg:"dc",lvl:1,lat:1,name:"{S}視床（後外側腹側核・後内側腹側核）",
+ hx:"高血圧の既往。突然{C}半身がしびれた。",
+ req:[["{C}の顔面・上肢・下肢の全感覚（触覚・温痛覚・振動覚）低下","VPL（体幹・四肢）とVPM（顔面）が隣接し、顔を含めた半身の全感覚が障害される"],
+      ["感覚障害の境界が正中線ではっきり分かれる","視床性感覚障害の特徴"],
+      ["筋力低下はない","内包後脚は保たれる"]],
+ opt:[["{C}の口の周りと手のひらのしびれで始まった（手口感覚症候群）","視床で口と手の領域が隣接"],
+      ["数週後から{C}半身の焼けるような痛み","視床痛（Dejerine-Roussy症候群）"]],
+ near:["bs_latmed","cx_rpar","dc_ic","sc_bs"],
+ sig:"顔面を含む対側半身の全感覚低下、麻痺なし",
+ pearl:"顔と体で感覚障害が左右に分かれれば延髄外側、顔を含め同じ側にそろえば視床か頭頂葉。皮質性なら二点識別・立体覚の障害が目立つ。"},
+{id:"dc_thalh",reg:"dc",lvl:2,lat:1,name:"{S}視床（出血、内包へ進展）",
+ hx:"未治療の高血圧。突然{C}半身のしびれと脱力。",
+ req:[["{C}半身の感覚障害が運動障害より強い","視床が主座で内包に及ぶ"],
+      ["両眼が下内方に偏位（鼻先を見つめる）","視床から中脳上部の垂直注視中枢への圧迫"],
+      ["両側の縮瞳","視床下部〜中脳の交感神経路"]],
+ opt:[["{C}片麻痺","内包後脚への進展"],["上方視ができない","中脳背側（視蓋前域）への圧迫"],["傾眠","視床・中脳網様体"]],
+ near:["dc_put","dc_thal","bs_dmb","bs_pbase"],
+ sig:"対側の感覚優位の片麻痺＋眼球の下内方偏位",
+ pearl:"共同偏視の向きは出血部位の手がかり：被殻は病側へ、視床は下内方、橋は健側（または正中固定と縮瞳）。"},
+{id:"dc_put",reg:"dc",lvl:1,lat:1,name:"{S}被殻（被殻出血）",
+ hx:"未治療の高血圧。仕事中に突然{C}半身が動かなくなり、頭痛と嘔吐。",
+ req:[["{C}片麻痺（顔面を含む）","被殻外側から内包後脚への進展"],
+      ["両眼が{I}へ共同偏視（病巣を見つめる）","前頭眼野からの下行路が障害され、健常側の前頭眼野が眼を病側へ押す"]],
+ opt:[["{C}半身の感覚低下","内包後脚後部・視床皮質路"],
+      ["失語","優位半球の被殻出血による皮質下性失語","L"],
+      ["左半側空間無視","劣位半球の被殻出血","R"],
+      ["{C}同名半盲","視放線への進展"]],
+ near:["dc_thalh","dc_ic","bs_pbase","bs_vinuc:C"],
+ sig:"対側片麻痺＋病側への共同偏視",
+ pearl:"テント上の破壊性病変では眼は病側を見つめ、橋病変では健側（麻痺側）を見る。けいれん発作中は焦点と反対側へ向く。"},
+{id:"dc_stn",reg:"dc",lvl:2,lat:1,name:"{S}視床下核",
+ hx:"糖尿病・高血圧の高齢者。急に{C}腕を振り回すような動きが止まらない。",
+ req:[["{C}上下肢近位の、大きく投げ出すような不随意運動（片側バリズム）","視床下核の障害で淡蒼球内節への興奮性入力が減り、視床への抑制が外れる"],
+      ["睡眠中は消える","不随意運動の一般的特徴"]],
+ opt:[["筋力低下・感覚障害はない","内包・視床は保たれる"],
+      ["数日〜数週で舞踏運動様に小さくなる","バリズムと舞踏運動は連続した病態"]],
+ near:["dc_put","dc_thal","cb_hemi:C","bs_claude"],
+ sig:"対側の片側バリズム",
+ pearl:"非ケトン性高血糖では被殻（T1高信号）の障害で片側舞踏運動・バリズムが起こる。血糖を必ず確認する。"},
+{id:"dc_pm",reg:"dc",lvl:3,name:"両側視床傍正中部（Percheron動脈領域）",
+ hx:"突然意識がもうろうとなり、呼びかけで開眼してもすぐ眠ってしまう。",
+ req:[["過眠・意識障害（呼べば覚醒する）","視床内側の上行性網様体賦活系"],
+      ["上下方向の垂直注視麻痺","中脳上部（riMLF）への進展"],
+      ["覚醒しても新しいことを覚えられない","視床背内側核・乳頭視床路"]],
+ opt:[["四肢の麻痺は軽いか、ない","内包は保たれる"],["自発性の著しい低下","視床背内側核と前頭葉の回路"]],
+ near:["bs_dmb","dc_thal","vis_anton","dc_thalh"],
+ sig:"過眠＋垂直注視麻痺＋健忘",
+ pearl:"Percheron動脈は片側のP1から出て両側視床内側を栄養する変異。原因不明の意識障害では両側視床の拡散強調像を見落とさない。"},
+/* ───── 脳幹 ───── */
+{id:"bs_dmb",reg:"bs",lvl:2,name:"中脳背側（視蓋前域）",
+ hx:"20歳代男性。数か月前から頭痛があり、上が見にくい。",
+ req:[["上方注視麻痺","中脳背側の上方注視の中枢（riMLF・後交連）"],
+      ["対光反射は弱いが近見で縮瞳する（対光-近見反応解離）","視蓋前域の対光反射路が障害され、腹側を通る近見反応路は保たれる"],
+      ["上を見ようとすると両眼が引き込まれ輻輳する（輻輳後退眼振）","Parinaud症候群の特徴"]],
+ opt:[["眼瞼が後退して上の白目が見える（Collier徴候）","後交連核の障害"],["松果体部の腫瘍・水頭症","中脳背側を圧迫する代表的原因"]],
+ near:["dc_pm","bs_weber","cn_3nuc","nm_mg"],
+ sig:"上方注視麻痺＋対光-近見反応解離＋輻輳後退眼振（Parinaud）",
+ pearl:"対光-近見反応解離は中脳背側病変のほか、Adie瞳孔・Argyll Robertson瞳孔（神経梅毒）・糖尿病でもみられる。"},
+{id:"bs_weber",reg:"bs",lvl:1,lat:1,name:"{S}中脳腹側（大脳脚）",
+ hx:"高血圧・糖尿病。突然物が二重に見え、{C}半身が動かない。",
+ req:[["{I}の眼瞼下垂・散瞳、眼球は外下方へ偏位","大脳脚内側を通る動眼神経束"],
+      ["{C}片麻痺（顔面下部・舌を含む）","大脳脚の皮質脊髄路・皮質延髄路（交叉前）"]],
+ opt:[["{I}眼の内転・上転・下転ができない","動眼神経支配の内直筋・上直筋・下直筋"]],
+ near:["bs_claude","cn_3","bs_mlg","cn_3nuc"],
+ sig:"同側動眼神経麻痺＋対側片麻痺（Weber）",
+ pearl:"交代性麻痺では脳神経麻痺の側が病巣側。どの脳神経かで高さが決まる（III中脳、VI・VII橋、XII延髄）。"},
+{id:"bs_claude",reg:"bs",lvl:2,lat:1,name:"{S}中脳被蓋（赤核）",
+ hx:"心房細動の既往。突然物が二重に見え、ふらつく。",
+ req:[["{I}の動眼神経麻痺（眼瞼下垂・散瞳・内転障害）","被蓋を通る動眼神経束"],
+      ["{C}上下肢の小脳性運動失調（測定障害・企図振戦）","赤核・交叉後の上小脳脚線維の障害で対側に失調"]],
+ opt:[["{C}の粗大な振戦・不随意運動","赤核の障害（Benedikt型）"],["筋力低下はないか軽い","大脳脚は保たれる"]],
+ near:["bs_weber","cb_hemi:C","cn_3","dc_stn"],
+ sig:"同側動眼神経麻痺＋対側失調（Claude）",
+ pearl:"上小脳脚は中脳下部で交叉する。交叉より上の病変では失調が対側に出る。"},
+{id:"cn_3nuc",reg:"bs",lvl:3,lat:1,name:"{S}動眼神経核（中脳）",
+ hx:"高血圧。突然両方のまぶたが下がり、物が二重に見える。",
+ req:[["{I}眼の内転・下転障害","同側の内直筋・下直筋・下斜筋の亜核"],
+      ["両側の眼瞼下垂","眼瞼挙筋は正中の単一亜核（中心尾側核）が両側を支配"],
+      ["両眼の上転障害","上直筋亜核の線維は交叉して対側を支配し、反対側からの線維も同側の核内を通る"]],
+ opt:[["{I}の散瞳","Edinger-Westphal核"]],
+ near:["cn_3","bs_weber","bs_dmb","nm_mg"],
+ sig:"片側の動眼神経麻痺に両側眼瞼下垂・両側上転障害を伴う",
+ pearl:"片側の動眼神経麻痺で対側の上直筋が正常なら核性ではない。"},
+{id:"bs_vinuc",reg:"bs",lvl:3,lat:1,name:"{S}外転神経核（橋下部背側）",
+ hx:"多発性硬化症の既往。急に{I}側を見られなくなった。",
+ req:[["{I}方向への水平注視で両眼とも動かない（同側水平注視麻痺）","外転神経核には内側縦束を経て対側動眼神経核へ向かう介在ニューロンがある"],
+      ["垂直方向の眼球運動と輻輳は正常","中脳の中枢は保たれる"]],
+ opt:[["{I}の額を含む顔面麻痺","顔面神経線維が外転神経核を回り込む（顔面神経膝）"],["{I}方向を見ようとして頭ごと回す","注視麻痺の代償"]],
+ near:["cn_6","bs_15","bs_mlf","dc_put:C"],
+ sig:"同側への水平注視麻痺（両眼）、垂直・輻輳は正常",
+ pearl:"片眼の外転障害は外転神経、両眼の同側注視麻痺は外転神経核（またはPPRF）。"},
+{id:"bs_mlf",reg:"bs",lvl:2,lat:1,name:"{S}内側縦束（MLF）",
+ hx:"30歳代女性。視神経炎の既往。左右を見ると物がぶれる。",
+ req:[["{C}方向を見ると{I}眼が内転しない","病側の内側縦束が障害され、対側外転神経核から同側動眼神経核への信号が途絶"],
+      ["{C}眼の外転時に単眼性の眼振","内転不足を補う過剰な信号"],
+      ["輻輳では{I}眼も内転できる","内直筋と動眼神経自体は正常"]],
+ opt:[["眼瞼下垂・瞳孔異常はない","動眼神経麻痺とは異なる"],["垂直方向の眼振","内側縦束は垂直の前庭眼反射路も通す"]],
+ near:["cn_3","bs_15","nm_mg","cn_6:C"],
+ sig:"同側眼の内転障害＋対側眼外転時の眼振、輻輳保存（INO）",
+ pearl:"INOは内転できない眼の側の内側縦束の障害。若年・両側は多発性硬化症、高齢・片側は脳幹梗塞が多い。重症筋無力症はINOを模倣しうる。"},
+{id:"bs_15",reg:"bs",lvl:3,lat:1,name:"{S}橋下部背側（外転神経核＋内側縦束）",
+ hx:"高血圧。突然、目が横に動かなくなった。",
+ req:[["{I}方向への水平注視で両眼とも動かない","同側の外転神経核（またはPPRF）"],
+      ["{C}方向を見ると{I}眼は内転できず、{C}眼だけが外転し眼振を伴う","同側内側縦束の障害（INO）が加わる"],
+      ["垂直方向の眼球運動・輻輳は保たれる","中脳は保たれる"]],
+ opt:[["{I}の末梢性顔面麻痺（8½症候群）","顔面神経膝の障害"]],
+ near:["bs_vinuc","bs_mlf","cn_6","bs_mlg"],
+ sig:"動くのは対側眼の外転だけ（one-and-a-half症候群）",
+ pearl:"one-and-a-half症候群：一側の水平注視麻痺（1）＋同側のINO（½）。残るのは対側眼の外転のみ。"},
+{id:"bs_mlg",reg:"bs",lvl:2,lat:1,name:"{S}橋下部腹側",
+ hx:"高血圧・糖尿病。物が二重に見え、{C}半身が動かない。",
+ req:[["{I}眼の外転障害","橋腹側を通る外転神経束"],
+      ["{I}の額を含む顔面麻痺","顔面神経束（末梢性）"],
+      ["{C}上下肢の麻痺（顔面は含まない）","橋底部の皮質脊髄路（交叉前）"]],
+ opt:[["{C}の足底反射が伸展","錐体路徴候"]],
+ near:["bs_weber","bs_vinuc","bs_pbase","bs_medmed"],
+ sig:"同側VI・VII麻痺＋対側片麻痺（Millard-Gubler）",
+ pearl:"顔面の麻痺と四肢の麻痺が反対側なら脳幹。末梢性顔面麻痺の側が病巣側。"},
+{id:"bs_pbase",reg:"bs",lvl:2,lat:1,name:"{S}橋底部（傍正中橋枝領域）",
+ hx:"高血圧・糖尿病。数日かけて{C}手足が動かしにくくなった。",
+ req:[["{C}上下肢の筋力低下（軽度〜中等度）","橋底部の皮質脊髄路"],
+      ["筋力低下に見合わない{C}上下肢の運動失調（失調性片麻痺）","橋核・橋小脳線維の障害"],
+      ["眼球運動・感覚は正常","被蓋は保たれる"]],
+ opt:[["構音障害と{C}手の不器用さ","構音障害・手不器用症候群（同じ橋底部ラクナでみられる）"],["{C}の顔面下部の麻痺","皮質延髄路"]],
+ near:["dc_ic","cb_hemi:C","bs_mlg","dc_thal"],
+ sig:"失調性片麻痺・構音障害-手不器用",
+ pearl:"失調性片麻痺は内包後脚・放線冠でも起こり、症候だけで橋と内包は確定できない。数日で進行するのは分枝粥腫病（BAD）型に多い。"},
+{id:"bs_latmed",reg:"bs",lvl:1,lat:1,name:"{S}延髄外側",
+ hx:"50歳代男性。ゴルフの後に首の後ろが痛み、回転性めまいと嘔吐。",
+ req:[["{I}顔面の温痛覚低下","三叉神経脊髄路・核（交叉前）"],
+      ["{C}の頸部以下の温痛覚低下","外側脊髄視床路（交叉後）"],
+      ["嚥下障害・嗄声、{I}の軟口蓋挙上不良","疑核"]],
+ opt:[["{I}のHorner症候群（縮瞳・眼瞼下垂）","下行性交感神経路"],
+      ["{I}上下肢の失調","下小脳脚・脊髄小脳路"],
+      ["回転性めまい・眼振","前庭神経核"],
+      ["しゃっくりが止まらない","延髄の吃逆中枢"],
+      ["四肢の筋力低下はない","錐体（延髄腹内側）は保たれる"]],
+ near:["bs_medmed","cb_hemi","dc_thal","cn_jf"],
+ sig:"同側顔面＋対側体幹四肢の温痛覚障害、疑核障害、Horner（Wallenberg）",
+ pearl:"顔と体の感覚障害が左右に分かれれば延髄外側。若年者では椎骨動脈解離を考える。"},
+{id:"bs_medmed",reg:"bs",lvl:2,lat:1,name:"{S}延髄内側",
+ hx:"高血圧・脂質異常症。突然{C}手足が動かず、しゃべりにくい。",
+ req:[["舌を出すと{I}へ偏位し、{I}の舌が萎縮","舌下神経（核・神経束）の障害。舌は病側へ偏る"],
+      ["{C}上下肢の麻痺（顔面は保たれる）","延髄錐体（交叉前）。皮質延髄路は既に分かれているので顔は保たれる"],
+      ["{C}上下肢の位置覚・振動覚の低下","内側毛帯（交叉後）"]],
+ opt:[["温痛覚は保たれる","外側脊髄視床路は外側を通る"]],
+ near:["bs_latmed","dc_ic","bs_mlg","cn_cs"],
+ sig:"同側舌下神経麻痺＋対側片麻痺（顔面回避）＋対側深部覚低下（Dejerine）",
+ pearl:"片麻痺で顔面が保たれる時は延髄（または頸髄）を考え、舌の偏位を見る。"},
+/* ───── 小脳 ───── */
+{id:"cb_hemi",reg:"cb",lvl:1,lat:1,name:"{S}小脳半球",
+ hx:"高血圧。突然の後頭部痛・回転性めまい・嘔吐。歩くと{I}へ倒れる。",
+ req:[["{I}の指鼻試験・踵膝試験で測定障害","小脳半球は同側の四肢を制御（経路が二重に交叉）"],
+      ["{I}手の反復拮抗運動の拙劣","同側小脳半球"],
+      ["筋力低下・感覚障害はない","錐体路・感覚路は保たれる"]],
+ opt:[["{I}を見ると強くなる注視方向性眼振","同側小脳"],["断綴性の構音障害","小脳性構音障害"],["{I}上肢の筋緊張低下（腕を振ると大きく揺れる）","小脳性の低緊張"]],
+ near:["cb_verm","bs_latmed","bs_pbase:C","sc_scd"],
+ sig:"同側四肢の失調、麻痺・感覚障害なし",
+ pearl:"小脳出血・梗塞の頭痛・嘔吐・歩行不能は脳幹圧迫の前ぶれになりうる。『歩けるか』を必ず確かめる。"},
+{id:"cb_verm",reg:"cb",lvl:2,name:"小脳虫部",
+ hx:"長年の大量飲酒。数週かけて歩行がふらつき、足を広げて歩く。",
+ req:[["開脚の不安定な歩行、継ぎ足歩行ができない","虫部は体幹・歩行を制御"],
+      ["座位・立位でも体幹が揺れる（体幹失調）","正中構造の障害"],
+      ["上肢の指鼻試験はほぼ正常","半球は比較的保たれる"]],
+ opt:[["踵膝試験は両側でやや拙劣","前上部虫部は下肢を制御（アルコール性小脳変性）"],["閉眼でも開眼でも同じ程度に揺れる","感覚性失調なら閉眼で著明に悪化（Romberg徴候）"]],
+ near:["cb_hemi","sc_scd","nm_pn","cx_aca"],
+ sig:"体幹・歩行の失調、四肢は保たれる",
+ pearl:"Romberg徴候は小脳ではなく深部感覚（後索・末梢神経）の障害を示す。小脳性失調は開眼でも不安定。"},
+/* ───── 脳神経・眼球運動 ───── */
+{id:"cn_3",reg:"cn",lvl:1,lat:1,name:"{S}動眼神経（くも膜下腔、後交通動脈分岐部付近）",
+ hx:"50歳代女性。突然の激しい頭痛のあと、{I}のまぶたが開かない。",
+ req:[["{I}の完全な眼瞼下垂","眼瞼挙筋"],
+      ["{I}の散瞳・対光反射消失","瞳孔線維は動眼神経の表面を走り、外からの圧迫で早期に障害される"],
+      ["{I}眼は外下方へ偏位し、内転・上転・下転ができない","外直筋（VI）と上斜筋（IV）だけが働く"]],
+ opt:[["他の脳神経・四肢に異常はない","単独の動眼神経障害"]],
+ near:["cn_3nuc","bs_weber","cn_cav","nm_mg"],
+ sig:"散瞳を伴う単独の動眼神経麻痺",
+ pearl:"散瞳を伴う動眼神経麻痺は動脈瘤を否定するまで緊急。瞳孔回避型は微小血管性が多いが、発症数日は散瞳が遅れて出ることがある。"},
+{id:"cn_4",reg:"cn",lvl:2,lat:1,name:"{S}滑車神経",
+ hx:"頭部打撲の数日後から、上下にずれて二重に見える。階段を下りるとき特につらい。",
+ req:[["{I}眼の上斜視","上斜筋（下転・内旋）の麻痺"],
+      ["{C}方向を見ながら下を見ると複視が強くなる","上斜筋は内転位での下転に最も働く"],
+      ["頭を{I}へ傾けると上斜視が強くなる（Bielschowsky頭部傾斜試験陽性）","同側へ傾けると内旋が必要になり、上斜筋の代わりに働く上直筋が眼を上げてしまう"]],
+ opt:[["頭を{C}へ傾けた姿勢をとる","外旋を補う代償頭位"],["眼瞼下垂・瞳孔異常はない","動眼神経は保たれる"]],
+ near:["cn_3","cn_6","bs_mlf","nm_mg"],
+ sig:"同側の上斜視、対側視＋下方視・同側傾斜で増悪",
+ pearl:"滑車神経核は対側の上斜筋を支配する（背側で交叉）。頭部外傷は両側滑車神経麻痺の最多原因。Parksの3段階試験で決める。"},
+{id:"cn_6",reg:"cn",lvl:1,lat:1,name:"{S}外転神経",
+ hx:"糖尿病。数日前から横にずれて二重に見え、{I}を見ると悪化する。",
+ req:[["{I}眼の外転障害（内斜視）","外直筋の麻痺"],
+      ["水平性複視が{I}方向視と遠見で増悪","外直筋は外転時・遠見時に働く"],
+      ["{C}眼の動きは正常","核性なら両眼の水平注視麻痺になる"]],
+ opt:[["顔面麻痺・四肢の症状はない","橋の病変ではない"],["顔を{I}へ回した姿勢","代償頭位"]],
+ near:["bs_vinuc","bs_mlf:C","bs_mlg","nm_mg"],
+ sig:"片眼の外転障害のみ",
+ pearl:"外転神経は頭蓋内の走行が長く、頭蓋内圧の亢進・低下で偽性局在徴候として（ときに両側に）出る。"},
+{id:"cn_cpa",reg:"cn",lvl:2,lat:1,name:"{S}小脳橋角部",
+ hx:"数年前から{I}耳の聞こえが悪く、耳鳴りがある。最近ふらつく。",
+ req:[["{I}の感音難聴・耳鳴","内耳神経（前庭神経鞘腫が多い）"],
+      ["{I}の角膜反射の低下","三叉神経の感覚枝が早くから圧迫される"],
+      ["{I}上下肢の失調","中小脳脚・小脳半球の圧迫"]],
+ opt:[["{I}顔面のしびれ","三叉神経"],["{I}の軽い顔面麻痺","顔面神経は圧迫に強く、後まで目立たない"],["数年かけて徐々に進行","良性腫瘍の経過"]],
+ near:["cn_7c","bs_latmed","cb_hemi","bs_mlg"],
+ sig:"同側の難聴・角膜反射低下・失調（V・VII・VIII＋小脳）",
+ pearl:"一側の感音難聴は聴神経腫瘍を除外する。角膜反射の左右差は早期の客観的所見。"},
+{id:"cn_cav",reg:"cn",lvl:2,lat:1,name:"{S}海綿静脈洞",
+ hx:"{I}眼の奥の痛みと複視が1週間で進行。",
+ req:[["{I}眼の全方向の眼球運動障害（III・IV・VI）","海綿静脈洞内を3つの眼運動神経が通る"],
+      ["{I}の額・眼の周りの感覚低下（V1）","三叉神経第1枝は外側壁を通る"],
+      ["視力は正常","視神経は海綿静脈洞を通らない"]],
+ opt:[["{I}の頬の感覚低下（V2）","上顎神経も外側壁の下部を通る"],
+      ["{I}の瞳孔は中等度散大で固定","動眼神経（副交感）と交感神経の両方が障害"],
+      ["{I}の眼球突出・結膜充血・眼窩部の雑音","頸動脈海綿静脈洞瘻"],
+      ["咀嚼筋・下顎の感覚は正常","V3は卵円孔から出るので保たれる"]],
+ near:["cn_apex","cn_3","nm_mg","cn_cpa"],
+ sig:"同側III・IV・VI＋V1（±V2）、視力正常",
+ pearl:"多発脳神経麻痺は『それらの神経が一緒に走る場所』で局在する。視神経が加われば眼窩尖端、V2がなければ上眼窩裂も考える。"},
+{id:"cn_apex",reg:"cn",lvl:3,lat:1,name:"{S}眼窩尖端",
+ hx:"糖尿病のコントロール不良。{I}眼の痛み、視力低下、複視。",
+ req:[["{I}眼の視力低下・RAPD陽性","視神経管の入口"],
+      ["{I}眼の全方向の眼球運動障害","III・IV・VI"],
+      ["{I}の額の感覚低下","V1"]],
+ opt:[["{I}の頬の感覚は正常","V2は正円孔から出るので保たれることが多い"],["鼻腔の黒色痂皮","ムーコル症など侵襲性真菌症"]],
+ near:["cn_cav","vis_on","cn_3","nm_mg"],
+ sig:"同側II＋III・IV・VI＋V1",
+ pearl:"視神経障害の有無が海綿静脈洞と眼窩尖端を分ける。"},
+{id:"cn_7c",reg:"cn",lvl:3,lat:1,name:"{S}顔面神経（顔面神経管内、アブミ骨筋神経の分岐より近位）",
+ hx:"数日前に{I}耳の後ろが痛み、朝起きたら顔がゆがんでいた。",
+ req:[["{I}の額を含む顔面全体の麻痺","末梢性（核・神経）。中枢性なら額は両側支配で保たれる"],
+      ["{I}耳で音が響く（聴覚過敏）","アブミ骨筋神経の分岐より近位"],
+      ["{I}舌前2/3の味覚低下","鼓索神経の分岐より近位"]],
+ opt:[["涙の分泌は保たれる","大錐体神経（膝神経節で分岐）より遠位"],["他の脳神経・四肢に異常はない","単独の顔面神経障害"]],
+ near:["cn_7f","cn_cpa","bs_mlg","dc_ic:C"],
+ sig:"額を含む末梢性顔面麻痺＋聴覚過敏・味覚低下、涙は保たれる",
+ pearl:"大錐体神経→アブミ骨筋神経→鼓索神経の順に分かれるので、症状の組み合わせで障害部位がわかる。耳介の水疱があればRamsay Hunt症候群。"},
+{id:"cn_7f",reg:"cn",lvl:3,lat:1,name:"{S}顔面神経（茎乳突孔より遠位、耳下腺内）",
+ hx:"数か月かけて{I}の口角が下がってきた。{I}耳の下にしこりがある。",
+ req:[["{I}顔面の麻痺（一部の枝で目立つ）","耳下腺内で枝分かれした後の障害"],
+      ["味覚・聴覚過敏・涙の分泌に異常はない","鼓索神経・アブミ骨筋神経・大錐体神経は茎乳突孔より近位で分かれる"]],
+ opt:[["{I}耳下部の腫瘤","耳下腺腫瘍"]],
+ near:["cn_7c","cn_cpa","bs_mlg","nm_mg"],
+ sig:"味覚・聴覚過敏を伴わない末梢性顔面麻痺",
+ pearl:"緩徐進行・部分的な顔面麻痺はBell麻痺らしくない。耳下腺・側頭骨の腫瘍を画像で探す。"},
+{id:"cn_jf",reg:"cn",lvl:3,lat:1,name:"{S}頸静脈孔",
+ hx:"数週前から飲み込みにくく、声がかすれる。{I}の肩が上がりにくい。",
+ req:[["嚥下障害・嗄声、{I}の軟口蓋挙上不良（カーテン徴候）","舌咽神経・迷走神経"],
+      ["{I}胸鎖乳突筋の筋力低下（顔を{C}へ向ける力が弱い）","副神経"],
+      ["{I}僧帽筋の筋力低下（肩をすくめる力が弱い）","副神経"]],
+ opt:[["舌の動きは正常","舌下神経は舌下神経管から出るので保たれる（Vernet症候群）"],["Horner症候群はない","交感神経は頸静脈孔の外"],["{I}の咽頭反射の消失","舌咽神経（感覚）"]],
+ near:["bs_latmed","cn_cs","nm_mg","nm_als"],
+ sig:"同側IX・X・XI（Vernet）",
+ pearl:"IX〜XIIならCollet-Sicard（頸静脈孔＋舌下神経管）、さらに交感神経が加われば咽頭後隙（Villaret）。"},
+{id:"cn_cs",reg:"cn",lvl:3,lat:1,name:"{S}頸静脈孔＋舌下神経管（後頭顆部）",
+ hx:"がんの既往。後頭部痛が続き、飲み込みにくく声がかすれる。",
+ req:[["嚥下障害・嗄声、{I}の軟口蓋挙上不良","IX・X"],
+      ["{I}胸鎖乳突筋・僧帽筋の筋力低下","XI"],
+      ["舌を出すと{I}へ偏位し、萎縮している","XII"]],
+ opt:[["Horner症候群はない","咽頭後隙（Villaret）ではない"],["持続する後頭部痛","頭蓋底転移"]],
+ near:["cn_jf","bs_medmed","bs_latmed","nm_als"],
+ sig:"同側IX〜XII（Collet-Sicard）",
+ pearl:"下位脳神経の多発障害は頭蓋底転移・腫瘍を考え、CT骨条件とMRIで頭蓋底を見る。"},
+{id:"cn_horner",reg:"cn",lvl:2,lat:1,name:"{S}内頸動脈周囲の交感神経（節後線維）",
+ hx:"40歳代。首をひねる施術を受けた翌日から{I}の頸部痛と頭痛。",
+ req:[["{I}の縮瞳（暗所で左右差が大きくなる）","交感神経の障害による瞳孔散大筋の麻痺"],
+      ["{I}の軽い眼瞼下垂","Müller筋の麻痺"],
+      ["顔面の発汗は保たれる","顔面の汗腺への線維は外頸動脈に沿うため、内頸動脈周囲（節後）の病変では保たれる"]],
+ opt:[["舌を出すと{I}へ偏位","内頸動脈解離による舌下神経の圧迫"],["{C}上肢の一過性の脱力","解離部からの塞栓（TIA）"],["拍動性の耳鳴","内頸動脈解離"]],
+ near:["bs_latmed","rt_lt","cn_3","cn_cav"],
+ sig:"同側Horner（顔面発汗保存）＋頸部痛",
+ pearl:"痛みを伴うHorner症候群は内頸動脈解離を考えて頸部血管を評価する。中枢性（延髄外側）・節前性（肺尖・T1）・節後性で随伴症状が異なる。"},
+/* ───── 視覚路 ───── */
+{id:"vis_on",reg:"vis",lvl:1,lat:1,name:"{S}視神経",
+ hx:"30歳代女性。数日で{I}眼が見えにくくなり、眼を動かすと痛い。",
+ req:[["{I}眼の視力低下・色覚低下","視神経"],
+      ["{I}眼のRAPD陽性","片側の求心路（網膜・視神経）の障害"],
+      ["{I}眼の中心暗点","乳頭黄斑線維の障害"]],
+ opt:[["眼球運動時痛","視神経炎（視神経鞘が外眼筋の起始部に付着）"],["{C}眼の視野は正常","視交叉より前の障害"]],
+ near:["vis_chiasm","vis_tract","cn_apex","cx_pca"],
+ sig:"片眼の視力低下・中心暗点・RAPD",
+ pearl:"片眼だけの視野障害は視交叉より前。RAPDは網膜・視神経障害の左右差を最も鋭敏に示す。"},
+{id:"vis_chiasm",reg:"vis",lvl:1,name:"視交叉",
+ hx:"40歳代。最近、車の運転で横から来る自転車に気づかない。",
+ req:[["両耳側半盲","視交叉で交叉する鼻側網膜線維（耳側視野）の障害"]],
+ opt:[["上耳側から欠損が始まる","下からの圧迫（下垂体腺腫）では下鼻側網膜線維が先に障害"],
+      ["無月経・乳汁分泌、または手足の肥大","下垂体腺腫のホルモン症状"],
+      ["視力は保たれていることが多い","交叉線維が主に障害される"]],
+ near:["vis_on","vis_tract","vis_anton","cx_pca"],
+ sig:"両耳側半盲",
+ pearl:"下からの圧迫（下垂体）は上耳側から、上からの圧迫（頭蓋咽頭腫など）は下耳側から欠けやすい。"},
+{id:"vis_tract",reg:"vis",lvl:3,lat:1,name:"{S}視索",
+ hx:"数か月前から{C}側が見えにくい。",
+ req:[["{C}同名半盲（左右眼の欠損の形が一致しない＝不調和性）","視索では左右眼の対応する線維がまだ近接していない"],
+      ["{C}眼のRAPD","交叉線維（耳側視野＝欠損が大きい側の眼）の方が多いため"]],
+ opt:[["{C}眼の視神経乳頭の帯状萎縮","交叉線維（鼻側網膜）の萎縮"],["四肢の麻痺はない","内包は保たれる"]],
+ near:["cx_pca","vis_meyer","vis_chiasm","vis_on:C"],
+ sig:"対側の不調和性同名半盲＋RAPD",
+ pearl:"同名半盲にRAPDを伴えば視索。後頭葉の病変ではRAPDは出ない。"},
+{id:"vis_meyer",reg:"vis",lvl:2,lat:1,name:"{S}側頭葉（Meyer係蹄）",
+ hx:"{I}側頭葉の手術後から、{C}の上の方が見えない。",
+ req:[["{C}同名上四分盲","下方網膜（上方視野）からの線維は側頭葉の前方を回るMeyer係蹄を通る"]],
+ opt:[["四肢の麻痺はない","内包・中心前回は保たれる"],
+      ["流暢性失語","優位半球側頭葉の病変","L"],
+      ["既視感・上腹部不快感の発作","側頭葉てんかん"]],
+ near:["cx_pca","vis_tract","cx_rpar","cx_wernicke"],
+ sig:"対側の同名上四分盲",
+ pearl:"上四分盲は側頭葉（pie in the sky）、下四分盲は頭頂葉（pie on the floor）。"},
+/* ───── 脊髄 ───── */
+{id:"sc_bs",reg:"sc",lvl:1,lat:1,name:"{S}脊髄半側（胸髄T10付近）",
+ hx:"数か月前から背中の痛みがあり、{I}脚が動かしにくくなった。",
+ req:[["{I}下肢の筋力低下と腱反射亢進","同側の皮質脊髄路（交叉後）"],
+      ["{I}下肢の位置覚・振動覚の低下","後索は延髄で交叉するまで同側を上行"],
+      ["{C}の臍より下の温痛覚低下","脊髄視床路は入ってすぐ（1〜2髄節上がって）交叉し対側を上行"]],
+ opt:[["{I}の臍の高さに帯状の全感覚低下","病変髄節の後根進入部"],["{I}の足底反射が伸展","錐体路徴候"]],
+ near:["sc_asa","cx_aca:C","sc_scd","rt_cauda"],
+ sig:"同側の運動・深部覚障害＋対側の温痛覚障害（Brown-Séquard）",
+ pearl:"温痛覚障害のレベルは病変より1〜2髄節下に出る。感覚レベルより上の髄節も画像の範囲に入れる。"},
+{id:"sc_asa",reg:"sc",lvl:1,name:"胸髄前方2/3（前脊髄動脈領域）",
+ hx:"胸腹部大動脈瘤の術後に両脚が動かない。",
+ req:[["両下肢の弛緩性麻痺","前角・両側皮質脊髄路（急性期は脊髄ショックで弛緩性）"],
+      ["胸部以下の温痛覚低下","両側の脊髄視床路"],
+      ["振動覚・位置覚は保たれる","後索は後脊髄動脈の支配"]],
+ opt:[["尿閉","仙髄の排尿中枢への下行路"],["発症時の背部痛","脊髄梗塞の初発症状"],["数週後に腱反射亢進・Babinski徴候","脊髄ショックからの回復"]],
+ near:["sc_bs","sc_scd","rt_cauda","nm_gbs"],
+ sig:"対麻痺＋解離性感覚障害（深部覚保存）＋膀胱障害",
+ pearl:"解離性感覚障害（温痛覚↓・深部覚保存）は前脊髄動脈症候群と脊髄中心部の病変（脊髄空洞症など）で出る。"},
+{id:"sc_cc",reg:"sc",lvl:2,name:"頸髄中心部",
+ hx:"頸椎症のある70歳代男性。転んで額を打った直後から手が動かない。",
+ req:[["上肢（特に手）の筋力低下が下肢より強い","中心灰白質の前角と、皮質脊髄路の内側寄りの線維が障害"],
+      ["両肩〜上肢の温痛覚低下（宙づり型）","中心管の前で交叉する脊髄視床路線維"]],
+ opt:[["下肢の筋力は比較的保たれる","中心部から離れた線維は保たれやすい"],["排尿障害","程度はさまざま"],["振動覚は保たれる","後索は保たれやすい"]],
+ near:["sc_asa","sc_c6","nm_gbs","rt_lt"],
+ sig:"上肢優位の筋力低下＋宙づり型の温痛覚障害",
+ pearl:"高齢者の頸部過伸展外傷は骨折がなくても中心性頸髄損傷を起こす。緩徐進行の宙づり型解離性感覚障害は脊髄空洞症を考える。"},
+{id:"sc_scd",reg:"sc",lvl:2,name:"脊髄後索・側索（両側）",
+ hx:"胃全摘後の60歳代。数か月で歩行が不安定になった。",
+ req:[["両下肢の振動覚・位置覚の低下","後索"],
+      ["Romberg徴候陽性","深部感覚性の失調"],
+      ["両側のBabinski徴候","側索（皮質脊髄路）"]],
+ opt:[["アキレス腱反射は消失","併存する末梢神経障害"],["首を前に曲げると背中に電撃痛（Lhermitte徴候）","後索の障害"],["大球性貧血","ビタミンB12欠乏"]],
+ near:["nm_pn","cb_verm","sc_asa","sc_c6"],
+ sig:"深部覚障害・Romberg陽性＋錐体路徴候（腱反射は低下しうる）",
+ pearl:"『Babinski陽性なのにアキレス腱反射消失』は、B12欠乏・銅欠乏・笑気・Friedreich失調症などを考える組み合わせ。"},
+{id:"sc_c6",reg:"sc",lvl:3,name:"頸髄 C5〜C6髄節",
+ hx:"60歳代。両手のしびれと、ボタンがかけにくい。",
+ req:[["腕橈骨筋反射を叩くと肘は動かず指が屈曲する（逆転橈骨反射）","C5〜6髄節の反射弓が障害され、下の髄節（C8）の反射が亢進"],
+      ["上腕三頭筋反射の亢進","C7髄節より下の錐体路障害"],
+      ["両下肢の腱反射亢進・Babinski徴候","病変レベルより下の錐体路障害"]],
+ opt:[["上腕二頭筋反射の低下","C5〜6の反射弓"],["手指を素早く握って開くことができない（myelopathy hand）","頸髄症"],["Hoffmann反射陽性","上肢の錐体路徴候"]],
+ near:["rt_c6","sc_cc","nm_als","sc_scd"],
+ sig:"逆転橈骨反射＋三頭筋反射亢進＋下肢の錐体路徴候",
+ pearl:"反射が『どこで低下し、どこから亢進するか』で頸髄の障害髄節がわかる。椎間と髄節は1つずれる（C5/6椎間→C6髄節付近）。"},
+{id:"sc_conus",reg:"sc",lvl:2,name:"脊髄円錐",
+ hx:"急に尿が出なくなり、お尻の周りがしびれる。",
+ req:[["左右対称の会陰・肛門周囲（サドル領域）の感覚低下","S3〜5髄節"],
+      ["早期からの尿閉・便失禁","仙髄の排尿・排便中枢"],
+      ["下肢の筋力低下は軽いか、ない","L5〜S2の障害は軽い"]],
+ opt:[["肛門反射・球海綿体反射の消失","S2〜4の反射弓"],["根性痛は目立たない","神経根ではなく髄節の障害"],["勃起障害","S2〜4"]],
+ near:["rt_cauda","sc_asa","rt_s1","sc_bs"],
+ sig:"対称性のサドル感覚障害＋早期の膀胱直腸障害、下肢は軽い",
+ pearl:"円錐は対称・痛みが少ない・膀胱障害が早い、馬尾は非対称・根性痛が強い・膀胱障害は遅れる。ただし重なりは多い。"},
+/* ───── 神経根・神経叢 ───── */
+{id:"rt_cauda",reg:"rt",lvl:2,name:"馬尾",
+ hx:"腰痛の既往。重い物を持った後から激しい腰痛と両脚の痛み。",
+ req:[["左右差のある下肢の放散痛","複数の腰仙部神経根"],
+      ["左右差のある両下肢の弛緩性筋力低下","多根性の下位運動ニューロン障害"],
+      ["膝蓋腱反射・アキレス腱反射の低下〜消失","L3〜S1の反射弓"]],
+ opt:[["左右差のあるサドル領域の感覚低下","S2〜5根"],["遅れて出る尿閉","S2〜4根"],["Babinski徴候は陰性","脊髄ではない（下位運動ニューロン）"]],
+ near:["sc_conus","rt_s1","nm_gbs","sc_asa"],
+ sig:"非対称の根性痛・多根性の弛緩性麻痺・反射消失",
+ pearl:"馬尾症候群は緊急手術の適応。残尿と肛門周囲の感覚を必ず確認する。"},
+{id:"rt_c5",reg:"rt",lvl:1,lat:1,name:"{S}C5神経根",
+ hx:"首を反らすと{I}の肩から上腕外側に痛みが走る。",
+ req:[["{I}三角筋・上腕二頭筋の筋力低下","C5支配（腋窩神経・筋皮神経）"],
+      ["{I}上腕外側の感覚低下","C5皮膚分節"],
+      ["{I}上腕二頭筋反射の低下","C5〜6"]],
+ opt:[["{I}菱形筋（肩甲骨を寄せる）の筋力低下","肩甲背神経は神経根から直接出る→神経叢ではなく根"],["頸部を後屈し患側へ傾けると痛みが走る（Spurling徴候）","椎間孔での圧迫"]],
+ near:["pn_ax","rt_ut","rt_c6","nm_myo"],
+ sig:"三角筋・二頭筋の低下、上腕外側の感覚低下、二頭筋反射低下",
+ pearl:"C5根障害（頸椎症性筋萎縮症・術後C5麻痺）は感覚障害が乏しいことがある。"},
+{id:"rt_c6",reg:"rt",lvl:1,lat:1,name:"{S}C6神経根",
+ hx:"{I}の首から腕、母指にかけての痛みとしびれ。",
+ req:[["{I}母指・示指のしびれ","C6皮膚分節"],
+      ["{I}腕橈骨筋反射の低下","C5〜6"],
+      ["{I}手関節背屈（橈側手根伸筋）の筋力低下","C6"]],
+ opt:[["{I}上腕二頭筋の筋力低下","C5〜6"],["Spurling徴候陽性","椎間孔での根の圧迫"],["{I}前腕橈側のしびれ","C6皮膚分節（手根管症候群では出ない）"]],
+ near:["pn_cts","rt_c7","rt_c5","sc_c6"],
+ sig:"母指・示指のしびれ＋腕橈骨筋反射低下",
+ pearl:"母指・示指のしびれは手根管症候群と紛らわしい。前腕橈側の感覚と腕橈骨筋反射は手根管症候群では保たれる。"},
+{id:"rt_c7",reg:"rt",lvl:1,lat:1,name:"{S}C7神経根",
+ hx:"{I}の首から腕の後ろ、中指にかけての痛み。",
+ req:[["{I}中指のしびれ","C7皮膚分節"],
+      ["{I}上腕三頭筋反射の低下","C7"],
+      ["{I}上腕三頭筋の筋力低下","C7（上腕中央での橈骨神経麻痺なら保たれる）"]],
+ opt:[["{I}手関節屈曲（橈側手根屈筋）の筋力低下","正中神経支配のC7筋→橈骨神経だけの障害ではない"],["{I}手指伸展の筋力低下","C7〜8"]],
+ near:["pn_radial","rt_c6","rt_c8","cx_handknob:C"],
+ sig:"中指のしびれ＋三頭筋反射低下、橈骨・正中両神経のC7筋が低下",
+ pearl:"1本の神経では説明できず、複数の神経にまたがる同じ髄節の筋が弱ければ根（または神経叢）。"},
+{id:"rt_c8",reg:"rt",lvl:2,lat:1,name:"{S}C8神経根",
+ hx:"{I}の小指側のしびれと、手の力が入らない。",
+ req:[["{I}小指・環指と前腕内側遠位のしびれ","C8皮膚分節（前腕内側は内側前腕皮神経で、尺骨神経ではない）"],
+      ["{I}第一背側骨間筋の筋力低下","C8（尺骨神経）"],
+      ["{I}長母指屈筋・示指深指屈筋の筋力低下","C8（正中神経・前骨間神経）→尺骨神経障害では保たれる"]],
+ opt:[["Horner症候群はない","T1・交感神経節は保たれる"],["首の動きで痛みが増す","根性痛"]],
+ near:["pn_ulnar","rt_lt","rt_c7","nm_als"],
+ sig:"小指側＋前腕内側のしびれ、尺骨・正中両神経のC8筋が低下",
+ pearl:"尺骨神経障害では前腕内側の感覚が保たれ、正中神経のC8筋（長母指屈筋・示指深指屈筋）も保たれる。"},
+{id:"rt_lt",reg:"rt",lvl:3,lat:1,name:"{S}腕神経叢下神経幹",
+ hx:"20歳代女性。{I}の手がやせてきた。腕を上げる作業でしびれる。",
+ req:[["{I}母指球の筋萎縮が目立つ（短母指外転筋＞小指球）","T1優位の下神経幹障害（神経性胸郭出口症候群）"],
+      ["{I}前腕内側のしびれ","内側前腕皮神経（C8〜T1、下神経幹から）"],
+      ["{I}第一背側骨間筋の筋力低下","C8"]],
+ opt:[["{I}のHorner症候群","T1と星状神経節（肺尖部腫瘍＝Pancoast腫瘍）"],["頸肋・C7横突起の延長","神経性胸郭出口症候群の原因"]],
+ near:["rt_c8","pn_ulnar","pn_cts","nm_als"],
+ sig:"母指球優位の萎縮＋前腕内側のしびれ",
+ pearl:"母指球が萎縮しているのに、感覚障害が正中神経領域ではなく前腕内側にあれば下神経幹（T1）を考える。"},
+{id:"rt_ut",reg:"rt",lvl:3,lat:1,name:"{S}腕神経叢上神経幹",
+ hx:"重いリュックを背負って登山した翌日から、{I}の腕が上がらない。",
+ req:[["{I}三角筋・上腕二頭筋・腕橈骨筋の筋力低下","C5〜6線維"],
+      ["{I}棘上筋・棘下筋の筋力低下","肩甲上神経は上神経幹から出る"],
+      ["{I}菱形筋・前鋸筋は正常","肩甲背神経（C5）・長胸神経（C5〜7）は神経根から直接出る→根より遠位の病変"]],
+ opt:[["{I}上腕外側〜前腕外側のしびれ","C5〜6の感覚線維"],["頸部痛・Spurling徴候はない","根の圧迫ではない"]],
+ near:["rt_c5","pn_ax","rt_c6","pn_lt"],
+ sig:"C5〜6筋＋棘上・棘下筋の低下、菱形筋・前鋸筋は正常",
+ pearl:"根のすぐ近くから出る枝（肩甲背神経・長胸神経）が保たれていれば神経叢の病変。針筋電図で傍脊柱筋が正常なことも裏づけになる。"},
+/* ───── 末梢神経 ───── */
+{id:"pn_ax",reg:"pn",lvl:2,lat:1,name:"{S}腋窩神経",
+ hx:"{I}肩関節の脱臼を整復された後から、腕を横に上げられない。",
+ req:[["{I}三角筋の筋力低下（肩の外転）","腋窩神経"],
+      ["{I}肩外側の限られた範囲の感覚低下","上外側上腕皮神経（腋窩神経の枝）"]],
+ opt:[["{I}上腕二頭筋・棘上筋は正常","C5根・上神経幹ではない"],["{I}上腕二頭筋反射は正常","C5〜6の反射弓は保たれる"]],
+ near:["rt_c5","rt_ut","pn_lt","nm_myo"],
+ sig:"三角筋だけの筋力低下＋肩外側の感覚低下",
+ pearl:"肩の外転が弱い時は、三角筋だけか、棘上筋・二頭筋も弱いかで、腋窩神経・上神経幹・C5根を分ける。"},
+{id:"pn_lt",reg:"pn",lvl:2,lat:1,name:"{S}長胸神経",
+ hx:"重い物を担ぐ作業の後から、{I}の肩が疲れやすい。",
+ req:[["{I}壁を押すと肩甲骨の内側縁が浮き上がる（翼状肩甲）","前鋸筋の麻痺"]],
+ opt:[["感覚障害はない","長胸神経は運動神経"],["腕を前から上へ挙げにくい","前鋸筋は肩甲骨を回旋して挙上を助ける"]],
+ near:["pn_ax","rt_ut","rt_c5","nm_myo"],
+ sig:"翼状肩甲（前鋸筋麻痺）、感覚正常",
+ pearl:"前鋸筋麻痺の翼状肩甲は壁押しで内側縁が浮き、僧帽筋麻痺（副神経）は外転で目立つ。顔面肩甲上腕型筋ジストロフィーは両側性が多い。"},
+{id:"pn_radial",reg:"pn",lvl:1,lat:1,name:"{S}橈骨神経（上腕骨の橈骨神経溝）",
+ hx:"飲酒して椅子の背に腕をかけたまま眠り、朝から{I}手が垂れる。",
+ req:[["{I}の下垂手・下垂指","手関節・指の伸筋"],
+      ["{I}腕橈骨筋の筋力低下","橈骨神経溝より遠位で枝分かれ"],
+      ["{I}上腕三頭筋は正常","三頭筋への枝は橈骨神経溝より近位で分かれる"]],
+ opt:[["{I}手背の第1指間のしびれ","浅枝"],["手関節を支えると指の外転力は正常","下垂手では骨間筋が弱く見える（偽性尺骨神経麻痺）"],["{I}上腕三頭筋反射は正常","C7根障害ではない"]],
+ near:["pn_pin","rt_c7","cx_handknob:C","rt_c8"],
+ sig:"下垂手＋腕橈骨筋低下、三頭筋は正常",
+ pearl:"下垂手では手関節を支えて骨間筋を測る。支えないと尺骨神経障害を合併しているように見える。"},
+{id:"pn_pin",reg:"pn",lvl:2,lat:1,name:"{S}後骨間神経",
+ hx:"{I}前腕の外側が痛み、数週で指が伸ばせなくなった。",
+ req:[["{I}手指（中手指節関節）の伸展ができない（下垂指）","後骨間神経支配の総指伸筋・示指伸筋など"],
+      ["手関節の背屈はできるが橈側に偏る","長橈側手根伸筋（分岐より近位）は保たれ、尺側手根伸筋が弱い"],
+      ["感覚障害はない","後骨間神経は運動枝"]],
+ opt:[["{I}腕橈骨筋は正常","後骨間神経より近位の枝"]],
+ near:["pn_radial","rt_c7","cx_handknob:C","nm_als"],
+ sig:"下垂指（下垂手ではない）、橈屈しながら背屈、感覚正常",
+ pearl:"感覚障害のない下垂指は後骨間神経麻痺・多巣性運動ニューロパチー・ALS・hand knobの梗塞を考える。"},
+{id:"pn_ulnar",reg:"pn",lvl:1,lat:1,name:"{S}尺骨神経（肘部管）",
+ hx:"肘をついて作業することが多い。{I}の小指と環指がしびれ、箸が使いにくい。",
+ req:[["{I}小指と環指尺側半分のしびれ（手背も含む）","尺骨神経。手背の感覚低下は背側枝の分岐（手首より上）より近位の障害を示す"],
+      ["{I}第一背側骨間筋・小指外転筋の筋力低下","尺骨神経支配の手内筋"],
+      ["前腕内側の感覚は正常","内側前腕皮神経は尺骨神経ではない→C8根・下神経幹ではない"]],
+ opt:[["{I}のFroment徴候（紙をつまむと母指IP関節が曲がる）","母指内転筋の筋力低下を長母指屈筋（正中神経）で代償"],["{I}環指・小指の深指屈筋の筋力低下","肘部より近位での障害"],["肘部管のTinel徴候","局所の圧迫"]],
+ near:["rt_c8","rt_lt","pn_cts","cx_handknob:C"],
+ sig:"小指・環指尺側のしびれ（手背含む）＋尺骨神経の手内筋低下、前腕内側は正常",
+ pearl:"環指の中央で感覚が分かれる所見は末梢神経（尺骨・正中神経）の障害を示し、根障害では分かれない。"},
+{id:"pn_cts",reg:"pn",lvl:1,lat:1,name:"{S}正中神経（手根管）",
+ hx:"50歳代女性。{I}手の指のしびれで夜中に目が覚める。",
+ req:[["{I}母指・示指・中指・環指橈側のしびれ","正中神経の指への感覚枝"],
+      ["夜間・明け方に悪化し、手を振ると楽になる","手根管内の圧上昇"],
+      ["母指球の皮膚の感覚は正常","手掌枝は手根管より手前で分かれる"]],
+ opt:[["{I}短母指外転筋の萎縮・筋力低下","反回枝"],["Phalen徴候・手首のTinel徴候が陽性","手根管での圧迫"],["{I}長母指屈筋は正常","前骨間神経・前腕での障害ではない"]],
+ near:["rt_c6","pn_ain","rt_lt","pn_ulnar"],
+ sig:"正中神経の指領域のしびれ（母指球の皮膚は正常）、夜間増悪",
+ pearl:"環指を縦に分ける感覚障害（ring finger splitting）は手根管症候群に特異的。"},
+{id:"pn_ain",reg:"pn",lvl:2,lat:1,name:"{S}前骨間神経",
+ hx:"{I}の肩から前腕が強く痛んだ数日後から、細かいものがつまめない。",
+ req:[["{I}母指と示指で丸（OKサイン）が作れず、つまむと涙のしずく形になる","長母指屈筋・示指深指屈筋の麻痺"],
+      ["感覚障害はない","前骨間神経は運動枝"]],
+ opt:[["{I}方形回内筋の筋力低下（肘を曲げての回内）","前骨間神経"],["{I}短母指外転筋は正常","手根管ではない"]],
+ near:["pn_cts","rt_c8","rt_lt","nm_als"],
+ sig:"涙のしずく徴候、感覚正常",
+ pearl:"前骨間神経麻痺の多くは神経痛性筋萎縮症（Parsonage-Turner症候群）の部分症で、病変は上腕の神経束にある。"},
+{id:"pn_peron",reg:"pn",lvl:1,lat:1,name:"{S}総腓骨神経（腓骨頭部）",
+ hx:"ダイエットで体重が減った。足を組む習慣がある。{I}足先が上がらずつまずく。",
+ req:[["{I}足関節背屈・母趾背屈の筋力低下（下垂足）","深腓骨神経"],
+      ["{I}足の外がえしの筋力低下","浅腓骨神経"],
+      ["{I}足の内がえしは正常","後脛骨筋（脛骨神経・L5）→L5根障害ではない"]],
+ opt:[["{I}下腿外側〜足背のしびれ","浅腓骨神経"],["{I}アキレス腱反射は正常","S1・坐骨神経本幹ではない"],["{I}股関節外転（中殿筋）は正常","上殿神経（L5）→L5根ではない"]],
+ near:["rt_l5","rt_l4","nm_pn","sc_bs"],
+ sig:"下垂足＋外がえし低下、内がえしは正常",
+ pearl:"下垂足では足の内がえし（後脛骨筋）と股外転（中殿筋）を必ず診る。保たれれば腓骨神経、弱ければL5根。"},
+{id:"rt_l5",reg:"rt",lvl:1,lat:1,name:"{S}L5神経根",
+ hx:"{I}の腰から脚の外側に走る痛み。",
+ req:[["{I}母趾背屈の筋力低下","長母趾伸筋（L5）"],
+      ["{I}足の内がえしの筋力低下","後脛骨筋（脛骨神経・L5）"],
+      ["{I}股関節外転の筋力低下","中殿筋（上殿神経・L5）"]],
+ opt:[["{I}下腿外側〜足背・母趾のしびれ","L5皮膚分節"],["膝蓋腱反射・アキレス腱反射は正常","L5には信頼できる主要な腱反射がない"],["下肢伸展挙上テスト陽性","坐骨神経の伸張で根性痛"]],
+ near:["pn_peron","rt_l4","rt_s1","rt_cauda"],
+ sig:"母趾背屈＋内がえし＋股外転の低下",
+ pearl:"L5根障害を腓骨神経麻痺と取り違えないために、腓骨神経以外のL5筋（中殿筋・後脛骨筋）を診る。"},
+{id:"rt_l4",reg:"rt",lvl:2,lat:1,name:"{S}L4神経根",
+ hx:"{I}の腰から大腿前面、すねの内側に走る痛み。",
+ req:[["{I}膝蓋腱反射の低下","L3〜4"],
+      ["{I}大腿四頭筋の筋力低下","大腿神経・L3〜4"],
+      ["{I}股関節内転の筋力低下","閉鎖神経（L2〜4）→大腿神経だけの障害ではない"]],
+ opt:[["{I}下腿内側のしびれ","L4皮膚分節"],["{I}前脛骨筋の筋力低下","L4〜5（深腓骨神経）"],["大腿神経伸張テスト陽性","上位腰椎の根"]],
+ near:["pn_fem","rt_l5","pn_lfcn","rt_cauda"],
+ sig:"四頭筋・股内転筋の低下＋膝蓋腱反射低下＋下腿内側のしびれ",
+ pearl:"四頭筋の筋力低下に股内転筋の低下が加われば、大腿神経ではなく根か腰神経叢。糖尿病性腰仙部神経根神経叢障害も考える。"},
+{id:"rt_s1",reg:"rt",lvl:1,lat:1,name:"{S}S1神経根",
+ hx:"{I}の殿部からふくらはぎ、足の外側に走る痛み。",
+ req:[["{I}アキレス腱反射の低下〜消失","S1"],
+      ["{I}足の外側〜足底のしびれ","S1皮膚分節"],
+      ["{I}片脚でのつま先立ちができない（下腿三頭筋の筋力低下）","S1"]],
+ opt:[["{I}大殿筋の筋力低下","下殿神経（S1）"],["下肢伸展挙上テスト陽性","根性痛"]],
+ near:["rt_l5","nm_pn","rt_cauda","sc_conus"],
+ sig:"アキレス腱反射低下＋足外側のしびれ＋底屈低下",
+ pearl:"片側だけのアキレス腱反射消失は根の局在に有用。高齢者の両側低下はしばしば正常範囲。"},
+{id:"pn_fem",reg:"pn",lvl:2,lat:1,name:"{S}大腿神経",
+ hx:"抗凝固薬を内服中。{I}の鼠径部〜大腿の痛みの後、膝が崩れる。",
+ req:[["{I}大腿四頭筋の筋力低下","大腿神経"],
+      ["{I}膝蓋腱反射の低下","大腿神経"],
+      ["{I}股関節内転は正常","閉鎖神経（L2〜4）→L4根・腰神経叢ではない"]],
+ opt:[["{I}大腿前面〜下腿内側のしびれ","前皮枝・伏在神経"],["{I}股関節屈曲の筋力低下","腸腰筋への枝→鼠径靱帯より近位（腸腰筋血腫など）"]],
+ near:["rt_l4","pn_lfcn","nm_myo","rt_cauda"],
+ sig:"四頭筋低下＋膝蓋腱反射低下、股内転は正常",
+ pearl:"抗凝固薬内服中の大腿神経麻痺は腸腰筋血腫を疑ってCTで確かめる。"},
+{id:"pn_lfcn",reg:"pn",lvl:1,lat:1,name:"{S}外側大腿皮神経",
+ hx:"体重が増え、ベルトをきつく締める仕事。{I}太ももの外側がピリピリする。",
+ req:[["{I}大腿外側に限られたしびれ・灼熱痛","外側大腿皮神経（感覚神経）"],
+      ["筋力低下・腱反射の異常はない","運動線維を含まない"]],
+ opt:[["立位・歩行で悪化し、座ると楽","鼠径靱帯での絞扼"],["上前腸骨棘の内側の圧痛","絞扼部位"]],
+ near:["rt_l4","pn_fem","nm_pn","rt_cauda"],
+ sig:"大腿外側だけのしびれ、筋力・反射正常（感覚異常性大腿痛）",
+ pearl:"大腿外側のしびれに筋力低下・反射低下が加われば、L2〜3根や腰神経叢の病変を考える。"},
+/* ───── 神経筋接合部・筋・びまん性 ───── */
+{id:"nm_mg",reg:"nm",lvl:1,name:"神経筋接合部（シナプス後）",
+ hx:"30歳代女性。夕方になるとまぶたが下がり、物が二重に見える。",
+ req:[["日内変動・易疲労性のある眼瞼下垂と複視","神経筋接合部の安全域の低下"],
+      ["瞳孔は正常","瞳孔括約筋は障害されない"],
+      ["感覚障害はなく、腱反射は正常","末梢神経・中枢は正常"]],
+ opt:[["上方視を続けると眼瞼下垂が強くなる","易疲労性"],["眼瞼を冷やすと眼瞼下垂が改善（アイスパック試験）","冷却でアセチルコリンエステラーゼ活性が低下"],["片方の眼瞼を持ち上げると、もう片方が下がる","Heringの法則（enhanced ptosis）"],["食事の途中でかむのが疲れる","球症状"]],
+ near:["cn_3","bs_mlf","nm_lems","cn_cav"],
+ sig:"変動する眼瞼下垂・複視、瞳孔正常、感覚・反射正常",
+ pearl:"重症筋無力症はどんな眼球運動障害（INO・注視麻痺）も模倣しうるが、瞳孔は障害されない。"},
+{id:"nm_lems",reg:"nm",lvl:2,name:"神経筋接合部（シナプス前）",
+ hx:"60歳代の喫煙者。数か月で階段がのぼりにくく、口が渇く。",
+ req:[["下肢優位・近位筋優位の筋力低下","シナプス前のアセチルコリン放出の低下"],
+      ["腱反射は低下〜消失し、短い最大収縮の後に一時的に出る","運動後の促通"],
+      ["口渇・便秘・起立性低血圧","自律神経のシナプス前障害（P/Q型電位依存性カルシウムチャネル抗体）"]],
+ opt:[["眼瞼下垂は軽い","重症筋無力症に比べ眼症状は目立たない"],["肺小細胞がん","傍腫瘍性"]],
+ near:["nm_mg","nm_myo","nm_gbs","nm_pn"],
+ sig:"近位筋力低下＋反射消失（促通あり）＋自律神経症状（LEMS）",
+ pearl:"反射のない近位筋力低下ではLEMSを考え、10秒の最大収縮後に反射や筋力が戻るかを見る。"},
+{id:"nm_myo",reg:"nm",lvl:1,name:"骨格筋（近位筋優位のミオパチー）",
+ hx:"50歳代。数か月で腕が上がりにくく、しゃがんだ姿勢から立ち上がれない。",
+ req:[["肩・腰まわりの近位筋優位で左右対称の筋力低下","筋疾患の典型的な分布"],
+      ["感覚障害はない","末梢神経は正常"],
+      ["腱反射は保たれる（筋力低下が強いと低下）","反射弓は正常"]],
+ opt:[["頸部屈筋の筋力低下","炎症性筋疾患で目立つ"],["上眼瞼のヘリオトロープ疹、指関節背側のGottron丘疹","皮膚筋炎"],["CK上昇","筋線維の壊死"]],
+ near:["nm_lems","nm_mg","nm_gbs","nm_als"],
+ sig:"対称性の近位筋力低下、感覚正常、反射保存",
+ pearl:"スタチン内服中の近位筋力低下・CK高値では抗HMGCR抗体陽性の壊死性ミオパチーも考える。"},
+{id:"nm_pn",reg:"nm",lvl:1,name:"末梢神経（長さ依存性の多発ニューロパチー）",
+ hx:"糖尿病20年。足先のしびれが数年かけて膝の高さまで上がってきた。",
+ req:[["足先から始まり上へ広がる左右対称のしびれ（手袋靴下型）","長い軸索ほど早く障害される"],
+      ["アキレス腱反射の消失","最も長い反射弓"],
+      ["足趾の背屈・屈曲の筋力低下","最も遠位の筋"]],
+ opt:[["しびれが膝の高さに達したころ、指先にも出てきた","長さ依存性（下肢の障害長と上肢の長さが対応）"],["振動覚低下・Romberg徴候陽性","大径線維の障害"],["起立性低血圧・足の発汗低下","小径線維・自律神経"]],
+ near:["sc_scd","rt_cauda","nm_gbs","sc_conus"],
+ sig:"対称性・遠位優位の感覚運動障害＋アキレス腱反射消失",
+ pearl:"非対称・上肢から始まる・急性・運動優位のいずれかがあれば、長さ依存性ではない（多発単神経炎・CIDP・感覚神経節障害など）。"},
+{id:"nm_gbs",reg:"nm",lvl:1,name:"末梢神経・神経根（急性の多発根ニューロパチー）",
+ hx:"2週間前に下痢。数日で両脚から上へ脱力が広がった。",
+ req:[["数日で進行する両側の弛緩性筋力低下（下肢から上行）","神経根を含む多発性の障害"],
+      ["全身の腱反射の低下〜消失","反射弓の障害"],
+      ["感覚障害は軽い","運動優位"]],
+ opt:[["両側の顔面神経麻痺","脳神経（根）"],["腰背部痛","神経根の炎症"],["頻脈・血圧の変動","自律神経障害"]],
+ near:["sc_asa","nm_myo","nm_mg","rt_cauda"],
+ sig:"急性・上行性の弛緩性麻痺＋腱反射消失",
+ pearl:"急性の対麻痺で早期から膀胱障害があり、感覚レベルがあれば脊髄を考える。GBSでも早期は反射が残ることがある。"},
+{id:"nm_als",reg:"nm",lvl:2,name:"上位＋下位運動ニューロン（脊髄前角・皮質脊髄路）",
+ hx:"60歳代。1年かけて右手がやせ、最近しゃべりにくい。",
+ req:[["筋萎縮・線維束性収縮","下位運動ニューロン（前角細胞）"],
+      ["萎縮した肢で腱反射が亢進","上位運動ニューロン障害の併存"],
+      ["感覚障害はない","感覚系は保たれる"]],
+ opt:[["舌の萎縮と線維束性収縮","延髄の下位運動ニューロン"],["下顎反射の亢進","橋より上の上位運動ニューロン障害"],["眼球運動・膀胱直腸機能は保たれる","動眼神経核・Onuf核は障害されにくい"]],
+ near:["sc_c6","nm_myo","rt_lt","nm_pn"],
+ sig:"筋萎縮・線維束性収縮＋腱反射亢進、感覚正常",
+ pearl:"下顎反射の亢進は頸椎症では説明できない上位運動ニューロン徴候で、ALSと頸椎症を分ける手がかりになる。"}
+];
+
+</script>
+<script>
+(function(){
+"use strict";
+var KEY="ltr-v1";
+var byId={};SITES.forEach(function(s){byId[s.id]=s;});
+var REGKEYS=Object.keys(REGIONS);
+var SIDE={L:"左",R:"右"};
+function opp(x){return x==="L"?"R":"L";}
+function rnd(n){return Math.floor(Math.random()*n);}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function fill(t,side){
+  if(side) return t.replace(/\{S\}|\{I\}/g,SIDE[side]).replace(/\{C\}/g,SIDE[opp(side)]);
+  return t.replace(/\{S\}/g,"").replace(/\{I\}/g,"同側").replace(/\{C\}/g,"対側");
+}
+function fillAtlas(t){return t.replace(/\{S\}/g,"一側の").replace(/\{I\}/g,"同側").replace(/\{C\}/g,"対側");}
+function label(id,side){var s=byId[id];return fill(s.name,s.lat?side:null);}
+function allF(s){return s.req.map(function(f){return {t:f[0],w:f[1],r:1};}).concat(s.opt.map(function(f){return {t:f[0],w:f[1],c:f[2]||null};}));}
+function hasC(s){return /\{C\}/.test(JSON.stringify([s.req,s.opt]));}
+
+var st;
+function defaults(){return {set:{reg:REGKEYS.slice(),lvl:3,hide:false,weak:false},cur:null,st:{},hist:[],cnt:0,streak:0};}
+try{st=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){st=null;}
+if(!st||typeof st!=="object")st=defaults();
+var d0=defaults();
+Object.keys(d0).forEach(function(k){if(st[k]===undefined)st[k]=d0[k];});
+Object.keys(d0.set).forEach(function(k){if(st.set[k]===undefined)st.set[k]=d0.set[k];});
+if(st.cur&&!byId[st.cur.id])st.cur=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+
+/* ── 症例の組み立て ── */
+function makeCase(id,side,fixedF){
+  var s=byId[id];
+  side=s.lat?(side||(Math.random()<.5?"L":"R")):null;
+  var F=allF(s),req=[],optc=[];
+  F.forEach(function(f,i){if(f.r)req.push(i);else if(!f.c||f.c===side)optc.push(i);});
+  var k=optc.length?Math.max(1,Math.ceil(optc.length/2)):0;
+  var shown=fixedF?fixedF.slice():shuffle(req.concat(shuffle(optc).slice(0,k)));
+  var opts=[{id:id,side:side}],seen={};seen[id+(side||"")]=1;
+  function add(o){var key=o.id+(o.side||"");if(seen[key])return;seen[key]=1;opts.push(o);}
+  if(s.lat&&hasC(s))add({id:id,side:opp(side)});
+  s.near.forEach(function(spec){
+    var p=spec.split(":"),n=byId[p[0]];if(!n)return;
+    var sd=null;
+    if(n.lat){sd=p[1]==="L"||p[1]==="R"?p[1]:(p[1]==="C"?(side?opp(side):(Math.random()<.5?"L":"R")):(side||(Math.random()<.5?"L":"R")));}
+    add({id:n.id,side:sd});
+  });
+  var pool=shuffle(SITES.filter(function(x){return x.reg===s.reg;}));
+  for(var i=0;opts.length<4&&i<pool.length;i++){var x=pool[i];add({id:x.id,side:x.lat?(side||"R"):null});}
+  opts=[opts[0]].concat(opts.slice(1,5));
+  var age=null,sex=null;
+  if(!/歳代/.test(s.hx)){age=35+rnd(50);}
+  if(!/女性|男性/.test(s.hx)){sex=Math.random()<.5?"男性":"女性";}
+  return {id:id,side:side,f:shown,o:shuffle(opts),age:age,sex:sex,ans:null,hint:false,reveal:!st.set.hide,no:st.cnt+1};
+}
+function pickSite(){
+  var c=SITES.filter(function(s){return st.set.reg.indexOf(s.reg)>=0&&s.lvl<=st.set.lvl;});
+  if(!c.length)return null;
+  var last=st.cur&&st.cur.id;
+  if(c.length>1)c=c.filter(function(s){return s.id!==last;});
+  var w=c.map(function(s){if(!st.set.weak)return 1;var r=st.st[s.id];if(!r||!r.n)return 3;return 1+4*(1-r.c/r.n);});
+  var sum=w.reduce(function(a,b){return a+b;},0),x=Math.random()*sum;
+  for(var i=0;i<c.length;i++){x-=w[i];if(x<=0)return c[i].id;}
+  return c[c.length-1].id;
+}
+function newQ(id,side,fixedF){
+  var sid=id||pickSite();
+  if(!sid){st.cur=null;save();renderQ();return;}
+  st.cur=makeCase(sid,side,fixedF);save();renderQ();
+  try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}
+}
+
+/* ── 出題画面 ── */
+var qArea=document.getElementById("qArea");
+function lvDots(n){return "●●●".slice(0,n)+"○○○".slice(0,3-n);}
+function renderQ(){
+  var q=st.cur;
+  if(!q){
+    var c=SITES.filter(function(s){return st.set.reg.indexOf(s.reg)>=0&&s.lvl<=st.set.lvl;}).length;
+    qArea.innerHTML='<div class="card"><h2>はじめる</h2><p class="hint" style="font-size:14px">出題範囲：'+c+'部位。症候を読み、病巣部位を選んでください。答えると、所見ごとの局在の意味と、ほかの選択肢との違いを解説します。</p><div class="nav"><button class="btn primary" type="button" id="goQ"'+(c?'':' disabled')+'>問題を出す</button></div>'+(c?'':'<p class="hint">出題範囲が空です。設定で系統を選んでください。</p>')+'</div>';
+    var g=document.getElementById("goQ");if(g)g.onclick=function(){newQ();};
+    return;
+  }
+  var s=byId[q.id],F=allF(s),side=q.side;
+  var who=[];if(q.age)who.push(q.age+"歳");if(q.sex)who.push(q.sex);
+  var h='<div class="card"><div class="qhead"><span>第'+q.no+'問</span><span class="lv" title="難易度">'+lvDots(s.lvl)+'</span>'+((q.hint||q.ans)?'<span class="regtag">'+esc(REGIONS[s.reg])+'</span>':'')+'</div>';
+  h+='<p class="pt">'+(who.length?esc(who.join("・"))+"。":"")+esc(fill(s.hx,side))+'</p>';
+  h+='<ul class="fd">'+q.f.map(function(i){return '<li>'+esc(fill(F[i].t,side))+'</li>';}).join("")+'</ul>';
+  h+='<p class="ask">病巣はどこか？</p>';
+  if(!q.reveal&&!q.ans){
+    h+='<div class="nav"><button class="btn primary" type="button" id="revBtn">考えたら選択肢を表示</button></div>';
+  }else{
+    h+='<div class="opts">'+q.o.map(function(o,k){
+      var cls="";
+      if(q.ans){if(o.id===q.id&&o.side===q.side)cls=" ok";else if(k===q.ans.k)cls=" ng";}
+      return '<button type="button" class="opt'+cls+'" data-k="'+k+'"'+(q.ans?' disabled':'')+'><span class="n">'+(k+1)+'</span><span>'+esc(label(o.id,o.side))+'</span></button>';
+    }).join("")+'</div>';
+  }
+  if(!q.ans){
+    h+='<div class="nav"><button class="btn sm" type="button" id="hintBtn"'+(q.hint?' disabled':'')+'>ヒント（系統）</button><button class="btn sm" type="button" id="giveBtn">わからない（解説へ）</button><button class="btn sm" type="button" id="skipBtn">別の問題</button></div>';
+  }
+  h+='</div>';
+  if(q.ans)h+=explain(q);
+  qArea.innerHTML=h;
+  var b;
+  if((b=document.getElementById("revBtn")))b.onclick=function(){q.reveal=true;save();renderQ();};
+  if((b=document.getElementById("hintBtn")))b.onclick=function(){q.hint=true;save();renderQ();};
+  if((b=document.getElementById("giveBtn")))b.onclick=function(){answer(-1);};
+  if((b=document.getElementById("skipBtn")))b.onclick=function(){newQ();};
+  Array.prototype.forEach.call(qArea.querySelectorAll(".opt"),function(el){el.onclick=function(){answer(+el.getAttribute("data-k"));};});
+  if((b=document.getElementById("nextBtn")))b.onclick=function(){newQ();};
+  if((b=document.getElementById("sameBtn")))b.onclick=function(){newQ(q.id,s.lat?opp(q.side):null);};
+}
+function answer(k){
+  var q=st.cur;if(!q||q.ans)return;
+  var ok=k>=0&&q.o[k].id===q.id&&q.o[k].side===q.side;
+  q.ans={k:k,ok:ok};q.reveal=true;
+  var r=st.st[q.id]||(st.st[q.id]={n:0,c:0});r.n++;if(ok)r.c++;
+  st.cnt++;st.streak=ok?st.streak+1:0;
+  st.hist.unshift({id:q.id,side:q.side,f:q.f,ok:ok,t:Date.now()});
+  if(st.hist.length>60)st.hist.length=60;
+  save();renderQ();renderTop();
+  setTimeout(function(){var e=document.getElementById("exCard");if(e)try{e.scrollIntoView({behavior:"smooth",block:"start"});}catch(x){}},60);
+}
+function explain(q){
+  var s=byId[q.id],F=allF(s),side=q.side;
+  var h='<div class="card ex" id="exCard">';
+  h+='<div class="result '+(q.ans.ok?'ok':'ng')+'">'+(q.ans.ok?'正解':(q.ans.k<0?'解説':'不正解'))+'<span class="ans">'+esc(label(q.id,side))+'</span><span class="syn">'+esc(s.sig)+'</span></div>';
+  h+='<h3>所見ごとの局在の意味</h3><ul class="why">'+q.f.map(function(i){return '<li><span class="f">'+esc(fill(F[i].t,side))+'</span><span class="w">'+esc(fill(F[i].w,side))+'</span></li>';}).join("")+'</ul>';
+  var others=q.o.filter(function(o){return !(o.id===q.id&&o.side===q.side);});
+  if(others.length){
+    var ipsi=null;q.f.some(function(i){if(/\{I\}/.test(F[i].t)){ipsi=fill(F[i].t,side);return true;}return false;});
+    h+='<h3>ほかの選択肢との違い</h3><ul class="why">'+others.map(function(o){
+      var t;
+      if(o.id===q.id)t="同じ部位で左右が逆。"+(ipsi?"病巣と同じ側に出る所見（「"+ipsi+"」）から側を決める。":"所見の左右から病巣側を決める。");
+      else t="この部位なら："+byId[o.id].sig;
+      return '<li><span class="dn">'+esc(label(o.id,o.side))+'</span><span class="w">'+esc(t)+'</span></li>';
+    }).join("")+'</ul>';
+  }
+  var rest=F.map(function(f,i){return i;}).filter(function(i){return q.f.indexOf(i)<0&&(!F[i].c||F[i].c===side);});
+  if(rest.length)h+='<h3>この部位でほかにみられる所見</h3><ul class="why">'+rest.map(function(i){return '<li><span class="f">'+esc(fill(F[i].t,side))+'</span><span class="w">'+esc(fill(F[i].w,side))+'</span></li>';}).join("")+'</ul>';
+  h+='<div class="pearl"><b>ポイント</b>'+esc(s.pearl)+'</div>';
+  h+='<div class="nav"><button class="btn primary" type="button" id="nextBtn">次の問題</button><button class="btn" type="button" id="sameBtn">'+(s.lat?'同じ部位を反対側で':'同じ部位をもう一度')+'</button></div>';
+  return h+'</div>';
+}
+
+/* ── 設定 ── */
+var regChips=document.getElementById("regChips");
+function renderSet(){
+  regChips.innerHTML=REGKEYS.map(function(k){var on=st.set.reg.indexOf(k)>=0;var n=SITES.filter(function(s){return s.reg===k;}).length;
+    return '<label class="chip'+(on?' on':'')+'"><input type="checkbox" data-r="'+k+'"'+(on?' checked':'')+'>'+esc(REGIONS[k])+'<span class="hint" style="margin:0">'+n+'</span></label>';}).join("");
+  Array.prototype.forEach.call(regChips.querySelectorAll("input"),function(el){el.onchange=function(){
+    var k=el.getAttribute("data-r"),i=st.set.reg.indexOf(k);
+    if(el.checked&&i<0)st.set.reg.push(k);if(!el.checked&&i>=0)st.set.reg.splice(i,1);
+    save();renderSet();if(!st.cur)renderQ();};});
+  document.getElementById("lvSel").value=String(st.set.lvl);
+  document.getElementById("hideOpt").checked=!!st.set.hide;
+  document.getElementById("weakOpt").checked=!!st.set.weak;
+  var c=SITES.filter(function(s){return st.set.reg.indexOf(s.reg)>=0&&s.lvl<=st.set.lvl;}).length;
+  document.getElementById("setSum").textContent="（"+c+"部位）";
+}
+document.getElementById("regAll").onclick=function(){st.set.reg=REGKEYS.slice();save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("regNone").onclick=function(){st.set.reg=[];save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("lvSel").onchange=function(){st.set.lvl=+this.value;save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("hideOpt").onchange=function(){st.set.hide=this.checked;save();};
+document.getElementById("weakOpt").onchange=function(){st.set.weak=this.checked;save();};
+
+/* ── 一覧 ── */
+var aList=document.getElementById("aList"),aQ=document.getElementById("aQ");
+function siteText(s){return [s.name,s.sig,s.pearl].concat(s.req.map(function(f){return f[0]+f[1];}),s.opt.map(function(f){return f[0]+f[1];})).join(" ");}
+function renderAtlas(){
+  var q=aQ.value.trim();
+  var h="";
+  REGKEYS.forEach(function(k){
+    var list=SITES.filter(function(s){return s.reg===k&&(!q||siteText(s).indexOf(q)>=0||fillAtlas(siteText(s)).indexOf(q)>=0);});
+    if(!list.length)return;
+    h+='<div class="card"><h2>'+esc(REGIONS[k])+'</h2>'+list.map(function(s){
+      var r=st.st[s.id];
+      return '<details class="site"><summary><b>'+esc(fillAtlas(s.name))+'<span class="lvb">'+lvDots(s.lvl)+(r&&r.n?'　'+r.c+'/'+r.n:'')+'</span></b><span>'+esc(s.sig)+'</span></summary>'+
+        '<div class="sub">必須の所見</div><ul class="why">'+s.req.map(function(f){return '<li><span class="f">'+esc(fillAtlas(f[0]))+'</span><span class="w">'+esc(fillAtlas(f[1]))+'</span></li>';}).join("")+'</ul>'+
+        (s.opt.length?'<div class="sub">伴いうる所見</div><ul class="why">'+s.opt.map(function(f){return '<li><span class="f">'+esc(fillAtlas(f[0]))+(f[2]?'（'+SIDE[f[2]]+'病変）':'')+'</span><span class="w">'+esc(fillAtlas(f[1]))+'</span></li>';}).join("")+'</ul>':'')+
+        '<div class="pearl"><b>ポイント</b>'+esc(s.pearl)+'</div><div class="nav"><button class="btn sm" type="button" data-q="'+s.id+'">この部位で出題</button></div></details>';
+    }).join("")+'</div>';
+  });
+  aList.innerHTML=h||'<div class="card empty">該当する部位がありません。</div>';
+  Array.prototype.forEach.call(aList.querySelectorAll("[data-q]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-q"));show("v-q");};});
+}
+aQ.addEventListener("input",renderAtlas);
+
+/* ── 成績 ── */
+var sArea=document.getElementById("sArea"),resetArm=false;
+function renderStats(){
+  var tot=0,cor=0;Object.keys(st.st).forEach(function(k){if(byId[k]){tot+=st.st[k].n;cor+=st.st[k].c;}});
+  var h='<div class="card"><h2>系統別の正答率</h2>';
+  if(!tot)h+='<p class="empty">まだ回答がありません。</p>';
+  else{
+    h+='<table class="st">'+REGKEYS.map(function(k){var n=0,c=0;SITES.forEach(function(s){if(s.reg===k&&st.st[s.id]){n+=st.st[s.id].n;c+=st.st[s.id].c;}});
+      var p=n?Math.round(c/n*100):null;
+      return '<tr><td>'+esc(REGIONS[k])+'</td><td style="width:34%"><div class="bar"><i style="width:'+(p||0)+'%"></i></div></td><td class="num">'+(n?p+'%':'—')+'</td><td class="num hint" style="margin:0">'+c+'/'+n+'</td></tr>';}).join("")+'</table>';
+  }
+  h+='</div>';
+  var weak=Object.keys(st.st).filter(function(k){return byId[k]&&st.st[k].n&&st.st[k].c<st.st[k].n;}).sort(function(a,b){return st.st[a].c/st.st[a].n-st.st[b].c/st.st[b].n||st.st[b].n-st.st[a].n;}).slice(0,10);
+  h+='<div class="card"><h2>苦手な部位</h2>'+(weak.length?'<table class="st">'+weak.map(function(k){var r=st.st[k];return '<tr><td>'+esc(fillAtlas(byId[k].name))+'</td><td class="num">'+r.c+'/'+r.n+'</td><td class="num"><button class="btn sm" type="button" data-w="'+k+'">出題</button></td></tr>';}).join("")+'</table>':'<p class="empty">間違えた部位はまだありません。</p>')+'</div>';
+  var wr=st.hist.filter(function(x){return !x.ok&&byId[x.id];}).slice(0,15);
+  h+='<div class="card"><h2>最近間違えた問題</h2>'+(wr.length?'<table class="st">'+wr.map(function(x,i){var d=new Date(x.t);return '<tr><td>'+esc(label(x.id,x.side))+'<span class="hint" style="display:block;margin:0">'+(d.getMonth()+1)+'/'+d.getDate()+'</span></td><td class="num"><button class="btn sm" type="button" data-h="'+i+'">同じ問題</button></td></tr>';}).join("")+'</table><p class="hint">「同じ問題」は前回と同じ所見で出題します（選択肢の順は変わります）。</p>':'<p class="empty">まだありません。</p>')+'</div>';
+  h+='<div class="card"><button class="btn sm" type="button" id="resetBtn">'+(resetArm?'もう一度押すと成績を消去':'成績を消去')+'</button><p class="hint">成績と履歴だけを消します。右上の「入力クリア」は設定と出題中の問題を消し、成績は残します。</p></div>';
+  sArea.innerHTML=h;
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-w]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-w"));show("v-q");};});
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-h]"),function(b){b.onclick=function(){var x=wr[+b.getAttribute("data-h")];newQ(x.id,x.side,x.f);show("v-q");};});
+  document.getElementById("resetBtn").onclick=function(){
+    if(!resetArm){resetArm=true;renderStats();setTimeout(function(){resetArm=false;if(document.getElementById("v-s").classList.contains("active"))renderStats();},4000);return;}
+    resetArm=false;st.st={};st.hist=[];st.cnt=0;st.streak=0;save();renderStats();renderTop();toast("成績を消去しました");
+  };
+}
+function renderTop(){
+  var tot=0,cor=0;Object.keys(st.st).forEach(function(k){tot+=st.st[k].n;cor+=st.st[k].c;});
+  document.getElementById("sN").textContent=tot;
+  document.getElementById("sR").textContent=tot?Math.round(cor/tot*100)+"%":"—";
+  document.getElementById("sS").textContent=st.streak||0;
+}
+
+/* ── タブ ── */
+var tabs=document.querySelectorAll("nav.tabs button");
+function show(v){
+  Array.prototype.forEach.call(document.querySelectorAll("section.view"),function(s){s.classList.toggle("active",s.id===v);});
+  Array.prototype.forEach.call(tabs,function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===v?"true":"false");});
+  if(v==="v-a")renderAtlas();if(v==="v-s")renderStats();
+  window.scrollTo(0,0);
+}
+Array.prototype.forEach.call(tabs,function(b){b.onclick=function(){show(b.getAttribute("data-v"));};});
+var tt;function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on");},2600);}
+window.__ltrToast=toast;
+
+renderSet();renderTop();renderQ();
+})();
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    var onClaude=/claude\.ai$|claudeusercontent|claude\.site/.test(h);
+    if(!("serviceWorker" in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller&&window.__ltrToast)window.__ltrToast("新しい版を取り込みました。次に開いたときに反映されます");
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[{"k":"ltr-v1","keep":["st","hist","cnt"]}];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>

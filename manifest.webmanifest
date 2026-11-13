@@ -315,6 +315,18 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "神経局在トレーニング",
+      "short_name": "局在トレーニング",
+      "url": "ltr/",
+      "icons": [
+        {
+          "src": "ltr/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
