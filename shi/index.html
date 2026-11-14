@@ -152,6 +152,15 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
 .kv dd{margin:0}
 .sub{font-size:12px;color:var(--muted)}
 .rowx{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.phg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.phs{border:1px dashed var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.phs small{font-size:11.5px;color:var(--muted);line-height:1.35}
+.phb{display:flex;gap:6px}
+.phb label{flex:1;text-align:center;border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:8px;padding:9px 4px;font-weight:700;font-size:14px;cursor:pointer}
+.phb input{display:none}
+.phi{width:100%;max-height:160px;object-fit:contain;border-radius:6px;background:#0001}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
 details.more>summary{cursor:pointer;font-size:14px;color:var(--accent);font-weight:700;padding:4px 0}
 details.card>summary{color:var(--ink)}
 </style>
@@ -172,6 +181,20 @@ details.card>summary{color:var(--ink)}
 
 <!-- ========== かんたん ========== -->
 <div data-p="q">
+  <section class="card hidden" id="phCard">
+    <h2>📷 裏面の写真から読み込む</h2>
+    <p class="note w" style="margin:0 0 10px"><b>氏名・住所・生年月日が写らないように撮る</b>（写った場合は切り取ってから選ぶ）。画像は読み取りのためにClaudeへ送られる。</p>
+    <div class="phg">
+      <div class="phs"><b>裏面 左側</b><small>神経学的所見・計測・動作活動・歩行能力</small>
+        <div class="phb"><label>撮影<input type="file" accept="image/*" capture="environment" data-ph="l"></label><label>選ぶ<input type="file" accept="image/*" data-ph="l"></label></div>
+        <img id="phImg_l" class="phi hidden" alt=""></div>
+      <div class="phs"><b>裏面 右側</b><small>関節可動域（ROM）と筋力テスト（MMT）</small>
+        <div class="phb"><label>撮影<input type="file" accept="image/*" capture="environment" data-ph="r"></label><label>選ぶ<input type="file" accept="image/*" data-ph="r"></label></div>
+        <img id="phImg_r" class="phi hidden" alt=""></div>
+    </div>
+    <div class="rowx" style="margin-top:10px"><button class="btn" type="button" id="phRun" disabled>読み取って反映する</button><button class="btn hidden" type="button" id="phUndo">読み込み前に戻す</button></div>
+    <div id="phStat" class="hint" style="margin-top:8px"></div>
+  </section>
   <section class="card">
     <h2>1 原疾患</h2>
     <div class="chips" id="qDx"></div>
@@ -940,8 +963,86 @@ document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)r
 function copy(t){const done=()=>toast("コピーしました");if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(done,()=>fb())}else fb();
  function fb(){const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){toast("コピーできませんでした")}ta.remove()}}
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2600)}
+
+/* ---------- 写真から読み込み（claude.ai 版のみ。PWA では非表示） ---------- */
+let SAMPLE=null,phBusy=false,phBak=null;const PH={l:null,r:null};
+function shrink(file,max){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),img=new Image();
+ img.onload=()=>{const r=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement("canvas");c.width=Math.round(img.naturalWidth*r);c.height=Math.round(img.naturalHeight*r);
+  c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error("画像を変換できませんでした")),"image/jpeg",0.88)};
+ img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("画像を開けませんでした"))};img.src=url})}
+function phPrompt(){
+ const J=k=>'"'+k+'":{"rom":数値|null,"mmt":["×|△|○", ...]}';
+ const side='{'+["sh","el","wr","hip","kn","an"].map(J).join(",")+'}';
+ return ["あなたは身体障害者診断書・意見書（肢体不自由用）の裏面を読み取るアシスタントです。添付画像は裏面の左側（神経学的所見・計測・動作活動・歩行能力及び起立位の状況）と右側（関節可動域ROMと筋力テストMMT）の写真です（片方だけのこともある）。手書きの○囲み・記号・数値・可動域の図を読み取ってください。",
+ "【出力】次の形のJSONのみ。説明文やコードブロック記号は付けない。",
+ '{"side":"R|L|B|null","sens":[],"mot":[],"site":[],"bb":"なし|あり|null","deform":"なし|あり|null",',
+ '"grip":{"R":数値|null,"L":数値|null},"leg_len":{"R":数値|null,"L":数値|null},',
+ '"adl":{'+ADL.map(a=>'"'+a[0]+'":"○|△|×|null"').join(",")+'},',
+ '"walk_text":"歩行能力欄の記載どおり","walk":"none|lt100|lt1k|lt2k|ok|null","stand_text":"起立位保持欄の記載どおり","stand":"none|lt10|lt30|lt60|ok|null",',
+ '"joints":{"R":'+side+',"L":'+side+'},"findings":"追加所見の要点（日本語・80字以内）","uncertain":["joints.L.sh.rom や adl.a4 のような欄名"],"note":"読み取りの注意点（短く）"}',
+ "【ルール】",
+ "- sens は 感覚脱失・感覚鈍麻・異常感覚 から、mot は 弛緩性麻痺・痙性麻痺・固縮・不随意運動・しんせん・運動失調・その他 から、site は 脳・脊髄・末梢神経・筋肉・骨関節・その他 から、○で囲まれたものだけ。「なし」に○なら空配列。",
+ "- side は図示・計測・ROM/MMTの左右差から障害のある側（右R・左L・両側B）。判断できなければ null。",
+ "- adl の項目は順に："+ADL.map(a=>a[0]+"="+a[1]).join("、")+"。記号は ○（自立）・△（半介助）・×（全介助又は不能）。未記入は null。",
+ "- walk：歩行不能→none、100m未満しか歩けない（100m以上歩行不能・50mなど）→lt100、1km未満（1km以上歩行不能・500m・300mなど）→lt1k、2km未満（2km以上歩行不能・1.5kmなど）→lt2k、2km以上歩ける→ok。",
+ "- stand：起立位を保てない→none、10分未満（10分以上困難・5分など）→lt10、30分未満（30分以上困難・15分など）→lt30、1時間未満（1時間以上困難）→lt60、1時間以上可→ok。",
+ "- joints：sh肩・el肘・wr手・hip股・kn膝・an足関節。rom はその関節の主要な運動方向（屈曲-伸展、外転-内転など）の連続した他動可動域のうち最も小さいもの（度）。強直は0。記載がなければ null。mmt はその関節の各運動方向に記入された筋力記号（×・△・○）をすべて並べる。記載がなければ空配列。",
+ "- 手指の関節の記載は joints に入れず、findings に短く書く。",
+ "- 少しでも自信のない欄は uncertain に入れる。",
+ "- 患者の氏名・住所・生年月日・IDなど個人情報は一切出力しない。",
+ "- 診断書の裏面でない画像なら、すべて null／空にして note に理由を書く。"].join("\n");
+}
+function phStat(h){$("phStat").innerHTML=h}
+function parseLoose(t){if(t&&typeof t==="object")return t;const m=String(t||"").match(/\{[\s\S]*\}/);if(!m)throw new Error("読み取り結果を解釈できませんでした");return JSON.parse(m[0])}
+function phApply(o){
+ phBak=JSON.stringify(S);const got=[],L=["感覚","運動","起因部位"];
+ const pick=(v,ok)=>Array.isArray(v)?v.filter(x=>ok.includes(x)):[];
+ const sens=pick(o.sens,["感覚脱失","感覚鈍麻","異常感覚"]),mot=pick(o.mot,["弛緩性麻痺","痙性麻痺","固縮","不随意運動","しんせん","運動失調","その他"]),site=pick(o.site,["脳","脊髄","末梢神経","筋肉","骨関節","その他"]);
+ if(Array.isArray(o.sens)){S.neuro.sens=sens;got.push("感覚障害")}
+ if(Array.isArray(o.mot)&&(mot.length||!S.neuro.mot.length)){S.neuro.mot=mot;got.push("運動障害")}
+ if(site.length){S.neuro.site=site;got.push("起因部位")}
+ if(o.bb==="なし"||o.bb==="あり")S.neuro.bb=o.bb;if(o.deform==="なし"||o.deform==="あり")S.neuro.deform=o.deform;
+ if(!S.side&&["R","L","B"].includes(o.side)){S.side=o.side;got.push("障害のある側")}
+ ["R","L"].forEach(k=>{const g=num(o.grip&&o.grip[k]);if(g!=null){S.grip[k]=String(g);got.includes("握力")||got.push("握力")}
+  const l=num(o.leg_len&&o.leg_len[k]);if(l!=null){S.len[k]=String(l);got.includes("下肢長")||got.push("下肢長")}});
+ let na=0;S.adl=S.adl||{};ADL.forEach(a=>{const v=o.adl&&o.adl[a[0]];if(["○","△","×"].includes(v)){S.adl[a[0]]=v;na++}});if(na)got.push("動作・活動 "+na+"項目");
+ if(["none","lt100","lt1k","lt2k","ok"].includes(o.walk)){S.walk=o.walk;got.push("歩行能力")}
+ if(["none","lt10","lt30","lt60","ok"].includes(o.stand)){S.stand=o.stand;got.push("起立位保持")}
+ const SV={"×":2,"△":3,"○":5};let nj=0;
+ ["R","L"].forEach(sd=>["sh","el","wr","hip","kn","an"].forEach(k=>{const j=o.joints&&o.joints[sd]&&o.joints[sd][k];if(!j)return;
+  const cur=Object.assign({},S.J[sd][k]);let hit=false;const r=num(j.rom);if(r!=null){cur.rom=String(r);hit=true}
+  const ms=(Array.isArray(j.mmt)?j.mmt:[]).map(x=>SV[x]).filter(x=>x!=null);
+  if(ms.length){const a=ms.reduce((x,y)=>x+y,0)/ms.length;cur.mmt=String(Math.round(a*2)/2);hit=true}
+  if(hit){S.J[sd][k]=cur;nj++}}));
+ if(nj)got.push("ROM・MMT "+nj+"関節");
+ if(o.findings&&!S.imaging)S.imaging=String(o.findings).slice(0,200);
+ fillBound();renderAll();
+ const un=(o.uncertain||[]).map(x=>String(x).replace(/joints\.(R|L)\.(\w+)\.(rom|mmt)/,(m,a,b,c)=>SN[a]+({sh:"肩",el:"肘",wr:"手",hip:"股",kn:"膝",an:"足"}[b]||b)+(c==="rom"?"ROM":"MMT")).replace(/adl\.(a\d+)/,(m,a)=>(ADL.find(x=>x[0]===a)||[0,a])[1]));
+ phStat((got.length?"<b>反映した項目</b>："+got.join("、"):"反映できる記載が見つからなかった。")+
+  (un.length?'<br><b style="color:var(--warn)">要確認</b>：'+esc(un.join("、")):"")+(o.note?"<br>メモ："+esc(o.note):"")+
+  '<br>MMTは記号を ×=2・△=3・○=5 として関節ごとに平均した。所見・関節タブで写真と見比べてから使う。'+(dxObj().id?"":'<br><b>原疾患を選ぶと1枚目が完成する。</b>'));
+ $("phUndo").classList.remove("hidden");
+}
+async function phRun(){if(phBusy||!SAMPLE)return;const files=["l","r"].map(k=>PH[k]).filter(Boolean);if(!files.length)return;
+ phBusy=true;$("phRun").disabled=true;phStat('<span class="spin"></span>読み取っています（20〜60秒）…');
+ try{const imgs=await Promise.all(files.map(f=>shrink(f,2200)));
+  const r=SAMPLE.json?await SAMPLE.json(phPrompt(),{images:imgs,modelTier:"complex",cache:false}):(await SAMPLE(phPrompt(),{images:imgs,modelTier:"complex",cache:false})).text;
+  phApply(parseLoose(r));
+ }catch(err){const c=err&&err.code;
+  if(c==="not_granted"){phStat("写真の読み取りが許可されていません。");$("phCard").classList.add("hidden")}
+  else if(c==="rate_limited")phStat("混み合っています。少し時間をおいてからもう一度試してください。");
+  else phStat("読み取りに失敗しました："+esc((err&&err.message)||"不明なエラー")+"<br>写真を撮り直すか、手で入力してください。")}
+ phBusy=false;$("phRun").disabled=!(PH.l||PH.r);}
+function initPhoto(){
+ if(!(window.claude&&typeof window.claude.use==="function"))return;
+ window.claude.use("sample").then(s=>{if(!s)return;return Promise.resolve(s.limits?s.limits():{images:true}).then(l=>{if(l&&l.images){SAMPLE=s;$("phCard").classList.remove("hidden")}})}).catch(()=>{});
+ document.querySelectorAll("[data-ph]").forEach(inp=>inp.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const k=inp.dataset.ph;PH[k]=f;
+  const im=$("phImg_"+k);try{im.src=URL.createObjectURL(f);im.classList.remove("hidden")}catch(x){}$("phRun").disabled=false;inp.value=""}));
+ $("phRun").addEventListener("click",phRun);
+ $("phUndo").addEventListener("click",()=>{if(!phBak)return;try{S=JSON.parse(phBak)}catch(e){return}phBak=null;fillBound();renderAll();$("phUndo").classList.add("hidden");phStat("読み込み前の値に戻した。")});
+}
 function setHH(){const h=document.querySelector("header.top");if(h)document.documentElement.style.setProperty("--hh",(h.offsetHeight+6)+"px")}
-load();initStatic();fillBound();setTab(S.tab);renderAll();setHH();window.addEventListener("load",()=>renderAll());window.addEventListener("resize",setHH);
+load();initStatic();fillBound();setTab(S.tab);renderAll();setHH();window.addEventListener("load",()=>renderAll());initPhoto();window.addEventListener("resize",setHH);
 </script>
 
 <script>
