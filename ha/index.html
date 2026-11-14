@@ -158,71 +158,54 @@ a{color:var(--info)}
 
 .st.bk{background:var(--info-soft);color:var(--info)}
 .tag.gl{background:var(--ok-soft);color:var(--ok)}
-nav.tabs button{font-size:12px}
-@media (max-width:380px){nav.tabs button{font-size:11px;padding:6px 1px}}
+nav.tabs{grid-template-columns:repeat(4,1fr)!important}
+nav.tabs button{font-size:13px}
+.chips{gap:5px}
+.chip span{padding:6px 11px;font-size:13.5px;min-height:34px}
+#a-ci .chip input:checked + span{background:var(--crit);border-color:var(--crit);color:#fff}
+.q{margin:0 0 10px}
+#a-migq{margin-bottom:10px}
+details.more{border-top:1px dashed var(--line);margin-top:10px;padding-top:8px}
+details.card.more{border-top:1px solid var(--line);margin-top:0}
+details.more>summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--accent);list-style:none;padding:4px 0}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"＋ ";}
+details.more[open]>summary::before{content:"− ";}
+details.more .cnt{font-weight:400;color:var(--muted);font-size:12.5px;margin-left:4px}
+.pnote{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+.pnote:empty{display:none}
+.pnote .pl{font-size:11px;font-weight:700;background:var(--info-soft);color:var(--info);border-radius:4px;padding:0 6px;margin-right:6px}
+.flags{display:flex;flex-direction:column;gap:6px}
+.flag{font:inherit;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;gap:1px}
+.flag b{font-size:14px;font-weight:600}
+.flag small{font-size:12px;color:var(--muted)}
+.flag.on{background:var(--crit-soft);border-color:var(--crit)}
+.flag.on b::before{content:"✓ ";color:var(--crit)}
+.bulk button[aria-pressed="true"]{background:var(--ok-soft);color:var(--ok);border-color:var(--ok);font-weight:700}
+.mrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dotted var(--line)}
+.mrow>span{font-size:13.5px}
+.mrow .chips{flex:none}
+#v-ref{display:flex;flex-direction:column;gap:12px}
+.sub{display:flex;flex-direction:column;gap:12px}
+.sub.hidden{display:none}
 
 </style>
 </head>
 <body>
 <header class="top">
-  <div class="brand"><h1>頭痛ナビ</h1><small>鑑別・急性期・予防・使用過多・群発</small></div>
-  <nav class="tabs" role="tablist" aria-label="場面">
-    <button type="button" role="tab" data-v="dx" aria-selected="false">鑑別</button>
-    <button type="button" role="tab" data-v="ac" aria-selected="true">急性期</button>
-    <button type="button" role="tab" data-v="pv" aria-selected="false">予防</button>
-    <button type="button" role="tab" data-v="moh" aria-selected="false">使用<br>過多</button>
-    <button type="button" role="tab" data-v="ch" aria-selected="false">群発<br>特殊</button>
-    <button type="button" role="tab" data-v="dr" aria-selected="false">薬剤</button>
-    <button type="button" role="tab" data-v="ev" aria-selected="false">根拠</button>
+  <div class="brand"><h1>頭痛ナビ</h1><small>発作を止める・予防を決める・危険信号</small></div>
+  <nav class="tabs" role="tablist" aria-label="入口">
+    <button type="button" role="tab" data-v="ac" aria-selected="true">発作を<br>止める</button>
+    <button type="button" role="tab" data-v="pv" aria-selected="false">予防を<br>決める</button>
+    <button type="button" role="tab" data-v="dx" aria-selected="false">危険<br>信号</button>
+    <button type="button" role="tab" data-v="ref" aria-selected="false">資料</button>
   </nav>
 </header>
 
 <main>
-<!-- ===================== 鑑別 ===================== -->
-<div id="v-dx" class="view hidden">
-  <section class="card">
-    <h2>二次性頭痛の危険信号（SNNOOP10）</h2>
-    <p class="hint" style="margin-top:-4px">1つでも「あり」なら、一次性頭痛と決める前に画像・採血・髄液などを検討する。</p>
-    <div class="ck" id="x-flags"></div>
-    <div class="bulk"><button type="button" data-bulk="x" data-a="0">すべて「なし」</button><button type="button" data-bulk="x" data-a="-1">未入力に戻す</button></div>
-  </section>
-  <div id="x-out"></div>
-  <section class="card">
-    <h2>一次性頭痛の見分け（ICHD-3）</h2>
-    <div class="q"><span class="lb">発作1回の長さ（未治療・治療無効時）</span>
-      <div class="chips">
-        <label class="chip"><input type="radio" name="x-dur" value="s"><span>数秒〜数分</span></label>
-        <label class="chip"><input type="radio" name="x-dur" value="c"><span>15〜180分</span></label>
-        <label class="chip"><input type="radio" name="x-dur" value="m"><span>4〜72時間</span></label>
-        <label class="chip"><input type="radio" name="x-dur" value="t"><span>30分〜7日</span></label>
-        <label class="chip"><input type="radio" name="x-dur" value="d"><span>ほぼ毎日続く</span></label>
-      </div></div>
-    <div class="q"><span class="lb">痛みの性状</span>
-      <label class="chk"><input type="checkbox" id="x-uni">片側性</label>
-      <label class="chk"><input type="checkbox" id="x-puls">拍動性</label>
-      <label class="chk"><input type="checkbox" id="x-sev">中等度〜重度（日常生活が妨げられる）</label>
-      <label class="chk"><input type="checkbox" id="x-act">階段昇降など日常的な動作で悪化する（動けなくなる）</label>
-      <label class="chk"><input type="checkbox" id="x-press">圧迫感・締めつけ感（非拍動性）</label>
-      <label class="chk"><input type="checkbox" id="x-orb">眼窩・眼窩上・側頭部の激痛</label>
-    </div>
-    <div class="q"><span class="lb">随伴症状</span>
-      <label class="chk"><input type="checkbox" id="x-nv">悪心または嘔吐</label>
-      <label class="chk"><input type="checkbox" id="x-photo">光過敏</label>
-      <label class="chk"><input type="checkbox" id="x-phono">音過敏</label>
-      <label class="chk"><input type="checkbox" id="x-aut">同側の結膜充血・流涙・鼻閉・鼻漏・眼瞼浮腫・縮瞳/眼瞼下垂</label>
-      <label class="chk"><input type="checkbox" id="x-rest">発作中に落ち着かずじっとしていられない</label>
-      <label class="chk"><input type="checkbox" id="x-aura">完全可逆性の視覚・感覚・言語の前兆（5分以上かけて進展、5〜60分）</label>
-      <label class="chk"><input type="checkbox" id="x-n5">同様の発作が5回以上（群発頭痛では5回、緊張型では10回）</label>
-    </div>
-    <p class="hint">簡易スクリーナー（ID Migraine）：「支障」「悪心」「光過敏」のうち2つ以上で片頭痛の可能性が高い。</p>
-  </section>
-  <div id="x-dxout"></div>
-</div>
-
-<!-- ===================== 急性期 ===================== -->
+<!-- ===================== 発作を止める ===================== -->
 <div id="v-ac" class="view hidden">
   <section class="card">
-    <h2>頭痛の種類と今回の発作</h2>
     <div class="q"><span class="lb">診断</span>
       <div class="chips">
         <label class="chip"><input type="radio" name="a-type" value="mig" checked><span>片頭痛</span></label>
@@ -230,7 +213,7 @@ nav.tabs button{font-size:12px}
         <label class="chip"><input type="radio" name="a-type" value="ch"><span>群発頭痛</span></label>
       </div></div>
     <div id="a-migq">
-    <div class="q"><span class="lb">発作の強さ</span>
+    <div class="q"><span class="lb">強さ</span>
       <div class="chips">
         <label class="chip"><input type="radio" name="a-sev" value="mild"><span>軽度〜中等度</span></label>
         <label class="chip"><input type="radio" name="a-sev" value="sev" checked><span>中等度〜重度</span></label>
@@ -238,142 +221,224 @@ nav.tabs button{font-size:12px}
     <div class="q"><span class="lb">悪心・嘔吐</span>
       <div class="chips">
         <label class="chip"><input type="radio" name="a-nv" value="0" checked><span>なし</span></label>
-        <label class="chip"><input type="radio" name="a-nv" value="1"><span>悪心あり</span></label>
-        <label class="chip"><input type="radio" name="a-nv" value="2"><span>嘔吐で内服困難</span></label>
+        <label class="chip"><input type="radio" name="a-nv" value="1"><span>悪心</span></label>
+        <label class="chip"><input type="radio" name="a-nv" value="2"><span>嘔吐で飲めない</span></label>
       </div></div>
-    <label class="chk"><input type="checkbox" id="a-late">服用が遅れた・すでに痛みのピーク（アロディニアあり）</label>
-    <label class="chk"><input type="checkbox" id="a-recur">内服で効くが24時間以内に再発しやすい</label>
-    <label class="chk"><input type="checkbox" id="a-nsfail">NSAIDs・アセトアミノフェンで効果不十分だった</label>
-    <label class="chk"><input type="checkbox" id="a-tfail">トリプタン2剤以上で効果不十分・副作用で使えない</label>
-    <label class="chk"><input type="checkbox" id="a-mens">月経時片頭痛（長く重い）</label>
-    <label class="chk"><input type="checkbox" id="a-status">72時間以上続く（片頭痛発作重積）</label>
     </div>
     <div class="q"><span class="lb">場面</span>
       <div class="chips">
-        <label class="chip"><input type="radio" name="a-set" value="op" checked><span>外来・頓用処方</span></label>
-        <label class="chip"><input type="radio" name="a-set" value="er"><span>救急外来・病棟（注射可）</span></label>
+        <label class="chip"><input type="radio" name="a-set" value="op" checked><span>外来・頓用</span></label>
+        <label class="chip"><input type="radio" name="a-set" value="er"><span>救急・病棟（注射可）</span></label>
       </div></div>
-  </section>
-  <section class="card">
-    <h2>患者背景</h2>
-    <div class="sec-h">トリプタン・エルゴタミンの禁忌</div>
-    <label class="chk"><input type="checkbox" id="a-ihd">虚血性心疾患（既往・症状・徴候を含む）</label>
-    <label class="chk"><input type="checkbox" id="a-cvd">脳梗塞・TIAの既往</label>
-    <label class="chk"><input type="checkbox" id="a-pad">末梢血管障害</label>
-    <label class="chk"><input type="checkbox" id="a-htn">コントロールされていない高血圧</label>
-    <label class="chk"><input type="checkbox" id="a-hemi">片麻痺性片頭痛・脳幹性前兆を伴う片頭痛</label>
-    <label class="chk"><input type="checkbox" id="a-liver">重度の肝機能障害</label>
-    <div class="sec-h">腎機能・妊娠</div>
-    <label class="chk"><input type="checkbox" id="a-renal">重度腎機能障害・透析</label>
-    <div class="q" style="margin-top:6px"><span class="lb">妊娠・授乳</span>
-      <div class="chips">
-        <label class="chip"><input type="radio" name="a-preg" value="no" checked><span>該当なし</span></label>
-        <label class="chip"><input type="radio" name="a-preg" value="p1"><span>妊娠中（〜27週）</span></label>
-        <label class="chip"><input type="radio" name="a-preg" value="p3"><span>妊娠28週以降</span></label>
-        <label class="chip"><input type="radio" name="a-preg" value="lac"><span>授乳中</span></label>
-      </div></div>
-    <div class="sec-h">併用薬・生活</div>
-    <label class="chk"><input type="checkbox" id="a-prop">プロプラノロール内服中</label>
-    <label class="chk"><input type="checkbox" id="a-maoi">MAO阻害薬内服中・中止2週間以内（セレギリン・ラサギリン・サフィナミドを含む）</label>
-    <label class="chk"><input type="checkbox" id="a-cyp">HIVプロテアーゼ阻害薬・強いCYP3A4阻害薬（クラリスロマイシン、イトラコナゾール等）</label>
-    <label class="chk"><input type="checkbox" id="a-ssri">SSRI・SNRI内服中</label>
-    <label class="chk"><input type="checkbox" id="a-asthma">アスピリン喘息・NSAIDs過敏</label>
-    <label class="chk"><input type="checkbox" id="a-gi">消化性潰瘍の既往・抗血栓薬内服中</label>
-    <label class="chk"><input type="checkbox" id="a-drive">服用後に車を運転する予定がある・運転が仕事</label>
-    <div class="grid" style="margin-top:8px">
-      <label class="f">急性期薬を飲む日（日/月）<input type="number" id="a-days" inputmode="numeric" min="0" max="31" placeholder="例 8"></label>
+    <div class="q"><span class="lb">トリプタンの禁忌（あるものだけ押す）</span>
+      <div class="chips" id="a-ci">
+        <label class="chip"><input type="checkbox" id="a-ihd"><span>虚血性心疾患</span></label>
+        <label class="chip"><input type="checkbox" id="a-cvd"><span>脳梗塞・TIA</span></label>
+        <label class="chip"><input type="checkbox" id="a-pad"><span>末梢血管障害</span></label>
+        <label class="chip"><input type="checkbox" id="a-htn"><span>コントロール不良の高血圧</span></label>
+        <label class="chip"><input type="checkbox" id="a-hemi"><span>片麻痺性・脳幹性前兆</span></label>
+      </div>
+      <div class="bulk"><button type="button" data-none="a-ci">該当なし</button><span class="hint" id="a-ci-st" style="margin:0"></span></div>
+      <p class="hint">重度肝障害・腎機能・妊娠は上の患者プロファイルから取ります。</p>
     </div>
+    <div class="pnote" id="a-pnote"></div>
+    <div class="q" data-wp-show="preg:preg"><span class="lb">妊娠週数</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="a-preg" value="p1" data-wp="preg" data-wp-v="preg"><span>〜27週</span></label>
+        <label class="chip"><input type="radio" name="a-preg" value="p3" data-wp="preg" data-wp-v="preg"><span>28週以降</span></label>
+      </div></div>
+    <div class="hidden">
+      <input type="radio" name="a-preg" value="no" data-wp="preg" data-wp-v="none" checked>
+      <input type="radio" name="a-preg" value="lac" data-wp="preg" data-wp-v="lact">
+      <input type="checkbox" id="a-liver" data-wp="liver" data-wp-v="cpC">
+      <input type="checkbox" id="a-renal" data-wp="renal" data-wp-v="lt15">
+    </div>
+    <details class="more" id="a-more"><summary>詳しく（経過・併用薬・服薬日数）<span class="cnt" id="a-more-n"></span></summary>
+      <div class="sec-h">今回の発作・これまでの経過</div>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" id="a-late"><span>服用が遅れた・ピーク後</span></label>
+        <label class="chip"><input type="checkbox" id="a-recur"><span>24時間以内に再発しやすい</span></label>
+        <label class="chip"><input type="checkbox" id="a-nsfail"><span>NSAIDs・アセトアミノフェン無効</span></label>
+        <label class="chip"><input type="checkbox" id="a-tfail"><span>トリプタン2剤以上が無効・不耐</span></label>
+        <label class="chip"><input type="checkbox" id="a-mens"><span>月経時片頭痛</span></label>
+        <label class="chip"><input type="checkbox" id="a-status"><span>72時間以上続く（重積）</span></label>
+      </div>
+      <div class="sec-h">併用薬・背景</div>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" id="a-prop"><span>プロプラノロール</span></label>
+        <label class="chip"><input type="checkbox" id="a-maoi"><span>MAO阻害薬（セレギリン等）</span></label>
+        <label class="chip"><input type="checkbox" id="a-cyp"><span>HIVプロテアーゼ阻害薬・強いCYP3A4阻害薬</span></label>
+        <label class="chip"><input type="checkbox" id="a-ssri"><span>SSRI・SNRI</span></label>
+        <label class="chip"><input type="checkbox" id="a-asthma"><span>アスピリン喘息・NSAIDs過敏</span></label>
+        <label class="chip"><input type="checkbox" id="a-gi" data-wp="at" data-wp-v="ap,ac,both"><span>消化性潰瘍・抗血栓薬</span></label>
+        <label class="chip"><input type="checkbox" id="a-drive"><span>服用後に運転</span></label>
+      </div>
+      <div class="q" style="margin-top:10px"><span class="lb">急性期薬を飲む日（月あたり）</span>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="a-days" value="3" data-l="月5日以下"><span>5日以下</span></label>
+          <label class="chip"><input type="radio" name="a-days" value="7" data-l="月6〜9日"><span>6〜9日</span></label>
+          <label class="chip"><input type="radio" name="a-days" value="12" data-l="月10日以上"><span>10日以上</span></label>
+        </div></div>
+    </details>
   </section>
   <div id="a-out"></div>
 </div>
 
-<!-- ===================== 予防 ===================== -->
+<!-- ===================== 予防を決める ===================== -->
 <div id="v-pv" class="view hidden">
   <section class="card">
-    <h2>頭痛の頻度（最近3か月の平均）</h2>
-    <div class="grid">
-      <label class="f">頭痛のある日（日/月）<input type="number" id="p-hd" inputmode="numeric" min="0" max="31" placeholder="例 10"></label>
-      <label class="f">片頭痛の日（日/月）<input type="number" id="p-mmd" inputmode="numeric" min="0" max="31" placeholder="例 6"></label>
-      <label class="f">急性期薬を飲む日（日/月）<input type="number" id="p-amd" inputmode="numeric" min="0" max="31" placeholder="例 6"></label>
-    </div>
-    <label class="chk" style="margin-top:6px"><input type="checkbox" id="p-dis">非薬物療法・急性期治療をしても日常生活に支障がある</label>
-    <label class="chk"><input type="checkbox" id="p-noacute">急性期治療薬が使えない・効かない</label>
-    <label class="chk"><input type="checkbox" id="p-spec">片麻痺性片頭痛・脳幹性前兆・遷延性前兆など</label>
-  </section>
-  <section class="card">
-    <h2>併存症・背景（薬の選び分けに使う）</h2>
-    <div class="sec-h">あると選びやすい薬がある</div>
-    <label class="chk"><input type="checkbox" id="p-htn">高血圧</label>
-    <label class="chk"><input type="checkbox" id="p-anx">不安・緊張しやすい・動悸・本態性振戦</label>
-    <label class="chk"><input type="checkbox" id="p-dep">うつ・不眠・緊張型頭痛の併存・慢性疼痛</label>
-    <label class="chk"><input type="checkbox" id="p-epi">てんかん・双極性障害</label>
-    <label class="chk"><input type="checkbox" id="p-obese">肥満（体重を増やしたくない）</label>
-    <label class="chk"><input type="checkbox" id="p-ae">副作用をとても心配している・初めての予防薬</label>
-    <label class="chk"><input type="checkbox" id="p-daily">毎日飲むのが難しい（注射の方がよい）</label>
-    <div class="sec-h">避けたい薬がある</div>
-    <label class="chk"><input type="checkbox" id="p-asthma">喘息・COPD</label>
-    <label class="chk"><input type="checkbox" id="p-brady">徐脈・房室ブロック・心不全</label>
-    <label class="chk"><input type="checkbox" id="p-hypo">低血圧・立ちくらみ</label>
-    <label class="chk"><input type="checkbox" id="p-glau">閉塞隅角緑内障・前立腺肥大・QT延長</label>
-    <label class="chk"><input type="checkbox" id="p-stone">尿路結石の既往・やせ</label>
-    <label class="chk"><input type="checkbox" id="p-liver">肝機能障害</label>
-    <label class="chk"><input type="checkbox" id="p-ckd">CrCl 30 mL/分未満・透析</label>
-    <label class="chk"><input type="checkbox" id="p-vasc">虚血性脳卒中・虚血性心疾患・レイノー現象</label>
-    <label class="chk"><input type="checkbox" id="p-const">便秘が強い</label>
-    <label class="chk"><input type="checkbox" id="p-cyp">強いCYP3A4阻害薬（クラリスロマイシン、イトラコナゾール等）</label>
-    <label class="chk"><input type="checkbox" id="p-old">65歳以上</label>
-    <div class="q" style="margin-top:6px"><span class="lb">妊娠</span>
+    <div class="q"><span class="lb">頭痛のある日（月あたり・最近3か月）</span>
       <div class="chips">
-        <label class="chip"><input type="radio" name="p-preg" value="no" checked><span>該当なし・男性</span></label>
-        <label class="chip"><input type="radio" name="p-preg" value="cb"><span>妊娠の可能性がある年代</span></label>
-        <label class="chip"><input type="radio" name="p-preg" value="plan"><span>妊娠を希望</span></label>
-        <label class="chip"><input type="radio" name="p-preg" value="preg"><span>妊娠中</span></label>
-        <label class="chip"><input type="radio" name="p-preg" value="lac"><span>授乳中</span></label>
+        <label class="chip"><input type="radio" name="p-hd" value="3"><span>4日以下</span></label>
+        <label class="chip"><input type="radio" name="p-hd" value="10"><span>5〜14日</span></label>
+        <label class="chip"><input type="radio" name="p-hd" value="20"><span>15日以上</span></label>
       </div></div>
-  </section>
-  <section class="card">
-    <h2>これまでの予防薬</h2>
-    <p class="hint" style="margin-top:-4px">効果不十分・忍容性が低い・禁忌のいずれかで使えなかった薬にチェック。</p>
-    <label class="chk"><input type="checkbox" id="p-f-lom">ロメリジン</label>
-    <label class="chk"><input type="checkbox" id="p-f-pro">プロプラノロール</label>
-    <label class="chk"><input type="checkbox" id="p-f-vpa">バルプロ酸</label>
-    <label class="chk"><input type="checkbox" id="p-f-ami">アミトリプチリン</label>
-    <label class="chk"><input type="checkbox" id="p-f-oth">その他の経口予防薬（ベラパミル、トピラマート、カンデサルタン等）</label>
-    <label class="chk"><input type="checkbox" id="p-f-gep">ゲパント（リメゲパント・アトゲパント）</label>
-    <label class="chk"><input type="checkbox" id="p-f-mab">CGRP関連抗体薬</label>
+    <div class="q"><span class="lb">うち片頭痛の日</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="p-mmd" value="1"><span>1日以下</span></label>
+        <label class="chip"><input type="radio" name="p-mmd" value="2"><span>2日</span></label>
+        <label class="chip"><input type="radio" name="p-mmd" value="3"><span>3日</span></label>
+        <label class="chip"><input type="radio" name="p-mmd" value="5"><span>4〜7日</span></label>
+        <label class="chip"><input type="radio" name="p-mmd" value="10"><span>8日以上</span></label>
+      </div></div>
+    <div class="q"><span class="lb">急性期薬を飲む日</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="p-amd" value="1"><span>2日以下</span></label>
+        <label class="chip"><input type="radio" name="p-amd" value="6"><span>3〜9日</span></label>
+        <label class="chip"><input type="radio" name="p-amd" value="12"><span>10日以上</span></label>
+      </div>
+      <label class="chk" style="margin-top:6px"><input type="checkbox" id="p-dis">急性期治療をしても日常生活に支障がある</label></div>
+    <div class="q" id="p-pregq"><span class="lb">妊娠の可能性</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="p-preg" value="no" data-wp="preg" data-wp-v="none" checked><span>なし・男性</span></label>
+        <label class="chip"><input type="radio" name="p-preg" value="cb" data-wp="preg" data-wp-v="none"><span>可能性のある年代</span></label>
+        <label class="chip"><input type="radio" name="p-preg" value="plan" data-wp="preg" data-wp-v="none"><span>妊娠を希望</span></label>
+      </div></div>
+    <div class="hidden">
+      <input type="radio" name="p-preg" value="preg" data-wp="preg" data-wp-v="preg">
+      <input type="radio" name="p-preg" value="lac" data-wp="preg" data-wp-v="lact">
+      <input type="checkbox" id="p-old" data-wp="age" data-wp-v="65-74,ge75">
+      <input type="checkbox" id="p-ckd" data-wp="renal" data-wp-v="15-29,lt15">
+      <input type="checkbox" id="p-liver" data-wp="liver" data-wp-v="cpB,cpC">
+    </div>
+    <div class="pnote" id="p-pnote"></div>
+    <div class="q"><span class="lb">主な併存症（あるものだけ押す）</span>
+      <div class="chips" id="p-cm">
+        <label class="chip"><input type="checkbox" id="p-htn"><span>高血圧</span></label>
+        <label class="chip"><input type="checkbox" id="p-anx"><span>不安・動悸・振戦</span></label>
+        <label class="chip"><input type="checkbox" id="p-dep"><span>うつ・不眠・緊張型頭痛</span></label>
+        <label class="chip"><input type="checkbox" id="p-epi"><span>てんかん・双極性障害</span></label>
+        <label class="chip"><input type="checkbox" id="p-obese"><span>肥満</span></label>
+        <label class="chip"><input type="checkbox" id="p-asthma"><span>喘息・COPD</span></label>
+        <label class="chip"><input type="checkbox" id="p-brady"><span>徐脈・房室ブロック・心不全</span></label>
+        <label class="chip"><input type="checkbox" id="p-vasc"><span>虚血性脳・心疾患</span></label>
+      </div>
+      <div class="bulk"><button type="button" data-none="p-cm">該当なし</button></div></div>
+    <details class="more" id="p-more"><summary>詳しく（前治療・ほかの背景）<span class="cnt" id="p-more-n"></span></summary>
+      <div class="sec-h">使えなかった予防薬（無効・副作用・禁忌）</div>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" id="p-f-lom"><span>ロメリジン</span></label>
+        <label class="chip"><input type="checkbox" id="p-f-pro"><span>プロプラノロール</span></label>
+        <label class="chip"><input type="checkbox" id="p-f-vpa"><span>バルプロ酸</span></label>
+        <label class="chip"><input type="checkbox" id="p-f-ami"><span>アミトリプチリン</span></label>
+        <label class="chip"><input type="checkbox" id="p-f-oth"><span>ほかの経口薬</span></label>
+        <label class="chip"><input type="checkbox" id="p-f-gep"><span>ゲパント</span></label>
+        <label class="chip"><input type="checkbox" id="p-f-mab"><span>CGRP関連抗体</span></label>
+      </div>
+      <div class="sec-h">ほかの背景</div>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" id="p-noacute"><span>急性期薬が使えない・効かない</span></label>
+        <label class="chip"><input type="checkbox" id="p-spec"><span>片麻痺性・脳幹性・遷延性前兆</span></label>
+        <label class="chip"><input type="checkbox" id="p-ae"><span>副作用が心配・初めての予防薬</span></label>
+        <label class="chip"><input type="checkbox" id="p-daily"><span>毎日の服薬が難しい</span></label>
+        <label class="chip"><input type="checkbox" id="p-hypo"><span>低血圧</span></label>
+        <label class="chip"><input type="checkbox" id="p-glau"><span>緑内障・前立腺肥大・QT延長</span></label>
+        <label class="chip"><input type="checkbox" id="p-stone"><span>尿路結石・やせ</span></label>
+        <label class="chip"><input type="checkbox" id="p-const"><span>便秘が強い</span></label>
+        <label class="chip"><input type="checkbox" id="p-cyp"><span>強いCYP3A4阻害薬</span></label>
+      </div>
+      <p class="hint">65歳以上・腎機能・肝機能はプロファイルから取ります。</p>
+    </details>
   </section>
   <div id="p-out"></div>
+  <details class="card more" id="m-box"><summary>薬剤の使用過多を判定する（ICHD-3 8.2）<span class="cnt" id="m-more-n"></span></summary>
+    <div class="q" style="margin-top:8px"><span class="lb">頭痛のある日</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="m-hd" value="10"><span>14日以下</span></label>
+        <label class="chip"><input type="radio" name="m-hd" value="20"><span>15日以上</span></label>
+      </div>
+      <div class="chips" style="margin-top:6px">
+        <label class="chip"><input type="checkbox" id="m-3m"><span>3か月を超えて続く</span></label>
+        <label class="chip"><input type="checkbox" id="m-prior"><span>もとの頭痛がある</span></label>
+      </div></div>
+    <div class="sec-h">服用日数（月あたり、使う薬だけ）</div>
+    <div class="mrow"><span>トリプタン</span><div class="chips"><label class="chip"><input type="radio" name="m-trip" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-trip" value="12"><span>10日以上</span></label></div></div>
+    <div class="mrow"><span>複合鎮痛薬（市販薬の多く）</span><div class="chips"><label class="chip"><input type="radio" name="m-comb" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-comb" value="12"><span>10日以上</span></label></div></div>
+    <div class="mrow"><span>単一の鎮痛薬（アセトアミノフェン・NSAIDs）</span><div class="chips"><label class="chip"><input type="radio" name="m-simp" value="7"><span>1〜14日</span></label><label class="chip"><input type="radio" name="m-simp" value="20"><span>15日以上</span></label></div></div>
+    <div class="mrow"><span>エルゴタミン</span><div class="chips"><label class="chip"><input type="radio" name="m-erg" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-erg" value="12"><span>10日以上</span></label></div></div>
+    <div class="mrow"><span>オピオイド</span><div class="chips"><label class="chip"><input type="radio" name="m-opi" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-opi" value="12"><span>10日以上</span></label></div></div>
+    <div class="mrow"><span>ラスミジタン・急性期のゲパント</span><div class="chips"><label class="chip"><input type="radio" name="m-new" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-new" value="12"><span>10日以上</span></label></div></div>
+    <div class="mrow"><span>すべての急性期薬の合計</span><div class="chips"><label class="chip"><input type="radio" name="m-tot" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-tot" value="12"><span>10日以上</span></label></div></div>
+    <div class="bulk"><button type="button" data-mclr="1">服用日数をリセット</button></div>
+    <div class="sec-h">背景</div>
+    <div class="chips">
+      <label class="chip"><input type="checkbox" id="m-psy"><span>うつ・不安・依存傾向</span></label>
+      <label class="chip"><input type="checkbox" id="m-opiuse"><span>オピオイド等の乱用</span></label>
+      <label class="chip"><input type="checkbox" id="m-fail"><span>外来での離脱に失敗</span></label>
+    </div>
+    <div id="m-out" style="margin-top:10px;display:flex;flex-direction:column;gap:12px"></div>
+  </details>
 </div>
 
-<!-- ===================== 薬剤の使用過多 ===================== -->
-<div id="v-moh" class="view hidden">
+<!-- ===================== 危険信号 ===================== -->
+<div id="v-dx" class="view hidden">
   <section class="card">
-    <h2>薬剤の使用過多による頭痛（ICHD-3 8.2）</h2>
-    <div class="grid">
-      <label class="f">頭痛のある日（日/月）<input type="number" id="m-hd" inputmode="numeric" min="0" max="31" placeholder="例 20"></label>
-    </div>
-    <label class="chk" style="margin-top:6px"><input type="checkbox" id="m-3m">その使い方が3か月を超えて続いている</label>
-    <label class="chk"><input type="checkbox" id="m-prior">もともと片頭痛・緊張型頭痛などの頭痛がある</label>
-    <h3>服用日数（日/月）</h3>
-    <div class="grid">
-      <label class="f">トリプタン<input type="number" id="m-trip" inputmode="numeric" min="0" max="31"></label>
-      <label class="f">複合鎮痛薬（市販薬の多く）<input type="number" id="m-comb" inputmode="numeric" min="0" max="31"></label>
-      <label class="f">単一の鎮痛薬（アセトアミノフェン・NSAIDs）<input type="number" id="m-simp" inputmode="numeric" min="0" max="31"></label>
-      <label class="f">エルゴタミン<input type="number" id="m-erg" inputmode="numeric" min="0" max="31"></label>
-      <label class="f">オピオイド（トラマドール・コデイン）<input type="number" id="m-opi" inputmode="numeric" min="0" max="31"></label>
-      <label class="f">ラスミジタン・急性期のゲパント<input type="number" id="m-new" inputmode="numeric" min="0" max="31"></label>
-      <label class="f">上記の合計日数（重複は1日）<input type="number" id="m-tot" inputmode="numeric" min="0" max="31"></label>
-    </div>
-    <div class="sec-h" style="margin-top:12px">背景</div>
-    <label class="chk"><input type="checkbox" id="m-psy">うつ・不安・依存傾向がある</label>
-    <label class="chk"><input type="checkbox" id="m-opiuse">オピオイド・バルビツール酸・ベンゾジアゼピンの乱用</label>
-    <label class="chk"><input type="checkbox" id="m-fail">外来での離脱に失敗したことがある</label>
+    <h2>二次性頭痛の危険信号（SNNOOP10）</h2>
+    <p class="hint" style="margin-top:-4px">当てはまる項目だけ押す。なければ「該当なし」。</p>
+    <div class="flags" id="x-flags"></div>
+    <div class="bulk"><button type="button" data-bulk="x" data-a="0">該当なし（残りすべて）</button><button type="button" data-bulk="x" data-a="-1">やり直す</button></div>
   </section>
-  <div id="m-out"></div>
+  <div id="x-out"></div>
+  <details class="card more" id="x-box"><summary>一次性頭痛の見分け（ICHD-3）</summary>
+    <div class="q" style="margin-top:8px"><span class="lb">発作1回の長さ</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="x-dur" value="s"><span>秒〜分</span></label>
+        <label class="chip"><input type="radio" name="x-dur" value="c"><span>15〜180分</span></label>
+        <label class="chip"><input type="radio" name="x-dur" value="m"><span>4〜72時間</span></label>
+        <label class="chip"><input type="radio" name="x-dur" value="t"><span>30分〜7日</span></label>
+        <label class="chip"><input type="radio" name="x-dur" value="d"><span>ほぼ毎日</span></label>
+      </div></div>
+    <div class="q"><span class="lb">特徴（あるものだけ）</span>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" id="x-uni"><span>片側</span></label>
+        <label class="chip"><input type="checkbox" id="x-puls"><span>拍動性</span></label>
+        <label class="chip"><input type="checkbox" id="x-sev"><span>中等度〜重度</span></label>
+        <label class="chip"><input type="checkbox" id="x-act"><span>動作で悪化</span></label>
+        <label class="chip"><input type="checkbox" id="x-press"><span>締めつけ感</span></label>
+        <label class="chip"><input type="checkbox" id="x-orb"><span>眼窩周囲の激痛</span></label>
+        <label class="chip"><input type="checkbox" id="x-nv"><span>悪心・嘔吐</span></label>
+        <label class="chip"><input type="checkbox" id="x-photo"><span>光過敏</span></label>
+        <label class="chip"><input type="checkbox" id="x-phono"><span>音過敏</span></label>
+        <label class="chip"><input type="checkbox" id="x-aut"><span>同側の自律神経症状</span></label>
+        <label class="chip"><input type="checkbox" id="x-rest"><span>じっとしていられない</span></label>
+        <label class="chip"><input type="checkbox" id="x-aura"><span>可逆性の前兆</span></label>
+        <label class="chip"><input type="checkbox" id="x-n5"><span>同様の発作5回以上</span></label>
+      </div></div>
+    <p class="hint">ID Migraine：「支障」「悪心」「光過敏」の2つ以上で片頭痛の可能性が高い。</p>
+    <div id="x-dxout"></div>
+  </details>
 </div>
 
-<!-- ===================== 群発・特殊 ===================== -->
-<div id="v-ch" class="view hidden">
+<!-- ===================== 資料 ===================== -->
+<div id="v-ref" class="view hidden">
+  <section class="card" style="padding:10px 14px">
+    <div class="chips" id="r-sub">
+      <label class="chip"><input type="radio" name="r-sub" value="ch" checked><span>群発・特殊</span></label>
+      <label class="chip"><input type="radio" name="r-sub" value="dr"><span>薬剤</span></label>
+      <label class="chip"><input type="radio" name="r-sub" value="ev"><span>根拠・版</span></label>
+    </div>
+  </section>
+<div id="v-ch" class="sub">
   <section class="card">
     <div class="chips" id="c-filter">
       <label class="chip"><input type="radio" name="c-f" value="ch" checked><span>群発頭痛</span></label>
@@ -384,25 +449,34 @@ nav.tabs button{font-size:12px}
       <label class="chip"><input type="radio" name="c-f" value="tth"><span>緊張型頭痛</span></label>
     </div>
   </section>
+  <div id="c-out"></div>
   <div id="c-ch-in" class="hidden">
     <section class="card">
-      <h2>群発頭痛：ベラパミルの増量チェック</h2>
+      <h2>ベラパミルの増量チェック</h2>
       <div class="grid">
         <label class="f">現在のベラパミル（mg/日）<input type="number" id="c-vd" inputmode="numeric" min="0" max="960" step="40" placeholder="例 120"></label>
-        <label class="f">心拍数（/分）<input type="number" id="c-hr" inputmode="numeric" min="20" max="200" placeholder="例 68"></label>
-        <label class="f">PR間隔（ms）<input type="number" id="c-pr" inputmode="numeric" min="80" max="400" placeholder="例 170"></label>
       </div>
-      <label class="chk" style="margin-top:6px"><input type="checkbox" id="c-av2">II度以上の房室ブロック・洞房ブロック・洞不全</label>
-      <label class="chk"><input type="checkbox" id="c-hf">うっ血性心不全</label>
-      <label class="chk"><input type="checkbox" id="c-bb">β遮断薬・ジゴキシン・強いCYP3A4阻害薬を併用</label>
-      <div id="c-vout"></div>
+      <div class="q" style="margin-top:8px"><span class="lb">心拍数</span>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="c-hr" value="60"><span>50以上</span></label>
+          <label class="chip"><input type="radio" name="c-hr" value="45"><span>50未満</span></label>
+        </div></div>
+      <div class="q"><span class="lb">PR間隔</span>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="c-pr" value="170"><span>200 ms以下</span></label>
+          <label class="chip"><input type="radio" name="c-pr" value="220"><span>201〜239</span></label>
+          <label class="chip"><input type="radio" name="c-pr" value="250"><span>240以上</span></label>
+        </div></div>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" id="c-av2"><span>II度以上の房室ブロック・洞不全</span></label>
+        <label class="chip"><input type="checkbox" id="c-hf"><span>うっ血性心不全</span></label>
+        <label class="chip"><input type="checkbox" id="c-bb"><span>β遮断薬・ジゴキシン・強いCYP3A4阻害薬</span></label>
+      </div>
+      <div id="c-vout" style="margin-top:10px"></div>
     </section>
   </div>
-  <div id="c-out"></div>
 </div>
-
-<!-- ===================== 薬剤 ===================== -->
-<div id="v-dr" class="view hidden">
+<div id="v-dr" class="sub hidden">
   <section class="card">
     <div class="sec-h">急性期</div>
     <div class="drugs" id="d-ac"></div>
@@ -413,9 +487,7 @@ nav.tabs button{font-size:12px}
   </section>
   <div id="d-out"></div>
 </div>
-
-<!-- ===================== 根拠 ===================== -->
-<div id="v-ev" class="view hidden">
+<div id="v-ev" class="sub hidden">
   <section class="card">
     <h2>この1年ほどの主な更新</h2>
     <div class="news" id="e-news"></div>
@@ -435,8 +507,10 @@ nav.tabs button{font-size:12px}
   <section class="card fine">
     <p><span class="st ok">原本で確認</span> PubMed抄録・PMDA添付文書・厚労省通知・学会文書の原本で記載を直接確認。<span class="st bk">成書で確認</span> 『頭痛治療薬の考え方、使い方』（中外医学社、2016年 第2版）で確認。改訂がありうるので処方前に最新の添付文書を見る。<span class="st sec">二次資料のみ</span> 解説記事・総説・一般的な知識による。</p>
     <p>保険上の扱い（適応・審査上認める・適応外）は2026年11月時点の把握で、地域の審査で異なることがあります。</p>
-    <p>判断の参考資料です。最終判断は主治医が行い、院内の取り決めがあればそちらを優先してください。データ作成：Claude（2026年11月11日）。</p>
+    <p>判断の参考資料です。最終判断は診察と原典に基づき主治医が行い、院内の取り決めがあればそちらを優先してください。データ作成：Claude（2026年11月11日、入力の簡略化 11月14日）。</p>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px"><span>アプリの版：<b id="app-ver"></b></span><button type="button" class="tp-go" id="forceUpdate">最新版に更新</button></div>
   </section>
+</div>
 </div>
 </main>
 <div class="toast" id="toast"></div>
@@ -490,7 +564,9 @@ function card(h,inner){return `<section class="card">${h?`<h2>${h}</h2>`:""}${in
 function ul(a){return a.length?`<ul class="list">${a.join("")}</ul>`:""}
 const $=id=>document.getElementById(id);
 const val=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:""};
-const num=id=>{const e=$(id);if(!e)return null;const v=parseFloat(e.value);return isNaN(v)?null:v};
+const num=id=>{const e=$(id);let v;if(e)v=parseFloat(e.value);else v=parseFloat(val(id));return isNaN(v)?null:v};
+const lab=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?(e.dataset.l||""):""};
+const APP_VERSION="ha-2026-11-14a";
 const ck=id=>{const e=$(id);return !!(e&&e.checked)};
 
 /* ============ タブ ============ */
@@ -499,14 +575,16 @@ function setTab(v){
   curTab=v;
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v?"true":"false"));
   document.querySelectorAll(".view").forEach(d=>d.classList.toggle("hidden",d.id!=="v-"+v));
+  setSub();
 }
+function setSub(){const s=val("r-sub")||"ch";document.querySelectorAll(".sub").forEach(d=>d.classList.toggle("hidden",d.id!=="v-"+s));}
 
 /* ============ 保存 ============ */
 const KEY="ha-nav-v1";
-let XF={}, dDrug="rim";
+let XF={}, dDrug="rim", NONE={};
 function save(){
   try{
-    const o={tab:curTab,xf:XF,dd:dDrug,f:{}};
+    const o={tab:curTab,xf:XF,dd:dDrug,nn:NONE,f:{}};
     document.querySelectorAll("main input,main select").forEach(el=>{
       if(!el.id&&!el.name)return;
       if(el.type==="radio"){if(el.checked)o.f["r:"+el.name]=el.value}
@@ -525,7 +603,7 @@ function load(){
       else if(t==="c"){const e=$(n);if(e)e.checked=!!v}
       else{const e=$(n);if(e)e.value=v}
     }
-    if(o.xf)XF=o.xf; if(o.dd&&DR[o.dd])dDrug=o.dd; if(o.tab)curTab=o.tab;
+    if(o.xf)XF=o.xf; if(o.nn)NONE=o.nn; if(o.tab&&!["ac","pv","dx","ref"].includes(o.tab))o.tab="ac"; if(o.dd&&DR[o.dd])dDrug=o.dd; if(o.tab)curTab=o.tab;
   }catch(e){}
 }
 
@@ -552,7 +630,7 @@ function ynRow(st,k,t,s){
   return `<div class="it${v===1?" hit":""}"><div class="tx">${esc(t)}${s?`<small>${esc(s)}</small>`:""}</div><div class="yn"><button type="button" class="n" data-x="${k}" data-a="0" aria-pressed="${v===0}">なし</button><button type="button" class="y" data-x="${k}" data-a="1" aria-pressed="${v===1}">あり</button></div></div>`;
 }
 function renderDx(){
-  $("x-flags").innerHTML=FLAGS.map(f=>ynRow(XF,f.k,f.t,f.s)).join("");
+  $("x-flags").innerHTML=FLAGS.map(f=>`<button type="button" class="flag${XF[f.k]===1?" on":""}" data-x="${f.k}" aria-pressed="${XF[f.k]===1}"><b>${esc(f.t)}</b><small>${esc(f.s)}</small></button>`).join("");
   const hit=FLAGS.filter(f=>XF[f.k]===1), done=FLAGS.filter(f=>XF[f.k]!==undefined).length;
   let v;
   if(hit.length){
@@ -632,7 +710,7 @@ function renderAc(){
     L.push(item("do","アセトアミノフェン 500〜1000 mg","妊娠中・授乳中・NSAIDsが使えない人の第一選択。1日4000 mgまで。",["BOOK","GL21"],"bk"));
     L.push(item("caution","カフェイン配合の市販薬は効くが使いすぎに注意","月15日以上（複合鎮痛薬は10日以上）で薬剤の使用過多による頭痛になりうる。",["BOOK"],"bk"));
     L.push(item("avoid","トリプタンは緊張型頭痛には効かない","片頭痛が混在していないか頭痛ダイアリーで確認する。",["GL21"],"sec"));
-    if(warnMoh) L.push(item("avoid",`急性期薬が月${days}日`,"使用過多タブで評価。月に頭痛が多い場合は予防（アミトリプチリン）を考える。",["BOOK"],"bk"));
+    if(warnMoh) L.push(item("avoid",`急性期薬が${lab("a-days")}`,"使用過多タブで評価。月に頭痛が多い場合は予防（アミトリプチリン）を考える。",["BOOK"],"bk"));
     $("a-out").innerHTML=card("緊張型頭痛の急性期",ul(L));return;
   }
 
@@ -732,8 +810,8 @@ function renderAc(){
     other.push(rim);
   }
   if(nsaidNG&&preg==="no") avoid.push(item("avoid","NSAIDs","アスピリン喘息・NSAIDs過敏。アセトアミノフェンも高用量で交差反応がありうる（1回300 mg以下から）。",["GL21"],"sec"));
-  if(warnMoh) care.push(item("avoid",`急性期薬が月${days}日`,"トリプタン・複合鎮痛薬は月10日以上、単一鎮痛薬は15日以上で使用過多になりうる。予防療法を始める（予防タブ）。",["ICHD3","BOOK"],"ok"));
-  else if(days!==null&&days>=6) care.push(item("caution",`急性期薬が月${days}日`,"月6日以上で予防療法を考える目安。",["BOOK"],"bk"));
+  if(warnMoh) care.push(item("avoid",`急性期薬が${lab("a-days")}`,"トリプタン・複合鎮痛薬は月10日以上、単一鎮痛薬は15日以上で使用過多になりうる。予防療法を始める（予防タブ）。",["ICHD3","BOOK"],"ok"));
+  else if(days!==null&&days>=6) care.push(item("caution",`急性期薬が${lab("a-days")}`,"月6日以上で予防療法を考える目安。",["BOOK"],"bk"));
   if(mens) care.push(item("note","月経時片頭痛","ナラトリプタンなど半減期の長いトリプタン。月経周期が規則的なら月経2日前から5〜6日間の短期予防（ナラトリプタン 1日2回など、適応外）もある。",["BOOK"],"bk"));
   care.push(item("note","効果判定は3回の発作で","1回で無効と決めない。服用タイミング・用量・剤型を変えてから他剤へ。",["BOOK"],"bk"));
 
@@ -1075,17 +1153,50 @@ function renderEv(){
 }
 
 /* ============ 共通 ============ */
-function renderAll(){renderDx();renderAc();renderPv();renderMoh();renderCh();renderDr();renderEv()}
+function pdesc(){
+  const P=(window.WardProfile&&WardProfile.get())||{};
+  const t=[];
+  if(P.preg==="preg")t.push("妊娠中");if(P.preg==="lact")t.push("授乳中");
+  if(P.renal==="lt15")t.push("腎：15未満・透析");else if(P.renal==="15-29")t.push("腎：15〜29");
+  if(P.liver==="cpC")t.push("肝：Child-Pugh C");else if(P.liver==="cpB")t.push("肝：Child-Pugh B");
+  if(P.age==="65-74"||P.age==="ge75")t.push("65歳以上");
+  if(P.at&&P.at!=="none")t.push("抗血栓薬あり");
+  return t;
+}
+function renderUi(){
+  const t=pdesc();
+  const set=(id,a)=>{const e=$(id);if(e)e.innerHTML=a.length?`<span class="pl">プロファイル</span>${esc(a.join("・"))}を反映`:""};
+  set("a-pnote",t.filter(x=>!/65歳/.test(x)));
+  set("p-pnote",t.filter(x=>!/抗血栓/.test(x)));
+  const pp=val("p-preg");$("p-pregq").classList.toggle("hidden",pp==="preg"||pp==="lac");
+  const cnt=id=>{const d=$(id);return d?d.querySelectorAll("input[type=checkbox]:checked,input[type=radio]:checked").length:0};
+  [["a-more","a-more-n"],["p-more","p-more-n"],["m-box","m-more-n"]].forEach(([b,n])=>{const k=cnt(b);$(n).textContent=k?`（${k}件入力）`:""});
+  ["a-ci","p-cm"].forEach(id=>{const any=$(id).querySelector("input:checked");if(any)delete NONE[id];
+    const st=$(id).parentNode.querySelector(".bulk button");if(st)st.setAttribute("aria-pressed",NONE[id]?"true":"false");});
+  const s=$("a-ci-st");if(s)s.textContent=NONE["a-ci"]?"確認済み":"";
+  $("app-ver").textContent=APP_VERSION;
+  setSub();
+}
+function renderAll(){renderUi();renderDx();renderAc();renderPv();renderMoh();renderCh();renderDr();renderEv()}
 document.addEventListener("input",e=>{if(e.target.closest("main")){renderAll();save()}});
 document.addEventListener("change",e=>{if(e.target.closest("main")){renderAll();save()}});
 document.addEventListener("click",e=>{
   const t=e.target.closest("nav.tabs button");if(t){setTab(t.dataset.v);save();window.scrollTo({top:0});return}
-  const x=e.target.closest("[data-x]");if(x){const k=x.dataset.x,a=+x.dataset.a;if(XF[k]===a)delete XF[k];else XF[k]=a;renderDx();save();return}
+  const x=e.target.closest("[data-x]");if(x){const k=x.dataset.x;if(XF[k]===1){if(Object.values(XF).some(v=>v===0))XF[k]=0;else delete XF[k];}else XF[k]=1;renderDx();save();return}
   const bk=e.target.closest("[data-bulk]");if(bk){const a=+bk.dataset.a;FLAGS.forEach(f=>{if(a<0)delete XF[f.k];else XF[f.k]=a});renderDx();save();return}
   const d=e.target.closest("[data-d]");if(d){dDrug=d.dataset.d;renderDr();save();return}
+  const nn=e.target.closest("[data-none]");if(nn){const id=nn.dataset.none;$(id).querySelectorAll("input[type=checkbox]").forEach(c=>c.checked=false);NONE[id]=1;renderAll();save();return}
+  const mc=e.target.closest("[data-mclr]");if(mc){["m-trip","m-comb","m-simp","m-erg","m-opi","m-new","m-tot"].forEach(n=>document.querySelectorAll(`input[name="${n}"]`).forEach(r=>r.checked=false));renderAll();save();return}
+  if(e.target.id==="forceUpdate"){(async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(_){}try{await fetch(location.href,{cache:"reload"});}catch(_){toast("通信できないため更新を確認できません");return}setTimeout(()=>location.reload(),800)})();return}
 });
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),3500)}
+const DESEL=/^(m-|a-days|c-hr|c-pr|p-hd|p-mmd|p-amd)/;
+document.addEventListener("pointerdown",e=>{const l=e.target.closest&&e.target.closest("label.chip");if(!l)return;const r=l.querySelector("input[type=radio]");if(r)r._prev=r.checked;},true);
+document.addEventListener("click",e=>{const l=e.target.closest("label.chip");if(!l)return;const r=l.querySelector("input[type=radio]");if(!r||!DESEL.test(r.name))return;
+  if(r._prev){r._prev=false;setTimeout(()=>{r.checked=false;renderAll();save()},0);}},true);
 load(); setTab(curTab); renderAll();
+document.addEventListener("DOMContentLoaded",()=>{renderAll();if(window.WardProfile)WardProfile.onChange(()=>setTimeout(()=>{renderAll();save()},0));});
+
 
 </script>
 <script>
@@ -1109,6 +1220,68 @@ function hh(){try{document.documentElement.style.setProperty('--hh',document.que
   }catch(e){}
 })();
 </script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
 <!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
 <style>
 #wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -1137,7 +1310,7 @@ function hh(){try{document.documentElement.style.setProperty('--hh',document.que
 <script>
 (function(){
   var KEYS=["ha-nav-v1"];
-  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
   var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
   function close(){dlg.classList.remove("on");}
   btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
@@ -1171,6 +1344,7 @@ function hh(){try{document.documentElement.style.setProperty('--hh',document.que
 })();
 </script>
 <!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
 <script src="../share.js" defer></script>
 </body>
 </html>
