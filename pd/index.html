@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#2e6b4f">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PD薬剤ナビ">
+<title>PD薬剤調整ナビ（LEDD・周術期・運動合併症・悪性症候群）</title>
+<style>
+:root{
+  /* PD＝深緑。L-dopa（緑）・DA（青）・MAO-B/COMT（橙）・その他（灰）で薬効群を色分け */
+  --accent:#2e6b4f; --accent-ink:#fff; --accent-soft:#e4f1ea;
+  --bg:#f3f6f4; --surface:#fff; --ink:#18221d; --muted:#5c6b63; --line:#d6e0da;
+  --ld:#2e6b4f; --ld-soft:#e4f1ea; --da:#1f5aa6; --da-soft:#e6eef9; --en:#9a5a0c; --en-soft:#fbefe2; --ot:#5e6670; --ot-soft:#eceef0;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --info:#2b5b9a; --info-soft:#e7eef8;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#7fd1a8; --accent-ink:#0e2119; --accent-soft:#1b3328;
+  --bg:#111613; --surface:#1a211d; --ink:#e9f0ec; --muted:#a3b2aa; --line:#2f3a34;
+  --ld:#7fd1a8; --ld-soft:#1b3328; --da:#8db7f2; --da-soft:#18263a; --en:#f0b46e; --en-soft:#33261a; --ot:#b9c1c8; --ot-soft:#262b2f;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 8px calc(12px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:18px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:12px;font-weight:700;border:0;border-radius:8px;padding:6px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:40px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.2)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(12px + env(safe-area-inset-right)) 0 calc(12px + env(safe-area-inset-left))}
+section.pane[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 12px}
+.card h2{font-size:16px;margin:0 0 8px}
+.card h3{font-size:14.5px;margin:12px 0 6px}
+.muted{color:var(--muted);font-size:13px}
+.small{font-size:13px}
+p{margin:6px 0}
+ul,ol{margin:6px 0;padding-left:1.3em}
+li{margin:3px 0}
+.q{margin:10px 0 4px;font-weight:700;font-size:14.5px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button,.chip{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;min-height:38px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.picker h3{margin:10px 0 4px;font-size:13px;color:var(--muted)}
+.picker .chip{font-size:13.5px;padding:5px 10px;min-height:36px}
+.picker .chip.ld{border-color:var(--ld)}.picker .chip.da{border-color:var(--da)}.picker .chip.en{border-color:var(--en)}.picker .chip.ot{border-color:var(--ot)}
+.picker .chip.on{opacity:.45}
+.med{border:1px solid var(--line);border-left:5px solid var(--ot);border-radius:10px;padding:8px 10px;margin:8px 0;background:var(--surface)}
+.med.ld{border-left-color:var(--ld)}.med.da{border-left-color:var(--da)}.med.en{border-left-color:var(--en)}
+.med .hd{display:flex;gap:8px;align-items:flex-start}
+.med .nm{flex:1;font-weight:700;font-size:14.5px;line-height:1.35}
+.med .nm small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.med .led{font-family:var(--num);font-weight:700;font-size:14px;white-space:nowrap}
+.med .x{font:inherit;border:0;background:transparent;color:var(--muted);font-size:20px;line-height:1;padding:0 4px;cursor:pointer;min-height:32px}
+.med .row{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;align-items:center}
+.med .row .lb{font-size:12px;color:var(--muted);width:3.2em}
+.med .row button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:4px 8px;min-height:34px;min-width:40px;cursor:pointer}
+.med .row button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:700}
+.med .row input{font:inherit;font-size:15px;width:7em;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.med .nt{font-size:12.5px;color:var(--muted);margin-top:4px}
+.verdict{border-radius:12px;padding:12px;margin:0 0 12px;border:1px solid var(--line);background:var(--surface)}
+.verdict.ok{background:var(--ok-soft);border-color:transparent}.verdict.warn{background:var(--warn-soft);border-color:transparent}
+.verdict.crit{background:var(--crit-soft);border-color:transparent}.verdict.info{background:var(--info-soft);border-color:transparent}
+.verdict .big{font-size:17px;font-weight:800;line-height:1.4}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink);margin-right:6px;vertical-align:2px}
+.bars{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:8px 0 4px;background:var(--line)}
+.bars span{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:700}
+td.n{font-family:var(--num);white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:5px;padding:0 5px;margin-left:4px;vertical-align:1px}
+.tag.v{background:var(--ok-soft);color:var(--ok)}.tag.u{background:var(--warn-soft);color:var(--warn)}.tag.use{background:var(--accent);color:var(--accent-ink)}.tag.done{background:var(--ot-soft);color:var(--ot)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:6px 0}
+.steps>li{position:relative;padding:8px 8px 8px 38px;border:1px solid var(--line);border-radius:10px;margin:6px 0;background:var(--surface)}
+.steps>li::before{counter-increment:s;content:counter(s);position:absolute;left:8px;top:8px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:13px;font-weight:800;text-align:center;line-height:22px}
+.steps>li.hit{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.steps>li .s{font-size:13px;color:var(--muted)}
+.box{border-radius:10px;padding:8px 10px;margin:8px 0;font-size:14px}
+.box.warn{background:var(--warn-soft)}.box.crit{background:var(--crit-soft)}.box.info{background:var(--info-soft)}.box.ok{background:var(--ok-soft)}
+details{border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:8px 0;background:var(--surface)}
+details summary{cursor:pointer;font-weight:700;font-size:14px;min-height:30px;display:flex;align-items:center}
+.plan{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0}
+.plan h4{margin:0 0 4px;font-size:14.5px}
+.num{font-family:var(--num);font-weight:800}
+a{color:var(--info)}
+.btnline{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn{font:inherit;font-size:14px;border:1.5px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:9px;padding:7px 12px;min-height:40px;cursor:pointer}
+.disc{font-size:12px;color:var(--muted);margin:8px 0 16px}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:8px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:90vw}
+#toast.on{opacity:.95}
+@media print{header.top{position:static}nav.tabs{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>PD薬剤調整ナビ</h1><small>LEDD・絶食/周術期・運動合併症・悪性症候群</small></div>
+  <nav class="tabs" role="tablist" aria-label="場面">
+    <button type="button" data-v="led" aria-selected="true">LEDD<br>計算</button>
+    <button type="button" data-v="npo" aria-selected="false">絶食・<br>周術期</button>
+    <button type="button" data-v="mc" aria-selected="false">対処<br>の順</button>
+    <button type="button" data-v="nms" aria-selected="false">悪性症候<br>群・離脱</button>
+    <button type="button" data-v="ref" aria-selected="false">出典</button>
+  </nav>
+</header>
+<main>
+
+<!-- ===== LEDD ===== -->
+<section class="pane" id="p-led">
+  <div class="verdict info" id="ledV"><span class="pill">LEDD</span><span class="big" id="ledBig">薬を下から選ぶと合計が出ます</span>
+    <div class="bars" id="ledBars"></div>
+    <div class="legend"><span><i style="background:var(--ld)"></i>L-dopa</span><span><i style="background:var(--en)"></i>COMT・MAO-B</span><span><i style="background:var(--da)"></i>DA</span><span><i style="background:var(--ot)"></i>その他</span></div>
+    <div class="small" id="ledBreak"></div>
+  </div>
+  <div id="medList"></div>
+  <div class="box warn" id="profWarn" hidden></div>
+  <div class="card picker">
+    <h2>今飲んでいる薬をタップ</h2>
+    <div id="picker"></div>
+    <p class="muted">1回量・回数（または1日量）をタップで選びます。換算係数は Jost 2023（MDS）に合わせています。</p>
+  </div>
+  <details>
+    <summary>換算係数の早見表（LED＝L-dopa換算量）</summary>
+    <div id="factorTable"></div>
+  </details>
+</section>
+
+<!-- ===== 絶食・周術期 ===== -->
+<section class="pane" id="p-npo" hidden>
+  <div class="verdict info" id="npoV"><span class="pill" id="npoPill">周術期</span><span class="big" id="npoBig">LEDDタブで薬を入れると、置き換え量を計算します</span></div>
+  <div class="card">
+    <div class="q">① 経口できない期間</div>
+    <div class="seg" data-k="dur">
+      <button type="button" data-val="short">検査・処置（数時間）</button>
+      <button type="button" data-val="days">手術・数日</button>
+      <button type="button" data-val="long">長期（誤嚥性肺炎・イレウス等）</button>
+    </div>
+    <div class="q">② 胃管・胃瘻から薬を入れられるか</div>
+    <div class="seg" data-k="gut">
+      <button type="button" data-val="ng">入れられる</button>
+      <button type="button" data-val="none">入れられない（消化管が使えない）</button>
+    </div>
+    <div class="q">③ せん妄・幻覚のリスク</div>
+    <div class="seg" data-k="del">
+      <button type="button" data-val="lo">低い</button>
+      <button type="button" data-val="hi">高い（高齢・認知症・せん妄既往）</button>
+    </div>
+    <p class="muted" id="delHint"></p>
+  </div>
+  <div id="npoOut"></div>
+  <div class="card">
+    <h2>どの場合も</h2>
+    <ul>
+      <li><b>急に止めない。</b>中止・減量・置換で悪性症候群（parkinsonism-hyperpyrexia）と DAWS が起こりうる。</li>
+      <li>手術の日も、入室直前まで少量の水で内服。術後は飲めるようになり次第すぐ再開（定時投与。時間がずれないよう指示を明記）。</li>
+      <li><b>避ける制吐薬・鎮静薬</b>：メトクロプラミド（プリンペラン）、プロクロルペラジン（ノバミン）、ドロペリドール（ドロレプタン）、ハロペリドール（セレネース）、スルピリド（ドグマチール）など D2 遮断薬。制吐はドンペリドン（ナウゼリン 錠・坐剤）を使う。</li>
+      <li>MAO-B 阻害薬内服中はペチジン・トラマドール・タペンタドールが<b>併用禁忌</b>（エクフィナ添付文書で照合。セレギリン・ラサギリンも同様に禁忌の記載あり、抗うつ薬の扱いは薬ごとに添付文書で確認）。</li>
+      <li>アポモルヒネ（アポカイン）使用中はオンダンセトロンなど 5-HT3 拮抗薬を併用しない<span class="tag u">未照合</span>。</li>
+      <li>DBS 植込み患者は電気メス・MRI の前に設定を確認（主治医・メーカー窓口へ）<span class="tag u">未照合</span>。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 対処の順 ===== -->
+<section class="pane" id="p-mc" hidden>
+  <div class="card">
+    <div class="seg" data-k="mc">
+      <button type="button" data-val="wo">wearing-off</button>
+      <button type="button" data-val="dk">ジスキネジア</button>
+      <button type="button" data-val="hal">幻覚・妄想</button>
+      <button type="button" data-val="oth">その他（delayed-on・オフ時ジストニア）</button>
+    </div>
+    <p class="muted">枠が濃い段階＝LEDDタブに入れた薬と関係する段階。「使用中」「済」の印は入力から自動で付きます。</p>
+  </div>
+  <div id="mcOut"></div>
+</section>
+
+<!-- ===== 悪性症候群・離脱 ===== -->
+<section class="pane" id="p-nms" hidden>
+  <div class="verdict crit"><span class="pill">疑ったら</span><span class="big">止めた薬をすぐ戻す＋冷却・補液・CK・腎機能。重症は ICU</span></div>
+  <div class="card">
+    <h2>悪性症候群（parkinsonism-hyperpyrexia syndrome）</h2>
+    <h3>疑う所見</h3>
+    <table>
+      <tr><th>大症状</th><td>発熱、筋強剛、CK 上昇</td></tr>
+      <tr><th>小症状</th><td>頻脈、血圧の異常、頻呼吸、意識変容、発汗、白血球増多</td></tr>
+      <tr><th>目安</th><td>大症状3つ、または大症状2つ＋小症状4つ（Levinson 1986 の基準。成書の表より）</td></tr>
+    </table>
+    <p class="small">誘因：抗パーキンソン病薬の中止・減量・DA の急な置き換え、感染・脱水・夏季、便秘などによる L-dopa の吸収障害、強い wearing-off のオフ。PD 治療中はどの薬でも、どの時期でも起こりうる。</p>
+    <h3>初期対応（並行して行う）</h3>
+    <ol class="steps">
+      <li><b>止めた薬を戻す</b>：原則として発症前の量。経口・経管が無理なら L-dopa 注。
+        <div class="s" id="nmsDose">LEDDタブで薬を入れると、発症前の量から L-dopa 注の目安を出します。</div></li>
+      <li><b>全身管理</b>：十分な補液と電解質補正、全身冷却（解熱薬は効きにくい）。CK・腎機能・ミオグロビン尿・凝固を追う。意識障害・バイタル不安定は ICU、なければ転送。</li>
+      <li><b>ダントロレン</b>（ダントリウム静注用 20mg）：初回 40mg 静注、改善しなければ 20mg ずつ追加、1日総量 200mg まで、通常7日以内。経口に移れるときはダントリウムカプセル 25mg を1回25〜50mg、1日3回。肝機能を定期的に確認。<span class="tag v">添付文書照合</span></li>
+      <li><b>ドパミン作動薬の追加</b>：ブロモクリプチン（パーロデル）15〜22.5mg/日 分3 経管が挙げられている<span class="tag u">成書の処方例・未照合</span>。</li>
+      <li><b>D2 遮断薬を止める</b>（抗精神病薬・メトクロプラミドなど）。誤嚥・深部静脈血栓・横紋筋融解による腎障害に備える。</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h2>DA 離脱症候群（DAWS）</h2>
+    <p>DA の減量・中止で、抑うつ、疲労、不安、不眠、パニック発作、全身痛、自律神経症状（多汗・めまい・悪心・顔面紅潮）、薬物渇望などが出る。衝動制御障害（ICD）を合併している人で起こりやすい。</p>
+    <ul>
+      <li>対応は DA の再開・増量。L-dopa では代わりになりにくい。</li>
+      <li>減量はゆっくり。副作用と思い込んでさらに急に減らす・向精神薬を足すと運動症状が急に悪化する。</li>
+      <li>絶食時は DA をロチゴチン貼付（ニュープロ）に置き換えて DAWS を防ぐ（「絶食・周術期」タブ）。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>そのほかの「急に止めて悪くなる」もの</h2>
+    <ul>
+      <li><b>アマンタジン</b>（シンメトレル）：急な中止でせん妄・悪性症候群様の症状。減らすときは漸減<span class="tag u">未照合</span>。</li>
+      <li><b>DBS の停止・電池切れ</b>：重い無動・高熱（DBS 離脱症候群）。植込み施設へすぐ連絡<span class="tag u">未照合</span>。</li>
+      <li><b>持続療法</b>（デュオドーパ、ヴィアレブ）のポンプ停止・チューブトラブル：経口 L-dopa をすぐ再開できるよう、処方と量を事前に決めておく。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 出典 ===== -->
+<section class="pane" id="p-ref" hidden>
+  <div class="card">
+    <h2>このアプリについて</h2>
+    <p class="small">病棟で今の抗パーキンソン病薬を入れて、LEDD・絶食時の置き換え・運動合併症と幻覚の対処順・悪性症候群の初期対応を確認するための補助ツール。入力はこの端末にだけ保存し、送信しない。患者を特定できる情報は入れない。</p>
+    <p class="small"><b>数値の扱い</b>：<span class="tag v">添付文書照合</span>は PMDA の添付文書と照らした数値、<span class="tag u">未照合</span>は成書・海外資料などの目安。LEDD は研究用の換算で、薬を切り替える量そのものではない。最終判断は診察と原典で行う。</p>
+    <p>アプリの版：<b id="appVer">2026-11-14</b>　<button type="button" class="btn" id="forceUpdate">最新版に更新</button></p>
+  </div>
+  <div class="card">
+    <h2>出典</h2>
+    <ol class="small">
+      <li>日本神経学会（監修）. パーキンソン病診療ガイドライン2018. 医学書院, 2018.（wearing-off・ジスキネジア・オフ時ジストニア・幻覚妄想のアルゴリズム、経口不可時の L-dopa 注の換算）<a href="https://www.neurology-jp.org/guidelinem/parkinson_2018.html">日本神経学会</a></li>
+      <li>Jost ST, et al. Levodopa Dose Equivalency in Parkinson's Disease: Updated Systematic Review and Proposals. Mov Disord. 2023;38:1236-1252. <a href="https://pubmed.ncbi.nlm.nih.gov/37147135/">PubMed 37147135</a></li>
+      <li>Tomlinson CL, et al. Systematic review of levodopa dose equivalency reporting in Parkinson's disease. Mov Disord. 2010;25:2649-2653. <a href="https://pubmed.ncbi.nlm.nih.gov/21069833/">PubMed 21069833</a></li>
+      <li>de Bie RMA, et al. Update on Treatments for Parkinson's Disease Motor Fluctuations – An MDS Evidence-Based Medicine Review. Mov Disord. 2025;40:776-794. <a href="https://pubmed.ncbi.nlm.nih.gov/40055961/">PubMed 40055961</a></li>
+      <li>Seppi K, et al. Update on treatments for nonmotor symptoms of Parkinson's disease – an evidence-based medicine review. Mov Disord. 2019;34:180-198. <a href="https://pubmed.ncbi.nlm.nih.gov/30653247/">PubMed 30653247</a></li>
+      <li>Brennan KA, Genever RW. Managing Parkinson's disease during surgery. BMJ. 2010;341:c5718. <a href="https://pubmed.ncbi.nlm.nih.gov/21051395/">PubMed 21051395</a>（ロチゴチン置き換えの式。Parkinson's UK の入院時チェックリストに収載）</li>
+      <li>Rabinak CA, Nirenberg MJ. Dopamine agonist withdrawal syndrome in Parkinson disease. Arch Neurol. 2010;67:58-63. <a href="https://pubmed.ncbi.nlm.nih.gov/20065130/">PubMed 20065130</a></li>
+      <li>PMDA 添付文書：<a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/180078_1169700S1025_1_17">ニュープロパッチ</a>（含有量 2.25〜18mg、PD 上限 36mg/日）、<a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/650034_1169701S1020_1_05">ハルロピテープ</a>（17.1.3 他の DA からの切り替え換算表）、<a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/181251_1229402D1039_2_03">ダントリウム静注用</a>、<a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/170033_1169018F1020_2_03">エクフィナ錠</a>、<a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/650168_1169012F1022_1_28">ビ・シフロール錠</a></li>
+      <li>成書（要点を自分の言葉でまとめた）：『実践 パーキンソン病治療薬を使いこなす』（手術・検査時の断薬、誤嚥性肺炎例の L-dopa 注＋ロチゴチン、ゾニサミド・イストラデフィリンの換算の目安、DAWS）、『パーキンソン病治療薬の選び方と使い方』（悪性症候群の診断基準と治療手順）</li>
+    </ol>
+    <h3>係数を決めた経緯</h3>
+    <ul class="small">
+      <li>ロチゴチン：Jost 2023 は放出量（mg/24h）×30.3。日本の表示は含有量で、2.25mg＝1mg/24h（面積 5cm²）なので、日本の表示 mg ×13.47。</li>
+      <li>ハルロピテープ：Jost 2023 に係数がないため、添付文書の切り替え表（本剤 8mg ≒ ロピニロール経口 2mg）から ×5 とした<span class="tag u">換算は推定</span>。</li>
+      <li>L-dopa 単剤（ドパストン）：DCI 配合剤 100mg ≒ 単剤 500mg の目安（成書）から ×0.2<span class="tag u">未照合</span>。</li>
+      <li>エンタカポン：服用回数分の L-dopa にだけ ×0.33（L-dopa の1回量は1日量を回数で割った平均）。オピカポンは全 L-dopa に ×0.5。イストラデフィリンは L-dopa の LED ×0.2（Jost）。成書は「ノウリアスト 40mg ≒ L-dopa 100mg」と推定。</li>
+      <li>ゾニサミドは用量によらず 100（日本以外では使わない式）、サフィナミドは 50・100mg とも 150、トリヘキシフェニジルは単回で効果が明らかな人だけ 100 とされるため、既定では 0。</li>
+    </ul>
+  </div>
+  <p class="disc">診療判断の補助ツールです。最終判断は診察と原典（ガイドライン・添付文書）で行ってください。</p>
+</section>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const KEY="pdnav-v1";
+/* ---------- 薬の定義 ----------
+  cls: ld=L-dopa, comt, maob, da, oth
+  mode: "pd"=1回量×回数, "day"=1日量, "num"=数値入力（mg/日）
+  f: 係数（1日量×f）、fix: 固定LED、special: 計算は calc() 内 */
+const DRUGS=[
+ {id:"lc",ch:"ネオドパストン・メネシット",cls:"ld",g:"L-dopa",nm:"レボドパ・カルビドパ",br:"ネオドパストン、メネシット（配合錠 L100・L250）",mode:"pd",doses:[25,50,75,100,125,150,200,250],times:[1,2,3,4,5,6,7,8],f:1,ng:"粉砕・簡易懸濁で胃管から可（成書に粉砕・懸濁で再開した例）。溶かしたら早めに投与。"},
+ {id:"lb",ch:"マドパー・ECドパール",cls:"ld",g:"L-dopa",nm:"レボドパ・ベンセラジド",br:"マドパー、イーシー・ドパール、ネオドパゾール",mode:"pd",doses:[25,50,75,100,125,150,200],times:[1,2,3,4,5,6,7,8],f:1,ng:"粉砕・簡易懸濁で胃管から可（未照合・薬剤部に確認）。"},
+ {id:"st",cls:"ld",g:"L-dopa",nm:"レボドパ・カルビドパ・エンタカポン",br:"スタレボ配合錠 L50・L100",mode:"pd",doses:[50,100,150,200],times:[1,2,3,4,5,6,7,8],special:1,ng:"胃管からの可否は薬剤部に確認（未照合）。無理ならレボドパ・カルビドパ同量に置き換え（エンタカポン分は一時なし）。"},
+ {id:"ldo",ch:"ドパストン（単剤）",cls:"ld",g:"L-dopa",nm:"レボドパ単剤",br:"ドパストンカプセル250mg・散",mode:"pd",doses:[125,250,500],times:[1,2,3,4,5,6],f:0.2,ng:"散は胃管から可（未照合）。",note:"DCI配合剤100mg≒単剤500mg の目安で換算（成書）"},
+ {id:"lcig",cls:"ld",g:"L-dopa",nm:"L-dopa・カルビドパ 経腸用液（空腸持続）",br:"デュオドーパ配合経腸用液",mode:"num",unit:"L-dopa mg/日（朝＋持続＋追加）",f:1.11,ng:"ポンプ停止時は同量前後の経口 L-dopa へ（主治医と事前に決めておく）。"},
+ {id:"fos",cls:"ld",g:"L-dopa",nm:"ホスレボドパ・ホスカルビドパ 持続皮下注",br:"ヴィアレブ配合持続皮下注",mode:"num",unit:"ホスレボドパ mg/日",f:0.75,ng:"皮下注のため絶食中も継続できる。"},
+ {id:"ent",cls:"comt",g:"COMT・MAO-B",nm:"エンタカポン",br:"コムタン錠100mg（L-dopa と同時に）",mode:"pd",doses:[100,200],times:[1,2,3,4,5,6,7,8],special:1,ng:"胃管からの可否は薬剤部に確認（未照合）。絶食中は一時中止でよい。"},
+ {id:"opi",cls:"comt",g:"COMT・MAO-B",nm:"オピカポン",br:"オンジェンティス錠25mg（1日1回、L-dopa と1時間以上あける）",mode:"day",days:[25],special:1,ng:"絶食中は一時中止でよい。胃管からは薬剤部に確認（未照合）。"},
+ {id:"sel",cls:"maob",g:"COMT・MAO-B",nm:"セレギリン",br:"エフピーOD錠2.5",mode:"day",days:[2.5,5,7.5,10],f:10,ng:"OD錠。絶食中は一時中止でよい。"},
+ {id:"ras",cls:"maob",g:"COMT・MAO-B",nm:"ラサギリン",br:"アジレクト錠0.5mg・1mg",mode:"day",days:[0.5,1],f:100,ng:"絶食中は一時中止でよい（半減期は短いが MAO-B 阻害は数日続く）。"},
+ {id:"saf",cls:"maob",g:"COMT・MAO-B",nm:"サフィナミド",br:"エクフィナ錠50mg",mode:"day",days:[50,100],fix:150,ng:"絶食中は一時中止でよい。"},
+ {id:"prm",cls:"da",g:"DA",nm:"プラミペキソール（速放）",br:"ビ・シフロール錠0.125・0.5mg",mode:"pd",doses:[0.125,0.25,0.375,0.5,0.75,1,1.5],times:[1,2,3],f:100,ng:"粉砕・簡易懸濁で胃管から可（未照合）。"},
+ {id:"prmla",cls:"da",g:"DA",nm:"プラミペキソール（徐放）",br:"ミラペックスLA錠0.375・1.5mg",mode:"day",days:[0.375,0.75,1.5,2.25,3,3.75,4.5],f:100,ng:"徐放錠は粉砕不可。胃管なら同じ1日量のビ・シフロールを1日2〜3回に分けて。"},
+ {id:"rop",cls:"da",g:"DA",nm:"ロピニロール（速放）",br:"レキップ錠0.25・1・2mg",mode:"pd",doses:[0.25,0.5,1,2,3,4,5],times:[1,2,3],f:20,ng:"粉砕・簡易懸濁で胃管から可（未照合）。"},
+ {id:"ropcr",cls:"da",g:"DA",nm:"ロピニロール（徐放）",br:"レキップCR錠2・8mg",mode:"day",days:[2,4,6,8,10,12,14,16],f:20,ng:"徐放錠は粉砕不可。胃管なら同じ1日量のレキップを1日3回に分けて（目安）。"},
+ {id:"ropt",cls:"da",g:"DA",nm:"ロピニロール貼付",br:"ハルロピテープ8〜40mg",mode:"day",days:[8,16,24,32,40,48,56,64],f:5,ng:"貼付剤。絶食中もそのまま継続。",note:"添付文書の切り替え表（8mg≒経口2mg）から推定"},
+ {id:"rot",cls:"da",g:"DA",nm:"ロチゴチン貼付",br:"ニュープロパッチ2.25〜18mg（日本の表示は含有量）",mode:"day",days:[2.25,4.5,6.75,9,13.5,18,22.5,27,31.5,36],f:30.3/2.25,ng:"貼付剤。絶食中もそのまま継続。"},
+ {id:"apo",cls:"da",g:"DA",nm:"アポモルヒネ皮下注（オフ時）",br:"アポカイン皮下注30mg",mode:"pd",doses:[1,2,3,4,5,6],times:[1,2,3,4,5],f:10,ng:"皮下注。オフ時のレスキュー。制吐薬・5-HT3拮抗薬の併用に注意。"},
+ {id:"cab",cls:"da",g:"DA",nm:"カベルゴリン",br:"カバサール錠0.25・1mg",mode:"day",days:[0.25,0.5,1,1.5,2,3],f:66.67,ng:"半減期が長く、短期の絶食では影響が少ない。"},
+ {id:"bro",cls:"da",g:"DA",nm:"ブロモクリプチン",br:"パーロデル錠2.5mg",mode:"day",days:[2.5,5,7.5,10,15,22.5],f:10,ng:"粉砕して胃管から（未照合）。"},
+ {id:"per",cls:"da",g:"DA",nm:"ペルゴリド",br:"ペルゴリド錠（後発）",mode:"day",days:[0.25,0.5,0.75,1,1.5,2,3],f:100,ng:"胃管からは薬剤部に確認（未照合）。"},
+ {id:"ama",cls:"oth",g:"その他",nm:"アマンタジン",br:"シンメトレル錠50・100mg",mode:"day",days:[50,100,150,200,300],f:1,ng:"細粒あり。急な中止は避ける（せん妄・悪性症候群様）。"},
+ {id:"zns",cls:"oth",g:"その他",nm:"ゾニサミド",br:"トレリーフOD錠25・50mg",mode:"day",days:[25,50],fix:100,ng:"OD錠。絶食中は一時中止でよい。"},
+ {id:"ist",cls:"oth",g:"その他",nm:"イストラデフィリン",br:"ノウリアスト錠20mg",mode:"day",days:[20,40],special:1,ng:"絶食中は一時中止でよい。"},
+ {id:"thp",cls:"oth",g:"その他",nm:"トリヘキシフェニジル",br:"アーテン錠2mg",mode:"day",days:[2,4,6],fix:0,ng:"高齢者は中止を検討（せん妄・認知機能）。",note:"単回で明らかに効く人だけ100（Jost）。既定は0"}
+];
+const DM=Object.fromEntries(DRUGS.map(d=>[d.id,d]));
+const CLS_LB={ld:"L-dopa",comt:"COMT阻害薬",maob:"MAO-B阻害薬",da:"DA",oth:"その他"};
+const CLS_COL={ld:"ld",comt:"en",maob:"en",da:"da",oth:"ot"};
+
+/* ---------- 状態 ---------- */
+let S={meds:[],tab:"led",dur:null,gut:null,del:null,mc:"wo"};
+function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)S=Object.assign(S,o);}catch(e){}
+  S.meds=(S.meds||[]).filter(m=>DM[m.id]);}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const fmt=(x,d=0)=>{if(!isFinite(x))return"—";const p=Math.pow(10,d);return String(Math.round(x*p)/p);};
+const r5=x=>Math.round(x/5)*5;
+
+/* ---------- LEDD ---------- */
+function daily(m){const d=DM[m.id];if(d.mode==="pd")return (m.d||0)*(m.n||0);if(d.mode==="num")return parseFloat(m.v)||0;return m.d||0;}
+function calc(){
+  const r={rows:{},ld:0,comt:0,maob:0,da:0,oth:0,ldOral:0,ldAll:0,ldTimes:0,ldIRtotal:0,stL:0,total:0,daRows:[]};
+  // L-dopa 系
+  S.meds.forEach(m=>{const d=DM[m.id],dd=daily(m);if(d.cls!=="ld")return;
+    let led=0;
+    if(d.id==="st"){led=dd*1;r.stL+=dd;}else led=dd*d.f;
+    r.rows[m.id]=led;r.ld+=led;r.ldAll+=led;
+    if(d.id!=="lcig"&&d.id!=="fos"){r.ldOral+=led;}
+    if(d.id==="lc"||d.id==="lb"||d.id==="ldo"){r.ldIRtotal+=led;r.ldTimes=Math.max(r.ldTimes,m.n||0);}
+  });
+  // COMT
+  S.meds.forEach(m=>{const d=DM[m.id];
+    if(d.id==="ent"){const n=m.n||0;const frac=r.ldTimes?Math.min(1,n/r.ldTimes):0;const led=0.33*r.ldIRtotal*frac;r.rows.ent=led;r.comt+=led;}
+    if(d.id==="opi"&&(m.d||0)>0){const led=0.5*r.ldOral;r.rows.opi=led;r.comt+=led;}
+  });
+  // スタレボ内のエンタカポン
+  if(r.stL>0){const led=0.33*r.stL;r.rows.st=(r.rows.st||0)+led;r.comt+=0;r.ld+=led;r.stEnt=led;}
+  // その他
+  S.meds.forEach(m=>{const d=DM[m.id],dd=daily(m);if(d.cls==="ld"||d.cls==="comt")return;
+    let led=0;
+    if(d.id==="ist"){led=dd>0?0.2*r.ldAll:0;}
+    else if(d.fix!=null){led=dd>0?d.fix:0;}
+    else led=dd*d.f;
+    r.rows[m.id]=led;r[d.cls]+=led;
+    if(d.cls==="da")r.daRows.push({id:m.id,dd,led});
+  });
+  r.total=r.ld+r.comt+r.maob+r.da+r.oth;
+  return r;
+}
+
+/* ---------- 表示：LEDD ---------- */
+function doseLabel(x){return String(x);}
+function renderPicker(){
+  const groups=["L-dopa","COMT・MAO-B","DA","その他"];
+  const used=new Set(S.meds.map(m=>m.id));
+  $("picker").innerHTML=groups.map(g=>`<h3>${g}</h3><div class="seg">`+DRUGS.filter(d=>d.g===g).map(d=>`<button type="button" class="chip ${CLS_COL[d.cls]}${used.has(d.id)?" on":""}" data-add="${d.id}">${d.ch||d.br.split(/[（、]/)[0].replace(/錠.*|配合.*|カプセル.*|パッチ.*|テープ.*|皮下注.*|経腸用液.*/,"")||d.nm}</button>`).join("")+`</div>`).join("");
+}
+function renderMeds(r){
+  $("medList").innerHTML=S.meds.map((m,i)=>{const d=DM[m.id];
+    let rows="";
+    if(d.mode==="pd"){
+      rows=`<div class="row"><span class="lb">1回</span>${d.doses.map(x=>`<button type="button" data-i="${i}" data-f="d" data-x="${x}" aria-pressed="${m.d===x}">${doseLabel(x)}</button>`).join("")}<span class="muted">mg</span></div>
+      <div class="row"><span class="lb">回/日</span>${d.times.map(x=>`<button type="button" data-i="${i}" data-f="n" data-x="${x}" aria-pressed="${m.n===x}">${x}</button>`).join("")}</div>`;
+    }else if(d.mode==="day"){
+      rows=`<div class="row"><span class="lb">1日</span>${d.days.map(x=>`<button type="button" data-i="${i}" data-f="d" data-x="${x}" aria-pressed="${m.d===x}">${doseLabel(x)}</button>`).join("")}<span class="muted">mg</span></div>`;
+    }else{
+      rows=`<div class="row"><span class="lb">1日</span><input type="number" inputmode="decimal" data-i="${i}" data-f="v" value="${m.v||""}" placeholder="mg/日"><span class="muted">${d.unit}</span></div>`;
+    }
+    const led=r.rows[m.id]||0;const dd=daily(m);
+    let nt="";
+    if(d.id==="ent"&&r.ldTimes&&(m.n||0)>r.ldTimes)nt="L-dopa の回数より多い分は計算に入れていません。";
+    if(d.id==="ent"&&!r.ldIRtotal)nt="L-dopa（配合錠・単剤）を入れると計算します。";
+    if(d.id==="opi"&&S.meds.some(x=>x.id==="ent"||x.id==="st"))nt="オピカポンとエンタカポン（スタレボ含む）は通常併用しない。";
+    if(d.id==="st"&&r.stEnt)nt=`うちエンタカポン分 ${fmt(r.stEnt)} mg`;
+    if(d.note)nt=(nt?nt+"　":"")+d.note;
+    return `<div class="med ${CLS_COL[d.cls]}"><div class="hd"><div class="nm">${d.nm}<small>${d.br}</small></div><div class="led">${dd?fmt(led)+" mg":"—"}</div><button type="button" class="x" data-del="${i}" aria-label="削除">×</button></div>${rows}${nt?`<div class="nt">${nt}</div>`:""}</div>`;
+  }).join("");
+}
+function renderLed(){
+  const r=calc();
+  renderPicker();renderMeds(r);
+  const has=S.meds.some(m=>daily(m)>0);
+  const v=$("ledV");
+  if(!has){$("ledBig").textContent=S.meds.length?"用量を選ぶと合計が出ます":"薬を下から選ぶと合計が出ます";$("ledBars").innerHTML="";$("ledBreak").textContent="";v.className="verdict info";}
+  else{
+    $("ledBig").textContent=`LEDD 合計 ${fmt(r.total)} mg/日`;
+    const parts=[["ld",r.ld],["en",r.comt+r.maob],["da",r.da],["ot",r.oth]];
+    $("ledBars").innerHTML=parts.map(([c,x])=>x>0?`<span style="width:${x/r.total*100}%;background:var(--${c})"></span>`:"").join("");
+    const daPct=r.total?Math.round(r.da/r.total*100):0;
+    $("ledBreak").textContent=`L-dopa ${fmt(r.ld)}（うち配合剤エンタカポン分 ${fmt(r.stEnt||0)}）／COMT ${fmt(r.comt)}／MAO-B ${fmt(r.maob)}／DA ${fmt(r.da)}（全体の${daPct}%）／その他 ${fmt(r.oth)}`;
+    v.className="verdict ok";
+  }
+  // プロファイルからの注意
+  const w=profWarnings();$("profWarn").hidden=!w.length;$("profWarn").innerHTML=w.map(x=>"・"+x).join("<br>");
+  renderFactorTable();
+  return r;
+}
+function prof(){try{return WardProfile.get()||{};}catch(e){return{};}}
+function profWarnings(){
+  const p=prof(),ids=new Set(S.meds.map(m=>m.id)),w=[];
+  if(p.renal==="30-59"){if(ids.has("prm"))w.push("腎機能30〜59：ビ・シフロールは CCr 20〜50 で1日2回・上限2.25mg（添付文書）。");
+    if(ids.has("prmla"))w.push("腎機能30〜59：ミラペックスLAは CCr 30〜50 で上限2.25mg、開始1週は隔日（添付文書）。");
+    if(ids.has("ama"))w.push("腎機能低下：アマンタジンは投与間隔をあける（添付文書の CCr 別の表で確認）。");}
+  if(p.renal==="15-29"||p.renal==="lt15"){
+    if(ids.has("prm"))w.push("腎機能30未満：ビ・シフロールは CCr 20〜50で1日2回・上限2.25mg、20未満で1日1回・上限1.5mg（添付文書）。");
+    if(ids.has("prmla"))w.push("腎機能30未満：ミラペックスLAは CCr 30未満では使わない（速放錠へ）。");
+    if(ids.has("ama"))w.push(p.renal==="lt15"?"透析・高度腎障害：アマンタジンは禁忌（透析で除去されにくく中毒に）—中止を検討（未照合）。":"高度腎障害：アマンタジンは大きく減量・間隔延長（添付文書で確認）。");}
+  if(p.liver==="cpB"||p.liver==="cpC"){
+    if(ids.has("ras"))w.push("Child-Pugh B・C：ラサギリン（アジレクト）は禁忌（添付文書）。");
+    if(ids.has("saf"))w.push(p.liver==="cpC"?"Child-Pugh C：サフィナミド（エクフィナ）は禁忌（添付文書）。":"Child-Pugh B：サフィナミドは50mgまで（未照合）。");
+    if(ids.has("opi"))w.push("肝障害：オピカポンは Child-Pugh C で使わない（未照合）。");}
+  if(p.age==="ge75"){
+    if(ids.has("thp"))w.push("75歳以上：抗コリン薬（アーテン）はせん妄・認知機能低下のため中止を検討。");
+    if(ids.has("ama"))w.push("75歳以上：アマンタジンは幻覚・せん妄に注意（腎機能も確認）。");}
+  return w;
+}
+function renderFactorTable(){
+  const rows=DRUGS.map(d=>{let f;
+    if(d.id==="st")f="L-dopa量×1 ＋ L-dopa量×0.33";
+    else if(d.id==="ent")f="併用する L-dopa 量×0.33";
+    else if(d.id==="opi")f="全 L-dopa 量×0.5";
+    else if(d.id==="ist")f="L-dopa の LED×0.2";
+    else if(d.fix!=null)f=d.fix?`一律 ${d.fix}`:"0（条件付き100）";
+    else f="1日量×"+(Math.round(d.f*100)/100);
+    return `<tr><td>${d.nm}<br><span class="muted">${d.br}</span></td><td class="n">${f}</td></tr>`;}).join("");
+  $("factorTable").innerHTML=`<table><tr><th>薬</th><th>LED（mg）</th></tr>${rows}</table>
+  <p class="muted">例：ビ・シフロール 1.5mg/日＝150、レキップ 6mg/日＝120、ニュープロ 9mg＝121、ハルロピ 16mg＝80、アジレクト 1mg＝100。合計の数値は研究用の目安で、切り替え量そのものではない。</p>`;
+}
+
+/* ---------- 絶食・周術期 ---------- */
+const ROT_JP=x=>x/(30.3/2.25); // LED→日本表示mg
+function roundRotJP(mg){ // 2.25 刻み、上限36
+  let v=Math.floor(mg/2.25+0.25)*2.25; if(v>36)v=36; return v<0?0:v;}
+function brennan(r){
+  // A：L-dopa（mg、DCI 除く）。COMT 併用なら×1.3。日本では L-dopa 徐放錠がないため×0.7 は使わない
+  let A=0;S.meds.forEach(m=>{const d=DM[m.id];if(["lc","lb","st"].includes(d.id))A+=daily(m);if(d.id==="ldo")A+=daily(m)*0.2;});
+  const comt=S.meds.some(m=>["ent","opi","st"].includes(m.id)&&daily(m)>0);
+  if(comt)A*=1.3;
+  // B：DA（Brennan の係数）
+  let B=0;S.meds.forEach(m=>{const d=DM[m.id],dd=daily(m);
+    if(d.id==="prm"||d.id==="prmla"||d.id==="cab"||d.id==="per")B+=dd*100;
+    else if(d.id==="rop"||d.id==="ropcr")B+=dd*20;
+    else if(d.id==="ropt")B+=dd*5;
+    else if(d.id==="rot")B+=(dd/2.25)*20;
+    else if(d.id==="apo"||d.id==="bro")B+=dd*10;});
+  const adj=(A+B)*0.55;let mg24=Math.round(adj/20/2)*2;let capped=false;if(adj>350||mg24>16){mg24=16;capped=adj>350;}
+  return {A,B,adj,mg24,jp:mg24*2.25,capped,comt};
+}
+function renderNpo(r){
+  ["dur","gut","del"].forEach(k=>document.querySelectorAll(`.seg[data-k="${k}"] button`).forEach(b=>b.setAttribute("aria-pressed",S[k]===b.dataset.val)));
+  const p=prof();$("delHint").textContent=p.age==="ge75"?"プロファイル：75歳以上 →「高い」として扱うのが安全。":"";
+  const has=S.meds.some(m=>daily(m)>0);
+  const out=[];let big="",pill="周術期",tone="info";
+  const ids=new Set(S.meds.filter(m=>daily(m)>0).map(m=>m.id));
+  const dur=S.dur,gut=S.gut,hi=S.del==="hi";
+  if(!has){big="LEDDタブで今の薬を入れると、置き換え量を計算します";}
+  else if(!dur){big="① 経口できない期間を選んでください";}
+  else if(dur==="short"){
+    pill="検査・処置";tone="ok";big="内服はそのまま続ける（当日朝も少量の水で）";
+    out.push(`<div class="card"><h2>検査・処置（数時間の絶食）</h2><ul>
+      <li>内視鏡の朝絶食でも抗パーキンソン病薬は検査の妨げにならないため継続（成書）。服用してよいか事前に担当医と確認しておく。</li>
+      <li>胃透視は造影剤の分布に影響しうる。断薬が難しい人は内視鏡を選ぶ。</li>
+      <li>終わったら次の内服時刻を待たずに再開。遅れた回は1回分として飲む。</li>
+      <li>軽症なら数日の断薬で問題が出ないことが多いが、避けられるなら断薬しない方が安全（成書）。</li></ul></div>`);
+  }
+  else if(!gut){big="② 胃管・胃瘻から入れられるかを選んでください";}
+  else if(gut==="ng"){
+    pill="胃管から";tone="ok";big=(ids.has("prmla")||ids.has("ropcr"))?"同じ薬を胃管から続ける（徐放錠は速放錠に置き換え）":"同じ薬を胃管から続ける";
+    const lines=S.meds.filter(m=>daily(m)>0).map(m=>{const d=DM[m.id];let t=d.ng;
+      if(d.id==="prmla")t=`<b>→ ビ・シフロール ${fmt(daily(m),3)}mg/日 を1日${daily(m)<1.5?2:3}回に分けて</b>（同じ成分・同じ1日量）。`;
+      if(d.id==="ropcr")t=`<b>→ レキップ ${fmt(daily(m),2)}mg/日 を1日3回に分けて</b>（目安）。`;
+      return `<li><b>${d.nm}</b>（${d.br.split("（")[0]}）：${t}</li>`;}).join("");
+    out.push(`<div class="card"><h2>胃管・胃瘻からの投与</h2><ul>${lines}</ul>
+      <p class="muted">簡易懸濁・粉砕の可否は製剤ごとに薬剤部で確認（このアプリでは未照合の項目あり）。</p>
+      <div class="box info">経腸栄養のたんぱく質は L-dopa の吸収と競合する。L-dopa の前後は栄養をしばらく止める、持続注入なら投与時刻をそろえるなど工夫する<span class="tag u">未照合・一般的な目安</span>。</div></div>`);
+    if(dur==="long")out.push(`<div class="card"><h2>長期になりそうなら</h2><ul><li>嚥下障害自体も L-dopa で改善しうる。肺炎の改善を待つだけでなく、発症前の LEDD に近いドパミン補充を目指す（成書）。</li><li>経口再開に不安が残れば胃瘻も検討（経口摂取がまったくできなくなるわけではないと説明する）。</li></ul></div>`);
+  }
+  else{ // 消化管が使えない
+    tone="warn";pill="経口・経管不可";
+    const ldIV=r.ldOral; // L-dopa（配合剤換算）
+    const ivLo=r5(ldIV*0.5),ivHi=r5(ldIV*1.0);
+    const daLed=r.daRows.filter(x=>x.id!=="rot"&&x.id!=="ropt"&&x.id!=="apo").reduce((a,x)=>a+x.led,0);
+    const keepPatch=r.daRows.filter(x=>x.id==="rot"||x.id==="ropt");
+    let rotAdd=daLed>0?roundRotJP(ROT_JP(daLed)):0;
+    const curRot=(S.meds.find(m=>m.id==="rot")||{}).d||0;
+    let rotTotal=Math.min(36,curRot+rotAdd);
+    let rotStart=rotTotal;if(hi&&rotAdd>0)rotStart=Math.max(curRot,curRot+roundRotJP(ROT_JP(daLed)/2));
+    const B=brennan(r);
+    let bJP=B.jp;if(curRot&&!S.meds.some(m=>m.id!=="rot"&&daily(m)>0))bJP=curRot;
+    const bStart=hi?Math.max(2.25,roundRotJP(bJP/2)):bJP;
+    const lstr=ldIV>0?`ドパストン静注 ${ivLo}〜${ivHi}mg/日`:"";
+    const rstr=rotTotal>0?`ニュープロ ${fmt(hi?rotStart:rotTotal,2)}mg`:"";
+    big=[lstr,rstr].filter(Boolean).join("＋")||"DA はロチゴチン貼付へ";
+    if(!ldIV&&!rotTotal)big="L-dopa・DA を内服していなければ、他の薬は一時中止でよい";
+    const others=S.meds.filter(m=>daily(m)>0&&["comt","maob","oth"].includes(DM[m.id].cls)&&m.id!=="ama").map(m=>DM[m.id].nm);const hasAma=ids.has("ama");
+    out.push(`<div class="card"><h2>案1：L-dopa 注＋ロチゴチン貼付（DA 分）<span class="tag use">基本</span></h2>
+      ${ldIV>0?`<div class="plan"><h4>L-dopa → ドパストン静注（L-dopa 25mg・50mg）</h4>
+        <p>経口 L-dopa（配合剤換算）<span class="num">${fmt(ldIV)}</span> mg/日 → <span class="num">${ivLo}〜${ivHi}</span> mg/日</p>
+        <ul class="small"><li>配合剤 100mg につき注射 50〜100mg を1〜2時間かけて点滴（GL2018）。まず 50mg/100mg で始め、足りなければ 100mg/100mg へ（成書）。</li>
+        <li>1日の量を<b>2〜4回に分け、それぞれ30分〜1時間（〜3時間）で点滴</b>。24時間持続にすると血中濃度の山ができず効きが弱いことがある（成書）。</li>
+        <li>添付文書の用量（1日25〜50mg）は PD の補充には大幅に足りない点に注意（成書の指摘）。</li>
+        ${hi?"<li>せん妄リスクが高い：手術などの一時的な断薬なら、運動症状より悪性症候群を避けることを優先し、少なめ（例 1回50mgを1日2回）でもよい（成書）。</li>":""}</ul></div>`:""}
+      ${(daLed>0||keepPatch.length)?`<div class="plan"><h4>DA → ロチゴチン貼付（ニュープロ）</h4>
+        ${daLed>0?`<p>経口 DA の LED <span class="num">${fmt(daLed)}</span> mg → ニュープロ <span class="num">${fmt(rotAdd,2)}</span> mg/日${curRot?`（今の ${curRot}mg に追加 → 計 ${fmt(rotTotal,2)}mg）`:""}</p>
+        ${hi?`<p class="small"><b>せん妄リスクが高い：まず ${fmt(rotStart,2)}mg から</b>始め、こわばり・動きにくさが強ければ毎日見直して増やす。</p>`:""}`:""}
+        ${keepPatch.length?`<p class="small">貼付剤（${keepPatch.map(x=>DM[x.id].br.split("（")[0]).join("、")}）はそのまま継続。</p>`:""}
+        <ul class="small"><li>DAWS を防ぐためにも DA は貼付剤で続ける（成書）。</li><li>日本の表示は含有量：2.25mg＝放出 1mg/24h。PD の上限 36mg/日。換算は LED（Jost 2023）から。</li><li>アポカインはオフ時のレスキューとして使える（承認はオフ症状の改善、使用には指導が必要）。</li></ul></div>`:""}
+      ${others.length?`<p class="small"><b>一時中止でよいもの</b>：${others.join("、")}（注射剤がない）。</p>`:""}${hasAma?`<p class="small"><b>アマンタジン</b>：注射剤がない。長く飲んでいる人は急な中止でせん妄・悪性症候群様の症状が出ることがある<span class="tag u">未照合</span>。中止中は意識・体温・筋強剛を観察し、胃管が使えるようになり次第再開。</p>`:""}
+    </div>`);
+    out.push(`<div class="card"><h2>案2：ロチゴチン貼付だけで置き換える（Brennan & Genever の式）</h2>
+      <p>（L-dopa ${fmt(B.A)}${B.comt?"（COMT併用で×1.3）":""} ＋ DA ${fmt(B.B)}）×0.55 ＝ <span class="num">${fmt(B.adj)}</span> → 放出 ${B.mg24}mg/24h ＝ <b>ニュープロ ${fmt(B.jp,2)}mg/日</b>${hi?`、<b>せん妄リスクが高いので ${fmt(bStart,2)}mg から</b>`:""}</p>
+      <ul class="small"><li>静脈路が取れない・短期間の手術などで使う。0.55 は錯乱・幻覚を避けるための補正（英国 OPTIMAL・Parkinson's UK の資料）。</li>
+      <li>放出量は 2mg 刻み・上限 16mg/24h（＝日本表示 36mg）。${B.capped?"<b>補正後 350mg を超える：上限量でも足りない可能性。専門医と相談し、L-dopa 注やアポモルヒネを併用。</b>":"補正後 350mg を超えるときは上限量でも足りず、専門医と相談。"}</li>
+      <li>こわばり・動きにくさが増えたら増量、錯乱・幻覚が増えたら減量。毎日見直す。</li></ul></div>`);
+    if(dur==="long")out.push(`<div class="card"><h2>長期の経口不可</h2><ul><li>静注を続けるか、さらに長くなるなら腸瘻・胃瘻を検討（成書）。</li><li>経口・経管を再開したら、元の内服を戻し、L-dopa 注は数日かけて漸減・中止。貼付剤はそのまま続けてもよい（成書の症例）。</li><li>意識障害で幻覚・せん妄を伴う例を除き、できるだけ発症前の LEDD 近くまで補充する（成書）。</li></ul></div>`);
+  }
+  $("npoBig").textContent=big;$("npoPill").textContent=pill;$("npoV").className="verdict "+tone;
+  $("npoOut").innerHTML=out.join("");
+}
+
+/* ---------- 対処の順 ---------- */
+function useTag(list){const u=S.meds.filter(m=>daily(m)>0&&list.includes(m.id)).map(m=>DM[m.id].br.split(/[（、]/)[0].replace(/錠.*|OD.*|配合.*|パッチ.*|テープ.*/,""));return u.length?`<span class="tag use">使用中：${u.join("・")}</span>`:"";}
+function hitCls(list){return S.meds.some(m=>daily(m)>0&&list.includes(m.id))?" hit":"";}
+function renderMc(r){
+  document.querySelectorAll('.seg[data-k="mc"] button').forEach(b=>b.setAttribute("aria-pressed",S.mc===b.dataset.val));
+  const ldN=r.ldTimes,o=[];
+  const LD=["lc","lb","st","ldo"],DA=["prm","prmla","rop","ropcr","ropt","rot","apo","cab","bro","per"],COMT=["ent","opi","st"],MAOB=["sel","ras","saf"];
+  if(S.mc==="wo"){
+    o.push(`<div class="card"><h2>wearing-off（GL2018 のアルゴリズム＋その後の薬）</h2>
+    <p class="small">L-dopa を1日3回飲んでいても、服薬時刻に関連して効果が切れる状態。まず本当に wearing-off か（服薬時刻と症状の関係）を日誌で確かめる。</p>
+    <ol class="steps">
+      <li class="${ldN>=4?"":"hit"}"><b>L-dopa を1日4〜5回に分ける</b>、または <b>DA を開始・増量・変更</b>（徐放錠・貼付剤）${ldN?`<span class="tag ${ldN>=4?"done":"use"}">今 ${ldN}回/日</span>`:""}${useTag(DA)}
+        <div class="s">投与量不足のこともあるので、L-dopa 1日3〜4回・DA 十分量になっていなければ先にそれを行う。ロチゴチン貼付は早朝の運動症状に有効（成書）。</div></li>
+      <li class="${hitCls(COMT.concat(MAOB,["ist","zns"]))}"><b>併用薬を足す</b>：COMT 阻害薬（エンタカポン＝コムタン、オピカポン＝オンジェンティス）、MAO-B 阻害薬（セレギリン＝エフピー、ラサギリン＝アジレクト、サフィナミド＝エクフィナ）、イストラデフィリン（ノウリアスト）、ゾニサミド（トレリーフ）${useTag(COMT.concat(MAOB,["ist","zns"]))}
+        <div class="s">GL2018 はエンタカポン・セレギリン・イストラデフィリン・ゾニサミド。オピカポン・ラサギリン・サフィナミドはその後の承認（MDS 2025 ではオピカポン・サフィナミドが efficacious、ラサギリン・エンタカポン・イストラデフィリン・ゾニサミドは likely efficacious）。</div></li>
+      <li class="${ldN>=5?"hit":""}"><b>さらに L-dopa を頻回に</b>（おおむね1日8回くらいまで：成書）・<b>DA の増量・変更</b>、<b>アポモルヒネ皮下注</b>（アポカイン）をオフ時に${useTag(["apo"])}</li>
+      <li class="${hitCls(["lcig","fos"])}"><b>デバイス補助療法（DAT）を検討</b>：DBS（視床下核・淡蒼球内節）、L-dopa 持続経腸療法（デュオドーパ）、ホスレボドパ持続皮下注（ヴィアレブ）${useTag(["lcig","fos"])}
+        <div class="s">適応を十分に考えたうえで専門施設へ。ヴィアレブは GL2018 の後に承認（MDS 2025 では持続皮下 L-dopa は likely efficacious）。</div></li>
+    </ol></div>`);
+  }else if(S.mc==="dk"){
+    o.push(`<div class="card"><h2>peak-dose ジスキネジア（GL2018）</h2>
+    <p class="small">本人が困っているか・転倒や痛みにつながるかで治療するかを決める。軽いジスキネジアはオフより好まれることが多い。</p>
+    <ol class="steps">
+      <li class="${hitCls(LD)}"><b>L-dopa の1回量を減らし、回数を増やす</b>${useTag(LD)}<div class="s">25mg 単位の調整も考える（50mg 製剤の半錠・100mg の1/4錠：成書）。</div></li>
+      <li class="${hitCls(["ist"].concat(MAOB,COMT))}"><b>併用しているイストラデフィリン・MAO-B 阻害薬・エンタカポンを減量・中止</b>${useTag(["ist"].concat(MAOB,COMT))}<div class="s">オピカポン・サフィナミド・ラサギリンも同じ考え方（GL2018 の後の薬）。スタレボはレボドパ・カルビドパへ。</div></li>
+      <li class="${hitCls(LD)}"><b>L-dopa の1日量を減らし、不足分を DA で補う</b>${useTag(DA)}<div class="s">徐放錠・貼付剤も使えるが、ジスキネジアへのエビデンスは不十分。</div></li>
+      <li class="${hitCls(["ama"])}"><b>アマンタジン（シンメトレル）を開始・増量</b>（本邦の上限 300mg/日）${useTag(["ama"])}<div class="s">腎機能で減量・間隔延長。高齢者は幻覚・せん妄に注意。</div></li>
+      <li><b>DBS（視床下核・淡蒼球内節）</b>。希望しない・適応外なら L-dopa 持続経腸療法も選択肢。</li>
+    </ol></div>`);
+  }else if(S.mc==="hal"){
+    o.push(`<div class="card"><h2>幻覚・妄想（GL2018 のアルゴリズム）</h2>
+    <p class="small">症状と生活への影響を把握する。生活に支障がなければ経過観察し、規則正しい生活・日中の活動・夜間の睡眠を整える。</p>
+    <ol class="steps">
+      <li><b>身体疾患などの促進要因を直す</b>：感染・脱水・電解質・便秘・尿閉・疼痛・睡眠不足・環境の変化。<b>直近に加えた薬を減らす・止める</b>（抗コリン作用の薬、H2 遮断薬、ベンゾジアゼピンなど）。</li>
+      <li class="${hitCls(["thp"])}"><b>抗コリン薬を中止</b>${useTag(["thp"])}</li>
+      <li class="${hitCls(["ama","sel","ras","saf"])}"><b>アマンタジン・セレギリンを中止</b>${useTag(["ama","sel","ras","saf"])}<div class="s">ラサギリン・サフィナミドは GL2018 の後の薬だが、同じ MAO-B 阻害薬としてこの段階で考える（推定）。</div></li>
+      <li class="${hitCls(DA)}"><b>DA を減量・中止</b>${useTag(DA)}<div class="s">急に止めると DAWS・悪性症候群。減らしながら L-dopa で運動症状を補う。</div></li>
+      <li class="${hitCls(["ist","ent","opi","st","zns"])}"><b>イストラデフィリン・エンタカポン・ゾニサミドを中止</b>${useTag(["ist","ent","opi","st","zns"])}<div class="s">オピカポンも同じ段階で（推定）。</div></li>
+      <li class="${hitCls(["lc","lb","ldo"])}"><b>L-dopa を減量</b>${useTag(["lc","lb","ldo"])}<div class="s">運動症状が悪くならない範囲で。</div></li>
+      <li><b>非定型抗精神病薬</b>：クエチアピン（セロクエル、少量から。糖尿病には禁忌）。抗幻覚作用が期待でき運動症状を悪化させにくい。クロザピンは登録制。オランザピン・リスペリドンは運動症状を悪化させやすい。定型抗精神病薬は最後。</li>
+    </ol>
+    <div class="box info"><b>並行して考える</b>：コリンエステラーゼ阻害薬（ドネペジル＝アリセプトは DLB に適応。PD の認知症・幻覚への有効性は示されている）、抑肝散（成書で少量の使用例。エビデンスは限られる）。ピマバンセリンは海外で efficacious（MDS 2019）だが国内未承認。</div></div>`);
+  }else{
+    o.push(`<div class="card"><h2>delayed-on・no-on</h2><ul>
+      <li>空腸上部からの吸収が悪い。<b>食前に飲む</b>（食後より吸収が速い）、<b>水やレモン水に溶かして飲む</b>（成書）。</li>
+      <li>消化管の動きを良くする：ドンペリドン（ナウゼリン）を食前に。便秘を治す。</li>
+      <li>1回量を増やす。たんぱく質の多い食事との間隔をあける。</li>
+    </ul></div>
+    <div class="card"><h2>オフ時ジストニア（GL2018）</h2><ol class="steps">
+      <li><b>まず wearing-off の治療</b>でオフ時間を短くする・なくす。</li>
+      <li class="${hitCls(["rot","ropt","prmla","ropcr"])}"><b>早朝のジストニア</b>：長時間作用型 DA（ロチゴチン貼付は早朝の運動症状にエビデンス）、または起床時に少量の L-dopa。就寝前の L-dopa・DA でもよい。${useTag(["rot","ropt","prmla","ropcr"])}</li>
+      <li><b>薬で十分でなければ</b>：ボツリヌス治療、DBS（視床下核・淡蒼球内節）。</li>
+    </ol>
+    <p class="small">オン時のジストニアは peak-dose ジスキネジアに準じて治療する。</p></div>`);
+  }
+  $("mcOut").innerHTML=o.join("");
+}
+
+/* ---------- 悪性症候群タブの用量 ---------- */
+function renderNms(r){
+  const has=S.meds.some(m=>daily(m)>0);
+  if(!has){$("nmsDose").textContent="LEDDタブで発症前の薬を入れると、L-dopa 注の目安を出します。";return;}
+  const ld=r.ldOral;const da=r.daRows.filter(x=>x.id!=="rot"&&x.id!=="ropt"&&x.id!=="apo").reduce((a,x)=>a+x.led,0);
+  let t=`発症前 LEDD ${fmt(r.total)}mg（L-dopa ${fmt(ld)}）。`;
+  if(ld>0)t+=`経口不可なら ドパストン静注 ${r5(ld*0.5)}mg/日（不足なら ${r5(ld)}mg/日）を1日3〜4回に分け、1回を1〜3時間で点滴（GL2018・成書）。`;
+  if(da>0)t+=`DA 分（LED ${fmt(da)}）はニュープロ ${fmt(roundRotJP(ROT_JP(da)),2)}mg/日 で再開できる。`;
+  $("nmsDose").textContent=t;
+}
+
+/* ---------- まとめ ---------- */
+function renderAll(){
+  const r=renderLed();renderNpo(r);renderMc(r);renderNms(r);
+}
+function setTab(v){S.tab=v;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v));
+  document.querySelectorAll("section.pane").forEach(s=>s.hidden=s.id!=="p-"+v);renderAll();}
+
+/* ---------- 操作 ---------- */
+document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;setTab(b.dataset.v);save();window.scrollTo({top:0});});
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-add]");if(a){const id=a.dataset.add;if(!S.meds.some(m=>m.id===id)){const d=DM[id];const m={id};
+      if(d.mode==="day"&&d.days.length===1)m.d=d.days[0];
+      if(d.id==="ent"){m.d=100;}
+      S.meds.push(m);}
+    save();renderAll();toast(DM[id].nm+" を追加しました");return;}
+  const x=e.target.closest("[data-del]");if(x){S.meds.splice(+x.dataset.del,1);save();renderAll();return;}
+  const b=e.target.closest("button[data-i]");if(b){const m=S.meds[+b.dataset.i];if(!m)return;const v=parseFloat(b.dataset.x);
+    m[b.dataset.f]=v;
+    const d=DM[m.id];if(d.mode==="pd"&&b.dataset.f==="d"&&m.d&&!m.n){m.n=d.id==="apo"?1:3;}
+    save();renderAll();return;}
+  const s=e.target.closest(".seg[data-k] button");if(s){const k=s.closest(".seg").dataset.k;S[k]=(S[k]===s.dataset.val&&k!=="mc")?null:s.dataset.val;save();renderAll();return;}
+  if(e.target.id==="forceUpdate"){(async()=>{toast("最新版を確認しています…");
+    try{if("serviceWorker" in navigator){const rg=await navigator.serviceWorker.getRegistration("../");if(rg)await rg.update();}}catch(x){}
+    try{await fetch(location.href,{cache:"reload"});}catch(x){toast("通信できないため更新を確認できません");return;}
+    setTimeout(()=>location.reload(),800);})();}
+});
+document.addEventListener("input",e=>{const t=e.target.closest("input[data-i]");if(!t)return;const m=S.meds[+t.dataset.i];if(!m)return;m.v=t.value;save();
+  const r=calc();// 入力中はフォーカスを保つため一覧は描き直さない
+  const box=t.closest(".med");if(box)box.querySelector(".led").textContent=(parseFloat(t.value)>0?fmt(r.rows[m.id]||0)+" mg":"—");
+  $("ledBig").textContent=r.total>0?`LEDD 合計 ${fmt(r.total)} mg/日`:"用量を選ぶと合計が出ます";});
+document.addEventListener("change",e=>{if(e.target.closest("input[data-i]"))renderAll();});
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),2500);}
+window.addEventListener("load",()=>{try{WardProfile.onChange(()=>renderAll());}catch(e){}renderAll();});
+load();setTab(S.tab||"led");
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["pdnav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
+<script src="../share.js" defer></script>
+</body>
+</html>

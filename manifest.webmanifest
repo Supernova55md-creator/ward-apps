@@ -197,6 +197,18 @@
       ]
     },
     {
+      "name": "PD薬剤調整ナビ",
+      "short_name": "PD薬剤ナビ",
+      "url": "pd/",
+      "icons": [
+        {
+          "src": "pd/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "妊娠・授乳と神経疾患薬ナビ",
       "short_name": "妊娠授乳ナビ",
       "url": "preg/",
