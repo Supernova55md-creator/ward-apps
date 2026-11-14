@@ -141,18 +141,19 @@ table.tl tr.hl td{background:var(--accent-soft)}
 .tri button.on[data-v="×"]{background:var(--crit);color:#fff;border-color:var(--crit)}
 textarea{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;min-height:70px;resize:vertical}
 input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+#qRef td:first-child{white-space:nowrap}
 .out{border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:var(--bg);margin:0 0 10px}
 .out .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
 .out .hd b{font-size:13.5px}
 .out .tx{white-space:pre-wrap;font-size:15px;line-height:1.65;word-break:break-word}
 .cp{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:7px;padding:5px 10px;min-height:32px;cursor:pointer;flex:none}
-.strip{position:sticky;top:var(--hh,96px);z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-size:13.5px;display:flex;justify-content:space-between;align-items:center;gap:8px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
-.strip b{font-size:16px}
 .kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:14px}
 .kv dt{color:var(--muted);font-weight:700}
 .kv dd{margin:0}
 .sub{font-size:12px;color:var(--muted)}
 .rowx{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+details.more>summary{cursor:pointer;font-size:14px;color:var(--accent);font-weight:700;padding:4px 0}
+details.card>summary{color:var(--ink)}
 </style>
 
 <header class="top">
@@ -168,42 +169,53 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
 </header>
 
 <main>
-<div class="strip" id="strip"><span id="stripL">判定：—</span><button class="cp" type="button" data-go="rs">1枚目を見る</button></div>
 
 <!-- ========== かんたん ========== -->
 <div data-p="q">
   <section class="card">
-    <h2>かんたん入力（等級を決める項目だけ）</h2>
-    <label class="f">原疾患<select class="dxSel" data-k="dx"></select></label>
-    <div class="q" style="margin-top:12px"><span class="lb">障害のある側</span><div class="chips" data-chips="side"></div></div>
-    <label class="f">③ 発症日（脳血管障害は6か月の要件確認に使う）<input type="date" data-k="onset"></label>
+    <h2>1 原疾患</h2>
+    <div class="chips" id="qDx"></div>
+    <label class="f" style="margin-top:8px">ほかの疾患<select class="dxSel" data-k="dx"></select></label>
+    <label class="f hidden" id="qOnsetW" style="margin-top:8px">発症日（6か月の要件を確認）<input type="date" data-k="onset"></label>
+  </section>
+  <section class="card">
+    <h2>2 障害のある側</h2>
+    <div class="chips" data-chips="side"></div>
   </section>
   <section class="card" id="qUc">
-    <h2>上肢</h2>
+    <h2>3 上肢</h2>
     <div id="qU"></div>
   </section>
   <section class="card">
-    <h2>歩行・起立（補装具なしで）</h2>
-    <div class="grid">
-      <label class="f">歩行能力<select data-k="walk"><option value="">—</option><option value="none">歩行不能</option><option value="lt100">100m以上歩行不能</option><option value="lt1k">1km以上歩行不能</option><option value="lt2k">2km以上歩行不能</option><option value="ok">2km以上歩行可</option></select></label>
-      <label class="f">起立位保持<select data-k="stand"><option value="">—</option><option value="none">起立位を保てない</option><option value="lt10">10分以上困難</option><option value="lt30">30分以上困難</option><option value="lt60">1時間以上困難</option><option value="ok">1時間以上可</option></select></label>
-    </div>
-    <div id="qL" style="margin-top:8px"></div>
-    <div class="q" style="margin-top:10px"><span class="lb">歩行・起立の障害の主因</span><div class="chips" data-chips="gait"></div></div>
+    <h2>4 歩行・起立（補装具なしで）</h2>
+    <div class="q"><span class="lb">歩行</span><div class="chips" data-qk="walk"></div></div>
+    <div class="q"><span class="lb">起立位の保持</span><div class="chips" data-qk="stand"></div></div>
+    <div id="qL"></div>
     <div id="qT" class="hidden">
-      <h3>体幹</h3>
-      <div class="grid">
-        <label class="f">坐位保持<select data-k="sit"><option value="">—</option><option value="none">坐っていられない</option><option value="lt10">10分以上保てない</option><option value="ok">10分以上保てる</option></select></label>
-        <label class="f">立ち上がり<select data-k="rise"><option value="">—</option><option value="self">自力で可</option><option value="aid">自力では不可（人・柱・杖で可）</option><option value="none">介助でも不可</option></select></label>
-        <label class="f">片脚起立<select data-k="oneleg"><option value="">—</option><option value="ok">どちらかで可</option><option value="none">両脚とも全く不可</option></select></label>
-      </div>
+      <div class="q"><span class="lb">坐位の保持</span><div class="chips" data-qk="sit"></div></div>
+      <div class="q"><span class="lb">立ち上がり</span><div class="chips" data-qk="rise"></div></div>
+      <div class="q"><span class="lb">片脚起立</span><div class="chips" data-qk="oneleg"></div></div>
     </div>
+    <details class="more"><summary>主因の切り替え（下肢／体幹）</summary>
+      <div class="chips" data-chips="gait" style="margin-top:8px"></div>
+      <p class="hint">片麻痺で一側の体幹筋力低下を伴うものは下肢で認定（両側性病変を除く）。PD・SCD・MSAなどは体幹。下肢と体幹は指数合算せず高い方。</p>
+    </details>
   </section>
   <section class="card">
     <div id="qOut"></div>
     <div class="rowx" style="margin-top:10px"><button class="btn" type="button" data-act="copyAll">1枚目をまとめてコピー</button><button class="btn" type="button" data-go="rs">1枚目を欄ごとに見る</button></div>
-    <p class="hint">ROM・MMT・握力・動作活動を詳細タブで足すと、総合所見の根拠（MMT著減など）と整合性チェックに反映される。診断書の2・3枚目にはこれらの記載が必要。</p>
+    <p class="hint">ROM・MMT・握力・動作活動を詳細タブ（所見・関節）で足すと、総合所見の根拠（MMT著減など）と整合性チェックに反映される。診断書の2・3枚目にはこれらの記載が必要。</p>
   </section>
+  <details class="card more" id="qRef" style="--x:0"><summary><b>等級の早見</b></summary>
+    <div class="wrapx" style="margin-top:8px"><table class="tl">
+      <tr><th></th><th>全廃</th><th>著しい障害</th><th>軽度の障害</th></tr>
+      <tr><td>一上肢</td><td>2級</td><td>3級（5kg以内）</td><td>7級（精密運動不可・10kg以内）</td></tr>
+      <tr><td>両上肢</td><td>1級</td><td>2級</td><td>—</td></tr>
+      <tr><td>一下肢</td><td>3級（患肢で立てない）</td><td>4級（1km・30分・階段に手すり）</td><td>7級（2km・1時間）</td></tr>
+      <tr><td>両下肢</td><td>1級</td><td>2級</td><td>—</td></tr>
+    </table></div>
+    <p class="hint">体幹：坐位不能1級／坐位・起立10分未満・自力で立てない2級／100m歩行不能・片脚起立不可3級／2km歩行不能5級。指数 1級18・2級11・3級7・4級4・5級2・6級1・7級0.5。片麻痺の上肢全廃＋下肢全廃＝18で1級。</p>
+  </details>
 </div>
 
 <!-- ========== 原疾患 ========== -->
@@ -471,6 +483,7 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
   </section>
   <section class="card">
     <h2>出典（2026年11月12日に確認）</h2>
+    <p>アプリの版：<b>2026-11-14</b>　<button type="button" class="cp" id="forceUpdate">最新版に更新</button></p>
     <ul class="src">
       <li><a href="https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/shitai2023-1" target="_blank" rel="noopener">東京都：身体障害者診断書・意見書（肢体不自由用）様式</a></li>
       <li><a href="https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/2026-03-18-114130-426" target="_blank" rel="noopener">東京都心身障害者福祉センター：令和7年度 第15条指定医講習会資料（肢体不自由編）</a></li>
@@ -482,7 +495,7 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
   </section>
 </div>
 
-<p class="foot">自分用の補助ツール。患者個人情報は入力しない。入力はこの端末内にのみ保存。</p>
+<p class="foot">等級判定の補助。最終的な等級は東京都心身障害者福祉センターの審査で決まる。患者個人情報は入力しない。入力はこの端末内にのみ保存。</p>
 </main>
 <div id="toast" role="status"></div>
 
@@ -795,7 +808,7 @@ function sheet2(){
 
 /* ---------- 描画 ---------- */
 function setTab(t){S.tab=t;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false"));
- document.querySelectorAll("[data-p]").forEach(p=>p.classList.toggle("hidden",p.dataset.p!==t));$("strip").classList.toggle("hidden",t==="rs"||t==="ref"||t==="q");save();window.scrollTo(0,0)}
+ document.querySelectorAll("[data-p]").forEach(p=>p.classList.toggle("hidden",p.dataset.p!==t));save();window.scrollTo(0,0)}
 function chipsHTML(name,opts,cur,multi){return opts.map(o=>{const v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;const on=multi?cur.includes(v):cur===v;return '<label class="chip"><input type="'+(multi?"checkbox":"radio")+'" name="'+name+'" value="'+esc(v)+'"'+(on?" checked":"")+'><span>'+esc(l)+'</span></label>'}).join("")}
 function initStatic(){
 const dxOpts=(()=>{let h="",g="";DX.forEach(d=>{if(!d.id){h+='<option value="">'+d.n+'</option>';return}if(d.g!==g){if(g)h+="</optgroup>";h+='<optgroup label="'+d.g+'">';g=d.g}h+='<option value="'+d.id+'">'+d.n+'</option>'});return h+"</optgroup>"})();document.querySelectorAll(".dxSel").forEach(el=>el.innerHTML=dxOpts);
@@ -851,26 +864,41 @@ function renderResult(R){
  $("sheet1").innerHTML=f.map((x,i)=>'<div class="out"><div class="hd"><b>'+x[0]+'</b><button class="cp" type="button" data-cp="'+i+'">コピー</button></div><div class="tx">'+esc(x[1])+'</div></div>').join("");
  $("sheet2").innerHTML='<dl class="kv">'+sheet2().map(x=>'<dt>'+x[0]+'</dt><dd>'+esc(x[1])+'</dd>').join("")+'</dl>';
 }
-function renderStrip(R){const g=R.g;$("stripL").innerHTML='判定：<b>'+(g&&g<=6?g+"級相当":g===7?"7級":"—")+'</b>　<span class="sub">上肢'+(R.uG||"—")+'・下肢'+(R.lG||"—")+'・体幹'+(R.T.g||"—")+'</span>'}
+function renderSum(R){if(!window.wcSum)return;const g=R.g;
+ if(!dxObj().id&&!R.total){wcSum.set(null);return}
+ const t=(g&&g<=6?g+"級相当":g===7?"7級（単独では非該当）":"該当なし")+"　上肢"+(R.uG?R.uG+"級":"—")+"・下肢"+(R.lG?R.lG+"級":"—")+"・体幹"+(R.T.g?R.T.g+"級":"—");
+ wcSum.set(t,{tone:!g?"info":g<=2?"crit":g<=4?"warn":g<=6?"ok":"info",pill:"等級"})}
 function syncBound(){const a=document.activeElement;document.querySelectorAll("[data-k]").forEach(el=>{if(el===a)return;const v=gp(el.dataset.k);if(el.type==="checkbox")el.checked=!!v;else{const nv=v==null?"":v;if(el.value!==nv)el.value=nv}})}
+const QDX=["ci","ich","sah","pd","psp","msa","scd","als","csci","cm"];
+const QOPT={
+ walk:[["none","歩行不能"],["lt100","100m未満"],["lt1k","1km未満"],["lt2k","2km未満"],["ok","2km以上可"]],
+ stand:[["none","保てない"],["lt10","10分未満"],["lt30","30分未満"],["lt60","1時間未満"],["ok","1時間以上"]],
+ sit:[["none","坐れない"],["lt10","10分未満"],["ok","10分以上"]],
+ rise:[["self","自力で可"],["aid","人・柱・杖で可"],["none","介助でも不可"]],
+ oneleg:[["ok","どちらかで可"],["none","両脚とも不可"]]};
+const UOPT=[["","なし"],["fine","精密運動×（7級）"],["le10","10kg以内（7級）"],["le5","5kg以内（3級）"],["all","全廃（2級）"]];
 function renderQuick(R){
- const sd=sides();
- const uopt=[["","障害なし／軽微"],["fine","精密運動ができない（7級）"],["le10","10kg以内のみ下げられる（7級）"],["le5","5kg以内のみ下げられる（3級）"],["all","全廃（2級）"]];
+ const sd=sides();const d=dxObj();
+ $("qDx").innerHTML=chipsHTML("qdx",QDX.map(id=>[id,DX.find(x=>x.id===id).n]),S.dx,false);
+ $("qOnsetW").classList.toggle("hidden",!d.stroke);
+ document.querySelectorAll("[data-qk]").forEach(el=>{const k=el.dataset.qk;el.innerHTML=chipsHTML("qk_"+k,QOPT[k],S[k]||"",false)});
  const uv=J=>J.uAll?"all":J.lift==="le5"?"le5":J.lift==="le10"?"le10":J.fine?"fine":"";
  if(!sd.length){$("qU").innerHTML='<p class="hint">障害のある側を選ぶと表示。</p>';$("qL").innerHTML=""}
  else{
-  $("qU").innerHTML=sd.map(s=>'<label class="f" style="margin-bottom:8px">'+SN[s]+'上肢<select data-uq="'+s+'">'+uopt.map(o=>'<option value="'+o[0]+'"'+(uv(S.J[s])===o[0]?" selected":"")+'>'+o[1]+'</option>').join("")+'</select></label>').join("")+(sd.some(s=>R.U[s].parts.length)?'<p class="hint">関節タブの入力も合算している。</p>':'');
-  $("qL").innerHTML=R.gm==="trunk"?"":sd.map(s=>'<label class="chk"><input type="checkbox" data-sup="'+s+'"'+(S.J[s].sup?" checked":"")+'><span>'+SN[s]+'下肢：患肢で立位を保持できない（全廃 3級）</span></label>').join("");
+  $("qU").innerHTML=sd.map(s=>'<div class="q"><span class="lb">'+SN[s]+'上肢</span><div class="chips">'+chipsHTML("quq_"+s,UOPT,uv(S.J[s]),false)+'</div></div>').join("")+(sd.some(s=>R.U[s].parts.length)?'<p class="hint">関節タブの入力も合算している。</p>':'');
+  $("qL").innerHTML=R.gm==="trunk"?"":'<div class="q"><span class="lb">患肢で立位を保持できない（下肢全廃 3級）</span><div class="chips">'+sd.map(s=>'<label class="chip"><input type="checkbox" data-sup="'+s+'"'+(S.J[s].sup?" checked":"")+'><span>'+SN[s]+'下肢</span></label>').join("")+'</div></div>';
  }
  $("qT").classList.toggle("hidden",R.gm==="limb");
+ const qr=$("qRef");if(qr&&!qr.dataset.init){qr.dataset.init=1;qr.open=!d.id}
  const g=R.g,f=window._s1||[];const so=f.find(x=>x[0].startsWith("⑤"));const nm=f.find(x=>x[0].startsWith("①"));
  const cls=!g?"info":g<=2?"crit":g<=4?"warn":g<=6?"ok":"info";
+ if(!d.id&&!R.total){$("qOut").innerHTML='<p class="hint">原疾患・側・上肢・歩行を選ぶと、ここに等級と①障害名・⑤総合所見が出る。</p>';return}
  $("qOut").innerHTML='<div class="verdict '+cls+'" style="margin-bottom:10px"><span class="pill">参考意見</span><div class="big">'+(g&&g<=6?g+"級相当":g===7?"7級（単独では非該当）":"該当する所見なし")+'</div><div class="sub">上肢 '+(R.uG?R.uG+"級":"—")+'・下肢 '+(R.lG?R.lG+"級":"—")+'・体幹 '+(R.T.g?R.T.g+"級":"—")+'</div></div>'
-  +(nm?'<div class="out"><div class="hd"><b>① 障害名</b></div><div class="tx">'+esc(nm[1])+'</div></div>':'')
+  +(nm?'<div class="out"><div class="hd"><b>① 障害名</b><button class="cp" type="button" data-cp="'+f.indexOf(nm)+'">コピー</button></div><div class="tx">'+esc(nm[1])+'</div></div>':'')
   +(so?'<div class="out"><div class="hd"><b>⑤ 総合所見</b><button class="cp" type="button" data-cp="'+f.indexOf(so)+'">コピー</button></div><div class="tx">'+esc(so[1])+'</div></div>':'')
   +checks(R).filter(x=>x[0]!=="info").map(x=>'<p class="note w" style="margin:0 0 6px">'+esc(x[1])+'</p>').join("");
 }
-function renderAll(){const R=compute();syncBound();renderDx();renderJoints(R);renderADL();renderResult(R);renderQuick(R);renderStrip(R);save()}
+function renderAll(){const R=compute();syncBound();renderDx();renderJoints(R);renderADL();renderResult(R);renderQuick(R);renderSum(R);save()}
 
 /* ---------- イベント ---------- */
 function applyDxDefaults(){const d=dxObj();if(!d.id)return;S.cause=d.cause;S.gait="";S.neuro.mot=d.mot.slice();S.neuro.site=d.site.slice();
@@ -886,6 +914,9 @@ document.addEventListener("change",e=>{const el=e.target;
  if(el.name==="cause"){S.cause=el.value;renderAll();return}
  if(/^side\d/.test(el.name||"")){S.side=el.value;renderAll();return}
  if(/^gait\d/.test(el.name||"")){S.gait=el.value;renderAll();return}
+ if(el.name==="qdx"){S.dx=el.value;applyDxDefaults();renderAll();return}
+ if(/^qk_/.test(el.name||"")){S[el.name.slice(3)]=el.value;renderAll();return}
+ if(/^quq_/.test(el.name||"")){const J=S.J[el.name.slice(4)],v=el.value;J.uAll=v==="all";J.lift=v==="le5"||v==="le10"?v:"";J.fine=v==="fine";renderAll();return}
  if(el.dataset.uq){const J=S.J[el.dataset.uq],v=el.value;J.uAll=v==="all";J.lift=v==="le5"||v==="le10"?v:"";J.fine=v==="fine";renderAll();return}
  if(el.dataset.sup){S.J[el.dataset.sup].sup=el.checked;renderAll();return}
  const J=S.J[S.jside];
@@ -900,13 +931,17 @@ document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)r
  const tri=b.closest("[data-adl]");if(tri){const id=tri.dataset.adl;S.adl=S.adl||{};S.adl[id]=S.adl[id]===b.dataset.v?"":b.dataset.v;renderAll();return}
  if(b.id==="adlAllO"){ADL.forEach(a=>{if(!S.adl[a[0]])S.adl[a[0]]="○"});renderAll();toast("未入力の項目を○にしました");return}
  if(b.dataset.cp!=null){const x=window._s1[+b.dataset.cp];copy(x[1]);return}
+ if(b.id==="forceUpdate"){(async()=>{toast("最新版を確認しています…");
+  try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(x){}
+  try{await fetch(location.href,{cache:"reload"});}catch(x){toast("通信できないため更新を確認できません");return;}
+  setTimeout(()=>location.reload(),800);})();return}
  if(b.id==="copyAll"||b.dataset.act==="copyAll"){copy(window._s1.map(x=>"【"+x[0]+"】\n"+x[1]).join("\n\n"));return}
 });
 function copy(t){const done=()=>toast("コピーしました");if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(done,()=>fb())}else fb();
  function fb(){const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){toast("コピーできませんでした")}ta.remove()}}
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2600)}
 function setHH(){const h=document.querySelector("header.top");if(h)document.documentElement.style.setProperty("--hh",(h.offsetHeight+6)+"px")}
-load();initStatic();fillBound();setTab(S.tab);renderAll();setHH();window.addEventListener("resize",setHH);
+load();initStatic();fillBound();setTab(S.tab);renderAll();setHH();window.addEventListener("load",()=>renderAll());window.addEventListener("resize",setHH);
 </script>
 
 <script>
@@ -927,6 +962,69 @@ load();initStatic();fillBound();setTab(S.tab);renderAll();setHH();window.addEven
   }catch(e){}
 })();
 </script>
+
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
 <!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
 <style>
 #wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
