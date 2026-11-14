@@ -125,6 +125,18 @@
       ]
     },
     {
+      "name": "末梢神経局在トレーニング",
+      "short_name": "末梢局在トレ",
+      "url": "pnt/",
+      "icons": [
+        {
+          "src": "pnt/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "髄液所見 鑑別トレーニング",
       "short_name": "髄液トレーニング",
       "url": "csf/",

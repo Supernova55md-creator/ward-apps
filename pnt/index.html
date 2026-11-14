@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>末梢神経局在トレーニング</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0F766E">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="末梢局在トレ">
+<style>
+
+:root{
+  --bg:#F3F6F5; --surface:#FFFFFF; --ink:#1A2422; --muted:#5A6865; --line:#D9E2DF;
+  --accent:#0F766E; --accent-strong:#0B5650; --accent-soft:#E1F2EF; --on-accent:#FFFFFF;
+  --ok:#2E7D4F; --ok-soft:#E3F3E9; --ng:#B42318; --ng-soft:#FDE8E6; --warn-soft:#FFF4DB;
+  --font:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#121716; --surface:#1B2220; --ink:#E7EEEC; --muted:#9FB0AC; --line:#2D3835;
+    --accent:#2DBFAF; --accent-strong:#6FDCCF; --accent-soft:#16332F; --on-accent:#06201D;
+    --ok:#5CC48A; --ok-soft:#163323; --ng:#F27A6E; --ng-soft:#3B1C1A; --warn-soft:#3A3017; color-scheme:dark}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+.app{max-width:680px;margin:0 auto;padding:0 calc(14px + env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;border:5px solid var(--accent);flex:none}
+.brand h1{font-size:19px;font-weight:900}
+.brand small{color:var(--muted);font-size:11px;margin-left:auto;text-align:right;line-height:1.3}
+.summary{margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 9px}
+.tile .k{font-size:11px;color:var(--muted);display:block}
+.tile .v{font-size:17px;font-weight:700;display:block}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:6px}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sm{min-height:36px;padding:5px 11px;font-size:14px}
+.btn:disabled{opacity:.55;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.set>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details.set>summary::-webkit-details-marker{display:none}
+details.set>summary::after{content:"＋";margin-left:auto;color:var(--muted);font-weight:400}
+details.set[open]>summary::after{content:"－"}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input{margin:0;accent-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px}
+input[type=search]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;min-height:44px}
+.sw{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--accent)}
+/* 出題 */
+.qhead{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.lv{letter-spacing:1px;color:var(--accent)}
+.regtag{margin-left:auto;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:1px 10px;font-weight:700}
+.pt{font-size:15.5px;margin:0 0 8px}
+ul.fd{margin:0;padding:0;list-style:none}
+ul.fd li{position:relative;padding:7px 0 7px 18px;border-top:1px dashed var(--line);font-size:15.5px;line-height:1.5}
+ul.fd li:first-child{border-top:0}
+ul.fd li::before{content:"";position:absolute;left:3px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.ask{font-weight:700;margin:12px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;font-size:15.5px;line-height:1.45;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:11px;padding:11px 12px;min-height:48px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ng{border-color:var(--ng);background:var(--ng-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.result{border-radius:10px;padding:9px 12px;font-weight:700;margin-bottom:10px}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.ng{background:var(--ng-soft);color:var(--ng)}
+.result .ans{display:block;color:var(--ink);font-size:17px;margin-top:2px}
+.result .syn{display:block;color:var(--muted);font-weight:400;font-size:13.5px}
+.ex h3{font-size:14.5px;margin:12px 0 4px;color:var(--accent-strong)}
+.why{margin:0;padding:0;list-style:none}
+.why li{padding:7px 0;border-top:1px dashed var(--line);font-size:15px;line-height:1.5}
+.why li:first-child{border-top:0}
+.why .f{display:block}
+.why .w{display:block;color:var(--muted);font-size:13.5px;padding-left:1.2em;text-indent:-1.2em}
+.why .w::before{content:"→ ";color:var(--accent)}
+.why .dn{font-weight:700;display:block}
+.pearl{background:var(--warn-soft);border-radius:10px;padding:9px 12px;font-size:14.5px;margin-top:12px}
+.pearl b{display:block;font-size:13px;color:var(--muted)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.nav .btn{flex:1 1 140px}
+/* 一覧 */
+details.site{border-top:1px solid var(--line)}
+details.site:first-of-type{border-top:0}
+details.site>summary{cursor:pointer;padding:9px 0;list-style:none}
+details.site>summary::-webkit-details-marker{display:none}
+details.site>summary b{display:block;font-size:15px}
+details.site>summary span{display:block;font-size:13px;color:var(--muted)}
+.lvb{font-size:11px;color:var(--accent);margin-left:6px;font-weight:400}
+.sub{font-size:12.5px;color:var(--muted);margin:8px 0 2px;font-weight:700}
+/* 成績 */
+table.st{width:100%;border-collapse:collapse;font-size:14.5px}
+table.st td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+table.st td.num{text-align:right;white-space:nowrap;width:1%}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{color:var(--muted);font-size:14px}
+/* タブ */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+nav.tabs .in{display:flex;max-width:680px;width:100%}
+nav.tabs button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:9px 0 10px;min-height:56px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;display:none;max-width:90%}
+.toast.on{display:block}
+.foot{font-size:11.5px;color:var(--muted);margin:16px 2px 0}
+
+/* ── 末梢神経局在トレーニング 追加分 ── */
+.seg{display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:3px;margin:10px 0 8px}
+.seg button{flex:1;font:inherit;font-size:15px;border:0;background:none;color:var(--muted);border-radius:8px;min-height:44px;cursor:pointer;line-height:1.2;padding:4px 2px}
+.seg button small{display:block;font-size:11px;font-weight:400;margin-top:1px}
+.seg button[aria-selected=true]{background:var(--surface);color:var(--accent-strong);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+table.mm{width:100%;border-collapse:collapse;font-size:14.5px}
+table.mm th{font-size:12px;color:var(--muted);font-weight:400;text-align:left;padding:2px 4px 4px}
+table.mm td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+table.mm .g{text-align:center;width:52px}
+table.mm td.mn small{display:block;font-size:12px;color:var(--muted);line-height:1.35}
+table.mm td.inn{font-size:12.5px;color:var(--accent-strong);line-height:1.35;width:34%}
+table.mm tr.kn td{border-top:0;padding-top:0;font-size:12.5px;color:var(--muted)}
+table.mm.src td{padding:4px}
+.gr{display:inline-block;min-width:32px;text-align:center;border-radius:7px;padding:2px 6px;font-weight:800;font-size:15px}
+.g5{background:var(--bg);color:var(--muted);font-weight:500}
+.g4{background:#FFF1C9;color:#7A5200}
+.g3{background:#FFDCC2;color:#8A3A00}
+.g2,.g1,.g0{background:var(--ng-soft);color:var(--ng)}
+.rv{white-space:nowrap;font-size:14px}
+.rv.r1{color:#8A3A00;font-weight:700}
+.rv.r2{color:var(--ng);font-weight:700}
+.rv.r0{color:var(--muted)}
+.body{margin:4px 0 0}
+.body svg{width:100%;height:auto;display:block;max-height:560px}
+.body .sil path,.body .sil rect,.body .sil ellipse{fill:var(--surface);stroke:var(--muted);stroke-width:1.1;vector-effect:non-scaling-stroke}
+.body svg path[fill-rule]{stroke:none}
+.vl{font-size:11px;fill:var(--muted);font-family:var(--font)}
+.key{color:var(--accent);margin-right:2px}
+.pairbox{background:var(--accent-soft);border-radius:10px;padding:9px 12px;margin-top:12px;font-size:14.5px}
+.pairbox ul{margin:6px 0 0;padding-left:1.2em}
+.pairbox li{margin:3px 0}
+.edx{background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:14.5px;line-height:1.55}
+.pl{margin:2px 0 4px;font-size:14.5px}
+.segset{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.segset button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 14px;min-height:40px;cursor:pointer}
+.segset button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.lab{font-size:13px;color:var(--muted);margin-top:4px}
+.refs{margin:0;padding-left:1.2em;font-size:14px}
+.refs li{margin:6px 0;line-height:1.45}
+.refs a{color:var(--accent-strong);word-break:break-all}
+.note{font-size:13.5px;line-height:1.6}
+@media (prefers-color-scheme: dark){
+  .g4{background:#3A3017;color:#F2D27A}
+  .g3{background:#40281A;color:#F4A876}
+  .rv.r1{color:#F4A876}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><h1>末梢神経局在トレーニング</h1><small>筋・感覚・反射から<br>病変部位を当てる</small></div>
+  <div class="summary">
+    <div class="tile"><span class="k">回答数</span><span class="v" id="sN">0</span></div>
+    <div class="tile"><span class="k">正答率</span><span class="v" id="sR">—</span></div>
+    <div class="tile"><span class="k">連続正解</span><span class="v" id="sS">0</span></div>
+  </div>
+</header>
+
+<section class="view active" id="v-q" aria-label="出題">
+  <details class="card set" id="setBox">
+    <summary>出題範囲・設定 <span class="hint" id="setSum" style="margin:0 0 0 4px"></span></summary>
+    <div class="lab">モード</div>
+    <div class="segset"><button type="button" data-limb="up">上肢</button><button type="button" data-limb="lo">下肢</button><button type="button" data-limb="mix">混合</button></div>
+    <div class="lab">難易度</div>
+    <div class="segset"><button type="button" data-diff="1">典型例のみ</button><button type="button" data-diff="2">紛らわしいペアを含む</button></div>
+    <p class="hint" style="margin-top:-4px">「紛らわしいペアを含む」では応用の部位も出題し、ペアの相手を選択肢に入れ、筋力低下を軽めにします。</p>
+    <div class="lab">紛らわしいペアを集中して出す</div>
+    <div class="chips" id="pairChips"></div>
+    <p class="hint" id="pairNote" style="display:none">ペアを選んでいる間は、モード・難易度に関係なく、選んだペアの部位だけを出題します。</p>
+    <label class="sw"><input type="checkbox" id="weakOpt">間違えた部位・まだ解いていない部位を優先</label>
+    <label class="sw"><input type="checkbox" id="hideOpt">選択肢を隠して、先に自分で考える</label>
+    <p class="hint">所見は部位ごとの障害パターンから毎回組み立てます（左右・筋力の程度・提示する筋・感覚障害の有無が変わります）。</p>
+  </details>
+  <div id="qArea"></div>
+</section>
+
+<section class="view" id="v-a" aria-label="部位一覧">
+  <div class="card">
+    <h2>部位一覧（局在の要点）</h2>
+    <input type="search" id="aQ" placeholder="部位名・筋名で絞り込み（例：後脛骨筋、下垂手）" aria-label="絞り込み">
+    <p class="hint">各部位から、その部位の問題を出せます。感覚の図は右側で表示します。</p>
+  </div>
+  <div id="aList"></div>
+</section>
+
+<section class="view" id="v-s" aria-label="成績">
+  <div id="sArea"></div>
+</section>
+
+<section class="view" id="v-c" aria-label="出典">
+  <div class="card">
+    <h2>このアプリについて</h2>
+    <p class="note">末梢神経・神経根・神経叢の局在を練習する自分用の学習ツール。各部位の障害パターン（筋ごとの障害の程度・感覚の領域・腱反射）から、左右・筋力の程度・提示する筋を毎回変えて症例を組み立てる。選択肢との違いは、その症例の所見から自動で書き出す。</p>
+    <div class="row" style="margin-top:8px"><span class="hint" style="margin:0;font-size:13px">アプリの版：<b id="verTxt"></b></span><button class="btn sm" type="button" id="forceUpdate">最新版に更新</button></div>
+  </div>
+  <div class="card">
+    <h2>採用した根支配表</h2>
+    <p class="note">神経根の支配筋は教科書によって違いがある。この表は次の方針で作った。<b>太字</b>は主な根。</p>
+    <ul class="note" style="padding-left:1.2em;margin:4px 0 8px">
+      <li>C5〜C7：MRIで単一根と確認した頸椎症性神経根症の筋力・針筋電図の研究（Furukawa 2021）の結論に合わせた（三角筋・棘下筋・上腕二頭筋・腕橈骨筋はC5、長橈側手根伸筋はC5/C6、円回内筋はC6、上腕三頭筋・橈側手根屈筋はC7）。</li>
+      <li>C5〜C8：手術で確認した単一根病変の針筋電図（Levin 1996）と矛盾しないようにした。C6は「C5型」と「C7型」に分かれやすいことを解説に入れた。</li>
+      <li>L2〜S1：手術で確認した単一根病変の針筋電図（Tsao 2003）に合わせた（前脛骨筋は主にL5、腓腹筋はS1、大腿二頭筋はS1でL5では障害されない）。</li>
+      <li>上記の研究で扱われていない筋（菱形筋・前鋸筋・広背筋・手内筋・長母指屈筋・示指伸筋・腸腰筋・内転筋・中殿筋・大殿筋・後脛骨筋・足の内在筋など）は、一般的な成書の表（MRC『Aids to the Examination of the Peripheral Nervous System』など）に準じた。<b>この部分は原典の表と1筋ずつ照合していない。</b></li>
+      <li>術中の神経根刺激では、1つの根が教科書より広い範囲の筋を支配していた（Schirmer 2011）。根の支配には個人差が大きく、出題は「典型的な分布」の練習である。</li>
+    </ul>
+    <h3 style="font-size:14.5px;margin:10px 0 4px">上肢</h3><div id="tblUp"></div>
+    <h3 style="font-size:14.5px;margin:12px 0 4px">下肢</h3><div id="tblLo"></div>
+  </div>
+  <div class="card">
+    <h2>感覚の模式図</h2>
+    <p class="note">人体図は自作の模式図。皮膚分節は成書で一般的な分布を簡略化したもので、根の領域は実際には重なり、個人差が大きい（Lee 2008 は従来の皮膚分節図の根拠が弱いことを示し、根拠に基づく図を提案している）。<b>図の境界は原典の図と照合していない。</b>末梢神経の皮枝の領域も、決め手になる部分（母指球の皮膚＝正中神経手掌枝、手背尺側＝背側尺骨皮神経、第1趾間＝深腓骨神経、踵＝踵骨枝）を強調して単純化した。</p>
+  </div>
+  <div class="card">
+    <h2>文献</h2>
+    <ol class="refs">
+      <li>Furukawa Y, Miyaji Y, Kadoya A, et al. Determining C5, C6 and C7 myotomes through comparative analyses of clinical, MRI and EMG findings in cervical radiculopathy. Clin Neurophysiol Pract. 2021;6:88-92. <a href="https://pubmed.ncbi.nlm.nih.gov/33748550/" target="_blank" rel="noopener">PubMed 33748550</a></li>
+      <li>Levin KH, Maggiano HJ, Wilbourn AJ. Cervical radiculopathies: comparison of surgical and EMG localization of single-root lesions. Neurology. 1996;46:1022-1025. <a href="https://doi.org/10.1212/WNL.46.4.1022" target="_blank" rel="noopener">doi:10.1212/WNL.46.4.1022</a></li>
+      <li>Tsao BE, Levin KH, Bodner RA. Comparison of surgical and electrodiagnostic findings in single root lumbosacral radiculopathies. Muscle Nerve. 2003;27:60-64. <a href="https://pubmed.ncbi.nlm.nih.gov/12508296/" target="_blank" rel="noopener">PubMed 12508296</a></li>
+      <li>Schirmer CM, Shils JL, Arle JE, et al. Heuristic map of myotomal innervation in humans using direct intraoperative nerve root stimulation. J Neurosurg Spine. 2011;15:64-70. <a href="https://pubmed.ncbi.nlm.nih.gov/21476796/" target="_blank" rel="noopener">PubMed 21476796</a></li>
+      <li>Medical Research Council. Aids to the examination of the peripheral nervous system（UKRI 公開版）. <a href="https://www.ukri.org/publications/aids-to-the-examination-of-the-peripheral-nervous-system/" target="_blank" rel="noopener">UKRI</a></li>
+      <li>Lee MW, McPhee RW, Stringer MD. An evidence-based approach to human dermatomes. Clin Anat. 2008;21:363-373. <a href="https://pubmed.ncbi.nlm.nih.gov/18470936/" target="_blank" rel="noopener">PubMed 18470936</a></li>
+      <li>Ferrante MA. Brachial plexopathies: classification, causes, and consequences. Muscle Nerve. 2004;30:547-568. <a href="https://doi.org/10.1002/mus.20131" target="_blank" rel="noopener">doi:10.1002/mus.20131</a></li>
+      <li>Rubin DI. Brachial and lumbosacral plexopathies: a review. Clin Neurophysiol Pract. 2020;5:173-193. <a href="https://pubmed.ncbi.nlm.nih.gov/32954064/" target="_blank" rel="noopener">PubMed 32954064</a></li>
+      <li>Padua L, Coraci D, Erra C, et al. Carpal tunnel syndrome: clinical features, diagnosis, and management. Lancet Neurol. 2016;15:1273-1284. <a href="https://pubmed.ncbi.nlm.nih.gov/27751557/" target="_blank" rel="noopener">PubMed 27751557</a></li>
+      <li>Katirji MB, Wilbourn AJ. Common peroneal mononeuropathy: a clinical and electrophysiologic study of 116 lesions. Neurology. 1988;38:1723-1728. <a href="https://doi.org/10.1212/WNL.38.11.1723" target="_blank" rel="noopener">doi:10.1212/WNL.38.11.1723</a></li>
+    </ol>
+    <p class="hint">解説の文章は上記と一般的な成書の内容を自分の言葉でまとめたもの。本の文章・図は使っていない。各部位の「NCS・針筋電図」「ポイント」の記述は、文献と1文ずつ照合したものではない（未照合）。</p>
+  </div>
+  <div class="card"><p class="note" style="margin:0">学習用の補助ツールで、診断は診察・電気生理・画像で行う。入力と成績はこの端末内にだけ保存される。</p></div>
+</section>
+
+<p class="foot">自分用の学習ツールです。所見の組み合わせは典型例を単純化したもので、実際の症例では個人差・重なりがあります。成績はこの端末内にのみ保存されます。</p>
+</div>
+
+<nav class="tabs" role="tablist" aria-label="画面切替"><div class="in">
+  <button role="tab" aria-selected="true" data-v="v-q" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg>出題</button>
+  <button role="tab" aria-selected="false" data-v="v-a" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg>一覧</button>
+  <button role="tab" aria-selected="false" data-v="v-s" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>成績</button>
+  <button role="tab" aria-selected="false" data-v="v-c" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4h9l3 3v13H6z"/><path d="M9 10h6M9 14h6M9 18h4"/></svg>出典</button>
+</div></nav>
+<div class="toast" id="toast" role="status"></div>
+<script>
+/* ───── 筋（徒手筋力検査で診る筋）─────
+   [id, 筋名, 動作, 神経, 根（*＝主な根）, 経路] */
+var MUS={
+up:[
+["rhomb","菱形筋","肩甲骨の内転","肩甲背神経","C4 *C5","C5神経根から直接分枝（神経幹より近位）"],
+["serr","前鋸筋","肩甲骨の前方突出（壁押しで翼状肩甲を見る）","長胸神経","C5 *C6 *C7","C5–C7神経根から直接分枝（神経幹より近位）"],
+["ssp","棘上筋","肩外転の初動","肩甲上神経","*C5 C6","上神経幹から分枝"],
+["isp","棘下筋","肩外旋","肩甲上神経","*C5 C6","上神経幹から分枝"],
+["delt","三角筋","肩外転","腋窩神経","*C5 C6","後神経束→腋窩神経"],
+["lat","広背筋","肩内転・伸展","胸背神経","C6 *C7 C8","後神経束→胸背神経"],
+["bic","上腕二頭筋","肘屈曲（回外位）","筋皮神経","*C5 C6","外側神経束→筋皮神経"],
+["br","腕橈骨筋","肘屈曲（前腕中間位）","橈骨神経","*C5 C6","後神経束→橈骨神経（肘より近位で分枝）"],
+["tri","上腕三頭筋","肘伸展","橈骨神経","C6 *C7 C8","後神経束→橈骨神経（橈骨神経溝より近位で分枝）"],
+["ecrl","長橈側手根伸筋","手関節背屈（橈屈）","橈骨神経","*C5 *C6 C7","橈骨神経（肘より近位で分枝）"],
+["pt","円回内筋","前腕回内","正中神経","*C6 C7","外側神経束→正中神経（肘部で分枝）"],
+["fcr","橈側手根屈筋","手関節掌屈（橈屈）","正中神経","C6 *C7","外側神経束→正中神経（前腕近位で分枝）"],
+["edc","総指伸筋","指のMP関節伸展","後骨間神経","*C7 C8","橈骨神経→後骨間神経"],
+["ecu","尺側手根伸筋","手関節背屈（尺屈）","後骨間神経","*C7 C8","橈骨神経→後骨間神経"],
+["eip","示指伸筋","示指の伸展","後骨間神経","C7 *C8","橈骨神経→後骨間神経"],
+["fds","浅指屈筋","指のPIP関節屈曲","正中神経","C7 *C8 T1","正中神経（前腕で分枝）"],
+["fpl","長母指屈筋","母指IP関節屈曲","前骨間神経","C7 *C8","正中神経→前骨間神経"],
+["fdp23","深指屈筋（示指・中指）","示指・中指のDIP関節屈曲","前骨間神経","C7 *C8","正中神経→前骨間神経"],
+["pq","方形回内筋","肘屈曲位での回内","前骨間神経","C7 *C8","正中神経→前骨間神経"],
+["fcu","尺側手根屈筋","手関節掌屈（尺屈）","尺骨神経","C7 *C8","内側神経束→尺骨神経（肘部管付近で分枝）"],
+["fdp45","深指屈筋（環指・小指）","環指・小指のDIP関節屈曲","尺骨神経","C7 *C8","尺骨神経（前腕近位で分枝）"],
+["apb","短母指外転筋","母指の掌側外転","正中神経（反回枝）","C8 *T1","内側神経束→正中神経（手根管を通過）"],
+["adm","小指外転筋","小指の外転","尺骨神経","*C8 T1","尺骨神経（Guyon管を通過）"],
+["fdi","第一背側骨間筋","示指の外転","尺骨神経深枝","*C8 *T1","尺骨神経深枝（Guyon管を通過）"]
+],
+lo:[
+["ilio","腸腰筋","股関節屈曲","大腿神経・腰神経叢の枝","L1 *L2 *L3","腰神経叢から直接（大腰筋）・大腿神経（腸骨筋）"],
+["add","股関節内転筋群","股関節内転","閉鎖神経","L2 *L3 L4","腰神経叢→閉鎖神経"],
+["quad","大腿四頭筋","膝伸展","大腿神経","L2 *L3 *L4","腰神経叢→大腿神経"],
+["gmed","中殿筋","股関節外転","上殿神経","L4 *L5 S1","仙骨神経叢→上殿神経（坐骨神経とは別に骨盤を出る）"],
+["gmax","大殿筋","股関節伸展","下殿神経","L5 *S1 S2","仙骨神経叢→下殿神経"],
+["ham","ハムストリング","膝屈曲","坐骨神経","*L5 *S1 S2","坐骨神経（大腿で分枝）。内側はL5、大腿二頭筋はS1が主"],
+["ta","前脛骨筋","足関節背屈","深腓骨神経","L4 *L5","坐骨神経→総腓骨神経→深腓骨神経"],
+["ehl","長母趾伸筋","母趾の背屈","深腓骨神経","*L5 S1","総腓骨神経→深腓骨神経"],
+["pl","長腓骨筋","足の外反","浅腓骨神経","*L5 *S1","総腓骨神経→浅腓骨神経"],
+["tp","後脛骨筋","足の内反","脛骨神経","L4 *L5","坐骨神経→脛骨神経（下腿で分枝）"],
+["gas","腓腹筋・ヒラメ筋","足関節底屈（片脚つま先立ち）","脛骨神経","*S1 S2","脛骨神経（膝窩で分枝）"],
+["fdl","長趾屈筋","足趾の屈曲","脛骨神経","L5 *S1","脛骨神経（下腿で分枝）"],
+["ah","母趾外転筋（足の内在筋）","母趾の外転・足趾を広げる","内側足底神経","*S1 S2","脛骨神経→内側足底神経（足根管を通過）"]
+]};
+
+var REFL={
+up:[["bic","上腕二頭筋反射","C5–C6"],["br","腕橈骨筋反射","C5–C6"],["tri","上腕三頭筋反射","C7"]],
+lo:[["pat","膝蓋腱反射","L3–L4"],["mham","内側ハムストリング反射","L5"],["ach","アキレス腱反射","S1"]]
+};
+
+/* ───── 感覚の領域（模式図の多角形）─────
+   座標は右肢・外側を左に置いた正準座標（0〜130 × 0〜370）。表示時に左右・前後で反転する。
+   uf=上肢前面（手掌側）ub=上肢後面（手背側）lf=下肢前面 lb=下肢後面 ls=足底 */
+var REG={
+dC5:{lab:"上腕外側（C5）",v:{uf:[[[0,0],[58,0],[57,150],[0,150]]],ub:[[[0,0],[58,0],[57,150],[0,150]]]}},
+dC6:{lab:"前腕外側〜母指・示指（C6）",v:{uf:[[[0,150],[58,150],[56,262],[52,262],[51.5,370],[0,370]]],ub:[[[0,150],[50,150],[48,262],[52,262],[51.5,370],[0,370]]]}},
+dC7:{lab:"中指（手掌・手背）（C7）",v:{uf:[[[52,262],[62.5,262],[62.5,370],[52,370]]],ub:[[[50,150],[66,150],[64,262],[62.5,262],[62.5,370],[52,370],[52,262],[48,262]]]}},
+dC8:{lab:"環指・小指〜前腕尺側遠位（C8）",v:{uf:[[[62.5,262],[62,215],[130,215],[130,370],[62.5,370]]],ub:[[[66,215],[130,215],[130,370],[62.5,370],[62.5,262],[64,262]]]}},
+dT1:{lab:"前腕内側近位〜肘内側（T1）",v:{uf:[[[59,95],[130,95],[130,215],[62,215],[59,150]]],ub:[[[66,95],[130,95],[130,215],[66,215]]]}},
+ax_s:{lab:"上腕外側上部（上外側上腕皮神経）",v:{uf:[[[20,32],[50,30],[56,60],[50,94],[22,96]]],ub:[[[20,32],[50,30],[56,60],[50,94],[22,96]]]}},
+lacn:{lab:"前腕外側（外側前腕皮神経）",v:{uf:[[[0,148],[57,148],[55,262],[42,266],[0,266]]],ub:[[[0,150],[44,150],[44,262],[0,262]]]}},
+mabc:{lab:"前腕内側（内側前腕皮神経）",v:{uf:[[[61,148],[130,148],[130,262],[63,262]]],ub:[[[70,150],[130,150],[130,262],[72,262]]]}},
+rad_post:{lab:"上腕・前腕の後面（後上腕・後前腕皮神経）",v:{ub:[[[44,70],[74,70],[70,150],[66,262],[46,262],[42,150]]]}},
+srn:{lab:"手背橈側・第1指間背側（橈骨神経浅枝）",v:{ub:[[[0,262],[60,262],[60,322],[0,322]]]}},
+med_d13:{lab:"母指〜中指の手掌側（正中神経）",v:{uf:[[[0,268],[40,270],[46,294],[56,288],[62.5,290],[62.5,370],[0,370]]]}},
+med_r4:{lab:"環指橈側の手掌側（正中神経）",v:{uf:[[[62.5,292],[67.5,292],[67.5,370],[62.5,370]]]}},
+med_pcb:{lab:"母指球の皮膚（正中神経手掌枝）",v:{uf:[[[40,262],[56,262],[56,286],[46,294],[40,290]]]}},
+uln_palm:{lab:"小指・環指尺側の手掌側と小指球（尺骨神経）",v:{uf:[[[63,262],[130,262],[130,370],[67.5,370],[67.5,292],[63,288]]]}},
+uln_dors:{lab:"手背尺側・小指背側（背側尺骨皮神経）",v:{ub:[[[62.5,262],[130,262],[130,370],[67.5,370],[67.5,300],[62.5,300]]]}},
+dL2:{lab:"大腿前面上部（L2）",v:{lf:[[[0,30],[130,14],[130,62],[0,100]]]}},
+dL3:{lab:"大腿前面下部〜膝内側（L3）",v:{lf:[[[0,100],[130,62],[130,190],[66,190],[0,150]]]}},
+dL4:{lab:"下腿内側〜足の内側縁（L4）",v:{lf:[[[40,175],[130,175],[130,370],[78,370],[76,334],[66,300],[58,210]]],lb:[[[70,195],[130,195],[130,345],[68,345]]],ls:[[[66,95],[130,95],[130,160],[68,160]]]}},
+dL5:{lab:"下腿外側〜足背・母趾（L5）",v:{lf:[[[0,190],[58,210],[66,300],[76,334],[78,370],[38,370],[38,300],[0,300]]],ls:[[[52,20],[130,20],[130,95],[52,120]]]}},
+dS1:{lab:"足の外側縁・足底外側・踵（S1）",v:{lf:[[[0,300],[38,300],[38,370],[0,370]]],lb:[[[0,195],[56,195],[58,345],[0,345]]],ls:[[[0,20],[52,20],[56,160],[130,160],[130,210],[0,210]]]}},
+lfcn_s:{lab:"大腿前外側（外側大腿皮神経）",v:{lf:[[[0,28],[46,24],[50,90],[44,150],[0,150]]]}},
+fem_s:{lab:"大腿前面・内側（大腿神経前皮枝）",v:{lf:[[[46,22],[130,12],[130,66],[82,72],[82,150],[130,152],[130,180],[46,178],[50,90]]]}},
+obt_s:{lab:"大腿内側（閉鎖神経）",v:{lf:[[[82,74],[130,66],[130,150],[82,148]]]}},
+saph:{lab:"下腿内側〜足の内側（伏在神経）",v:{lf:[[[58,180],[130,180],[130,345],[80,334],[68,300],[60,220]]],lb:[[[76,185],[130,185],[130,340],[70,340]]]}},
+lscn:{lab:"下腿外側上部（外側腓腹皮神経）",v:{lf:[[[0,178],[50,178],[52,235],[0,235]]],lb:[[[0,178],[44,178],[44,240],[0,240]]]}},
+spn_s:{lab:"下腿遠位外側〜足背（浅腓骨神経）",v:{lf:[[[0,235],[54,232],[66,300],[80,334],[130,334],[130,370],[74,370],[74,325],[56,325],[56,370],[38,370],[38,300],[0,300]]]}},
+dpn_s:{lab:"第1趾間の背側（深腓骨神経）",v:{lf:[[[56,325],[74,325],[74,370],[56,370]]]}},
+sural:{lab:"足の外側縁・下腿後外側遠位（腓腹神経）",v:{lf:[[[0,300],[38,300],[38,370],[0,370]]],lb:[[[0,240],[46,240],[54,340],[0,340]]],ls:[[[0,90],[36,90],[38,210],[0,210]]]}},
+mpn:{lab:"足底内側・母趾〜第3趾（内側足底神経）",v:{ls:[[[49,0],[130,0],[130,160],[49,160]]]}},
+lpn:{lab:"足底外側・第4〜5趾（外側足底神経）",v:{ls:[[[0,0],[49,0],[49,160],[0,160]]]}},
+calc:{lab:"踵（脛骨神経の踵骨枝）",v:{ls:[[[0,160],[130,160],[130,210],[0,210]]]}},
+pfcn:{lab:"大腿後面（後大腿皮神経）",v:{lb:[[[0,20],[130,20],[130,178],[0,178]]]}}
+};
+
+var CAT={ur:"上肢：神経根",bp:"腕神経叢",un:"上肢：末梢神経",lr:"下肢：神経根",lsp:"腰仙骨神経叢",ln:"下肢：末梢神経"};
+
+/* ───── 病変部位 ─────
+   E：筋ごとの障害の程度（3 高度、2 中等度、1 軽度。"2/3" はどちらか。書かない筋は正常）
+   sens：感覚低下の領域、sp：感覚障害が出る確率
+   refl：腱反射（1 低下、2 消失）、rp：反射の変化が出る確率
+   keys：保たれることが決め手になる筋と理由
+   grp：紛らわしいペア */
+var LES=[
+/* ── 上肢：神経根 ── */
+{id:"r_c5",limb:"up",cat:"ur",lvl:2,name:"C5神経根",
+ E:"rhomb2 serr1 ssp2 isp2 delt2 bic2 br2 ecrl1",sens:["dC5"],sp:.7,refl:{bic:1,br:1},rp:.8,
+ keys:{tri:"C7が主",apb:"C8–T1"},
+ sig:"肩外転・外旋・肘屈曲の低下に菱形筋の低下を伴う。上腕外側の感覚低下、二頭筋反射低下",
+ logic:["三角筋（腋窩神経）・棘上筋/棘下筋（肩甲上神経）・上腕二頭筋（筋皮神経）・腕橈骨筋（橈骨神経）と、複数の神経にまたがってC5の筋が弱い → 単一の末梢神経では説明できない","菱形筋（肩甲背神経）はC5神経根から直接出る枝で、神経幹より近位。ここが弱ければ神経根（上神経幹ではない）","上腕三頭筋・手内筋は正常 → C7以下は保たれる"],
+ edx:"針は菱形筋・棘下筋・三角筋・上腕二頭筋と頸部傍脊柱筋。外側前腕皮神経のSNAPは保たれる（後根神経節より近位の障害）。",
+ pearl:"C5神経根症は肩の痛みと肩外転・外旋の低下が主体で、腱板断裂・肩関節疾患と紛らわしい。菱形筋と上腕二頭筋の筋力、二頭筋反射を確かめる。頸椎症性筋萎縮症（近位型）も同じ分布になる。",
+ hx:"数日前から首から{S}肩にかけて痛み、腕が上がりにくい。",
+ near:["bp_ut","ax","ss","r_c6"],grp:[]},
+{id:"r_c6",limb:"up",cat:"ur",lvl:1,name:"C6神経根",
+ E:"pt2 ecrl2 bic1 br1 fcr1 tri1 ssp1 isp1 delt1 serr1",sens:["dC6"],sp:.85,refl:{bic:1,br:1},rp:.7,
+ keys:{apb:"手根管を通る正中神経の筋（C8–T1）。C6では保たれる",fpl:"C8が主"},
+ sig:"前腕回内（円回内筋）と手関節背屈の低下、母指・示指〜前腕外側の感覚低下、二頭筋・腕橈骨筋反射低下",
+ logic:["円回内筋（正中神経）と長橈側手根伸筋（橈骨神経）が同時に弱い → 2つの神経にまたがるC6の筋節","短母指外転筋は正常 → 手根管症候群ではない（しびれの指は似ていても、母指球筋と前腕の筋で分かれる）","感覚障害が前腕外側まで及び、手背側にも出る → 手掌だけの正中神経領域より広い"],
+ edx:"正中・橈骨神経のSNAPは正常（節前障害）。手関節部の正中神経の遠位潜時も正常。針は円回内筋・短橈側手根伸筋と傍脊柱筋。",
+ pearl:"C6は筋節の個人差が大きく、C5型（肩・肘屈曲）にもC7型（三頭筋・橈側手根屈筋）にも寄る。円回内筋と手関節背屈が最も一貫して弱い。手根管症候群との合併（double crush）もある。",
+ hx:"首を後ろへ反らすと{S}腕に痛みが走り、親指と人差し指がしびれる。",
+ near:["med_cts","r_c5","r_c7","bp_ut","mc"],grp:["cts"]},
+{id:"r_c7",limb:"up",cat:"ur",lvl:1,name:"C7神経根",
+ E:"tri2 fcr2 edc2 pt1 lat1 ecu1 serr1",sens:["dC7"],sp:.85,refl:{tri:1},rp:.8,
+ keys:{br:"C5–C6が主（橈骨神経溝の障害では低下するが、C7では保たれる）",apb:"C8–T1",bic:"C5–C6"},
+ sig:"肘伸展（上腕三頭筋）・手関節掌屈（橈側手根屈筋）・指伸展の低下、中指の感覚低下、三頭筋反射低下",
+ logic:["上腕三頭筋・総指伸筋（橈骨神経）と橈側手根屈筋（正中神経）が同時に弱い → 複数の神経にまたがるC7の筋節","腕橈骨筋は正常 → 橈骨神経溝での橈骨神経麻痺ではない（溝の障害では腕橈骨筋が弱く、上腕三頭筋は保たれる）","短母指外転筋は正常、しびれは中指が中心 → 手根管症候群ではない"],
+ edx:"橈骨・正中神経のSNAPは正常。針は上腕三頭筋・橈側手根屈筋（正中神経のC7筋）と傍脊柱筋。",
+ pearl:"C7は頸椎神経根症で最も多い。下垂手に見えても、上腕三頭筋と橈側手根屈筋が同時に弱ければ神経根、腕橈骨筋が弱く上腕三頭筋が保たれれば橈骨神経溝。",
+ hx:"首から肩甲骨の内側、{S}腕の後ろへ痛みが広がる。",
+ near:["rad_grv","med_cts","bp_pc","r_c6","r_c8"],grp:["cts","rad"]},
+{id:"r_c8",limb:"up",cat:"ur",lvl:1,name:"C8神経根",
+ E:"fdp45 2 fpl2 eip2 adm2 fdi2 fcu1 fdp23 1 ecu1 apb1 fds1",sens:["dC8"],sp:.85,refl:{},rp:1,
+ keys:{tri:"C7が主",bic:"C5–C6"},
+ sig:"尺骨神経の手内筋に加え、長母指屈筋・示指伸筋（正中・橈骨神経のC8筋）も低下。小指〜前腕尺側遠位の感覚低下",
+ logic:["第一背側骨間筋・小指外転筋（尺骨神経）に加えて、長母指屈筋（正中神経）・示指伸筋（橈骨神経）も弱い → 尺骨神経だけでは説明できず、C8の筋節","感覚低下が手関節より近位の前腕尺側まで及ぶ → 尺骨神経（手関節より遠位）の範囲を超える","腱反射は正常（C8を反映する通常の腱反射はない）"],
+ edx:"尺骨神経のSNAPと内側前腕皮神経のSNAPは正常（節前）。下神経幹障害ではこれらが低下する。針は示指伸筋・長母指屈筋と傍脊柱筋。",
+ pearl:"尺骨神経障害を疑ったら、尺骨神経以外のC8筋（示指伸筋・長母指屈筋・短母指外転筋）を必ず診る。C8神経根症と下神経幹障害は診察だけでは分けにくく、SNAPで分ける。",
+ hx:"首の痛みのあと、{S}小指側のしびれと手の力の入りにくさ。",
+ near:["uln_cub","bp_lt","bp_mc","r_t1","uln_guy"],grp:["cub"]},
+{id:"r_t1",limb:"up",cat:"ur",lvl:2,name:"T1神経根",
+ E:"apb2 fdi2 adm1 fds1",sens:["dT1"],sp:.7,refl:{},rp:1,
+ keys:{fdp45:"C8が主",fcu:"C8が主",eip:"C8が主"},
+ sig:"短母指外転筋・第一背側骨間筋（2つの神経の手内筋）の低下、肘内側〜前腕内側近位の感覚低下",
+ logic:["短母指外転筋（正中神経）と第一背側骨間筋（尺骨神経）がともに弱い → 2つの神経の手内筋＝T1（とC8）","深指屈筋（環・小指）・示指伸筋は保たれる → C8の筋は主体ではない","感覚低下は肘内側〜前腕内側近位（T1皮膚分節）"],
+ edx:"内側前腕皮神経SNAPは正常（下神経幹障害では低下）。針は短母指外転筋・第一背側骨間筋と傍脊柱筋。同側のHorner症候群があれば肺尖部の病変を考える。",
+ pearl:"T1単独の神経根症はまれ。手内筋の萎縮をみたら、肺尖部腫瘍（Pancoast）・頸肋（下神経幹）・運動ニューロン疾患も考える。",
+ hx:null,
+ near:["bp_lt","r_c8","uln_cub","med_cts"],grp:[]},
+/* ── 腕神経叢 ── */
+{id:"bp_ut",limb:"up",cat:"bp",lvl:2,name:"腕神経叢：上神経幹",
+ E:"ssp3 isp3 delt3 bic3 br3 ecrl2 pt2 fcr1",sens:["ax_s","lacn"],sp:.9,refl:{bic:2,br:1},rp:.9,
+ keys:{rhomb:"肩甲背神経はC5神経根から直接出る（神経幹より近位）→ 保たれる",serr:"長胸神経はC5–C7神経根から直接出る → 保たれる"},
+ sig:"肩外転・外旋・肘屈曲の高度の低下（Erb型）で、菱形筋・前鋸筋は保たれる。上腕〜前腕外側の感覚低下",
+ logic:["三角筋・棘上筋/棘下筋・上腕二頭筋・腕橈骨筋＝C5–C6の筋が、神経をまたいで高度に弱い","菱形筋・前鋸筋（神経根から直接出る枝）は正常 → 障害は神経根より遠位、上神経幹","棘上筋・棘下筋（肩甲上神経は上神経幹から出る）も弱い → 神経束より近位"],
+ edx:"外側前腕皮神経・橈骨神経のSNAPが低下（節後障害）。針で菱形筋・前鋸筋・傍脊柱筋は正常。",
+ pearl:"神経根と神経叢は、①神経根から直接出る枝の筋（菱形筋・前鋸筋）②傍脊柱筋 ③SNAP（節後障害で低下）で分ける。上神経幹は神経痛性筋萎縮症・外傷・リュックサック麻痺で多い。",
+ hx:"重いリュックを背負って長時間歩いた翌日から{S}腕が上がらない。",
+ near:["r_c5","r_c6","ax","ss","bp_lc"],grp:[]},
+{id:"bp_mt",limb:"up",cat:"bp",lvl:2,name:"腕神経叢：中神経幹",
+ E:"tri2 fcr2 lat2 edc2 pt1 ecu1",sens:["dC7"],sp:.8,refl:{tri:1},rp:.8,
+ keys:{serr:"長胸神経にはC7神経根から直接枝が入る → 中神経幹障害では保たれる",br:"C5–C6"},
+ sig:"C7神経根症とほぼ同じ分布（上腕三頭筋・橈側手根屈筋・広背筋・指伸筋）の低下",
+ logic:["上腕三頭筋・橈側手根屈筋・広背筋・総指伸筋＝C7の筋","腕橈骨筋・上腕二頭筋は正常 → 上神経幹・橈骨神経溝ではない","中神経幹の単独障害はまれで、C7神経根症との区別は診察ではほぼできず、電気生理で行う"],
+ edx:"中指で記録する正中・橈骨神経のSNAPが低下（C7神経根症では正常）。傍脊柱筋は正常。",
+ pearl:"中神経幹単独の障害はまれ。外傷や腫瘍で他の神経幹と合併することが多い。この問題では、橈骨神経麻痺や後神経束との違い（腕橈骨筋・三角筋・橈側手根屈筋）を確認する。",
+ hx:null,
+ near:["bp_pc","rad_grv","bp_lc","r_c6"],grp:[]},
+{id:"bp_lt",limb:"up",cat:"bp",lvl:2,name:"腕神経叢：下神経幹",
+ E:"apb3 fdi3 adm3 fpl2 fdp23 2 fdp45 2 fcu2 eip2 fds2 ecu1",sens:["mabc","uln_palm","uln_dors","med_r4"],sp:.9,refl:{},rp:1,
+ keys:{tri:"C7が主",bic:"C5–C6"},
+ sig:"手内筋全体（正中・尺骨）と長母指屈筋・示指伸筋の低下、前腕内側〜手の尺側の感覚低下",
+ logic:["短母指外転筋（正中神経）と第一背側骨間筋・小指外転筋（尺骨神経）がともに強く弱い → 単一の神経ではない","示指伸筋（橈骨神経のC8筋）も弱い → 内側神経束より近位、C8–T1レベル","前腕内側（内側前腕皮神経）の感覚低下 → 尺骨神経障害では前腕に感覚障害は出ない"],
+ edx:"尺骨神経SNAPと内側前腕皮神経SNAPが低下（節後）、短母指外転筋で記録する正中神経CMAPの低下が目立つ。傍脊柱筋は正常。",
+ pearl:"真の神経性胸郭出口症候群（頸肋・線維性索による下神経幹障害）では、短母指外転筋の萎縮が最も目立ち（Gilliatt-Sumner hand）、内側前腕皮神経SNAPの低下が手がかりになる。",
+ hx:"若年女性。数年かけて{S}母指の付け根がやせてきた。腕を挙げるとしびれる。",
+ near:["r_c8","uln_cub","bp_mc","r_t1","med_cts"],grp:["cub"]},
+{id:"bp_lc",limb:"up",cat:"bp",lvl:2,name:"腕神経叢：外側神経束",
+ E:"bic3 pt3 fcr3",sens:["lacn","med_d13"],sp:.9,refl:{bic:2},rp:.9,
+ keys:{br:"橈骨神経（後神経束）",delt:"腋窩神経（後神経束）",ssp:"上神経幹から出る（神経束より近位）",apb:"正中神経の内側根（内側神経束）由来"},
+ sig:"上腕二頭筋・円回内筋・橈側手根屈筋の低下、前腕外側と母指〜中指の感覚低下",
+ logic:["筋皮神経（上腕二頭筋）と正中神経の外側根の筋（円回内筋・橈側手根屈筋）が弱い","腕橈骨筋・三角筋（後神経束）、棘上筋（上神経幹から出る肩甲上神経）は保たれる → 神経幹ではなく外側神経束","短母指外転筋は正常 → 正中神経の内側根（C8–T1）は保たれる"],
+ edx:"外側前腕皮神経SNAPと、母指・示指で記録する正中神経SNAPが低下。",
+ pearl:"神経束の障害は鎖骨下〜腋窩の外傷・肩関節脱臼・放射線治療後などで起こる。障害される枝を並べると、どの神経束かが分かる。",
+ hx:null,
+ near:["mc","r_c6","bp_ut","med_pron"],grp:[]},
+{id:"bp_pc",limb:"up",cat:"bp",lvl:2,name:"腕神経叢：後神経束",
+ E:"delt3 lat3 tri3 br3 ecrl3 edc3 ecu3 eip3",sens:["ax_s","rad_post","srn"],sp:.9,refl:{tri:2,br:2},rp:.9,
+ keys:{bic:"筋皮神経（外側神経束）",fcr:"正中神経"},
+ sig:"橈骨神経の全領域（上腕三頭筋を含む）に加え、三角筋・広背筋も低下",
+ logic:["上腕三頭筋〜指伸筋まで、橈骨神経の筋がすべて弱い","三角筋（腋窩神経）・広背筋（胸背神経）も弱い → 橈骨神経単独ではなく、これらが分かれる前の後神経束","上腕二頭筋・橈側手根屈筋は正常 → 外側神経束・C6–C7神経根は否定的"],
+ edx:"橈骨神経SNAP低下、腋窩神経・橈骨神経のCMAP低下。針は三角筋・広背筋・上腕三頭筋。",
+ pearl:"上腕三頭筋まで弱い下垂手では、三角筋と広背筋を診て、腋窩部の橈骨神経か後神経束かを分ける。",
+ hx:null,
+ near:["rad_ax","r_c7","ax","bp_mt"],grp:["rad"]},
+{id:"bp_mc",limb:"up",cat:"bp",lvl:2,name:"腕神経叢：内側神経束",
+ E:"fcu3 fdp45 3 adm3 fdi3 apb3 fpl2 fdp23 2 fds2",sens:["mabc","uln_palm","uln_dors","med_r4"],sp:.9,refl:{},rp:1,
+ keys:{eip:"後骨間神経（後神経束）→ 内側神経束障害では保たれる",ecu:"後骨間神経（後神経束）"},
+ sig:"尺骨神経の全筋と正中神経の手内筋（短母指外転筋）の低下で、示指伸筋は保たれる。前腕内側の感覚低下",
+ logic:["尺骨神経の筋と、短母指外転筋・長母指屈筋（正中神経の内側根）がともに弱い","示指伸筋・尺側手根伸筋（橈骨神経のC8筋）は正常 → 下神経幹・C8神経根ではなく、後神経束が分かれた後の内側神経束","前腕内側の感覚低下（内側前腕皮神経は内側神経束から出る）"],
+ edx:"尺骨神経・内側前腕皮神経SNAP低下。針で示指伸筋が正常であることを確かめる。",
+ pearl:"下神経幹と内側神経束の違いは、橈骨神経のC8筋（示指伸筋・長母指伸筋）が障害されるかどうか。",
+ hx:null,
+ near:["bp_lt","uln_cub","r_c8"],grp:["cub"]},
+/* ── 上肢：末梢神経 ── */
+{id:"med_cts",limb:"up",cat:"un",lvl:1,name:"正中神経：手根管",
+ E:"apb2/3",sens:["med_d13","med_r4"],sp:1,refl:{},rp:1,
+ keys:{fpl:"前骨間神経（手根管より近位で分枝）",fcr:"手根管より近位で分枝",pt:"肘部で分枝（C6神経根症では低下）",ecrl:"C5–C6（C6神経根症では低下）",tri:"C7（C7神経根症では低下）"},
+ sig:"短母指外転筋だけの低下、母指〜環指橈側の手掌側の感覚低下で、母指球の皮膚は保たれる",
+ logic:["正中神経の筋で弱いのは短母指外転筋だけ。長母指屈筋・橈側手根屈筋・円回内筋（手根管より近位で分枝する筋）は正常 → 手関節部での障害","感覚低下は母指〜環指橈側の手掌側に限られ、母指球の皮膚は保たれる → 手掌枝（手根管の手前で分かれる）が保たれる","腱反射は正常、前腕の筋も正常 → C6/C7神経根症ではない"],
+ edx:"手首〜手掌の正中神経の感覚伝導遅延（環指比較法・母指比較法で尺骨・橈骨神経と比べる）、運動遠位潜時の延長。針は短母指外転筋。",
+ pearl:"母指球の皮膚（手掌枝）が保たれていれば手根管、障害されていれば手根管より近位（回内筋部・神経根）を考える。夜間のしびれで目が覚め、手を振ると楽になる（flick sign）。",
+ hx:"夜中に{S}手のしびれで目が覚め、手を振ると楽になる。",
+ near:["r_c6","r_c7","med_pron","med_ain","uln_guy"],grp:["cts"]},
+{id:"med_ain",limb:"up",cat:"un",lvl:2,name:"正中神経：前骨間神経",
+ E:"fpl3 fdp23 3 pq3",sens:[],sp:1,refl:{},rp:1,
+ keys:{apb:"手根管を通る主幹（反回枝）",fcr:"前骨間神経より近位で分枝",pt:"肘部で分枝"},
+ sig:"長母指屈筋・示指深指屈筋・方形回内筋の低下（OKサインが作れない）、感覚障害なし",
+ logic:["母指IP関節と示指DIP関節の屈曲だけが弱い（涙のしずく徴候）→ 前骨間神経の支配筋","短母指外転筋・橈側手根屈筋・円回内筋は正常 → 正中神経本幹ではなく前骨間神経","感覚障害がない → 前骨間神経は皮膚の感覚枝を持たない"],
+ edx:"正中神経のSNAP・手関節部の伝導は正常。針で長母指屈筋・方形回内筋に脱神経。神経痛性筋萎縮症の部分症のことが多く、MRI・超音波で神経のくびれがみられることがある。",
+ pearl:"前骨間神経麻痺の多くは圧迫ではなく神経痛性筋萎縮症（強い痛みが先行）。屈筋腱断裂との区別も要る。",
+ hx:"数日続いた{S}前腕の強い痛みのあと、つまむ動作がしにくくなった。",
+ near:["med_pron","med_cts","r_c8","bp_lt"],grp:[]},
+{id:"med_pron",limb:"up",cat:"un",lvl:2,name:"正中神経：回内筋部（前腕近位）",
+ E:"fds2 fpl2 apb2 fdp23 1 fcr1 pq1",sens:["med_d13","med_r4","med_pcb"],sp:1,refl:{},rp:1,
+ keys:{pt:"枝の多くは回内筋より近位で出るため保たれやすい",ecrl:"C5–C6（C6神経根症では低下）",tri:"C7（C7神経根症では低下）"},
+ sig:"前腕と手の正中神経筋の軽い低下で、円回内筋は保たれる。母指球を含む正中神経領域の感覚低下",
+ logic:["浅指屈筋・長母指屈筋・短母指外転筋など、前腕と手の正中神経筋が弱い → 手根管より近位","母指球の皮膚（手掌枝）も感覚低下 → 手根管ではない","円回内筋は保たれる → 枝が出たあとの回内筋部〜前腕近位","長橈側手根伸筋・上腕三頭筋・反射は正常 → C6/C7神経根症ではない"],
+ edx:"手関節部の伝導は正常で、前腕部の伝導遅延は検出しにくい。針で長母指屈筋・浅指屈筋に神経原性変化、円回内筋は正常のことが多い。",
+ pearl:"回内筋症候群は筋力低下が軽く、前腕近位の痛みと母指球を含むしびれが主体のことが多い。筋力低下がはっきりしていれば神経痛性筋萎縮症や外傷も考える。",
+ hx:"繰り返し前腕をひねる作業のあと、{S}前腕の痛みと指のしびれ。",
+ near:["med_cts","med_ain","r_c7","r_c6","bp_lc"],grp:["cts"]},
+{id:"uln_cub",limb:"up",cat:"un",lvl:1,name:"尺骨神経：肘部管",
+ E:"fdi3 adm3 fdp45 2 fcu1",sens:["uln_palm","uln_dors"],sp:.95,refl:{},rp:1,
+ keys:{apb:"正中神経（C8–T1）。C8神経根症・下神経幹障害では低下",fpl:"前骨間神経（C8）",eip:"後骨間神経（C8）"},
+ sig:"尺骨神経の手内筋と環指・小指の深指屈筋の低下。小指・環指尺側と手背尺側の感覚低下で、前腕は保たれる",
+ logic:["第一背側骨間筋・小指外転筋に加え、環・小指の深指屈筋も弱い → 前腕で分枝する筋まで及ぶ、肘レベルの尺骨神経","短母指外転筋・長母指屈筋・示指伸筋（尺骨神経以外のC8筋）は正常 → C8神経根・下神経幹ではない","手背尺側（背側尺骨皮神経：手関節より近位で分枝）も感覚低下 → Guyon管ではない","前腕内側の感覚は保たれる → 内側前腕皮神経（下神経幹・内側神経束）は保たれる"],
+ edx:"肘をまたぐ区間の伝導速度低下・伝導ブロック（インチング法）、尺骨神経SNAP・背側尺骨皮神経SNAPの低下。針は第一背側骨間筋・深指屈筋（環・小指）。",
+ pearl:"尺側手根屈筋は肘部管の近くで分枝するため保たれることが多く、それだけで肘部管を否定しない。",
+ hx:"肘をついて作業することが多い。{S}小指側のしびれと箸の使いにくさ。",
+ near:["r_c8","bp_lt","uln_guy","bp_mc"],grp:["cub"]},
+{id:"uln_guy",limb:"up",cat:"un",lvl:2,name:"尺骨神経：Guyon管",
+ E:"fdi3 adm2",sens:["uln_palm"],sp:.7,refl:{},rp:1,
+ keys:{fdp45:"前腕で分枝（肘部管では低下）",fcu:"肘部で分枝",apb:"正中神経"},
+ sig:"尺骨神経の手内筋の低下で、環指・小指の深指屈筋は保たれ、手背尺側の感覚も保たれる",
+ logic:["第一背側骨間筋・小指外転筋が弱く、環・小指の深指屈筋と尺側手根屈筋は正常 → 前腕の枝より遠位の手関節部","手背尺側の感覚は保たれる（背側尺骨皮神経は手関節より近位で分かれる）→ Guyon管","感覚障害がなく運動だけの型（深枝の障害）もある"],
+ edx:"背側尺骨皮神経SNAPは正常、小指で記録する尺骨神経SNAPは低下（深枝型では正常）。第一背側骨間筋で記録する運動遠位潜時が延長。",
+ pearl:"Guyon管の障害は自転車のハンドル・ガングリオン・有鉤骨骨折で起こる。感覚障害のない手内筋萎縮では運動ニューロン疾患との区別に注意する。",
+ hx:"長距離の自転車走行のあと、{S}手の力が入りにくい。",
+ near:["uln_cub","r_t1","bp_mc","med_cts"],grp:["cub"]},
+{id:"rad_ax",limb:"up",cat:"un",lvl:2,name:"橈骨神経：腋窩部",
+ E:"tri3 br3 ecrl3 edc3 ecu3 eip3",sens:["rad_post","srn"],sp:.9,refl:{tri:2,br:2},rp:.9,
+ keys:{delt:"腋窩神経（後神経束から先に分かれる）",lat:"胸背神経（後神経束）",fcr:"正中神経（C7神経根症では低下）"},
+ sig:"上腕三頭筋を含む橈骨神経の全筋の低下で、三角筋・広背筋は保たれる",
+ logic:["上腕三頭筋も弱い → 三頭筋への枝が出る前、腋窩部の橈骨神経","三角筋・広背筋は正常 → 後神経束ではない","上腕後面〜前腕後面〜手背橈側の感覚低下"],
+ edx:"橈骨神経SNAP低下。針で上腕三頭筋に脱神経、三角筋・広背筋は正常。",
+ pearl:"松葉杖の腋窩圧迫などで起こる。上腕三頭筋の筋力で、腋窩部と橈骨神経溝を分ける。",
+ hx:"松葉杖を腋に当てて歩いていた。{S}手首が上がらない。",
+ near:["bp_pc","rad_grv","r_c7"],grp:["rad"]},
+{id:"rad_grv",limb:"up",cat:"un",lvl:1,name:"橈骨神経：橈骨神経溝（上腕）",
+ E:"br3 ecrl3 edc3 ecu3 eip3",sens:["srn"],sp:.9,refl:{br:2},rp:.9,
+ keys:{tri:"三頭筋への枝は橈骨神経溝より近位で出る",fcr:"正中神経（C7神経根症では低下）",lat:"胸背神経（C7神経根症では低下しうる）"},
+ sig:"下垂手・下垂指で腕橈骨筋も弱く、上腕三頭筋は保たれる。手背橈側（第1指間背側）の感覚低下",
+ logic:["腕橈骨筋・長橈側手根伸筋・指伸筋が弱く、上腕三頭筋は正常 → 三頭筋枝より遠位、腕橈骨筋枝より近位＝上腕の橈骨神経溝","橈側手根屈筋（正中神経のC7筋）は正常 → C7神経根症ではない","手背橈側の感覚低下（浅枝）→ 後骨間神経だけの障害ではない","手関節を他動的に背屈位に支えて骨間筋を診ると正常（下垂手による見かけの低下に注意）"],
+ edx:"橈骨神経溝をまたぐ伝導ブロック、橈骨神経浅枝SNAP（軸索障害で低下）。針は腕橈骨筋に脱神経、上腕三頭筋は正常。",
+ pearl:"飲酒後に腕を椅子の背に掛けて眠った翌朝の下垂手（Saturday night palsy）が典型。多くは脱髄性の伝導ブロックで、数週〜数か月で回復する。",
+ hx:"飲酒後、{S}腕を椅子の背もたれに掛けたまま眠ってしまい、翌朝から手首が上がらない。",
+ near:["r_c7","rad_pin","bp_pc","rad_ax"],grp:["rad"]},
+{id:"rad_pin",limb:"up",cat:"un",lvl:2,name:"橈骨神経：後骨間神経",
+ E:"edc3 ecu3 eip3",sens:[],sp:1,refl:{},rp:1,
+ keys:{br:"肘より近位で分枝",ecrl:"肘より近位で分枝（手関節は橈屈しながら背屈できる）",tri:"C7神経根症では低下",fcr:"C7神経根症では低下"},
+ sig:"指のMP関節伸展ができない下垂指。手関節背屈は橈屈しながら可能で、感覚障害なし",
+ logic:["総指伸筋・示指伸筋・尺側手根伸筋が弱い","腕橈骨筋・長橈側手根伸筋は正常 → 手関節は背屈できるが橈側へ偏る＝回外筋（Frohseのアーケード）付近の後骨間神経","感覚障害なし → 浅枝は分岐済みで保たれる","上腕三頭筋・橈側手根屈筋は正常 → C7神経根症ではない"],
+ edx:"橈骨神経浅枝SNAPは正常。針で総指伸筋・示指伸筋に脱神経、腕橈骨筋は正常。",
+ pearl:"下垂指は関節リウマチの伸筋腱断裂と区別する（腱固定効果：手関節を掌屈すると指が伸びれば腱は保たれている）。",
+ hx:"{S}前腕近位の外側にしこりがある。",
+ near:["rad_grv","r_c7","r_c8","bp_pc"],grp:["rad"]},
+{id:"ax",limb:"up",cat:"un",lvl:1,name:"腋窩神経",
+ E:"delt3",sens:["ax_s"],sp:.8,refl:{},rp:1,
+ keys:{isp:"肩甲上神経（C5）。C5神経根症・上神経幹障害では低下",bic:"筋皮神経（C5–C6）",lat:"後神経束障害では低下"},
+ sig:"三角筋だけの低下と上腕外側上部（肩章部）の感覚低下",
+ logic:["三角筋が弱く、棘上筋・棘下筋・上腕二頭筋は正常 → C5神経根・上神経幹ではない","広背筋・上腕三頭筋も正常 → 後神経束ではない","上腕外側上部の感覚低下（上外側上腕皮神経）"],
+ edx:"三角筋で記録する腋窩神経CMAPの低下、針で三角筋（と小円筋）に脱神経。",
+ pearl:"肩関節前方脱臼・上腕骨頸部骨折のあとに多い。痛みで肩を動かせない時期は、三角筋の収縮を触れて確かめる。",
+ hx:"{S}肩関節の脱臼を整復したあと、腕が横に上がらない。",
+ near:["r_c5","bp_ut","ss","bp_pc"],grp:[]},
+{id:"mc",limb:"up",cat:"un",lvl:2,name:"筋皮神経",
+ E:"bic3",sens:["lacn"],sp:.9,refl:{bic:2},rp:.9,
+ keys:{br:"橈骨神経（C5–C6）。C5/C6神経根症・上神経幹障害では低下",pt:"正中神経（外側神経束）",delt:"腋窩神経"},
+ sig:"上腕二頭筋の低下と二頭筋反射の低下、前腕外側の感覚低下で、腕橈骨筋は保たれる",
+ logic:["肘屈曲のうち上腕二頭筋だけが弱く、腕橈骨筋（同じC5–C6の橈骨神経の筋）は正常 → 神経根ではなく筋皮神経","三角筋・棘上筋も正常 → 上神経幹ではない","前腕外側の感覚低下（外側前腕皮神経は筋皮神経の終枝）"],
+ edx:"外側前腕皮神経SNAP低下。針で上腕二頭筋に脱神経、腕橈骨筋は正常。",
+ pearl:"筋皮神経単独の障害は、激しい筋力トレーニング・肩の手術・肩関節脱臼のあとに起こる。外側前腕皮神経だけの障害（肘窩の静脈穿刺）では筋力低下はない。",
+ hx:null,
+ near:["r_c6","bp_lc","bp_ut","r_c5"],grp:[]},
+{id:"ss",limb:"up",cat:"un",lvl:2,name:"肩甲上神経",
+ E:"ssp3 isp3",sens:[],sp:1,refl:{},rp:1,
+ keys:{delt:"腋窩神経",bic:"筋皮神経（C5神経根症では低下）",rhomb:"C5神経根症では低下"},
+ sig:"棘上筋・棘下筋の低下（肩外転の初動と外旋）で、三角筋・上腕二頭筋は保たれる。感覚障害なし",
+ logic:["棘上筋・棘下筋だけが弱い","三角筋・上腕二頭筋・菱形筋は正常 → C5神経根・上神経幹ではない","皮膚の感覚障害はない（肩甲上神経は皮膚枝を持たない）"],
+ edx:"針で棘上筋・棘下筋に脱神経。棘下筋だけの低下なら棘窩切痕（ガングリオン）での障害を考える。",
+ pearl:"肩甲上切痕では棘上筋・棘下筋、棘窩切痕では棘下筋だけが障害される。腱板断裂と紛らわしく、MRIでガングリオンを確認する。",
+ hx:null,
+ near:["r_c5","ax","bp_ut","lt"],grp:[]},
+{id:"lt",limb:"up",cat:"un",lvl:1,name:"長胸神経",
+ E:"serr3",sens:[],sp:1,refl:{},rp:1,
+ keys:{rhomb:"肩甲背神経（C5神経根症では低下）",ssp:"肩甲上神経（C5神経根症では低下）",delt:"腋窩神経"},
+ sig:"前鋸筋だけの低下（壁を押すと肩甲骨内側縁が浮く翼状肩甲）",
+ logic:["前鋸筋だけが弱い（腕を前へ挙げる・壁を押すと肩甲骨内側縁が浮き上がる）","菱形筋・棘上筋・三角筋は正常 → C5–C6神経根・上神経幹ではない","感覚障害はない（長胸神経は運動神経）"],
+ edx:"針で前鋸筋に脱神経（気胸に注意）。神経伝導検査は施行しにくい。",
+ pearl:"前鋸筋麻痺の翼状肩甲は内側縁が浮き、僧帽筋麻痺（副神経）では肩甲骨が外側へずれる。神経痛性筋萎縮症・重い荷物の担ぎ・胸部手術後に多い。",
+ hx:"重い荷物を肩に担ぐ仕事のあと、{S}背中の肩甲骨が浮いていると言われた。",
+ near:["r_c5","ss","bp_ut","ax"],grp:[]},
+/* ── 下肢：神経根 ── */
+{id:"r_l2",limb:"lo",cat:"lr",lvl:2,name:"L2神経根",
+ E:"ilio2 add1 quad1",sens:["dL2"],sp:.8,refl:{},rp:1,
+ keys:{ta:"L4–L5",gmed:"L5"},
+ sig:"股関節屈曲（腸腰筋）の軽い低下、大腿前面上部の感覚低下。膝蓋腱反射は保たれることが多い",
+ logic:["腸腰筋が主に弱く、大腿四頭筋・内転筋の低下は軽い","前脛骨筋は正常 → L4以下は保たれる","感覚低下は鼠径部の下〜大腿前面上部（L2皮膚分節）"],
+ edx:"針は腸腰筋・内転筋と傍脊柱筋。上位腰椎の神経根症は頻度が低く、椎間板ヘルニアより腫瘍・転移も考える。",
+ pearl:"上位腰椎神経根症（L2–L3）は大腿前面の痛みで、股関節疾患・大腿神経障害と紛らわしい。",
+ hx:null,
+ near:["r_l3","lfcn","lp_lum","fem"],grp:[]},
+{id:"r_l3",limb:"lo",cat:"lr",lvl:2,name:"L3神経根",
+ E:"quad2 add2 ilio1",sens:["dL3"],sp:.85,refl:{pat:1},rp:.8,
+ keys:{ta:"L4–L5",gmed:"L5"},
+ sig:"大腿四頭筋と股関節内転筋の低下、大腿前面下部〜膝内側の感覚低下、膝蓋腱反射低下",
+ logic:["大腿四頭筋（大腿神経）と内転筋（閉鎖神経）がともに弱い → 単一の神経ではない","前脛骨筋は正常 → L4より下は保たれる","感覚低下は大腿前面下部から膝内側（L3皮膚分節）で、下腿内側には及ばない"],
+ edx:"伏在神経SNAPは正常（節前）。針は大腿四頭筋・内転筋と傍脊柱筋。",
+ pearl:"膝蓋腱反射が低下していれば、大腿神経障害か上位腰椎神経根症かを内転筋の筋力で分ける。",
+ hx:null,
+ near:["fem","r_l4","lp_lum","obt"],grp:[]},
+{id:"r_l4",limb:"lo",cat:"lr",lvl:1,name:"L4神経根",
+ E:"quad2 add2 ta1 tp1 gmed1",sens:["dL4"],sp:.85,refl:{pat:1},rp:.8,
+ keys:{ehl:"L5が主",gas:"S1"},
+ sig:"大腿四頭筋と股関節内転筋の低下（前脛骨筋も軽く低下）、下腿内側の感覚低下、膝蓋腱反射低下",
+ logic:["大腿四頭筋（大腿神経）と股関節内転筋（閉鎖神経）がともに弱い → L3–L4の筋節","前脛骨筋の軽い低下、下腿内側までの感覚低下 → L3よりL4","長母趾伸筋は保たれる → L5は主体ではない"],
+ edx:"伏在神経SNAPは正常。針は大腿四頭筋・内転筋・前脛骨筋と傍脊柱筋。",
+ pearl:"大腿神経障害も膝蓋腱反射低下と下腿内側の感覚低下を起こす。内転筋が弱ければL4神経根（または腰神経叢）。",
+ hx:"腰痛のあと、{S}太ももの前から脛の内側に痛みが走る。",
+ near:["fem","r_l3","r_l5","lp_lum"],grp:[]},
+{id:"r_l5",limb:"lo",cat:"lr",lvl:1,name:"L5神経根",
+ E:"ehl2/3 ta2 pl2 tp2 gmed2 ham1 fdl1",sens:["dL5"],sp:.85,refl:{mham:1},rp:.5,
+ keys:{gas:"S1が主"},
+ sig:"足背屈・母趾背屈・外反に加え、内反（後脛骨筋）と股外転（中殿筋）も低下。下腿外側〜足背〜母趾の感覚低下",
+ logic:["前脛骨筋・長母趾伸筋・長腓骨筋（腓骨神経）に加え、後脛骨筋（脛骨神経）・中殿筋（上殿神経）も弱い → 腓骨神経だけでは説明できずL5","足の内反が弱い（後脛骨筋）→ 腓骨神経麻痺では内反は保たれる","アキレス腱反射は正常。内側ハムストリング反射が低下することがある"],
+ edx:"浅腓骨神経SNAPは正常（節前）。腓骨頭をまたぐ伝導ブロックはない。針は後脛骨筋・中殿筋と傍脊柱筋に神経原性変化。",
+ pearl:"下垂足では、内反（後脛骨筋）と股外転（中殿筋）を必ず診る。弱ければL5（または腰仙骨幹・坐骨神経）、保たれていれば腓骨神経。腰仙骨幹の障害（骨盤内腫瘍・分娩）はL5と同じ分布で、浅腓骨神経SNAPの低下で分かれる。",
+ hx:"腰痛があり、{S}お尻から下腿外側へ痛みが走る。",
+ near:["cpn","sci","r_s1","r_l4","dpn","lp_sac"],grp:["per"]},
+{id:"r_s1",limb:"lo",cat:"lr",lvl:1,name:"S1神経根",
+ E:"gas2 gmax2 ham1 fdl1 ah1 pl1",sens:["dS1"],sp:.85,refl:{ach:1},rp:.85,
+ keys:{ta:"L4–L5",tp:"L5"},
+ sig:"足底屈（腓腹筋）・股伸展（大殿筋）の低下、足外側〜足底外側の感覚低下、アキレス腱反射低下",
+ logic:["腓腹筋（脛骨神経）と大殿筋（下殿神経）がともに弱い → S1の筋節","前脛骨筋・後脛骨筋は正常 → L5は保たれる","アキレス腱反射の低下はS1を強く示す"],
+ edx:"腓腹神経SNAPは正常（節前）。H波の消失・潜時延長。針は腓腹筋内側頭・大殿筋と傍脊柱筋。",
+ pearl:"腓腹筋の軽い低下は臥位の徒手筋力検査では分からない。片脚つま先立ちを10回繰り返させる。",
+ hx:"重い物を持ち上げたあと、{S}お尻から足の裏の外側へ痛みが走る。",
+ near:["sci","tib_tt","r_l5","lp_sac"],grp:[]},
+/* ── 腰仙骨神経叢 ── */
+{id:"lp_lum",limb:"lo",cat:"lsp",lvl:2,name:"腰神経叢（L2–L4）",
+ E:"ilio3 quad3 add3",sens:["lfcn_s","fem_s","obt_s","saph"],sp:.9,refl:{pat:2},rp:.9,
+ keys:{ta:"深腓骨神経（L4–L5）",gmed:"仙骨神経叢（上殿神経）"},
+ sig:"腸腰筋・大腿四頭筋・内転筋の高度の低下、大腿前外側〜下腿内側の広い感覚低下、膝蓋腱反射消失",
+ logic:["大腿神経（大腿四頭筋）と閉鎖神経（内転筋）がともに強く弱い → 単一の神経ではない","腸腰筋も強く弱い → 鼠径靱帯より近位","外側大腿皮神経の領域まで感覚低下が広がる → 複数の神経根・神経叢レベル","前脛骨筋・中殿筋は正常 → L5・仙骨神経叢は保たれる"],
+ edx:"伏在神経・外側大腿皮神経SNAPが低下（節後）、傍脊柱筋は正常。",
+ pearl:"腰神経叢障害は後腹膜血腫（抗凝固療法中）、腸腰筋膿瘍、糖尿病性腰仙部神経根神経叢ニューロパチー（強い痛みと体重減少）で起こる。抗凝固薬内服中の急な大腿の痛みと脱力ではCTを撮る。",
+ hx:"抗凝固薬を内服中。急に{S}鼠径部から大腿が痛くなり、膝が崩れる。",
+ near:["fem","r_l3","r_l4","obt"],grp:[]},
+{id:"lp_sac",limb:"lo",cat:"lsp",lvl:2,name:"仙骨神経叢（腰仙骨幹を含む）",
+ E:"gmed3 gmax3 ham3 ta3 ehl3 pl3 tp3 gas3 fdl3 ah3",sens:["pfcn","lscn","spn_s","dpn_s","sural","mpn","lpn","calc"],sp:.9,refl:{ach:2,mham:2},rp:.9,
+ keys:{quad:"大腿神経（腰神経叢）",add:"閉鎖神経（腰神経叢）"},
+ sig:"坐骨神経の全領域に加え、中殿筋・大殿筋も低下。大腿後面〜下腿・足の感覚低下",
+ logic:["坐骨神経の筋（ハムストリング・下腿の全筋）が弱い","中殿筋・大殿筋（上殿・下殿神経）も弱い → 坐骨切痕より近位、仙骨神経叢","大腿後面（後大腿皮神経）の感覚低下も同じ意味","大腿四頭筋・内転筋は正常 → 腰神経叢は保たれる"],
+ edx:"腓腹神経・浅腓骨神経SNAP低下（節後）、傍脊柱筋は正常。複数の神経根症（L5–S1）との区別にSNAPが役立つ。",
+ pearl:"仙骨神経叢は骨盤内腫瘍（直腸癌・子宮頸癌など）、放射線、骨盤骨折、分娩で障害される。夜間の痛みが強い片側の下肢麻痺では骨盤内を画像で確認する。",
+ hx:null,
+ near:["sci","r_l5","r_s1","cpn"],grp:[]},
+/* ── 下肢：末梢神経 ── */
+{id:"fem",limb:"lo",cat:"ln",lvl:1,name:"大腿神経（鼠径部）",
+ E:"quad3",sens:["fem_s","saph"],sp:.9,refl:{pat:2},rp:.9,
+ keys:{add:"閉鎖神経（L2–L4）。L3/L4神経根症・腰神経叢障害では低下",ilio:"鼠径靱帯より近位で分枝",ta:"L4–L5（深腓骨神経）"},
+ sig:"大腿四頭筋の高度の低下と膝蓋腱反射消失、大腿前面〜下腿内側の感覚低下で、内転筋は保たれる",
+ logic:["大腿四頭筋が強く弱く、股関節内転筋は正常 → 閉鎖神経は保たれ、L3/L4神経根・腰神経叢ではない","腸腰筋は保たれる → 鼠径靱帯より遠位での障害","感覚低下は大腿前面と下腿内側（伏在神経）"],
+ edx:"大腿直筋で記録する大腿神経CMAPの低下、伏在神経SNAPの低下。針で大腿四頭筋に脱神経、内転筋は正常。",
+ pearl:"鼠径部のカテーテル操作・人工股関節手術・砕石位の手術後に多い。骨盤内（腸骨筋血腫）での障害では腸腰筋も弱くなる。",
+ hx:"心臓カテーテル検査（{S}大腿動脈穿刺）のあとから膝が崩れる。",
+ near:["r_l4","r_l3","lp_lum","obt","lfcn"],grp:[]},
+{id:"obt",limb:"lo",cat:"ln",lvl:2,name:"閉鎖神経",
+ E:"add3",sens:["obt_s"],sp:.7,refl:{},rp:1,
+ keys:{quad:"大腿神経（L3/L4神経根症・腰神経叢障害では低下）",ilio:"腰神経叢の枝"},
+ sig:"股関節内転筋だけの低下と大腿内側の小範囲の感覚低下",
+ logic:["股関節内転筋だけが弱い","大腿四頭筋・腸腰筋は正常 → 大腿神経・L3/L4神経根・腰神経叢ではない","膝蓋腱反射は正常"],
+ edx:"針で長内転筋に脱神経。神経伝導検査は施行しにくい。",
+ pearl:"閉鎖神経障害は骨盤手術・閉鎖孔ヘルニア（高齢女性で大腿内側の痛み：Howship-Romberg徴候）でみられる。歩行時に下肢が外へ振り出される。",
+ hx:null,
+ near:["fem","r_l3","lp_lum","r_l2"],grp:[]},
+{id:"sci",limb:"lo",cat:"ln",lvl:2,name:"坐骨神経（殿部〜大腿）",
+ E:"ham3 ta3 ehl3 pl3 tp2 gas2 fdl2 ah2",sens:["lscn","spn_s","dpn_s","sural","mpn","lpn","calc"],sp:.9,refl:{ach:1,mham:1},rp:.8,
+ keys:{gmed:"上殿神経（坐骨神経とは別に骨盤を出る）。L5神経根症・仙骨神経叢障害では低下",gmax:"下殿神経（S1神経根症では低下）",quad:"大腿神経"},
+ sig:"ハムストリングと下腿の全筋が低下（腓骨神経側が強い）で、中殿筋・大殿筋は保たれる。膝下の外側〜足背・足底の感覚低下",
+ logic:["前脛骨筋・長腓骨筋（腓骨神経）とともに、後脛骨筋・腓腹筋（脛骨神経）、ハムストリングも弱い → 腓骨頭より近位の坐骨神経","中殿筋・大殿筋は正常 → 坐骨切痕より遠位（仙骨神経叢・L5/S1神経根ではない）","感覚低下が足背だけでなく足底・足外側にも及ぶ → 腓骨神経だけではない","坐骨神経では腓骨神経の線維束が障害されやすく、腓骨神経麻痺に似ることがある"],
+ edx:"腓腹神経・浅腓骨神経SNAP低下。針で大腿二頭筋短頭（腓骨神経成分で、膝より近位で支配される唯一の筋）に脱神経があれば、腓骨頭より近位。",
+ pearl:"殿部の筋肉内注射、人工股関節手術、長時間の座位・昏睡での圧迫で起こる。",
+ hx:"人工股関節置換術のあとから{S}足が上がらない。",
+ near:["cpn","r_l5","lp_sac","r_s1","tib_tt"],grp:["per"]},
+{id:"cpn",limb:"lo",cat:"ln",lvl:1,name:"総腓骨神経（腓骨頭）",
+ E:"ta3 ehl3 pl3",sens:["lscn","spn_s","dpn_s"],sp:.9,refl:{},rp:1,
+ keys:{tp:"脛骨神経（L5）。L5神経根症では低下",gmed:"上殿神経（L5）。L5神経根症では低下",ham:"坐骨神経障害では低下",gas:"脛骨神経"},
+ sig:"足背屈・母趾背屈・外反の低下で、内反（後脛骨筋）と股外転は保たれる。下腿外側〜足背の感覚低下",
+ logic:["前脛骨筋・長母趾伸筋（深腓骨神経）と長腓骨筋（浅腓骨神経）がともに弱い → 両者が分かれる前の総腓骨神経","後脛骨筋（内反）と中殿筋は正常 → L5神経根症ではない","ハムストリング・腓腹筋、足底の感覚は正常 → 坐骨神経ではない","反射は正常"],
+ edx:"腓骨頭をまたぐ伝導ブロック・伝導遅延（短趾伸筋・前脛骨筋で記録）、浅腓骨神経SNAP低下（軸索障害）。針で大腿二頭筋短頭は正常。",
+ pearl:"脚を組む癖、急な体重減少、長期臥床、ギプス固定、しゃがみ込み作業で起こる。内反は足関節を少し底屈位にして後脛骨筋を診る（背屈できない足でも評価できる）。",
+ hx:"最近急に体重が減った。脚を組んで座る癖があり、ある朝から{S}足先がひっかかる。",
+ near:["r_l5","sci","dpn","spn"],grp:["per"]},
+{id:"dpn",limb:"lo",cat:"ln",lvl:2,name:"深腓骨神経",
+ E:"ta3 ehl3",sens:["dpn_s"],sp:.8,refl:{},rp:1,
+ keys:{pl:"浅腓骨神経（総腓骨神経障害では低下）",tp:"L5神経根症では低下"},
+ sig:"足背屈・母趾背屈の低下で外反は保たれる。第1趾間の感覚低下のみ",
+ logic:["前脛骨筋・長母趾伸筋が弱く、長腓骨筋は正常 → 浅腓骨神経は保たれ、深腓骨神経","感覚低下は第1趾間背側だけ（深腓骨神経の皮膚枝）","後脛骨筋・中殿筋は正常 → L5ではない"],
+ edx:"浅腓骨神経SNAPは正常。短趾伸筋で記録するCMAP低下、針で長腓骨筋は正常。",
+ pearl:"総腓骨神経障害でも深腓骨神経の線維束が選択的に障害されることがあり、腓骨頭部の伝導検査で確かめる。",
+ hx:null,
+ near:["cpn","r_l5","r_l4","spn"],grp:["per"]},
+{id:"spn",limb:"lo",cat:"ln",lvl:2,name:"浅腓骨神経",
+ E:"pl3",sens:["spn_s"],sp:.9,refl:{},rp:1,
+ keys:{ta:"深腓骨神経（総腓骨神経障害では低下）",tp:"L5神経根症では低下"},
+ sig:"足の外反だけの低下と、下腿遠位外側〜足背の感覚低下（第1趾間は保たれる）",
+ logic:["長腓骨筋（外反）だけが弱く、前脛骨筋・長母趾伸筋は正常 → 浅腓骨神経","感覚低下は足背の大部分で、第1趾間（深腓骨神経）は保たれる","後脛骨筋は正常 → L5ではない"],
+ edx:"浅腓骨神経SNAP低下、針で長腓骨筋に脱神経。",
+ pearl:"下腿外側で筋膜を貫く部位（足関節捻挫・コンパートメント症候群・ブーツの圧迫）で障害されやすい。感覚だけの障害も多い。",
+ hx:null,
+ near:["cpn","r_l5","sci","dpn","r_s1"],grp:[]},
+{id:"tib_tt",limb:"lo",cat:"ln",lvl:2,name:"脛骨神経：足根管",
+ E:"ah2",sens:["mpn","lpn"],sp:.9,refl:{},rp:1,
+ keys:{gas:"膝窩で分枝（S1神経根症では低下）",tp:"下腿で分枝",fdl:"下腿で分枝"},
+ sig:"足底の感覚低下（踵は保たれる）と足の内在筋の低下で、腓腹筋・後脛骨筋とアキレス腱反射は保たれる",
+ logic:["母趾外転筋（足の内在筋）だけが弱く、腓腹筋・後脛骨筋・長趾屈筋は正常 → 下腿の枝より遠位の脛骨神経","足底の感覚低下で踵は保たれる → 踵骨枝が分かれた後、足根管","アキレス腱反射は正常 → S1神経根症ではない","足背・足外側は正常 → 腓腹神経・腓骨神経は保たれる"],
+ edx:"内側・外側足底神経の感覚・運動伝導の遅延（母趾外転筋で記録する運動遠位潜時延長）。左右差で判断する。",
+ pearl:"足根管症候群は過剰診断されやすい。両側の足底のしびれは多発ニューロパチーをまず考える。",
+ hx:"{S}足首の内側を骨折したあとから、足の裏がしびれる。",
+ near:["r_s1","sci","lp_sac","r_l5"],grp:[]},
+{id:"lfcn",limb:"lo",cat:"ln",lvl:1,name:"外側大腿皮神経",
+ E:"",sens:["lfcn_s"],sp:1,refl:{},rp:1,
+ keys:{ilio:"L2神経根症では低下",quad:"大腿神経・L3/L4では低下"},
+ sig:"筋力低下はなく、大腿前外側の感覚低下・異常感覚だけ",
+ logic:["筋力低下がない → 運動線維を含まない皮神経の障害","感覚低下は大腿前外側に限られ、膝より下・大腿内側には及ばない","膝蓋腱反射は正常 → L2–L3神経根症・大腿神経障害ではない"],
+ edx:"外側大腿皮神経SNAPの左右差（技術的に難しく、肥満では記録しにくい）。神経根症を除外する検査が中心。",
+ pearl:"感覚異常性大腿痛（meralgia paresthetica）。きついベルト・肥満・妊娠・腹臥位手術で鼠径靱帯部で圧迫される。",
+ hx:"体重が増え、ベルトをきつく締めるようになった。{S}太ももの外側がピリピリする。",
+ near:["r_l2","r_l3","fem","lp_lum"],grp:[]}
+];
+
+/* ───── 紛らわしいペア ───── */
+var PAIRS=[
+{id:"cts",name:"手根管症候群 vs C6/C7神経根症",mem:["med_cts","r_c6","r_c7","med_pron"],
+ keys:["短母指外転筋：手根管で低下、C6・C7では正常（C8–T1の筋）",
+  "円回内筋・長橈側手根伸筋（手関節背屈）：C6で低下、手根管では正常",
+  "上腕三頭筋・橈側手根屈筋：C7で低下、手根管では正常",
+  "感覚：手根管は手掌側の母指〜環指橈側だけで、母指球の皮膚は保たれる。神経根症は前腕や手背側にも及ぶ。母指球まで及べば回内筋部",
+  "反射：C6は二頭筋・腕橈骨筋反射、C7は三頭筋反射が低下。手根管では正常",
+  "NCS：手根管は手首での正中神経の遅延。神経根症はSNAP正常で、針で円回内筋（C6）・橈側手根屈筋（C7）と傍脊柱筋"]},
+{id:"per",name:"腓骨神経麻痺 vs L5神経根症",mem:["cpn","r_l5","sci","dpn"],
+ keys:["後脛骨筋（足の内反）：L5で低下、腓骨神経麻痺では正常",
+  "中殿筋（股外転）：L5で低下、腓骨神経・坐骨神経では正常",
+  "ハムストリング・腓腹筋：坐骨神経で低下、腓骨頭では正常",
+  "感覚：腓骨神経は下腿外側〜足背で、足底は正常。L5は下腿外側〜足背〜母趾。坐骨神経は足底・足外側にも及ぶ",
+  "NCS：腓骨頭をまたぐ伝導ブロック＝腓骨神経。浅腓骨神経SNAP正常＝L5（節前）。針は後脛骨筋・中殿筋（L5）と大腿二頭筋短頭（坐骨神経か腓骨頭か）"]},
+{id:"cub",name:"肘部管症候群 vs C8神経根症・下神経幹障害",mem:["uln_cub","r_c8","bp_lt","uln_guy","bp_mc"],
+ keys:["長母指屈筋・示指伸筋・短母指外転筋（尺骨神経以外のC8–T1筋）：C8・下神経幹で低下、肘部管では正常",
+  "示指伸筋：下神経幹・C8で低下、内側神経束では正常",
+  "環指・小指の深指屈筋：肘部管で低下、Guyon管では正常",
+  "感覚：前腕内側（内側前腕皮神経）まで及べば下神経幹・内側神経束、C8は前腕尺側遠位まで。肘部管・Guyon管は手関節より遠位だけ。手背尺側が保たれればGuyon管",
+  "NCS：尺骨・内側前腕皮神経SNAP低下＝下神経幹（節後）、正常＝C8神経根。肘をまたぐ伝導遅延＝肘部管"]},
+{id:"rad",name:"橈骨神経麻痺 vs C7神経根症",mem:["rad_grv","r_c7","rad_pin","bp_pc","rad_ax"],
+ keys:["上腕三頭筋：C7で低下、橈骨神経溝では正常（枝が溝より近位で出る）",
+  "腕橈骨筋：橈骨神経溝で低下、C7では正常（C5–C6）、後骨間神経でも正常",
+  "橈側手根屈筋（正中神経のC7筋）：C7で低下、橈骨神経麻痺では正常",
+  "三角筋・広背筋：後神経束で低下（腋窩部の橈骨神経では正常）",
+  "感覚：橈骨神経溝は手背橈側、C7は中指、後骨間神経は感覚障害なし",
+  "NCS：溝をまたぐ伝導ブロック・浅枝SNAP低下＝橈骨神経。SNAP正常で針の傍脊柱筋・橈側手根屈筋に異常＝C7"]}
+];
+
+</script>
+<script>
+(function(){
+"use strict";
+var APP_VERSION="2026-11-14a";
+var KEY="pnt-v1";
+var byId={};LES.forEach(function(s){byId[s.id]=s;});
+var MUSI={};["up","lo"].forEach(function(l){MUS[l].forEach(function(m,i){MUSI[m[0]]={id:m[0],n:m[1],a:m[2],nv:m[3],r:m[4],p:m[5],limb:l,i:i};});});
+var PAIRI={};PAIRS.forEach(function(p){PAIRI[p.id]=p;});
+var CATKEYS=Object.keys(CAT);
+var SIDE={L:"左",R:"右"};
+function rnd(n){return Math.floor(Math.random()*n);}
+function pick(a){return a[rnd(a.length)];}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function fillS(t,side){return String(t).replace(/\{S\}/g,side?SIDE[side]:"");}
+/* E の解析："fdp45 2 apb2/3" → {fdp45:[2],apb:[2,3]} */
+function parseE(s){var o={},re=/([a-z]+(?:23|45)?)\s?([0-3](?:\/[0-3])*)/g,m;while((m=re.exec(s||""))){o[m[1]]=m[2].split("/").map(Number);}return o;}
+LES.forEach(function(s){s.e=parseE(s.E);s.emax={};Object.keys(s.e).forEach(function(k){if(!MUSI[k])console.warn("unknown muscle",s.id,k);s.emax[k]=Math.max.apply(null,s.e[k]);});});
+function ev(les,mid){return les.emax[mid]||0;}
+function emin(les,mid){var a=les.e[mid];return a?Math.min.apply(null,a):0;}
+function rootsHtml(r){return r.split(" ").map(function(x){return x.charAt(0)==="*"?"<b>"+esc(x.slice(1))+"</b>":esc(x);}).join("・");}
+function rootsTxt(r){return r.replace(/\*/g,"").split(" ").join("・");}
+function inPairs(id){return PAIRS.filter(function(p){return p.mem.indexOf(id)>=0;});}
+
+var st;
+function defaults(){return {set:{limb:"mix",diff:1,pairs:[],weak:false,hide:false},cur:null,st:{},hist:[],cnt:0,streak:0,conf:{}};}
+try{st=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){st=null;}
+if(!st||typeof st!=="object")st=defaults();
+var d0=defaults();
+Object.keys(d0).forEach(function(k){if(st[k]===undefined)st[k]=d0[k];});
+Object.keys(d0.set).forEach(function(k){if(st.set[k]===undefined)st.set[k]=d0.set[k];});
+st.set.pairs=st.set.pairs.filter(function(p){return PAIRI[p];});
+if(st.cur&&!byId[st.cur.id])st.cur=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+
+/* ── 出題候補 ── */
+function candidates(){
+  if(st.set.pairs.length){
+    var ids={};st.set.pairs.forEach(function(p){PAIRI[p].mem.forEach(function(m){ids[m]=1;});});
+    return LES.filter(function(s){return ids[s.id];});
+  }
+  return LES.filter(function(s){return (st.set.limb==="mix"||s.limb===st.set.limb)&&(st.set.diff===2||s.lvl===1);});
+}
+function pickLesion(){
+  var c=candidates();if(!c.length)return null;
+  var last=st.cur&&st.cur.id;
+  if(c.length>1)c=c.filter(function(s){return s.id!==last;});
+  var w=c.map(function(s){
+    var x=1;
+    if(st.set.diff===2&&!st.set.pairs.length&&s.grp.length)x*=2;
+    if(st.set.weak){var r=st.st[s.id];x*=(!r||!r.n)?3:1+4*(1-r.c/r.n);}
+    return x;});
+  var sum=w.reduce(function(a,b){return a+b;},0),x=Math.random()*sum;
+  for(var i=0;i<c.length;i++){x-=w[i];if(x<=0)return c[i].id;}
+  return c[c.length-1].id;
+}
+
+/* ── 症例の組み立て ── */
+function gradeOf(v,hard){
+  if(!v)return 5;
+  if(hard)return v===3?pick([2,3,3]):v===2?4:pick([4,5,5]);
+  return v===3?pick([0,1,2,2,3]):v===2?pick([3,4,4]):pick([4,5]);
+}
+function discr(c,d,mid){var a=ev(c,mid),b=ev(d,mid);return (emin(c,mid)>=2&&b===0)||(a===0&&emin(d,mid)>=2)||(emin(c,mid)>=3&&b<=1)||(a<=1&&emin(d,mid)>=3);}
+function buildOptions(les){
+  var ids=[les.id],seen={};seen[les.id]=1;
+  function add(id){if(!byId[id]||seen[id]||byId[id].limb!==les.limb)return;seen[id]=1;ids.push(id);}
+  var max=st.set.diff===2||st.set.pairs.length?5:4;
+  if(st.set.diff===2||st.set.pairs.length){
+    les.grp.forEach(function(g){shuffle(PAIRI[g].mem).forEach(add);});
+  }
+  les.near.forEach(function(n){if(ids.length<max)add(n);});
+  var pool=shuffle(LES.filter(function(x){return x.limb===les.limb;}));
+  for(var i=0;ids.length<max&&i<pool.length;i++)add(pool[i].id);
+  return ids.slice(0,max);
+}
+function makeCase(id,fixed){
+  var les=byId[id],hard=st.set.diff===2;
+  var side=fixed&&fixed.side||(Math.random()<.5?"L":"R");
+  var opts=fixed&&fixed.o?fixed.o.slice():buildOptions(les);
+  var m,s,rf;
+  if(fixed&&fixed.m){m=fixed.m;s=fixed.s;rf=fixed.rf;}
+  else{
+    var limbM=MUS[les.limb].map(function(x){return x[0];});
+    var want={};
+    Object.keys(les.e).forEach(function(k){want[k]=1;});
+    Object.keys(les.keys||{}).forEach(function(k){want[k]=1;});
+    opts.forEach(function(oid){if(oid===id)return;var d=byId[oid];
+      var ds=shuffle(limbM.filter(function(mid){return discr(les,d,mid);}));
+      ds.sort(function(a,b){return (want[b]?1:0)-(want[a]?1:0);});
+      ds.slice(0,2).forEach(function(k){want[k]=1;});});
+    var rest=shuffle(limbM.filter(function(k){return !want[k];}));
+    var need=Math.max(2,7-Object.keys(want).length);
+    rest.slice(0,need).forEach(function(k){want[k]=1;});
+    m=limbM.filter(function(k){return want[k];}).map(function(k){var a=les.e[k];return [k,gradeOf(a?pick(a):0,hard)];});
+    s=Math.random()<les.sp?les.sens.slice():[];
+    /* 筋で区別できない選択肢があれば、感覚所見は必ず出す */
+    if(!s.length&&les.sens.length&&opts.some(function(oid){return oid!==id&&!m.some(function(x){return discr(les,byId[oid],x[0]);});}))s=les.sens.slice();
+    rf={};var showR=Math.random()<les.rp;
+    REFL[les.limb].forEach(function(r){rf[r[0]]=showR&&les.refl[r[0]]?les.refl[r[0]]:0;});
+  }
+  var gen=les.limb==="up"?["{S}上肢の力が入りにくいと訴えて受診。","数週間前から{S}手の使いにくさとしびれがある。","{S}腕の脱力で紹介された。"]:["{S}下肢の脱力で受診。","{S}足がしびれて歩きにくい。","数週間前から{S}脚の力が入りにくい。"];
+  var hx=fixed&&fixed.hx||((!hard&&les.hx)?les.hx:pick(gen));
+  var age=fixed&&fixed.age||(25+rnd(55)),sex=fixed&&fixed.sex||(Math.random()<.5?"男性":"女性");
+  if(/若年女性/.test(hx)){sex="女性";age=20+rnd(12);}
+  return {id:id,side:side,m:m,s:s,rf:rf,o:shuffle(opts),hx:hx,age:age,sex:sex,tab:"m",hint:false,ans:null,reveal:!st.set.hide,no:st.cnt+1};
+}
+function newQ(id,fixed){
+  var sid=id||pickLesion();
+  if(!sid){st.cur=null;save();renderQ();return;}
+  st.cur=makeCase(sid,fixed);save();renderQ();
+  try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}
+}
+
+/* ── 人体の模式図（SVG） ── */
+var SIL={
+arm:'<path d="M34,22 C34,12 46,8 60,8 C74,8 86,12 86,22 L84,150 L78,262 L82,268 L83,305 L41,305 L40,272 L42,262 L38,150 Z"/><path d="M42,266 L33,276 L23,296 L18,312 C17,318 23,321 27,316 L35,302 L42,296 Z"/><rect x="41" y="296" width="10" height="52" rx="5"/><rect x="52" y="296" width="10.5" height="60" rx="5"/><rect x="63" y="296" width="9.5" height="53" rx="5"/><rect x="73" y="296" width="8.5" height="41" rx="4.2"/>',
+legf:'<path d="M22,16 L94,16 L86,80 L82,170 L80,205 L74,255 L70,298 L80,334 L30,334 L38,298 L38,255 L34,205 L30,170 L24,80 Z"/><ellipse cx="72" cy="342" rx="7" ry="9"/><ellipse cx="60" cy="340" rx="4.5" ry="6.5"/><ellipse cx="50" cy="339" rx="4" ry="6"/><ellipse cx="42" cy="338" rx="3.8" ry="5.5"/><ellipse cx="35" cy="336" rx="3.3" ry="4.5"/>',
+legb:'<path d="M22,16 L94,16 L86,80 L82,170 L80,205 L74,255 L70,298 L72,318 C70,334 44,336 40,318 L38,298 L38,255 L34,205 L30,170 L24,80 Z"/>',
+sole:'<path d="M40,178 C30,150 28,105 33,72 C36,60 44,56 56,56 L78,56 C86,58 88,72 84,90 C78,112 72,130 72,155 C72,180 62,192 55,192 C47,192 42,186 40,178 Z"/><ellipse cx="76" cy="42" rx="8" ry="10"/><ellipse cx="62" cy="44" rx="5" ry="6"/><ellipse cx="52" cy="47" rx="4.6" ry="5.6"/><ellipse cx="44" cy="51" rx="4.2" ry="5.2"/><ellipse cx="37" cy="57" rx="3.8" ry="4.6"/>'
+};
+/* 面ごとの配置：crop＝正準座標の切り出し範囲、s＝倍率 */
+var VIEWS={
+up:{w:270,h:452,p:[
+ {v:"uf",sil:"arm",back:false,x:24.7,y:20,s:.62,crop:[0,0,130,372],lab:"前面（手掌側）",top:true},
+ {v:"ub",sil:"arm",back:true,x:159.7,y:20,s:.62,crop:[0,0,130,372],lab:"後面（手背側）",top:true},
+ {v:"uf",sil:"arm",back:false,x:6,y:262,s:1.6,crop:[10,256,80,108],lab:"手掌（拡大）"},
+ {v:"ub",sil:"arm",back:true,x:141,y:262,s:1.6,crop:[10,256,80,108],lab:"手背（拡大）"}]},
+lo:{w:400,h:392,p:[
+ {v:"lf",sil:"legf",back:false,x:5,y:20,s:1,crop:[0,0,130,362],lab:"前面",top:true},
+ {v:"lb",sil:"legb",back:false,x:135,y:20,s:1,crop:[0,0,130,362],lab:"後面",top:true,backv:true},
+ {v:"ls",sil:"sole",back:false,x:285,y:20,s:1.15,crop:[22,28,72,170],lab:"足底（足趾が上）",top:true},
+ {v:"lf",sil:"legf",back:false,x:270,y:250,s:1.75,crop:[24,292,68,64],lab:"足背（拡大）"}]}
+};
+var svgN=0;
+function bodySvg(limb,side,regs){
+  var V=VIEWS[limb],n=++svgN;
+  var h='<svg viewBox="0 0 '+V.w+' '+V.h+'" role="img" aria-label="感覚障害の分布の模式図">';
+  h+='<defs><pattern id="ht'+n+'" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="rgba(214,69,50,.28)"/><line x1="0" y1="0" x2="0" y2="5" stroke="rgba(190,40,25,.85)" stroke-width="1.8"/></pattern></defs>';
+  V.p.forEach(function(vw,i){
+    var flip=(side==="L")!==!!(vw.back||vw.backv);
+    var c=vw.crop,cx=flip?130-c[0]-c[2]:c[0];
+    var cid='cl'+n+'_'+i,bid='bx'+n+'_'+i;
+    h+='<clipPath id="'+bid+'"><rect x="'+cx+'" y="'+c[1]+'" width="'+c[2]+'" height="'+c[3]+'"/></clipPath>';
+    h+='<g transform="translate('+vw.x+','+vw.y+') scale('+vw.s+') translate('+(-cx)+','+(-c[1])+')"><g clip-path="url(#'+bid+')"><g'+(flip?' transform="translate(130,0) scale(-1,1)"':'')+'>';
+    h+='<clipPath id="'+cid+'">'+SIL[vw.sil]+'</clipPath><g class="sil">'+SIL[vw.sil]+'</g><g clip-path="url(#'+cid+')" fill="url(#ht'+n+')">';
+    var d="";
+    regs.forEach(function(r){var R=REG[r];if(!R||!R.v[vw.v])return;R.v[vw.v].forEach(function(p){
+      var a=0;for(var k=0;k<p.length;k++){var q=p[k],u=p[(k+1)%p.length];a+=q[0]*u[1]-u[0]*q[1];}
+      var pp=a<0?p.slice().reverse():p; /* 向きをそろえて重なりを一度だけ塗る */
+      d+="M"+pp.map(function(q){return q.join(",");}).join("L")+"Z";});});
+    if(d)h+='<path d="'+d+'" fill-rule="nonzero"/>';
+    h+='</g></g></g></g>';
+    var lx=vw.x+c[2]*vw.s/2,ly=vw.top?vw.y-7:vw.y+c[3]*vw.s+13;
+    h+='<text class="vl" x="'+lx+'" y="'+ly+'" text-anchor="middle">'+esc(vw.lab)+'</text>';
+  });
+  return h+'</svg>';
+}
+
+/* ── 出題画面 ── */
+var qArea=document.getElementById("qArea");
+function lvTxt(l){return l===1?"典型":"応用";}
+function gChip(g){return '<span class="gr g'+g+'">'+g+'</span>';}
+var RLAB=["正常（2+）","低下（1+）","消失（0）"];
+function renderQ(){
+  var q=st.cur;
+  if(!q){
+    var c=candidates().length;
+    qArea.innerHTML='<div class="card"><h2>はじめる</h2><p class="hint" style="font-size:14px">出題範囲：'+c+'部位。「筋」「感覚」「反射」のタブで所見を見て、病変部位を選んでください。答えると、その部位に決まる理由、ほかの選択肢との違い、NCS・針筋電図の要点を解説します。</p><div class="nav"><button class="btn primary" type="button" id="goQ"'+(c?'':' disabled')+'>問題を出す</button></div>'+(c?'':'<p class="hint">出題範囲が空です。設定を見直してください。</p>')+'</div>';
+    var g=document.getElementById("goQ");if(g)g.onclick=function(){newQ();};
+    return;
+  }
+  var les=byId[q.id],side=q.side;
+  var weakN=q.m.filter(function(x){return x[1]<5;}).length,sensN=q.s.length,rfN=Object.keys(q.rf).filter(function(k){return q.rf[k];}).length;
+  var h='<div class="card"><div class="qhead"><span>第'+q.no+'問</span><span class="lv">'+lvTxt(les.lvl)+'</span>'+(q.ans?'<span class="regtag">'+esc(CAT[les.cat])+'</span>':'')+'</div>';
+  h+='<p class="pt">'+esc(q.age+"歳・"+q.sex+"。"+fillS(q.hx,side))+'</p>';
+  h+='<div class="seg" role="tablist">'+
+    '<button type="button" role="tab" data-t="m" aria-selected="'+(q.tab==="m")+'">筋<small>低下 '+weakN+'</small></button>'+
+    '<button type="button" role="tab" data-t="s" aria-selected="'+(q.tab==="s")+'">感覚<small>'+(sensN?'低下あり':'障害なし')+'</small></button>'+
+    '<button type="button" role="tab" data-t="r" aria-selected="'+(q.tab==="r")+'">反射<small>'+(rfN?'変化あり':'左右差なし')+'</small></button></div>';
+  h+='<div id="fbox">'+findings(q)+'</div>';
+  h+='<p class="ask">病変部位はどこか？</p>';
+  if(!q.reveal&&!q.ans){
+    h+='<div class="nav"><button class="btn primary" type="button" id="revBtn">考えたら選択肢を表示</button></div>';
+  }else{
+    h+='<div class="opts">'+q.o.map(function(oid,k){
+      var cls="";
+      if(q.ans){if(oid===q.id)cls=" ok";else if(k===q.ans.k)cls=" ng";}
+      return '<button type="button" class="opt'+cls+'" data-k="'+k+'"'+(q.ans?' disabled':'')+'><span class="n">'+(k+1)+'</span><span>'+esc(SIDE[side]+" "+byId[oid].name)+'</span></button>';
+    }).join("")+'</div>';
+  }
+  if(!q.ans){
+    h+='<div class="nav"><button class="btn sm" type="button" id="hintBtn"'+(q.hint?' disabled':'')+'>ヒント（筋の支配を表示）</button><button class="btn sm" type="button" id="giveBtn">わからない（解説へ）</button><button class="btn sm" type="button" id="skipBtn">別の問題</button></div>';
+  }
+  h+='</div>';
+  if(q.ans)h+=explain(q);
+  qArea.innerHTML=h;
+  bindQ(q);
+}
+function findings(q){
+  var les=byId[q.id],side=q.side,h="";
+  if(q.tab==="m"){
+    var showInn=q.hint||q.ans;
+    h+='<table class="mm"><tr><th>筋（動作）</th>'+(showInn?'<th>神経・根</th>':'')+'<th class="g">'+SIDE[side]+'</th></tr>';
+    q.m.forEach(function(x){var M=MUSI[x[0]];
+      h+='<tr><td class="mn">'+esc(M.n)+'<small>'+esc(M.a)+'</small></td>'+(showInn?'<td class="inn">'+esc(M.nv)+'<br>'+rootsHtml(M.r)+'</td>':'')+'<td class="g">'+gChip(x[1])+'</td></tr>';});
+    h+='</table><p class="hint">MRC 0〜5。表にない筋は正常。健側はすべて5。</p>';
+  }else if(q.tab==="s"){
+    h+='<div class="body">'+bodySvg(les.limb,side,q.s)+'</div>';
+    h+='<p class="hint">'+(q.s.length?'網掛け：'+SIDE[side]+'側の触覚・痛覚の低下（しびれ）。':'感覚障害はない。')+'図は模式図で、境界には個人差・重なりがある。健側は正常。</p>';
+  }else{
+    h+='<table class="mm rf"><tr><th>腱反射</th><th>'+SIDE[side]+'</th><th>健側</th></tr>';
+    REFL[les.limb].forEach(function(r){var v=q.rf[r[0]]||0;
+      h+='<tr><td>'+esc(r[1])+(q.ans?'<small class="hint" style="display:block;margin:0">'+esc(r[2])+'</small>':'')+'</td><td class="rv r'+v+'">'+RLAB[v]+'</td><td class="rv r0">正常（2+）</td></tr>';});
+    h+='</table><p class="hint">病的反射はない。</p>';
+  }
+  return h;
+}
+function bindQ(q){
+  var b;
+  Array.prototype.forEach.call(qArea.querySelectorAll(".seg button"),function(el){el.onclick=function(){q.tab=el.getAttribute("data-t");save();
+    Array.prototype.forEach.call(qArea.querySelectorAll(".seg button"),function(x){x.setAttribute("aria-selected",String(x===el));});
+    document.getElementById("fbox").innerHTML=findings(q);};});
+  if((b=document.getElementById("revBtn")))b.onclick=function(){q.reveal=true;save();renderQ();};
+  if((b=document.getElementById("hintBtn")))b.onclick=function(){q.hint=true;q.tab="m";save();renderQ();};
+  if((b=document.getElementById("giveBtn")))b.onclick=function(){answer(-1);};
+  if((b=document.getElementById("skipBtn")))b.onclick=function(){newQ();};
+  Array.prototype.forEach.call(qArea.querySelectorAll(".opt"),function(el){el.onclick=function(){answer(+el.getAttribute("data-k"));};});
+  if((b=document.getElementById("nextBtn")))b.onclick=function(){newQ();};
+  if((b=document.getElementById("sameBtn")))b.onclick=function(){newQ(q.id);};
+}
+function answer(k){
+  var q=st.cur;if(!q||q.ans)return;
+  var ok=k>=0&&q.o[k]===q.id;
+  q.ans={k:k,ok:ok};q.reveal=true;
+  var r=st.st[q.id]||(st.st[q.id]={n:0,c:0});r.n++;if(ok)r.c++;
+  st.cnt++;st.streak=ok?st.streak+1:0;
+  if(!ok&&k>=0){var ck=q.id+">"+q.o[k];st.conf[ck]=(st.conf[ck]||0)+1;}
+  st.hist.unshift({id:q.id,side:q.side,m:q.m,s:q.s,rf:q.rf,o:q.o,hx:q.hx,age:q.age,sex:q.sex,ok:ok,pk:k>=0?q.o[k]:null,t:Date.now()});
+  if(st.hist.length>60)st.hist.length=60;
+  save();renderQ();renderTop();
+  setTimeout(function(){var e=document.getElementById("exCard");if(e)try{e.scrollIntoView({behavior:"smooth",block:"start"});}catch(x){}},60);
+}
+function regLabs(a){return a.map(function(r){return REG[r]?REG[r].lab:r;}).join("、");}
+function sameSet(a,b){return a.slice().sort().join()===b.slice().sort().join();}
+/* 他の選択肢との違いを、この症例の所見から自動で書く */
+function diffs(q,d){
+  var les=byId[q.id],out=[];
+  q.m.forEach(function(x){var M=MUSI[x[0]],dv=ev(d,x[0]);
+    if(x[1]<5&&dv===0)out.push(M.n+"が"+x[1]+"に低下 ← "+d.name+"では保たれるはず"+(d.keys&&d.keys[x[0]]?"（"+d.keys[x[0]]+"）":""));
+    else if(x[1]===5&&emin(d,x[0])>=2)out.push(M.n+"は正常 ← "+d.name+"なら低下する（"+M.nv+"・"+rootsTxt(M.r)+"）");
+    else if(x[1]<=3&&dv===1&&emin(les,x[0])>=3)out.push(M.n+"が"+x[1]+"と高度に低下 ← "+d.name+"なら低下は軽い");
+    else if(x[1]>=4&&emin(d,x[0])>=3)out.push(M.n+"の低下は"+(x[1]===5?"ない":"軽い")+" ← "+d.name+"なら高度に低下する");
+  });
+  if(q.s.length&&!sameSet(q.s,d.sens))out.push("感覚：この症例は「"+regLabs(q.s)+"」。"+d.name+"なら"+(d.sens.length?"「"+regLabs(d.sens)+"」":"感覚障害は出ない"));
+  else if(!q.s.length&&d.sens.length&&d.sp>=.9)out.push("感覚障害がない ← "+d.name+"なら「"+regLabs(d.sens)+"」が低下しやすい");
+  REFL[les.limb].forEach(function(r){var a=q.rf[r[0]]||0,b=d.refl[r[0]]||0;
+    if(a&&!b)out.push(r[1]+"が低下 ← "+d.name+"では保たれる");
+    else if(!a&&b&&d.rp>=.8)out.push(r[1]+"は正常 ← "+d.name+"なら低下しやすい");});
+  return out.slice(0,4);
+}
+function explain(q){
+  var les=byId[q.id],side=q.side;
+  var h='<div class="card ex" id="exCard">';
+  h+='<div class="result '+(q.ans.ok?'ok':'ng')+'">'+(q.ans.ok?'正解':(q.ans.k<0?'解説':'不正解'))+'<span class="ans">'+esc(SIDE[side]+" "+les.name)+'</span><span class="syn">'+esc(les.sig)+'</span></div>';
+  h+='<h3>この部位に決まる理由</h3><ul class="why">'+les.logic.map(function(t){return '<li><span class="f">'+esc(t)+'</span></li>';}).join("")+'</ul>';
+  h+='<h3>この症例の筋所見と支配</h3><table class="mm">';
+  q.m.forEach(function(x){var M=MUSI[x[0]],key=les.keys&&les.keys[x[0]];
+    var note=x[1]<5?"障害あり":(key?"保たれる："+key:(ev(les,x[0])?"この例では保たれた":"正常"));
+    h+='<tr><td class="mn">'+(key?'<span class="key">★</span>':'')+esc(M.n)+'<small>'+esc(M.p)+'</small></td><td class="inn">'+esc(M.nv)+'<br>'+rootsHtml(M.r)+'</td><td class="g">'+gChip(x[1])+'</td></tr>'+(key||x[1]<5?'':'');
+    if(key)h+='<tr class="kn"><td colspan="3">'+esc(note)+'</td></tr>';});
+  h+='</table><p class="hint">★は「保たれること」が決め手になる筋。太字は主な神経根（採用した表は「出典」タブ）。</p>';
+  h+='<h3>感覚・反射</h3><ul class="why"><li><span class="f">'+(q.s.length?"感覚低下："+esc(regLabs(q.s)):"感覚障害なし"+(les.sens.length?"（この部位でも感覚障害が目立たないことがある。典型は「"+esc(regLabs(les.sens))+"」）":""))+'</span></li>';
+  var rch=REFL[les.limb].filter(function(r){return q.rf[r[0]];}).map(function(r){return r[1]+(q.rf[r[0]]===2?"消失":"低下");});
+  var rexp=REFL[les.limb].filter(function(r){return les.refl[r[0]];}).map(function(r){return r[1];});
+  h+='<li><span class="f">'+(rch.length?esc(rch.join("、")):"腱反射の左右差なし"+(rexp.length?"（"+esc(rexp.join("・"))+"が低下することがある）":""))+'</span></li></ul>';
+  var others=q.o.filter(function(o){return o!==q.id;});
+  if(others.length){
+    h+='<h3>ほかの選択肢との違い</h3><ul class="why">'+others.map(function(oid){var d=byId[oid],df=diffs(q,d);
+      return '<li><span class="dn">'+esc(SIDE[side]+" "+d.name)+(q.ans.k>=0&&q.o[q.ans.k]===oid?'（あなたの答え）':'')+'</span>'+(df.length?df.map(function(t){return '<span class="w">'+esc(t)+'</span>';}).join(""):'')+'<span class="w">この部位なら：'+esc(d.sig)+'</span></li>';}).join("")+'</ul>';
+  }
+  inPairs(q.id).forEach(function(p){
+    h+='<div class="pairbox"><b>紛らわしいペア：'+esc(p.name)+'</b><ul>'+p.keys.map(function(t){return '<li>'+esc(t)+'</li>';}).join("")+'</ul></div>';});
+  h+='<h3>NCS・針筋電図</h3><div class="edx">'+esc(les.edx)+'</div>';
+  h+='<div class="pearl"><b>ポイント</b>'+esc(les.pearl)+'</div>';
+  h+='<div class="nav"><button class="btn primary" type="button" id="nextBtn">次の問題</button><button class="btn" type="button" id="sameBtn">同じ部位をもう一度</button></div>';
+  return h+'</div>';
+}
+
+/* ── 設定 ── */
+function renderSet(){
+  Array.prototype.forEach.call(document.querySelectorAll("[data-limb]"),function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-limb")===st.set.limb));});
+  Array.prototype.forEach.call(document.querySelectorAll("[data-diff]"),function(b){b.setAttribute("aria-pressed",String(+b.getAttribute("data-diff")===st.set.diff));});
+  var pc=document.getElementById("pairChips");
+  pc.innerHTML=PAIRS.map(function(p){var on=st.set.pairs.indexOf(p.id)>=0;return '<label class="chip'+(on?' on':'')+'"><input type="checkbox" data-p="'+p.id+'"'+(on?' checked':'')+'>'+esc(p.name)+'</label>';}).join("");
+  Array.prototype.forEach.call(pc.querySelectorAll("input"),function(el){el.onchange=function(){var k=el.getAttribute("data-p"),i=st.set.pairs.indexOf(k);
+    if(el.checked&&i<0)st.set.pairs.push(k);if(!el.checked&&i>=0)st.set.pairs.splice(i,1);save();renderSet();if(!st.cur)renderQ();};});
+  document.getElementById("weakOpt").checked=!!st.set.weak;
+  document.getElementById("hideOpt").checked=!!st.set.hide;
+  var c=candidates().length;
+  document.getElementById("setSum").textContent="（"+(st.set.pairs.length?"ペア集中・":({up:"上肢",lo:"下肢",mix:"混合"})[st.set.limb]+"・"+(st.set.diff===2?"ペア含む":"典型のみ")+"・")+c+"部位）";
+  document.getElementById("pairNote").style.display=st.set.pairs.length?"block":"none";
+}
+Array.prototype.forEach.call(document.querySelectorAll("[data-limb]"),function(b){b.onclick=function(){st.set.limb=b.getAttribute("data-limb");save();renderSet();if(!st.cur)renderQ();};});
+Array.prototype.forEach.call(document.querySelectorAll("[data-diff]"),function(b){b.onclick=function(){st.set.diff=+b.getAttribute("data-diff");save();renderSet();if(!st.cur)renderQ();};});
+document.getElementById("weakOpt").onchange=function(){st.set.weak=this.checked;save();};
+document.getElementById("hideOpt").onchange=function(){st.set.hide=this.checked;save();};
+
+/* ── 一覧 ── */
+var aList=document.getElementById("aList"),aQ=document.getElementById("aQ");
+function lesText(s){return [s.name,s.sig,s.edx,s.pearl].concat(s.logic,Object.keys(s.e).map(function(k){return MUSI[k].n;}),s.sens.map(function(r){return REG[r].lab;})).join(" ");}
+function renderAtlas(){
+  var qv=aQ.value.trim(),h="";
+  if(!qv){
+    h+='<div class="card"><h2>紛らわしいペア</h2>'+PAIRS.map(function(p){
+      return '<details class="site"><summary><b>'+esc(p.name)+'</b><span>'+esc(p.mem.map(function(m){return byId[m].name;}).join("／"))+'</span></summary><ul class="why">'+p.keys.map(function(t){return '<li><span class="f">'+esc(t)+'</span></li>';}).join("")+'</ul><div class="nav"><button class="btn sm" type="button" data-pf="'+p.id+'">このペアで集中して出題</button></div></details>';}).join("")+'</div>';
+  }
+  CATKEYS.forEach(function(k){
+    var list=LES.filter(function(s){return s.cat===k&&(!qv||lesText(s).indexOf(qv)>=0);});
+    if(!list.length)return;
+    h+='<div class="card"><h2>'+esc(CAT[k])+'</h2>'+list.map(function(s){var r=st.st[s.id];
+      var aff=Object.keys(s.e).sort(function(a,b){return MUSI[a].i-MUSI[b].i;}).map(function(m){var v=s.emax[m];return MUSI[m].n+(v===3?"（高度）":v===1?"（軽度）":"");});
+      return '<details class="site" data-sv="'+s.id+'"><summary><b>'+esc(s.name)+'<span class="lvb">'+lvTxt(s.lvl)+(r&&r.n?'　'+r.c+'/'+r.n:'')+'</span></b><span>'+esc(s.sig)+'</span></summary>'+
+        '<div class="sub">障害される筋</div><p class="pl">'+(aff.length?esc(aff.join("、")):"なし（運動線維を含まない）")+'</p>'+
+        (Object.keys(s.keys||{}).length?'<div class="sub">保たれることが決め手になる筋</div><ul class="why">'+Object.keys(s.keys).map(function(m){return '<li><span class="f">'+esc(MUSI[m].n)+'</span><span class="w">'+esc(s.keys[m])+'</span></li>';}).join("")+'</ul>':'')+
+        '<div class="sub">感覚</div><p class="pl">'+(s.sens.length?esc(regLabs(s.sens)):"感覚障害なし")+'</p><div class="body sv"></div>'+
+        '<div class="sub">反射</div><p class="pl">'+(Object.keys(s.refl).length?esc(REFL[s.limb].filter(function(x){return s.refl[x[0]];}).map(function(x){return x[1]+(s.refl[x[0]]===2?"消失":"低下");}).join("、")):"変化なし")+'</p>'+
+        '<div class="sub">決まる理由</div><ul class="why">'+s.logic.map(function(t){return '<li><span class="f">'+esc(t)+'</span></li>';}).join("")+'</ul>'+
+        '<div class="sub">NCS・針筋電図</div><div class="edx">'+esc(s.edx)+'</div>'+
+        '<div class="pearl"><b>ポイント</b>'+esc(s.pearl)+'</div><div class="nav"><button class="btn sm" type="button" data-q="'+s.id+'">この部位で出題</button></div></details>';
+    }).join("")+'</div>';
+  });
+  aList.innerHTML=h||'<div class="card empty">該当する部位がありません。</div>';
+  Array.prototype.forEach.call(aList.querySelectorAll("[data-q]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-q"));show("v-q");};});
+  Array.prototype.forEach.call(aList.querySelectorAll("[data-pf]"),function(b){b.onclick=function(){st.set.pairs=[b.getAttribute("data-pf")];save();renderSet();newQ();show("v-q");toast("ペア集中モードにしました（設定で解除）");};});
+  Array.prototype.forEach.call(aList.querySelectorAll("details[data-sv]"),function(d){d.addEventListener("toggle",function(){var box=d.querySelector(".sv");if(d.open&&!box.innerHTML){var s=byId[d.getAttribute("data-sv")];if(s.sens.length)box.innerHTML=bodySvg(s.limb,"R",s.sens);}});});
+}
+aQ.addEventListener("input",renderAtlas);
+
+/* ── 成績 ── */
+var sArea=document.getElementById("sArea"),resetArm=false;
+function rate(ids){var n=0,c=0;ids.forEach(function(id){var r=st.st[id];if(r){n+=r.n;c+=r.c;}});return {n:n,c:c,p:n?Math.round(c/n*100):null};}
+function barRow(label,R){return '<tr><td>'+esc(label)+'</td><td style="width:34%"><div class="bar"><i style="width:'+(R.p||0)+'%"></i></div></td><td class="num">'+(R.n?R.p+'%':'—')+'</td><td class="num hint" style="margin:0">'+R.c+'/'+R.n+'</td></tr>';}
+function renderStats(){
+  var tot=rate(LES.map(function(s){return s.id;}));
+  var h='<div class="card"><h2>系統別の正答率</h2>';
+  if(!tot.n)h+='<p class="empty">まだ回答がありません。</p>';
+  else h+='<table class="st">'+CATKEYS.map(function(k){return barRow(CAT[k],rate(LES.filter(function(s){return s.cat===k;}).map(function(s){return s.id;})));}).join("")+'</table>';
+  h+='</div><div class="card"><h2>紛らわしいペア別</h2><table class="st">'+PAIRS.map(function(p){return barRow(p.name,rate(p.mem));}).join("")+'</table></div>';
+  var weak=Object.keys(st.st).filter(function(k){return byId[k]&&st.st[k].n&&st.st[k].c<st.st[k].n;}).sort(function(a,b){return st.st[a].c/st.st[a].n-st.st[b].c/st.st[b].n||st.st[b].n-st.st[a].n;}).slice(0,10);
+  h+='<div class="card"><h2>苦手な部位</h2>'+(weak.length?'<table class="st">'+weak.map(function(k){var r=st.st[k];return '<tr><td>'+esc(byId[k].name)+'</td><td class="num">'+r.c+'/'+r.n+'</td><td class="num"><button class="btn sm" type="button" data-w="'+k+'">出題</button></td></tr>';}).join("")+'</table>':'<p class="empty">間違えた部位はまだありません。</p>')+'</div>';
+  var cf=Object.keys(st.conf).filter(function(k){var p=k.split(">");return byId[p[0]]&&byId[p[1]];}).sort(function(a,b){return st.conf[b]-st.conf[a];}).slice(0,6);
+  h+='<div class="card"><h2>よく取り違える組み合わせ</h2>'+(cf.length?'<table class="st">'+cf.map(function(k){var p=k.split(">");return '<tr><td>'+esc(byId[p[0]].name)+'<span class="hint" style="display:block;margin:0">→ '+esc(byId[p[1]].name)+' と答えた</span></td><td class="num">'+st.conf[k]+'回</td></tr>';}).join("")+'</table>':'<p class="empty">まだありません。</p>')+'</div>';
+  var wr=st.hist.filter(function(x){return !x.ok&&byId[x.id];}).slice(0,15);
+  h+='<div class="card"><h2>最近間違えた問題</h2>'+(wr.length?'<table class="st">'+wr.map(function(x,i){var d=new Date(x.t);return '<tr><td>'+esc(SIDE[x.side]+" "+byId[x.id].name)+'<span class="hint" style="display:block;margin:0">'+(d.getMonth()+1)+'/'+d.getDate()+(x.pk&&byId[x.pk]?'　'+esc(byId[x.pk].name)+'と回答':'')+'</span></td><td class="num"><button class="btn sm" type="button" data-h="'+i+'">同じ問題</button></td></tr>';}).join("")+'</table><p class="hint">「同じ問題」は前回と同じ所見・選択肢で出題します（選択肢の順は変わります）。</p>':'<p class="empty">まだありません。</p>')+'</div>';
+  h+='<div class="card"><button class="btn sm" type="button" id="resetBtn">'+(resetArm?'もう一度押すと成績を消去':'成績を消去')+'</button><p class="hint">成績と履歴だけを消します。右上の「入力クリア」は設定と出題中の問題を消し、成績は残します。</p></div>';
+  sArea.innerHTML=h;
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-w]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-w"));show("v-q");};});
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-h]"),function(b){b.onclick=function(){var x=wr[+b.getAttribute("data-h")];newQ(x.id,x);show("v-q");};});
+  document.getElementById("resetBtn").onclick=function(){
+    if(!resetArm){resetArm=true;renderStats();setTimeout(function(){resetArm=false;if(document.getElementById("v-s").classList.contains("active"))renderStats();},4000);return;}
+    resetArm=false;st.st={};st.hist=[];st.cnt=0;st.streak=0;st.conf={};save();renderStats();renderTop();toast("成績を消去しました");
+  };
+}
+function renderTop(){
+  var tot=0,cor=0;Object.keys(st.st).forEach(function(k){tot+=st.st[k].n;cor+=st.st[k].c;});
+  document.getElementById("sN").textContent=tot;
+  document.getElementById("sR").textContent=tot?Math.round(cor/tot*100)+"%":"—";
+  document.getElementById("sS").textContent=st.streak||0;
+}
+
+/* ── 出典 ── */
+function renderSrc(){
+  var t=function(l){return '<table class="mm src"><tr><th>筋</th><th>神経</th><th>根</th></tr>'+MUS[l].map(function(m){return '<tr><td>'+esc(m[1])+'</td><td class="inn">'+esc(m[3])+'</td><td>'+rootsHtml(m[4])+'</td></tr>';}).join("")+'</table>';};
+  document.getElementById("tblUp").innerHTML=t("up");
+  document.getElementById("tblLo").innerHTML=t("lo");
+  document.getElementById("verTxt").textContent=APP_VERSION;
+}
+document.getElementById("forceUpdate").onclick=function(){
+  toast("最新版を確認しています…");
+  (async function(){try{if("serviceWorker" in navigator){var r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}
+    try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}
+    setTimeout(function(){location.reload();},800);})();
+};
+
+/* ── タブ ── */
+var tabs=document.querySelectorAll("nav.tabs button");
+function show(v){
+  Array.prototype.forEach.call(document.querySelectorAll("section.view"),function(s){s.classList.toggle("active",s.id===v);});
+  Array.prototype.forEach.call(tabs,function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===v?"true":"false");});
+  if(v==="v-a")renderAtlas();if(v==="v-s")renderStats();if(v==="v-c")renderSrc();
+  window.scrollTo(0,0);
+}
+Array.prototype.forEach.call(tabs,function(b){b.onclick=function(){show(b.getAttribute("data-v"));};});
+var tt;function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on");},2600);}
+window.__pntToast=toast;
+window.__pnt={LES:LES,byId:byId,ev:ev,emin:emin,discr:discr,makeCase:makeCase,st:function(){return st;},MUSI:MUSI,newQ:newQ,answer:answer};
+
+renderSet();renderTop();renderQ();
+})();
+
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    var onClaude=/claude\.ai$|claudeusercontent|claude\.site/.test(h);
+    if(!("serviceWorker" in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller&&window.__pntToast)window.__pntToast("新しい版を取り込みました。次に開いたときに反映されます");
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[{"k":"pnt-v1","keep":["st","hist","cnt","streak","conf"]}];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>
