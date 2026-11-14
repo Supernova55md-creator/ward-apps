@@ -33,12 +33,12 @@
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%}
 header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
-.top{display:flex;align-items:baseline;gap:8px;padding:10px 16px 4px}
+.hrow{display:flex;align-items:baseline;gap:8px;padding:10px 16px 4px}
 #swmsg{display:none;font-size:12px;background:var(--accent-soft);color:var(--accent);padding:6px 16px}
-.top h1{font-size:17px;margin:0;white-space:nowrap}
+.hrow h1{font-size:17px;margin:0;white-space:nowrap}
 .dis{scroll-margin-top:110px}
-@media (max-width:480px){.top small{display:none}}
-.top small{color:var(--muted);font-size:12px}
+@media (max-width:480px){.hrow small{display:none}}
+.hrow small{color:var(--muted);font-size:12px}
 nav{display:flex;overflow-x:auto;gap:4px;padding:4px 10px 8px;scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
 nav a{flex:0 0 auto;text-decoration:none;color:var(--muted);font-size:14px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);font-weight:700}
@@ -101,13 +101,24 @@ details>summary{cursor:pointer;padding:12px 14px;font-weight:700;font-size:15px}
 details>div{padding:0 14px 14px}
 .upd{font-size:12px;color:var(--warn);font-weight:700}
 .empty{font-size:14px;color:var(--muted);padding:6px 0}
+.hid{display:none!important}
+details.more{border:0;background:transparent}
+details.more>summary{padding:6px 0;font-size:13px;color:var(--accent);font-weight:700}
+details.more>div{padding:6px 0 0}
+.result.info{border-color:var(--accent);background:var(--accent-soft)}
+.qt{width:100%;font-size:13px}
+.qt td,.qt th{padding:5px}
+.ver{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.ver button{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;padding:6px 10px;cursor:pointer}
+.disclaimer{font-size:12px;color:var(--muted)}
+.wpnote{font-size:13px;color:var(--bad);font-weight:700}
 footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
 @media (prefers-reduced-motion:no-preference){.result,.dis{transition:background .15s}}
 </style>
 </head>
 <body>
-<header>
-  <div class="top"><h1>認知症外来ナビ</h1><small>『認知症の鑑別診断ガイドブック』準拠＋2026年改訂</small></div>
+<header class="top">
+  <div class="hrow top"><h1>認知症外来ナビ</h1><small>鑑別診断ガイドブック・添付文書（2026）</small></div>
   <nav id="tabs">
     <a href="#flow" data-v="flow">① 診断フロー</a>
     <a href="#dx" data-v="dx">② 病型鑑別</a>
@@ -123,6 +134,20 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
 <!-- ============ FLOW ============ -->
 <section class="view" id="v-flow">
   <h2>診断フロー</h2>
+
+  <div class="card">
+    <h3>外来の早見</h3>
+    <div class="tbl"><table class="qt"><thead><tr><th></th><th>検査で客観的低下</th><th>IADL</th><th>CDR-GS</th></tr></thead><tbody>
+      <tr><th>SCD</th><td>なし（自覚のみ）</td><td>自立</td><td>0</td></tr>
+      <tr><th>MCI</th><td>あり</td><td>自立（工夫で）</td><td>ほぼ0.5</td></tr>
+      <tr><th>認知症</th><td>あり</td><td>援助が必要</td><td>軽度≒1</td></tr>
+    </tbody></table></div>
+    <ul class="list">
+      <li><b>まず除外</b>：せん妄・うつ・薬剤（抗コリン薬、BZ、H2RA、ステロイド）、血液（B12・葉酸、甲状腺、Na・Ca、血糖、肝腎、梅毒）、画像（慢性硬膜下血腫、iNPH、腫瘍、梗塞）</li>
+      <li><b>急ぐサイン</b>：数日〜数カ月で進む、変動・発作的、歩行障害＋尿失禁、局所神経症候、60歳以下の発症</li>
+      <li><b>抗Aβ抗体薬の対象</b>：ADによるMCI〜軽度認知症、CDR-GS 0.5か1、Aβ病理陽性、MRI禁忌所見なし。MMSEはレカネマブ（レケンビ）22点以上、ドナネマブ（ケサンラ）20〜28点</li>
+    </ul>
+  </div>
 
   <div class="card">
     <div class="step"><span class="num">1</span><h3>認知機能低下の区分</h3></div>
@@ -157,6 +182,7 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
     <div class="step"><span class="num">2</span><h3>治せる原因・急ぐ原因を先に除外</h3></div>
     <p class="note">当てはまる項目にチェックすると、考える疾患と次の一手を表示します。</p>
     <div id="redflags"></div>
+    <details class="more" id="rfmore"><summary>ほかの手がかり</summary><div id="redflags2"></div></details>
     <div id="rfout"></div>
     <details><summary>全例に行う血液検査（表1-8）</summary><div><ul class="list" id="blood-all"></ul></div></details>
     <details><summary>画像で最初に確認すること</summary><div><ul class="list">
@@ -238,18 +264,23 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
   <h2>抗Aβ抗体薬 適格性チェック</h2>
   <div class="card">
     <div class="grid2">
-      <div class="q"><label for="mmse">MMSE（MMSE-J、投与前1カ月以内が目安）</label><input type="number" id="mmse" min="0" max="30" inputmode="numeric" placeholder="例：24"></div>
+      <div class="q"><span class="qlab">MMSE（MMSE-J、投与前1カ月以内が目安）</span><input type="hidden" id="mmse">
+        <div class="seg" data-bind="mmse"><button data-v="19">19点以下</button><button data-v="21">20〜21</button><button data-v="25">22〜28</button><button data-v="29">29〜30</button></div></div>
       <div class="q"><label for="cdr">CDR全般スコア（CDR-GS）</label>
-        <select id="cdr"><option value="">未評価</option><option>0</option><option>0.5</option><option>1</option><option>2</option><option>3</option></select><a href="#cdr" class="note">CDR判定ツールで計算する</a></div>
+        <select id="cdr" class="hid"><option value="">未評価</option><option>0</option><option>0.5</option><option>1</option><option>2</option><option>3</option></select>
+        <div class="seg" data-bind="cdr"><button data-v="0">0</button><button data-v="0.5">0.5</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div><a href="#cdr" class="note">CDR判定ツールで計算する</a></div>
     </div>
     <div class="q"><label for="amy">Aβ病理の確認（アミロイドPETまたは髄液）</label>
-      <select id="amy"><option value="">未実施</option><option value="pos">陽性（Aβ病理を示唆）</option><option value="neg">陰性</option></select></div>
+      <select id="amy" class="hid"><option value="">未実施</option><option value="pos">陽性（Aβ病理を示唆）</option><option value="neg">陰性</option></select>
+      <div class="seg" data-bind="amy"><button data-v="">未実施</button><button data-v="pos">陽性</button><button data-v="neg">陰性</button></div></div>
     <div>
       <label class="check"><input type="checkbox" id="c-dx"><span>臨床的にADによるMCIまたは軽度認知症と判断（他疾患による認知機能低下を除外済み）</span></label>
       <label class="check"><input type="checkbox" id="c-cons"><span>本人と家族・介護者が治療に同意している</span></label>
       <label class="check"><input type="checkbox" id="c-mri"><span>MRIが撮れる（MRI非対応の医療機器なし、閉所恐怖症なし）</span></label>
     </div>
     <div class="qlab">投与前MRIの禁忌所見（1つでもあれば不可）</div>
+    <div class="btnrow"><button class="btn ghost" id="ci-none" type="button">禁忌所見・過敏症の既往はすべてなし</button></div>
+    <input type="checkbox" id="c-ciok" class="hid">
     <div>
       <label class="check"><input type="checkbox" class="ci" id="x-edema"><span>血管原性脳浮腫</span></label>
       <label class="check"><input type="checkbox" class="ci" id="x-mb"><span>脳微小出血 5個以上</span></label>
@@ -258,9 +289,11 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
       <label class="check"><input type="checkbox" class="ci" id="x-hyp"><span>本剤成分への重篤な過敏症の既往</span></label>
     </div>
   </div>
+  <div id="absum" class="result"></div>
   <div class="grid2" id="about"></div>
   <div class="card">
     <h3>慎重に判断したい点</h3>
+    <p class="wpnote" data-wp-show="at:ac,both" hidden>抗凝固薬を内服中（共通プロファイル）：ARIAに伴う脳出血のリスクに注意し、適応を慎重に判断</p>
     <ul class="list">
       <li>APOE ε4ホモ接合型ではARIAの頻度・重症度・症候性ARIAが高い。<span class="upd">2026年7月 APOE遺伝子検査が保険収載、8月の添付文書改訂で投与前の検査実施の考慮が追記</span>（本書p.57・p.66-67の「保険外」は改訂前の記載）</li>
       <li>抗血栓薬、特に抗凝固薬の併用は出血リスクを考えて慎重に。詳細は添付文書と最適使用推進ガイドラインで確認</li>
@@ -294,12 +327,15 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
     </div></details>
     <h3 style="margin-top:6px">有効性・投与期間による判断</h3>
     <div class="grid2">
-      <div class="q"><label for="mon">投与開始からの月数</label><input type="number" id="mon" min="0" max="60" inputmode="numeric" placeholder="例：12"></div>
-      <div class="q"><label for="prog">直近の6カ月評価</label>
-        <select id="prog"><option value="">未評価</option><option value="ok">MCI〜軽度にとどまり、継続の意義あり</option><option value="mod">中等度以降に進行（CDR-GS 2以上など）</option><option value="noeff">有効性が期待できないと判断</option></select></div>
+      <div class="q"><span class="qlab">投与開始から</span><input type="hidden" id="mon">
+        <div class="seg" data-bind="mon"><button data-v="3">6カ月未満</button><button data-v="6">6〜11カ月</button><button data-v="12">12〜17カ月</button><button data-v="18">18カ月以上</button></div></div>
+      <div class="q"><span class="qlab">直近の6カ月評価</span>
+        <select id="prog" class="hid"><option value="">未評価</option><option value="ok">MCI〜軽度にとどまり、継続の意義あり</option><option value="mod">中等度以降に進行（CDR-GS 2以上など）</option><option value="noeff">有効性が期待できないと判断</option></select>
+        <div class="seg" data-bind="prog"><button data-v="">未評価</button><button data-v="ok">軽度まで・継続の意義あり</button><button data-v="mod">中等度以降に進行</button><button data-v="noeff">有効性が期待できない</button></div></div>
     </div>
-    <div class="q" id="petq"><label for="pet">アミロイドPET（ドナネマブ、12カ月目安）</label>
-      <select id="pet"><option value="">未実施</option><option value="clear">プラーク除去を確認</option><option value="remain">除去が確認されない</option></select></div>
+    <div class="q" id="petq"><span class="qlab">アミロイドPET（ドナネマブ、12カ月目安）</span>
+      <select id="pet" class="hid"><option value="">未実施</option><option value="clear">プラーク除去を確認</option><option value="remain">除去が確認されない</option></select>
+      <div class="seg" data-bind="pet"><button data-v="">未実施</button><button data-v="clear">除去を確認</button><button data-v="remain">除去なし</button></div></div>
     <div id="effout" class="result"></div>
     <ul class="list note">
       <li>投与中は6カ月ごとを目安に認知機能検査と臨床症状の評価を行い、有効性が期待できなければ中止。中等度以降に進行した人への継続投与の有効性は確立していない（両剤共通）</li>
@@ -310,7 +346,7 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
   <div class="card">
     <h3>2剤の比較</h3>
     <div class="tbl"><table>
-      <thead><tr><th></th><th>レカネマブ</th><th>ドナネマブ</th></tr></thead>
+      <thead><tr><th></th><th>レカネマブ（レケンビ）</th><th>ドナネマブ（ケサンラ）</th></tr></thead>
       <tbody>
         <tr><th>標的</th><td>可溶性プロトフィブリル優位</td><td>プラーク特異的（N3pG Aβ）</td></tr>
         <tr><th>MMSE</th><td>22点以上</td><td>20点以上28点以下</td></tr>
@@ -331,10 +367,10 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
   <div id="refout" style="display:flex;flex-direction:column;gap:8px"></div>
   <details><summary>アルツハイマー型認知症治療薬（ChEI・メマンチン）</summary><div>
     <div class="tbl"><table><thead><tr><th>薬剤</th><th>適応</th><th>代謝・注意</th></tr></thead><tbody>
-      <tr><td>ドネペジル</td><td>軽度〜重度（DLBにも適応）</td><td>CYP3A4/2D6。錠5→重度10 mg、貼付剤27.5→55 mg</td></tr>
-      <tr><td>ガランタミン</td><td>軽度〜中等度</td><td>CYP2D6/3A4。8→16（〜24）mg/日、1日2回</td></tr>
-      <tr><td>リバスチグミン</td><td>軽度〜中等度</td><td>非CYP。貼付18 mg/日、持続放出型は週2回貼り替え</td></tr>
-      <tr><td>メマンチン</td><td>中等度〜重度</td><td>腎排泄。高度腎障害では維持10 mg</td></tr>
+      <tr><td>ドネペジル（アリセプト、貼付剤アリドネパッチ）</td><td>軽度〜重度（DLBにも適応）</td><td>CYP3A4/2D6。錠5→重度10 mg、貼付剤27.5→55 mg</td></tr>
+      <tr><td>ガランタミン（レミニール）</td><td>軽度〜中等度</td><td>CYP2D6/3A4。8→16（〜24）mg/日、1日2回</td></tr>
+      <tr><td>リバスチグミン（イクセロンパッチ、リバスタッチパッチ、持続放出型リバルエンLAパッチ）</td><td>軽度〜中等度</td><td>非CYP。貼付18 mg/日、持続放出型は週2回貼り替え</td></tr>
+      <tr><td>メマンチン（メマリー）</td><td>中等度〜重度</td><td>腎排泄。高度腎障害では維持10 mg</td></tr>
     </tbody></table></div>
     <ul class="list" style="margin-top:8px">
       <li>ChEI同士の併用は不可。中等度〜重度ではどのChEIもメマンチンと併用可（p.70）</li>
@@ -342,7 +378,23 @@ footer{font-size:12px;color:var(--muted);text-align:left;padding-top:8px}
       <li>効果不十分・副作用時は他のChEIへ変更を検討（p.71-72）</li>
     </ul>
   </div></details>
-  <div class="btnrow"><button class="btn ghost" id="wipe">この端末に保存した入力をすべて消す</button></div>
+  <div class="card">
+    <h3>出典と照合の状況</h3>
+    <ul class="list">
+      <li><b>照合済み</b>：抗Aβ抗体薬の要件・用法・MRI時期・ARIA対応・中止判断は、各添付文書（レケンビ 2026年9月改訂第6版、ケサンラ 2026年8月改訂第6版）と最適使用推進ガイドラインに照合。CDRのGlobal ScoreはWashington大学の公式ルールに照合</li>
+      <li><b>原典未照合</b>：疾患早見表・診断フロー・検査の要点、MCIの移行率などの数値は書籍の記載を要約したもの（各項目の原著論文とは照合していない）。病型鑑別の重みづけは本アプリ独自の目安</li>
+    </ul>
+    <ul class="list" style="font-size:13px">
+      <li>『認知症の鑑別診断ガイドブック』（2026）— ページ番号は印刷ページ</li>
+      <li><a href="https://www.kegg.jp/medicus-bin/japic_med?japic_code=00071040">レケンビ点滴静注 添付文書（KEGG/JAPIC）</a></li>
+      <li><a href="https://www.kegg.jp/medicus-bin/japic_med?japic_code=00071554">ケサンラ点滴静注液350mg 添付文書（KEGG/JAPIC）</a></li>
+      <li><a href="https://www.pmda.go.jp/files/000281057.pdf">ドナネマブ 使用上の注意の改訂（PMDA, 2026年6月5日）</a>／<a href="https://www.pmda.go.jp/files/000281059.pdf">レカネマブ（同）</a>／<a href="https://www.pmda.go.jp/files/000282128.pdf">APOE検査（PMDA, 2026年8月17日）</a></li>
+      <li><a href="https://knightadrc.wustl.edu/professionals-clinicians/cdr-dementia-staging-instrument/cdr-scoring-rules/">CDR Scoring Rules（Knight ADRC）</a>／<a href="https://pubmed.ncbi.nlm.nih.gov/8232972/">Morris JC. Neurology 1993;43:2412-4</a></li>
+      <li><a href="https://pubmed.ncbi.nlm.nih.gov/38934362/">Jack CR Jr, et al. Revised criteria for diagnosis and staging of Alzheimer's disease. Alzheimers Dement 2024</a></li>
+    </ul>
+    <p class="disclaimer">診療判断の補助ツールです。最終判断は診察と原典（最新の添付文書・最適使用推進ガイドライン）で行ってください。患者を特定できる情報は入力しないでください。</p>
+    <div class="ver">アプリの版：<b id="appVer"></b><button type="button" id="forceUpdate">最新版に更新</button></div>
+  </div>
   <footer>
     <p>出典：『認知症の鑑別診断ガイドブック』（2026）。ページ番号は印刷ページ。本文は要約・言い換えで、原文の引用ではありません。</p>
     <p style="margin-top:6px">書籍刊行後の更新：ドナネマブ・レカネマブ使用上の注意改訂（PMDA 2026年6月5日、8月17日）、レケンビ皮下注承認（2026年9月16日）。投与判断は必ず最新の最適使用推進ガイドライン・添付文書で確認してください。個人用の参照ツールです。</p>
@@ -411,9 +463,13 @@ const RF=[
  {t:"膠原病・血管炎の既往、口腔潰瘍など",d:[41,39,38,40],a:"抗核抗体・dsDNA、髄液IL-6、甲状腺抗体（p.48-52）"},
  {t:"老年期に初発したうつ",d:[2,1,15],a:"うつ病との鑑別（表1-5）と、DLB・AD前駆の可能性（p.29）"},
 ];
-$("#redflags").innerHTML=RF.map((r,i)=>`<label class="check"><input type="checkbox" data-rf="${i}"><span>${esc(r.t)}</span></label>`).join("");
+const RF_TOP=[1,0,4,3,2];
+const rfRow=i=>`<label class="check"><input type="checkbox" data-rf="${i}"><span>${esc(RF[i].t)}</span></label>`;
+$("#redflags").innerHTML=RF_TOP.map(rfRow).join("");
+$("#redflags2").innerHTML=RF.map((r,i)=>i).filter(i=>!RF_TOP.includes(i)).map(rfRow).join("");
+$("#redflags2").addEventListener("change",()=>$("#redflags").dispatchEvent(new Event("change")));
 $("#redflags").addEventListener("change",()=>{
-  const on=$$("#redflags input:checked").map(x=>RF[+x.dataset.rf]);
+  const on=$$("#redflags input:checked, #redflags2 input:checked").map(x=>RF[+x.dataset.rf]);
   if(!on.length){$("#rfout").innerHTML="";return;}
   $("#rfout").innerHTML=`<div class="result warn">${on.map(r=>`<div><b style="font-size:14px">${esc(r.t)}</b><p style="font-size:14px">${esc(r.a)}</p><p style="font-size:13px">${r.d.map(n=>`<a href="#d${n}">${esc(byNo[n].abbr||byNo[n].name)}</a>`).join("・")}</p></div>`).join("")}</div>`;
 });
@@ -449,6 +505,8 @@ const CLUES=[
  ]],
  ["神経所見",[
   ["パーキンソニズム",{2:2,3:3,5:2,6:2,9:2,15:1,25:1}],
+  ["認知症がパーキンソニズムに先行か1年以内",{2:3}],
+  ["パーキンソン病の発症1年以上後に認知症",{3:3}],
   ["垂直性眼球運動障害・注意しても転倒",{5:3}],
   ["失行・皮質性感覚障害・著明な左右差",{6:3}],
   ["構音障害・発語失行",{5:2,6:2,4:1}],
@@ -494,7 +552,8 @@ const CLUES=[
  ]],
 ];
 const sel=new Set();
-$("#clues").innerHTML=CLUES.map((g,gi)=>`<div class="card" style="gap:8px"><h3>${g[0]}</h3><div class="chips">${g[1].map((c,ci)=>`<button class="chip" aria-pressed="false" data-c="${gi}-${ci}">${esc(c[0])}</button>`).join("")}</div></div>`).join("");
+const chip=(c,gi,ci)=>`<button class="chip" aria-pressed="false" data-c="${gi}-${ci}">${esc(c[0])}</button>`;
+$("#clues").innerHTML=CLUES.map((g,gi)=>`<div class="card" style="gap:6px"><h3>${g[0]}</h3><div class="chips">${g[1].slice(0,4).map((c,ci)=>chip(c,gi,ci)).join("")}</div>${g[1].length>4?`<details class="more"><summary>ほか${g[1].length-4}項目</summary><div class="chips">${g[1].slice(4).map((c,ci)=>chip(c,gi,ci+4)).join("")}</div></details>`:""}</div>`).join("");
 $("#clues").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;const k=b.dataset.c;
   if(sel.has(k))sel.delete(k);else sel.add(k);b.classList.toggle("on");b.setAttribute("aria-pressed",sel.has(k));renderDx();});
 $("#clr").addEventListener("click",()=>{sel.clear();$$("#clues .chip").forEach(b=>{b.classList.remove("on");b.setAttribute("aria-pressed","false")});renderDx();});
@@ -506,7 +565,8 @@ function renderDx(){
     for(const n in c[1]){sc[n]=(sc[n]||0)+c[1][n];(why[n]=why[n]||[]).push(c[0]);}});
   const rank=Object.keys(sc).sort((a,b)=>sc[b]-sc[a]||(+a)-(+b)).slice(0,10);
   const max=sc[rank[0]];
-  out.innerHTML=rank.map(n=>card(byNo[n],{score:sc[n],max,why:why[n],id:"X"+n})).join("");
+  const top=rank.filter(n=>sc[n]===max).map(n=>byNo[n].abbr||byNo[n].name);
+  out.innerHTML=`<div class="result info" id="dxtop"><b class="big">第1候補：${esc(top.slice(0,3).join("・"))}</b><span class="note">手がかり${sel.size}個の重みづけ。目安であり診断ではありません</span></div>`+rank.map(n=>card(byNo[n],{score:sc[n],max,why:why[n],id:"X"+n})).join("");
 }
 
 /* ---------- disease card ---------- */
@@ -543,17 +603,23 @@ function abeta(){
   else if(amy==="neg") common.push("Aβ病理が確認されていない（陰性）");
   if(!$("#c-cons").checked) pend.push("本人・家族の同意");
   if(!$("#c-mri").checked) pend.push("MRI撮像が可能か");
+  if(!$("#c-ciok").checked && !$$(".ci:checked").length) pend.push("投与前MRIの禁忌所見");
   $$(".ci:checked").forEach(x=>common.push("禁忌："+x.nextElementSibling.textContent));
   const drug=(name,lo,hi)=>{
     const ng=[...common];
     if(m===null) pend.includes("MMSE")||null;
-    if(m!==null && (m<lo||m>hi)) ng.push(`MMSE ${m}点（${hi===30?lo+"点以上":lo+"〜"+hi+"点"}が必要）`);
+    if(m!==null && (m<lo||m>hi)) ng.push(`MMSE ${MLAB[m]||m+"点"}（${hi===30?lo+"点以上":lo+"〜"+hi+"点"}が必要）`);
     const p=[...pend]; if(m===null)p.unshift("MMSE");
     let cls,t;
     if(ng.length){cls="bad";t="対象外";}else if(p.length){cls="warn";t="未確認の項目あり";}else{cls="ok";t="要件を満たす";}
     return `<div class="result ${cls}"><b>${name}</b><b class="big">${t}</b>${ng.length?`<ul class="list">${ng.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}${p.length?`<p class="note">未確認：${p.map(esc).join("、")}</p>`:""}${!ng.length&&!p.length?`<p class="note">施設要件と最新の最適使用推進ガイドラインの除外基準も確認</p>`:""}</div>`;
   };
-  $("#about").innerHTML=drug("レカネマブ",22,30)+drug("ドナネマブ",20,28);
+  $("#about").innerHTML=drug("レカネマブ（レケンビ）",22,30)+drug("ドナネマブ（ケサンラ）",20,28);
+  const st2=[...$$("#about .result")].map(r=>r.querySelector(".big").textContent);
+  const anyNg=st2.includes("対象外"),allNg=st2.every(x=>x==="対象外"),anyOk=st2.includes("要件を満たす");
+  const sm=$("#absum");sm.className="result "+(allNg?"bad":anyOk?"ok":"warn");
+  sm.innerHTML=`<b class="big">レカネマブ：${st2[0]}／ドナネマブ：${st2[1]}</b>`;
+  syncBind();
 }
 $("#v-abeta").addEventListener("input",abeta);$("#v-abeta").addEventListener("change",abeta);
 
@@ -608,7 +674,7 @@ function cdrCalc(){
   o.innerHTML=`<b class="big">CDR-GS ${g}（${lab}）</b><span>CDR-SB ${sb} / 18</span><span class="note">抗Aβ抗体薬の要件：CDR-GS 0.5または1 → ${g===0.5||g===1?"該当":"非該当"}</span>`;
 }
 $("#cdrclr").addEventListener("click",()=>{for(const k in cv)delete cv[k];$$("#cdrbox button").forEach(b=>b.classList.remove("on"));cdrCalc();});
-$("#cdr2ab").addEventListener("click",()=>{if(cdrGS===null){$("#cdrout").insertAdjacentHTML("beforeend",'<span class="note" style="color:var(--bad)">6領域すべてを選んでから反映してください</span>');return;}$("#cdr").value=String(cdrGS);abeta();location.hash="abeta";});
+$("#cdr2ab").addEventListener("click",()=>{if(cdrGS===null){$("#cdrout").insertAdjacentHTML("beforeend",'<span class="note" style="color:var(--bad)">6領域すべてを選んでから反映してください</span>');return;}$("#cdr").value=String(cdrGS);abeta();syncBind();location.hash="abeta";});
 cdrCalc();
 
 
@@ -616,13 +682,13 @@ cdrCalc();
 const SKEY="dementia-navi-state-v1";
 let WIPING=false;
 function saveState(){if(WIPING)return;try{
-  const s={seg:st,rf:$$("#redflags input:checked").map(x=>x.dataset.rf),clues:[...sel],cdr:cv,
+  const s={seg:st,rf:$$("#redflags input:checked, #redflags2 input:checked").map(x=>x.dataset.rf),clues:[...sel],cdr:cv,
     ab:{mmse:$("#mmse").value,cdr:$("#cdr").value,amy:$("#amy").value,chk:$$("#v-abeta input[type=checkbox]:checked").map(x=>x.id)},q:$("#q").value,sk,eff:{mon:$("#mon").value,prog:$("#prog").value,pet:$("#pet").value}};
   localStorage.setItem(SKEY,JSON.stringify(s));}catch(e){}}
 function loadState(){let s;try{s=JSON.parse(localStorage.getItem(SKEY)||"null");}catch(e){}if(!s)return;
   Object.entries(s.seg||{}).forEach(([k,v])=>{st[k]=v;$$(`.seg[data-k="${k}"] button`).forEach(b=>b.classList.toggle("on",b.dataset.v===v));});classify();
-  (s.rf||[]).forEach(i=>{const x=$(`#redflags input[data-rf="${i}"]`);if(x)x.checked=true;});$("#redflags").dispatchEvent(new Event("change"));
-  (s.clues||[]).forEach(k=>{const b=$(`#clues .chip[data-c="${k}"]`);if(b){sel.add(k);b.classList.add("on");b.setAttribute("aria-pressed","true");}});renderDx();
+  (s.rf||[]).forEach(i=>{const x=$(`#v-flow input[data-rf="${i}"]`);if(x){x.checked=true;if(x.closest("#redflags2"))$("#rfmore").open=true;}});$("#redflags").dispatchEvent(new Event("change"));
+  (s.clues||[]).forEach(k=>{const b=$(`#clues .chip[data-c="${k}"]`);if(b){sel.add(k);b.classList.add("on");b.setAttribute("aria-pressed","true");const d=b.closest("details");if(d)d.open=true;}});renderDx();
   Object.entries(s.cdr||{}).forEach(([k,v])=>{cv[k]=v;$$(`[data-cdr="${k}"] button`).forEach(b=>b.classList.toggle("on",+b.dataset.v===v));});cdrCalc();
   if(s.ab){$("#mmse").value=s.ab.mmse||"";$("#cdr").value=s.ab.cdr||"";$("#amy").value=s.ab.amy||"";(s.ab.chk||[]).forEach(id=>{const x=document.getElementById(id);if(x)x.checked=true;});}
   if(s.q)$("#q").value=s.q;
@@ -631,7 +697,20 @@ function loadState(){let s;try{s=JSON.parse(localStorage.getItem(SKEY)||"null");
   ariaCalc();effCalc();}
 ["click","change","input"].forEach(ev=>document.addEventListener(ev,()=>setTimeout(saveState,0)));
 
-$("#wipe").addEventListener("click",()=>{WIPING=true;try{localStorage.removeItem(SKEY);}catch(e){}location.hash="flow";location.reload();});
+
+
+
+/* ---------- bucket buttons bound to hidden fields ---------- */
+const MLAB={19:"19点以下",21:"20〜21点",25:"22〜28点",29:"29〜30点"};
+function normBind(k,v){if(v===""||v==null)return "";
+  if(k==="mmse"){const n=+v;return String(n<=19?19:n<=21?21:n<=28?25:29);}
+  if(k==="mon"){const n=+v;return String(n<6?3:n<12?6:n<18?12:18);}
+  return String(v);}
+function syncBind(){$$("[data-bind]").forEach(g=>{const f=document.getElementById(g.dataset.bind);if(!f)return;const v=normBind(g.dataset.bind,f.value);if(f.value!==v)f.value=v;g.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===v&&(v!==""||g.querySelector('button[data-v=""]')===b)));});}
+$$("[data-bind]").forEach(g=>g.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const f=document.getElementById(g.dataset.bind);
+  f.value=(f.value===b.dataset.v&&b.dataset.v!=="")?"":b.dataset.v;f.dispatchEvent(new Event("input",{bubbles:true}));f.dispatchEvent(new Event("change",{bubbles:true}));syncBind();}));
+$("#ci-none").addEventListener("click",()=>{$$(".ci").forEach(x=>x.checked=false);$("#c-ciok").checked=true;abeta();});
+$$(".ci").forEach(x=>x.addEventListener("change",()=>{if(x.checked)$("#c-ciok").checked=false;}));
 
 /* ---------- ARIA / stop flow ---------- */
 const sk={drug:"lec",sym:"0",e:"0",h:"0",ich:"0"};
@@ -661,7 +740,7 @@ function ariaCalc(){
 }
 function effCalc(){
   const don=sk.drug==="don",m=$("#mon").value===""?null:+$("#mon").value,pr=$("#prog").value,pet=$("#pet").value,o=$("#effout");
-  $("#petq").style.display=don?"":"none";
+  $("#petq").style.display=don?"":"none";syncBind();
   const msg=[];let cls="ok",head="継続";
   if(pr==="mod"||pr==="noeff"){cls="bad";head="投与中止を検討";msg.push(pr==="mod"?"中等度以降に進行した人への継続投与の有効性は確立していない":"有効性が期待できない場合は中止");}
   if(don){
@@ -679,6 +758,15 @@ function effCalc(){
 ["#mon","#prog","#pet"].forEach(s=>{$(s).addEventListener("input",effCalc);$(s).addEventListener("change",effCalc);});
 ariaCalc();effCalc();
 
+
+/* ---------- version / update ---------- */
+const APP_VER="2026-11-14";
+$("#appVer").textContent=APP_VER;
+$("#forceUpdate").addEventListener("click",async()=>{const b=$("#forceUpdate");b.textContent="確認中…";
+  try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}
+  try{await fetch(location.href,{cache:"reload"});}catch(e){b.textContent="通信できません";return;}
+  setTimeout(()=>location.reload(),800);});
+
 /* init */
 loadState(); renderList(); if(!sel.size)renderDx(); abeta(); route();
 })();
@@ -695,6 +783,68 @@ loadState(); renderList(); if(!sel.size)renderDx(); abeta(); route();
   }).catch(function(){});
 }catch(e){}})();
 </script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=["#cls.ok,#cls.warn,#cls.bad","#dxtop","#cdrout.ok,#cdrout.warn,#cdrout.bad","#absum.ok,#absum.warn,#absum.bad","#ariaout"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
 <!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
 <style>
 #wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -757,6 +907,7 @@ loadState(); renderList(); if(!sel.size)renderDx(); abeta(); route();
 })();
 </script>
 <!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
 <script src="../share.js" defer></script>
 </body>
 </html>
