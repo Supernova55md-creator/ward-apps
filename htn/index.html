@@ -49,11 +49,11 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:96px}
-header{background:var(--accent);color:var(--accent-ink);padding:calc(14px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left))}
-header .row{max-width:720px;margin:0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
-header h1{font-size:20px;margin:0;letter-spacing:.02em;text-wrap:balance}
-header .sub{font-size:12px;opacity:.9}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 10px calc(12px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .row{max-width:720px;margin:0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header.top h1{font-size:20px;margin:0;letter-spacing:.02em;text-wrap:balance}
+header.top .sub{font-size:12px;opacity:.9}
 main{max-width:720px;margin:0 auto;padding:12px calc(16px + env(safe-area-inset-right)) 12px calc(16px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
 section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
 h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px;text-wrap:balance}
@@ -136,90 +136,141 @@ button.ghost{background:transparent}
 .toast.on{opacity:1}
 @media (prefers-reduced-motion: reduce){.toast{transition:none}html{scroll-behavior:auto}}
 .disclaimer{font-size:12px;color:var(--muted)}
+
+.glabel{font-size:12px;color:var(--muted);margin:2px 0 6px;font-weight:700}
+.glabel + .scene{margin-bottom:10px}
+.scene.acute{grid-template-columns:1fr 1fr 1fr}
+@media (max-width:430px){.scene.acute{grid-template-columns:1fr 1fr}}
+.scene.acute .chip span{min-height:50px;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-weight:500;padding:6px 6px;line-height:1.25}
+.scene.gen{grid-template-columns:1fr 1fr}
+.scene.gen .chip span{min-height:46px;font-size:13.5px;padding:8px 10px}
+@media (max-width:430px){header.top .sub{display:none}}
+.scene .chip span small{display:block;font-size:11px;font-weight:400;opacity:.85}
+details.more{border:1px solid var(--line);border-radius:10px;background:var(--bg);margin-top:10px}
+details.more > summary{list-style:none;cursor:pointer;padding:10px 12px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:44px}
+details.more > summary::-webkit-details-marker{display:none}
+details.more > summary::after{content:"＋";color:var(--accent);font-size:18px}
+details.more[open] > summary::after{content:"－"}
+details.more > summary .cnt{font-weight:400;font-size:12px;color:var(--muted);margin-left:auto}
+details.more .in{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
+.pf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pf label.f select{font-size:14px;padding:7px 6px}
+.reveal{margin-top:8px;padding:8px 10px;border-left:3px solid var(--accent);background:var(--bg);border-radius:6px}
+.q{display:flex;flex-direction:column;gap:6px}
+.q > b{font-size:13px;color:var(--muted)}
+.ver{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
 </style>
 </head>
 <body>
-<header>
+<header class="top">
   <div class="row">
     <h1>高血圧治療ナビ</h1>
-    <div class="sub">JSH2025・脳卒中治療GL2021〔改訂2025〕準拠／病棟用</div>
+    <div class="sub">JSH2025・脳卒中治療GL2021〔改訂2025〕</div>
   </div>
 </header>
 
 <main>
 <form id="f" autocomplete="off" onsubmit="return false">
 
-<section class="card">
-  <h2><span class="num">1</span>場面</h2>
-  <div class="scene" id="scene">
-    <label class="chip"><input type="radio" name="scene" value="general" checked><span>一般・入院中の降圧薬調整</span></label>
-    <label class="chip"><input type="radio" name="scene" value="chronicStroke"><span>脳卒中 亜急性期〜慢性期（再発予防）</span></label>
-    <label class="chip"><input type="radio" name="scene" value="isNone"><span>脳梗塞 急性期（再灌流療法なし）</span></label>
-    <label class="chip"><input type="radio" name="scene" value="ivt"><span>脳梗塞 静注血栓溶解（rt-PA/TNK）前後</span></label>
-    <label class="chip"><input type="radio" name="scene" value="evt"><span>脳梗塞 血栓回収療法後</span></label>
-    <label class="chip"><input type="radio" name="scene" value="ich"><span>脳出血 急性期</span></label>
-    <label class="chip"><input type="radio" name="scene" value="sah"><span>くも膜下出血（動脈瘤未処置）</span></label>
+<section class="card" id="sceneCard">
+  <div class="glabel">急性期脳卒中：病型を押すと降圧目標が出ます</div>
+  <div class="scene acute">
+    <label class="chip"><input type="radio" name="scene" value="isNone"><span>脳梗塞<small>再灌流なし</small></span></label>
+    <label class="chip"><input type="radio" name="scene" value="ivtPre"><span>rt-PA/TNK<small>投与前</small></span></label>
+    <label class="chip"><input type="radio" name="scene" value="ivtPost"><span>rt-PA/TNK<small>投与後24時間</small></span></label>
+    <label class="chip"><input type="radio" name="scene" value="evt"><span>血栓回収<small>治療後</small></span></label>
+    <label class="chip"><input type="radio" name="scene" value="ich"><span>脳出血<small>急性期</small></span></label>
+    <label class="chip"><input type="radio" name="scene" value="sah"><span>くも膜下出血<small>動脈瘤未処置</small></span></label>
   </div>
-  <div id="evtIvt" class="sub-group hidden">
-    <div class="chips">
-      <label class="chip"><input type="checkbox" id="evtWithIvt"><span>静注血栓溶解も併用した</span></label>
-      <label class="chip"><input type="checkbox" id="evtIncomplete"><span>再開通不良（TICI 2a以下）</span></label>
-    </div>
-  </div>
-  <div id="ivtPhase" class="sub-group hidden">
-    <div class="chips">
-      <label class="chip"><input type="radio" name="ivtPhase" value="pre" checked><span>投与前</span></label>
-      <label class="chip"><input type="radio" name="ivtPhase" value="post"><span>投与後24時間以内</span></label>
-    </div>
+  <div class="glabel">慢性期・入院中の降圧薬選択</div>
+  <div class="scene gen">
+    <label class="chip"><input type="radio" name="scene" value="general" checked><span>一般・入院中の調整</span></label>
+    <label class="chip"><input type="radio" name="scene" value="chronicStroke"><span>脳卒中 慢性期・再発予防</span></label>
   </div>
 </section>
 
+<div id="resultSlotTop"></div>
+
 <section class="card">
-  <h2><span class="num">2</span>血圧・脈拍</h2>
+  <h2><span class="num">1</span>血圧<span class="hint" style="margin:0 0 0 auto;font-weight:400" id="bpHint"></span></h2>
   <div class="grid">
     <label class="f">診察室・病棟血圧（mmHg）
-      <div class="bp"><input type="number" id="sbp" inputmode="numeric" min="50" max="300" value="152" aria-label="収縮期血圧"><span class="slash">/</span><input type="number" id="dbp" inputmode="numeric" min="20" max="200" value="88" aria-label="拡張期血圧"></div>
+      <div class="bp"><input type="number" id="sbp" inputmode="numeric" min="50" max="300" placeholder="収縮期" aria-label="収縮期血圧"><span class="slash">/</span><input type="number" id="dbp" inputmode="numeric" min="20" max="200" placeholder="拡張期" aria-label="拡張期血圧"></div>
     </label>
-    <label class="f">家庭血圧（任意）
-      <div class="bp"><input type="number" id="hsbp" inputmode="numeric" min="50" max="300" placeholder="—" aria-label="家庭収縮期血圧"><span class="slash">/</span><input type="number" id="hdbp" inputmode="numeric" min="20" max="200" placeholder="—" aria-label="家庭拡張期血圧"></div>
-    </label>
-    <label class="f">脈拍（/分）<input type="number" id="hr" inputmode="numeric" min="20" max="250" value="76"></label>
+    <label class="f gen-only">脈拍（/分）<input type="number" id="hr" inputmode="numeric" min="20" max="250" placeholder="—"></label>
   </div>
-  <div class="chips" style="margin-top:10px">
-    <label class="chip"><input type="checkbox" id="hypoSx"><span>立ちくらみ・ふらつき・失神</span></label>
-    <label class="chip"><input type="checkbox" id="reactive"><span>疼痛・尿閉・不穏など一過性要因あり</span></label>
+
+  <div class="acute-only">
+    <div id="evtOpt" class="reveal hidden">
+      <div class="chips">
+        <label class="chip"><input type="checkbox" id="evtWithIvt"><span>静注血栓溶解も併用</span></label>
+        <label class="chip"><input type="checkbox" id="evtIncomplete"><span>再開通不良（TICI 2a以下）</span></label>
+      </div>
+    </div>
   </div>
+
+  <details class="more" id="emergBox">
+    <summary><span id="emergSum">急性臓器障害のサイン</span><span class="cnt" id="emergCnt"></span></summary>
+    <div class="in">
+      <p class="hint" style="margin:0">脳卒中急性期では、脳卒中以外の臓器障害（解離・ACS・心不全など）があるときにチェック。180/120以上になると自動で開きます。</p>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" class="emerg" value="enceph"><span>頭痛・意識障害・痙攣（高血圧性脳症/PRES疑い）</span></label>
+        <label class="chip"><input type="checkbox" class="emerg" value="retina"><span>視力障害・乳頭浮腫/眼底出血</span></label>
+        <label class="chip"><input type="checkbox" class="emerg" value="acs"><span>胸痛・急性冠症候群</span></label>
+        <label class="chip"><input type="checkbox" class="emerg" value="ahf"><span>呼吸困難・急性心不全/肺水腫</span></label>
+        <label class="chip"><input type="checkbox" class="emerg" value="aad"><span>背部痛・大動脈解離疑い</span></label>
+        <label class="chip"><input type="checkbox" class="emerg" value="aki"><span>急性腎障害・溶血/TMA</span></label>
+        <label class="chip"><input type="checkbox" class="emerg" value="eclampsia"><span>妊娠高血圧腎症・子癇</span></label>
+        <label class="chip"><input type="checkbox" class="emerg" value="pheo"><span>発作性の頭痛・動悸・発汗（褐色細胞腫クリーゼ疑い）</span></label>
+      </div>
+    </div>
+  </details>
 </section>
 
-<section class="card" id="emergCard">
-  <h2><span class="num">3</span>急性臓器障害のサイン</h2>
-  <div class="chips">
-    <label class="chip"><input type="checkbox" class="emerg" value="enceph"><span>頭痛・意識障害・痙攣（高血圧性脳症/PRES疑い）</span></label>
-    <label class="chip"><input type="checkbox" class="emerg" value="retina"><span>視力障害・乳頭浮腫/眼底出血</span></label>
-    <label class="chip"><input type="checkbox" class="emerg" value="acs"><span>胸痛・急性冠症候群</span></label>
-    <label class="chip"><input type="checkbox" class="emerg" value="ahf"><span>呼吸困難・急性心不全/肺水腫</span></label>
-    <label class="chip"><input type="checkbox" class="emerg" value="aad"><span>背部痛・大動脈解離疑い</span></label>
-    <label class="chip"><input type="checkbox" class="emerg" value="aki"><span>急性腎障害・溶血/TMA</span></label>
-    <label class="chip"><input type="checkbox" class="emerg" value="eclampsia"><span>妊娠高血圧腎症・子癇</span></label>
-    <label class="chip"><input type="checkbox" class="emerg" value="pheo"><span>発作性の頭痛・動悸・発汗（褐色細胞腫クリーゼ疑い）</span></label>
+<section class="card" id="oralCard">
+  <h2><span class="num">2</span>内服への切り替え</h2>
+  <div class="q">
+    <b>経口摂取</b>
+    <div class="chips">
+      <label class="chip"><input type="radio" name="route" value="po" checked><span>経口可</span></label>
+      <label class="chip"><input type="radio" name="route" value="tube"><span>経管のみ</span></label>
+      <label class="chip"><input type="radio" name="route" value="npo"><span>不可（絶食）</span></label>
+    </div>
   </div>
-  <p class="hint">脳卒中急性期の場面では、脳卒中そのもの以外の臓器障害（解離・ACS・心不全など）がある場合にチェックします。</p>
+  <div class="q" style="margin-top:8px">
+    <b>入院前の降圧薬</b>
+    <div class="chips">
+      <label class="chip"><input type="radio" name="preMed" value="no" checked><span>なし</span></label>
+      <label class="chip"><input type="radio" name="preMed" value="yes"><span>あり</span></label>
+    </div>
+  </div>
+  <p class="hint">年齢・腎機能・妊娠は共通プロファイル、併存疾患は下の「患者背景」の主要5項目から自動で反映します。</p>
 </section>
 
 <section class="card">
-  <h2><span class="num">4</span>患者背景・検査</h2>
-  <div class="grid">
-    <label class="f">年齢<input type="number" id="age" inputmode="numeric" min="15" max="110" value="72"></label>
-    <label class="f">ADL・健康状態
-      <select id="adl">
-        <option value="1">自立（元気な高齢者含む）</option>
-        <option value="2">手段的ADL低下・軽度認知障害</option>
-        <option value="3">基本的ADL低下・要介護</option>
-        <option value="4">高度要介護・終末期</option>
-      </select>
+  <h2><span class="num" id="bgNum">2</span>患者背景</h2>
+  <div class="pf">
+    <label class="f">年齢
+      <select id="pAge" data-wp="age"><option value="">未設定</option><option value="lt65">65未満</option><option value="65-74">65〜74</option><option value="ge75">75以上</option></select>
     </label>
-    <label class="f">血清K（mEq/L）<input type="number" id="k" inputmode="decimal" step="0.1" min="1.5" max="9" value="4.2"></label>
-    <label class="f">eGFR（mL/分/1.73m²）<input type="number" id="egfr" inputmode="numeric" min="1" max="200" value="58"></label>
+    <label class="f">腎機能（eGFR）
+      <select id="pRenal" data-wp="renal"><option value="">未設定</option><option value="ge60">60以上</option><option value="30-59">30〜59</option><option value="15-29">15〜29</option><option value="lt15">15未満・透析</option></select>
+    </label>
+    <label class="f">性別
+      <select id="pSex" data-wp="sex"><option value="">未設定</option><option value="m">男性</option><option value="f">女性</option></select>
+    </label>
+  </div>
+  <p class="hint">ここは全アプリ共通のプロファイルと連動します。</p>
+
+  <h3>主要な併存疾患</h3>
+  <div class="chips" id="major">
+    <label class="chip"><input type="checkbox" id="mDm" value="dm"><span>糖尿病</span></label>
+    <label class="chip"><input type="checkbox" id="mCkd" value="ckd"><span>CKD・蛋白尿</span></label>
+    <label class="chip"><input type="checkbox" id="mHf" value="hf"><span>心不全</span></label>
+    <label class="chip"><input type="checkbox" id="mStroke" value="strokeHx"><span>脳卒中既往</span></label>
+    <label class="chip" id="pregChip"><input type="checkbox" id="mPreg" value="pregnant" data-wp="preg" data-wp-v="preg" data-wp-ro><span>妊娠中</span></label>
+  </div>
+  <div class="reveal hidden" id="ckdOpt">
     <label class="f">尿蛋白（アルブミン）区分
       <select id="prot">
         <option value="A1">A1（正常）／未測定</option>
@@ -228,93 +279,111 @@ button.ghost{background:transparent}
       </select>
     </label>
   </div>
-
-  <h3>併存疾患・状態</h3>
-  <div class="chips" id="comorb">
-    <label class="chip"><input type="checkbox" value="dm"><span>糖尿病</span></label>
-    <label class="chip"><input type="checkbox" value="strokeHx"><span>脳卒中既往</span></label>
-    <label class="chip"><input type="checkbox" value="ichHx"><span>脳出血・微小出血多発</span></label>
-    <label class="chip"><input type="checkbox" value="stenosis"><span>頭蓋内外主幹動脈の高度狭窄・閉塞</span></label>
-    <label class="chip"><input type="checkbox" value="bad"><span>BAD・進行性脳梗塞</span></label>
-    <label class="chip"><input type="checkbox" value="dysphagia"><span>嚥下障害・誤嚥性肺炎リスク</span></label>
-    <label class="chip"><input type="checkbox" value="hfref"><span>心不全（HFrEF）</span></label>
-    <label class="chip"><input type="checkbox" value="hfpef"><span>心不全（HFpEF）</span></label>
-    <label class="chip"><input type="checkbox" value="cad"><span>狭心症・冠動脈疾患</span></label>
-    <label class="chip"><input type="checkbox" value="vsa"><span>冠攣縮性狭心症</span></label>
-    <label class="chip"><input type="checkbox" value="mi"><span>心筋梗塞後</span></label>
-    <label class="chip"><input type="checkbox" value="af"><span>心房細動</span></label>
-    <label class="chip"><input type="checkbox" value="lvh"><span>左室肥大</span></label>
-    <label class="chip"><input type="checkbox" value="brady"><span>徐脈・房室ブロック</span></label>
-    <label class="chip"><input type="checkbox" value="asthma"><span>気管支喘息</span></label>
-    <label class="chip"><input type="checkbox" value="copd"><span>COPD</span></label>
-    <label class="chip"><input type="checkbox" value="mg"><span>重症筋無力症</span></label>
-    <label class="chip"><input type="checkbox" value="noh"><span>神経原性起立性低血圧（PD・MSA・DLBなど）</span></label>
-    <label class="chip"><input type="checkbox" value="supine"><span>臥位高血圧</span></label>
-    <label class="chip"><input type="checkbox" value="gout"><span>痛風・高尿酸血症</span></label>
-    <label class="chip"><input type="checkbox" value="edema"><span>浮腫</span></label>
-    <label class="chip"><input type="checkbox" value="bph"><span>前立腺肥大</span></label>
-    <label class="chip"><input type="checkbox" value="rasStenosis"><span>両側腎動脈狭窄（単腎の狭窄）</span></label>
-    <label class="chip"><input type="checkbox" value="angioedema"><span>血管浮腫の既往</span></label>
-    <label class="chip"><input type="checkbox" value="pregnant"><span>妊娠中</span></label>
-    <label class="chip"><input type="checkbox" value="childbearing"><span>妊娠の可能性あり</span></label>
-    <label class="chip"><input type="checkbox" value="adherence"><span>服薬管理が難しい・認知症</span></label>
+  <div class="reveal hidden" id="hfOpt">
+    <div class="chips">
+      <label class="chip"><input type="radio" name="hfType" value="hfref" checked><span>EF低下（HFrEF）</span></label>
+      <label class="chip"><input type="radio" name="hfType" value="hfpef"><span>EF保持（HFpEF）</span></label>
+    </div>
   </div>
-</section>
 
-<section class="card">
-  <h2><span class="num">5</span>現在の降圧薬</h2>
-  <div class="chips" id="meds">
+  <h3 class="gen-only">現在の降圧薬</h3>
+  <div class="chips gen-only" id="meds">
     <label class="chip"><input type="checkbox" value="CCB"><span>Ca拮抗薬</span></label>
     <label class="chip"><input type="checkbox" value="ARB"><span>ARB</span></label>
     <label class="chip"><input type="checkbox" value="ACEI"><span>ACE阻害薬</span></label>
-    <label class="chip"><input type="checkbox" value="THZ"><span>サイアザイド系（類似）利尿薬</span></label>
+    <label class="chip"><input type="checkbox" value="THZ"><span>サイアザイド系</span></label>
     <label class="chip"><input type="checkbox" value="BB"><span>β遮断薬</span></label>
     <label class="chip"><input type="checkbox" value="ARNI"><span>ARNI</span></label>
     <label class="chip"><input type="checkbox" value="MRA"><span>MR拮抗薬</span></label>
     <label class="chip"><input type="checkbox" value="LOOP"><span>ループ利尿薬</span></label>
     <label class="chip"><input type="checkbox" value="ALPHA"><span>α遮断薬</span></label>
   </div>
-  <div class="chips" style="margin-top:8px">
-    <label class="chip"><input type="checkbox" id="roomUp"><span>現行薬に増量余地あり</span></label>
-  </div>
-</section>
 
-<section class="card">
-  <h2><span class="num">6</span>二次性高血圧・薬剤性の手がかり</h2>
-  <div class="chips" id="sec">
-    <label class="chip"><input type="checkbox" value="young"><span>40歳未満で発症</span></label>
-    <label class="chip"><input type="checkbox" value="lowK"><span>低K血症（利尿薬なしで）</span></label>
-    <label class="chip"><input type="checkbox" value="adrenal"><span>副腎偶発腫</span></label>
-    <label class="chip"><input type="checkbox" value="youngStroke"><span>若年の脳卒中</span></label>
-    <label class="chip"><input type="checkbox" value="sudden"><span>急な発症・急な増悪</span></label>
-    <label class="chip"><input type="checkbox" value="paroxysmal"><span>発作性高血圧・頭痛/動悸/発汗</span></label>
-    <label class="chip"><input type="checkbox" value="cushing"><span>満月様顔貌・中心性肥満・皮膚線条</span></label>
-    <label class="chip"><input type="checkbox" value="osa"><span>いびき・日中の眠気・肥満</span></label>
-    <label class="chip"><input type="checkbox" value="bruit"><span>腹部血管雑音・反復する肺水腫</span></label>
-    <label class="chip"><input type="checkbox" value="crRise"><span>RAS阻害薬開始後にCr 30%以上上昇</span></label>
-    <label class="chip"><input type="checkbox" value="thyroid"><span>甲状腺機能異常の徴候</span></label>
-  </div>
-  <h3>血圧を上げうる併用薬</h3>
-  <div class="chips" id="drugs">
-    <label class="chip"><input type="checkbox" value="nsaid"><span>NSAIDs</span></label>
-    <label class="chip"><input type="checkbox" value="steroid"><span>ステロイド（パルス含む）</span></label>
-    <label class="chip"><input type="checkbox" value="licorice"><span>甘草含有漢方（抑肝散・芍薬甘草湯など）</span></label>
-    <label class="chip"><input type="checkbox" value="pressor"><span>ミドドリン・ドロキシドパ</span></label>
-    <label class="chip"><input type="checkbox" value="cni"><span>カルシニューリン阻害薬</span></label>
-    <label class="chip"><input type="checkbox" value="vegf"><span>VEGF阻害薬・分子標的薬</span></label>
-    <label class="chip"><input type="checkbox" value="esa"><span>ESA（エリスロポエチン製剤）</span></label>
-    <label class="chip"><input type="checkbox" value="snri"><span>SNRI・三環系</span></label>
-    <label class="chip"><input type="checkbox" value="estrogen"><span>エストロゲン製剤</span></label>
-  </div>
-</section>
+  <details class="more" id="moreBox">
+    <summary>詳しく（その他の併存疾患・検査値・二次性の手がかり）<span class="cnt" id="moreCnt"></span></summary>
+    <div class="in">
+      <div class="grid">
+        <label class="f">血清K（mEq/L）<input type="number" id="k" inputmode="decimal" step="0.1" min="1.5" max="9" placeholder="—"></label>
+        <label class="f">eGFR 実測値<input type="number" id="egfr" inputmode="numeric" min="1" max="200" placeholder="区分で代用"></label>
+        <label class="f">家庭血圧
+          <div class="bp"><input type="number" id="hsbp" inputmode="numeric" min="50" max="300" placeholder="—" aria-label="家庭収縮期血圧"><span class="slash">/</span><input type="number" id="hdbp" inputmode="numeric" min="20" max="200" placeholder="—" aria-label="家庭拡張期血圧"></div>
+        </label>
+        <label class="f">ADL・健康状態
+          <select id="adl">
+            <option value="1">自立</option>
+            <option value="2">手段的ADL低下・軽度認知障害</option>
+            <option value="3">基本的ADL低下・要介護</option>
+            <option value="4">高度要介護・終末期</option>
+          </select>
+        </label>
+      </div>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" id="hypoSx"><span>立ちくらみ・ふらつき・失神</span></label>
+        <label class="chip"><input type="checkbox" id="reactive"><span>疼痛・尿閉・不穏など一過性要因あり</span></label>
+        <label class="chip gen-only"><input type="checkbox" id="roomUp"><span>現行薬に増量余地あり</span></label>
+      </div>
 
-<div class="btnrow">
-  <button type="button" class="primary" id="goResult">判定を見る</button>
-  <button type="button" id="resetBtn">入力をリセット</button>
-</div>
+      <b style="font-size:13px">その他の併存疾患・状態</b>
+      <div class="chips" id="comorb">
+        <label class="chip"><input type="checkbox" value="ichHx"><span>脳出血・微小出血多発</span></label>
+        <label class="chip"><input type="checkbox" value="stenosis"><span>頭蓋内外主幹動脈の高度狭窄・閉塞</span></label>
+        <label class="chip"><input type="checkbox" value="bad"><span>BAD・進行性脳梗塞</span></label>
+        <label class="chip"><input type="checkbox" value="dysphagia"><span>嚥下障害・誤嚥性肺炎リスク</span></label>
+        <label class="chip"><input type="checkbox" value="cad"><span>狭心症・冠動脈疾患</span></label>
+        <label class="chip"><input type="checkbox" value="vsa"><span>冠攣縮性狭心症</span></label>
+        <label class="chip"><input type="checkbox" value="mi"><span>心筋梗塞後</span></label>
+        <label class="chip"><input type="checkbox" value="af"><span>心房細動</span></label>
+        <label class="chip"><input type="checkbox" value="lvh"><span>左室肥大</span></label>
+        <label class="chip"><input type="checkbox" value="brady"><span>徐脈・房室ブロック</span></label>
+        <label class="chip"><input type="checkbox" value="asthma"><span>気管支喘息</span></label>
+        <label class="chip"><input type="checkbox" value="copd"><span>COPD</span></label>
+        <label class="chip"><input type="checkbox" value="mg"><span>重症筋無力症</span></label>
+        <label class="chip"><input type="checkbox" value="noh"><span>神経原性起立性低血圧（PD・MSA・DLBなど）</span></label>
+        <label class="chip"><input type="checkbox" value="supine"><span>臥位高血圧</span></label>
+        <label class="chip"><input type="checkbox" value="gout"><span>痛風・高尿酸血症</span></label>
+        <label class="chip"><input type="checkbox" value="edema"><span>浮腫</span></label>
+        <label class="chip"><input type="checkbox" value="bph"><span>前立腺肥大</span></label>
+        <label class="chip"><input type="checkbox" value="rasStenosis"><span>両側腎動脈狭窄（単腎の狭窄）</span></label>
+        <label class="chip"><input type="checkbox" value="angioedema"><span>血管浮腫の既往</span></label>
+        <label class="chip"><input type="checkbox" value="childbearing"><span>妊娠の可能性あり</span></label>
+        <label class="chip"><input type="checkbox" value="adherence"><span>服薬管理が難しい・認知症</span></label>
+      </div>
+
+      <div class="gen-only" style="display:flex;flex-direction:column;gap:10px">
+        <b style="font-size:13px">二次性高血圧の手がかり</b>
+        <div class="chips" id="sec">
+          <label class="chip"><input type="checkbox" value="young"><span>40歳未満で発症</span></label>
+          <label class="chip"><input type="checkbox" value="lowK"><span>低K血症（利尿薬なしで）</span></label>
+          <label class="chip"><input type="checkbox" value="adrenal"><span>副腎偶発腫</span></label>
+          <label class="chip"><input type="checkbox" value="youngStroke"><span>若年の脳卒中</span></label>
+          <label class="chip"><input type="checkbox" value="sudden"><span>急な発症・急な増悪</span></label>
+          <label class="chip"><input type="checkbox" value="paroxysmal"><span>発作性高血圧・頭痛/動悸/発汗</span></label>
+          <label class="chip"><input type="checkbox" value="cushing"><span>満月様顔貌・中心性肥満・皮膚線条</span></label>
+          <label class="chip"><input type="checkbox" value="osa"><span>いびき・日中の眠気・肥満</span></label>
+          <label class="chip"><input type="checkbox" value="bruit"><span>腹部血管雑音・反復する肺水腫</span></label>
+          <label class="chip"><input type="checkbox" value="crRise"><span>RAS阻害薬開始後にCr 30%以上上昇</span></label>
+          <label class="chip"><input type="checkbox" value="thyroid"><span>甲状腺機能異常の徴候</span></label>
+        </div>
+        <b style="font-size:13px">血圧を上げうる併用薬</b>
+        <div class="chips" id="drugs">
+          <label class="chip"><input type="checkbox" value="nsaid"><span>NSAIDs</span></label>
+          <label class="chip"><input type="checkbox" value="steroid"><span>ステロイド（パルス含む）</span></label>
+          <label class="chip"><input type="checkbox" value="licorice"><span>甘草含有漢方（抑肝散・芍薬甘草湯など）</span></label>
+          <label class="chip"><input type="checkbox" value="pressor"><span>ミドドリン・ドロキシドパ</span></label>
+          <label class="chip"><input type="checkbox" value="cni"><span>カルシニューリン阻害薬</span></label>
+          <label class="chip"><input type="checkbox" value="vegf"><span>VEGF阻害薬・分子標的薬</span></label>
+          <label class="chip"><input type="checkbox" value="esa"><span>ESA（エリスロポエチン製剤）</span></label>
+          <label class="chip"><input type="checkbox" value="snri"><span>SNRI・三環系</span></label>
+          <label class="chip"><input type="checkbox" value="estrogen"><span>エストロゲン製剤</span></label>
+        </div>
+      </div>
+    </div>
+  </details>
+</section>
 
 </form>
 
+<div id="resultSlotBottom"></div>
 <section class="card" id="result" aria-live="polite">
   <h2><span class="num">→</span>判定と推奨</h2>
   <div id="verdict"></div>
@@ -338,16 +407,11 @@ button.ghost{background:transparent}
   <h2>出典</h2>
   <ol class="refs" id="refList"></ol>
   <p class="hint">「実臨床」は原典に明記がない、または病棟運用上の工夫として付記した内容です。点線の枠で区別しています。静注薬の用量は添付文書の範囲を示しており、投与前に施設基準と添付文書を確認してください。</p>
-  <p class="disclaimer">本ツールは医師の判断を補助するもので、診療の最終判断は担当医が行います。ガイドライン改訂時は内容の見直しが必要です。</p>
+  <p class="hint">未照合の数値：脳出血の「収縮期110超を維持」、くも膜下出血の「収縮期160未満」、原発性アルドステロン症のARR基準は、成書・記憶に基づく目安で、原典との照合を終えていません。</p>
+  <p class="disclaimer">本ツールは医師の判断を補助するもので、診療の最終判断は診察と原典で行ってください。</p>
+  <div class="ver">アプリの版：<b id="appVer"></b><button type="button" id="forceUpdate">最新版に更新</button></div>
 </section>
 </main>
-
-<div class="dock">
-  <div class="in">
-    <div class="s" id="dockText"><b>—</b></div>
-    <button type="button" class="primary" id="dockBtn">結果へ</button>
-  </div>
-</div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -383,42 +447,104 @@ const CLS = {
   ALPHA:{name:'α遮断薬', g:3, ex:'ドキサゾシン（就寝前）'}
 };
 
-/* ======================= 入力の読み取り ======================= */
+
+/* ======================= 入力の読み取り（改訂：主要5項目＋共通プロファイル） ======================= */
+const APP_VER='2026-11-14a';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const num = id => { const v = parseFloat($('#'+id).value); return isNaN(v) ? null : v; };
+const ACUTE = ['isNone','ivtPre','ivtPost','evt','ich','sah'];
+const AGE_MID = {'lt65':60,'65-74':70,'ge75':80};
+const EGFR_MID = {'ge60':75,'30-59':45,'15-29':22,'lt15':10};
 
 function readForm(){
+  const raw = ($('input[name=scene]:checked')||{}).value || 'general';
+  const scene = (raw==='ivtPre'||raw==='ivtPost') ? 'ivt' : raw;
+  const ageBand = $('#pAge').value||null, renal = $('#pRenal').value||null, sex = $('#pSex').value||null;
+  const egfrExact = num('egfr');
+  const co = [];
+  if($('#mDm').checked) co.push('dm');
+  if($('#mStroke').checked) co.push('strokeHx');
+  if($('#mHf').checked) co.push(($('input[name=hfType]:checked')||{}).value||'hfref');
+  if($('#mPreg').checked && sex!=='m') co.push('pregnant');
+  $$('#comorb input:checked').forEach(e=>co.push(e.value));
   return {
-    scene: ($('input[name=scene]:checked')||{}).value || 'general',
-    ivtPhase: ($('input[name=ivtPhase]:checked')||{}).value || 'pre',
+    sceneRaw: raw, scene,
+    ivtPhase: raw==='ivtPost' ? 'post' : 'pre',
     evtWithIvt: $('#evtWithIvt').checked,
     evtIncomplete: $('#evtIncomplete').checked,
     sbp:num('sbp'), dbp:num('dbp'), hsbp:num('hsbp'), hdbp:num('hdbp'), hr:num('hr'),
     hypoSx:$('#hypoSx').checked, reactive:$('#reactive').checked,
     emerg:$$('.emerg:checked').map(e=>e.value),
-    age:num('age'), adl:parseInt($('#adl').value,10), k:num('k'), egfr:num('egfr'), prot:$('#prot').value,
-    co:$$('#comorb input:checked').map(e=>e.value),
-    meds:$$('#meds input:checked').map(e=>e.value),
+    age: ageBand ? AGE_MID[ageBand] : null, ageBand,
+    adl:parseInt($('#adl').value,10), k:num('k'),
+    egfr: egfrExact!=null ? egfrExact : (renal ? EGFR_MID[renal] : null),
+    egfrExact: egfrExact!=null ? true : (renal ? false : true), egfrBand: renal,
+    prot: $('#mCkd').checked ? $('#prot').value : 'A1',
+    co, sex,
+    meds: ACUTE.includes(raw) ? [] : $$('#meds input:checked').map(e=>e.value),
     roomUp:$('#roomUp').checked,
     sec:$$('#sec input:checked').map(e=>e.value),
-    drugs:$$('#drugs input:checked').map(e=>e.value)
+    drugs:$$('#drugs input:checked').map(e=>e.value),
+    route: ($('input[name=route]:checked')||{}).value||'po',
+    preMed: ($('input[name=preMed]:checked')||{}).value||'no'
   };
 }
-function writeForm(d){
-  const setR=(name,v)=>{const el=$(`input[name=${name}][value="${v}"]`); if(el) el.checked=true;};
-  setR('scene',d.scene); setR('ivtPhase',d.ivtPhase||'pre');
-  $('#evtWithIvt').checked=!!d.evtWithIvt; $('#evtIncomplete').checked=!!d.evtIncomplete;
-  ['sbp','dbp','hsbp','hdbp','hr','age','k','egfr'].forEach(id=>{$('#'+id).value = d[id]==null?'':d[id];});
-  $('#adl').value=String(d.adl||1); $('#prot').value=d.prot||'A1';
-  $('#hypoSx').checked=!!d.hypoSx; $('#reactive').checked=!!d.reactive; $('#roomUp').checked=!!d.roomUp;
-  $$('.emerg').forEach(e=>e.checked=(d.emerg||[]).includes(e.value));
-  $$('#comorb input').forEach(e=>e.checked=(d.co||[]).includes(e.value));
-  $$('#meds input').forEach(e=>e.checked=(d.meds||[]).includes(e.value));
-  $$('#sec input').forEach(e=>e.checked=(d.sec||[]).includes(e.value));
-  $$('#drugs input').forEach(e=>e.checked=(d.drugs||[]).includes(e.value));
+
+/* 画面の状態をそのまま保存・復元（共通プロファイルの項目は data-wp なので下書きでは触らない） */
+function snapshot(){
+  const o={};
+  $$('#f input, #f select').forEach(el=>{
+    const key = el.id || (el.name ? el.name+'='+el.value : null); if(!key) return;
+    if(el.type==='checkbox'||el.type==='radio') o[key]=el.checked; else o[key]=el.value;
+  });
+  return o;
+}
+function restore(o, withProfile){
+  if(!o) return;
+  $$('#f input, #f select').forEach(el=>{
+    if(el.hasAttribute('data-wp') && !withProfile) return;
+    const key = el.id || (el.name ? el.name+'='+el.value : null); if(!key || !(key in o)) return;
+    if(el.type==='checkbox'||el.type==='radio') el.checked=!!o[key]; else el.value=o[key];
+  });
+  if(withProfile && window.WardProfile){
+    try{ WardProfile.set({age:o.pAge||null, renal:o.pRenal||null, sex:o.pSex||null}); }catch(e){}
+  }
 }
 
+/* ======================= 内服への切り替え（急性期） ======================= */
+function oralPlan(d){
+  const it = (kind,t,desc,src,ex) => ({kind,t,d:desc,src:src||[],ex:ex||''});
+  const items=[];
+  const T={
+    isNone:['神経症状が安定してから','目安は発症数日〜1週。BAD・主幹動脈狭窄で症状が動く間は急がない。',['STROKE','PRAC']],
+    ivt:['治療後24時間を過ぎ、症状が安定してから','24時間は上限（180/105）を静注で管理し、その後に経口へ。',['RTPA','PRAC']],
+    evt:['治療後24時間を過ぎ、症状が安定してから','過度な降圧（収縮期140以下）を避けながら経口へ。',['STROKE','PRAC']],
+    ich:['経口摂取できるようになったら早めに','急性期の目標（収縮期140未満を7日間）を経口薬で引き継ぐ。',['STROKE','PRAC']],
+    sah:['動脈瘤処置の後に、脳神経外科と相談','処置後は遅発性脳血管攣縮の時期で、目標が変わる。',['STROKE','PRAC']]
+  }[d.scene];
+  items.push(it('do','開始の目安：'+T[0], T[1], T[2]));
+  // 候補は慢性期（再発予防）のロジックで順位付け（急性期の臓器障害は除いて計算）
+  const base = Object.assign({}, d, {scene:'chronicStroke', emerg:[], meds:[], sbp: 150, dbp: 85});
+  if(d.route!=='po' && !base.co.includes('dysphagia')) base.co = base.co.concat('dysphagia');
+  const R = evaluate(base);
+  const rk = (R._debug && R._debug.ranked || []).filter(k=>CLS[k].g===1);
+  const pick = rk.slice(0,2);
+  if(d.route==='npo'){
+    items.push(it('caution','経口・経管とも不可','静注（ニカルジピン・ジルチアゼム）を続け、経管ルートができたら切り替える。',['PRAC']));
+  }
+  if(d.preMed==='yes'){
+    items.push(it('do','入院前の降圧薬を再開','上の目安を過ぎたら、まず入院前の薬を再開する。利尿薬は脱水・低Naがないことを確認してから最後に。目標未達なら「慢性期」に切り替えて次の一手を確認。',['PRAC']));
+  } else if(d.co.includes('pregnant')){
+    items.push(it('do','最初の内服薬（妊娠中）','ニフェジピン徐放、ラベタロール、メチルドパから選ぶ。ACE阻害薬・ARB・ARNI・MR拮抗薬は使わない。産科と同時に方針を決める。',['JSH2025'],'ニフェジピン徐放（アダラートCR）／ラベタロール（トランデート）／メチルドパ（アルドメット）'));
+  } else if(pick.length){
+    items.push(it('do','最初の内服薬', pick.map(k=>CLS[k].name+(R._debug.why&&R._debug.why[k]&&R._debug.why[k].length?'（'+[...new Set(R._debug.why[k])].join('・')+'）':'')).join(' または ')+'。少量で開始し、静注は経口の効果を見ながら漸減。', ['JSH2025','STROKE','PRAC'], pick.map(k=>CLS[k].ex).join(' ／ ')));
+  }
+  if(d.route==='tube') items.push(it('caution','経管投与','普通錠・OD錠は簡易懸濁で投与できるものが多い。徐放錠（ニフェジピン徐放など）は粉砕・懸濁しない。個々の可否は薬剤部に確認。',['PRAC']));
+  if(R._debug && R._debug.avoidList && R._debug.avoidList.length) items.push(it('avoid','この患者で避ける薬', R._debug.avoidList.join('／'), ['JSH2025']));
+  items.push(it('do','最終目標','慢性期は130/80 mmHg未満（家庭125/75未満）。',['JSH2025','STROKE']));
+  return {title:'内服への切り替え', items};
+}
 /* ======================= 判定ロジック（純粋関数） ======================= */
 function bpGrade(s,d){
   if(s==null||d==null) return {g:-1,label:'未入力'};
@@ -523,6 +649,10 @@ function evaluate(d){
       acts.unshift(it('avoid','脳卒中以外の臓器障害を合併','大動脈解離・ACS・急性心不全・子癇などがあれば、その病態の降圧目標が優先される。直ちに該当科と相談。',['JSH2025','PRAC']));
       consult.push(it('consult','循環器内科／心臓血管外科','合併する急性臓器障害の評価。',['PRAC']));
     }
+    if(s==null){
+      const TH={isNone:'原則降圧しない（>220/120で24時間に約15%）',ivt:(d.ivtPhase==='pre'?'投与前は185/110 mmHg未満':'投与後24時間は180/105 mmHg未満'),evt:(d.evtWithIvt?'180/105 mmHg未満、収縮期140以下にしない':'収縮期140超〜180以下'),ich:'早期に収縮期140未満、7日間維持（110超）',sah:'動脈瘤処置まで収縮期160未満'};
+      R.level='info'; R.headline=TH[d.scene]; R.sub='血圧を入れると、いまの値で判定します';
+    }
     R.blocks.push({title:'いまやること', items:acts});
     if(consult.length) R.blocks.push({title:'必要なコンサルト', items:consult});
     R.dock = `${R.headline}`;
@@ -603,6 +733,7 @@ function evaluate(d){
   if(d.egfr!=null && d.egfr<30){ add('LOOP',2,'eGFR<30で利尿が必要'); ca('THZ','eGFR<30では効果が減弱（ループ利尿薬を検討）'); }
   // 禁忌・回避
   if(pregnant||has('childbearing')){ ['ARB','ACEI','ARNI'].forEach(k=>av(k, pregnant?'妊娠中は禁忌':'妊娠の可能性：避けるか確実な避妊下で')); av('MRA','妊娠中は避ける'); }
+  if(pregnant){ av('THZ','妊娠中は原則使わない（循環血漿量を減らす）'); ca('LOOP','妊娠中は肺水腫など限られた場面のみ'); add('BB',1,'妊娠中はラベタロール'); add('CCB',2,'妊娠中はニフェジピン徐放'); }
   if(has('rasStenosis')){ ['ARB','ACEI','ARNI'].forEach(k=>av(k,'両側腎動脈狭窄・単腎の狭窄')); }
   if(has('angioedema')){ av('ACEI','血管浮腫の既往'); av('ARNI','血管浮腫の既往'); ca('ARB','血管浮腫の既往'); }
   if(d.k!=null && d.k>=5.5){ av('MRA','K≥5.5'); ca('ARB','高K'); ca('ACEI','高K'); ca('ARNI','高K'); }
@@ -722,7 +853,10 @@ function evaluate(d){
   if(sec.includes('osa')) consult.push(it('consult','睡眠外来・呼吸器内科','睡眠時無呼吸の評価（簡易PSG）。CPAPで夜間・早朝高血圧が改善しうる。',['JSH2025']));
   // CKD
   const egfrRef = d.age!=null && d.age>=70 ? 40 : (d.age!=null&&d.age<40?60:45);
-  if((d.egfr!=null && d.egfr<egfrRef) || d.prot==='A3') consult.push(it('consult','腎臓内科',`eGFR ${d.egfr??'—'}（紹介目安 <${egfrRef}）／尿蛋白 ${d.prot}。CKDの評価と降圧薬の調整。`,['JSN','PRAC']));
+  const egfrUnsure = d.egfrExact===false && d.egfrBand==='30-59';
+  const egfrLabel = d.egfrExact===false && d.egfrBand ? ({'ge60':'60以上','30-59':'30〜59','15-29':'15〜29','lt15':'15未満'}[d.egfrBand]) : (d.egfr??'—');
+  if((!egfrUnsure && d.egfr!=null && d.egfr<egfrRef) || d.prot==='A3') consult.push(it('consult','腎臓内科',`eGFR ${egfrLabel}（紹介目安 <${egfrRef}）／尿蛋白 ${d.prot}。CKDの評価と降圧薬の調整。`,['JSN','PRAC']));
+  else if(egfrUnsure) notes.push(it('caution','腎臓内科への紹介','eGFR 30〜59 の区分のみ入力。実測値が45未満（70歳以上は40未満、40歳未満は60未満）なら紹介を考慮。「詳しく」に実測値を入れると判定します。',['JSN','PRAC']));
   if(d.k!=null && d.k>=5.5) consult.push(it('consult','腎臓内科（高K）','K≥5.5。RAS阻害薬・MR拮抗薬の調整、K吸着薬の検討。',['PRAC']));
   if(pregnant) consult.push(it('consult','産婦人科','妊娠中の降圧薬はニフェジピン、ラベタロール、メチルドパ、ヒドララジンから。',['JSH2025']));
   if(has('hfref')) consult.push(it('consult','循環器内科','HFrEFの心保護薬（ARNI・β遮断薬・MR拮抗薬・SGLT2阻害薬）の最適化。',['JSH2025','ESC']));
@@ -739,22 +873,45 @@ function evaluate(d){
   if(avoidItems.length||cautionItems.length) R.blocks.push({title:'避ける・注意する薬', items:[...avoidItems,...cautionItems]});
   if(consult.length) R.blocks.push({title:'必要なコンサルト', items:consult});
   R.dock = `${R.headline}｜目標 ${tOffice}`;
-  R._debug={stepNow, ranked};
+  R._debug={stepNow, ranked, why, avoidList:Object.keys(avoid).map(k=>CLS[k].name+'（'+[...new Set(avoid[k])].join('、')+'）')};
   return R;
 }
 function srcFor(k,reasons){ return ['JSH2025']; }
 
+
 /* ======================= 描画 ======================= */
-const LV = {crit:'要対応', warn:'要調整', ok:'良好', info:'方針確認'};
+const LV = {crit:'要対応', warn:'要調整', ok:'良好', info:'目標'};
 function srcChips(src){
   return '<span class="src">'+src.map(s=>{const r=REFS[s]; if(!r) return ''; return r.url?`<a href="#ref-${s}">${r.label}</a>`:`<a class="prac" href="#refs">${r.label}</a>`;}).join('')+'</span>';
 }
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function layout(raw){
+  const acute = ACUTE.includes(raw);
+  $$('.gen-only').forEach(e=>e.classList.toggle('hidden', acute));
+  $$('.acute-only').forEach(e=>e.classList.toggle('hidden', !acute));
+  $('#oralCard').classList.toggle('hidden', !acute);
+  $('#evtOpt').classList.toggle('hidden', raw!=='evt');
+  $('#bgNum').textContent = acute ? '3' : '2';
+  $('#ckdOpt').classList.toggle('hidden', !$('#mCkd').checked);
+  $('#hfOpt').classList.toggle('hidden', !$('#mHf').checked);
+  $('#pregChip').classList.toggle('hidden', $('#pSex').value==='m');
+  $('#bpHint').textContent = acute ? '空欄でも目標は表示' : '';
+  const slot = acute ? $('#resultSlotTop') : $('#resultSlotBottom');
+  if($('#result').parentNode!==slot.parentNode || $('#result').previousElementSibling!==slot) slot.after($('#result'));
+  const n=$$('#comorb input:checked, #sec input:checked, #drugs input:checked').length + ['k','egfr','hsbp'].filter(id=>$('#'+id).value!=='').length + ($('#adl').value!=='1'?1:0) + ($('#hypoSx').checked?1:0) + ($('#reactive').checked?1:0);
+  $('#moreCnt').textContent = n ? n+'項目入力済み' : '22項目';
+  const ne=$$('.emerg:checked').length; $('#emergCnt').textContent = ne ? ne+'項目' : '';
+}
+let lastSevere=false;
 function render(){
+  const raw = ($('input[name=scene]:checked')||{}).value || 'general';
+  layout(raw);
   const d=readForm();
-  $('#evtIvt').classList.toggle('hidden', d.scene!=='evt');
-  $('#ivtPhase').classList.toggle('hidden', d.scene!=='ivt');
+  const severe = d.sbp!=null && d.dbp!=null && (d.sbp>=180||d.dbp>=120);
+  if(severe && !lastSevere) $('#emergBox').open = true;
+  lastSevere = severe;
   const R=evaluate(d);
+  if(ACUTE.includes(raw)) R.blocks.push(oralPlan(d));
   const bp = d.sbp!=null&&d.dbp!=null?`${d.sbp}/${d.dbp}`:'—';
   $('#verdict').innerHTML = `<div class="verdict ${R.level}">
     <span class="pill">${LV[R.level]}</span>
@@ -769,9 +926,8 @@ function render(){
     }
     return `<h3>${b.title}</h3><ul class="list">${b.items.map(x=>`<li class="item ${x.kind}"><div class="t">${esc(x.t)}</div><div class="d">${esc(x.d)}</div>${x.ex?`<div class="ex">${esc(x.ex)}</div>`:''}${srcChips(x.src)}</li>`).join('')}</ul>`;
   }).join('');
-  $('#dockText').innerHTML = `<b><span class="dot ${R.level}"></span>${esc(LV[R.level])}</b>${esc(R.dock)}`;
   window._last={d,R};
-  try{ localStorage.setItem('htnnavi.draft', JSON.stringify(d)); }catch(e){}
+  try{ localStorage.setItem('htnnavi.draft', JSON.stringify({v:2, ui:snapshot()})); }catch(e){}
 }
 function renderRefs(){
   $('#refList').innerHTML = REF_ORDER.map(k=>{const r=REFS[k]; return `<li id="ref-${k}"><span class="tag">${r.label}</span>${esc(r.text)} <a href="${r.url}" target="_blank" rel="noopener">${r.url.replace('https://','')}</a></li>`;}).join('');
@@ -780,8 +936,8 @@ function renderRefs(){
 /* ======================= コピー ======================= */
 function summaryText(){
   const {d,R}=window._last;
-  const sceneName = $(`input[name=scene][value="${d.scene}"]`).nextElementSibling.textContent;
-  let t=`【血圧評価】${sceneName}\nBP ${d.sbp}/${d.dbp}`+(d.hr!=null?` HR ${d.hr}`:'')+(d.hsbp?`（家庭 ${d.hsbp}/${d.hdbp}）`:'')+`\n判定：${R.headline}。${R.sub}\n目標：`+R.targets.map(x=>`${x.k} ${x.v}`).join('、')+'\n';
+  const sceneName = $(`input[name=scene][value="${d.sceneRaw}"]`).nextElementSibling.textContent.replace(/\s+/g,' ');
+  let t=`【血圧評価】${sceneName}\nBP ${d.sbp??'—'}/${d.dbp??'—'}`+(d.hr!=null?` HR ${d.hr}`:'')+(d.hsbp?`（家庭 ${d.hsbp}/${d.hdbp}）`:'')+`\n判定：${R.headline}。${R.sub}\n目標：`+R.targets.map(x=>`${x.k} ${x.v}`).join('、')+'\n';
   R.blocks.forEach(b=>{ if(b.items){ t+=`■${b.title}\n`+b.items.map(x=>`・${x.t}：${x.d}`).join('\n')+'\n'; } });
   t+='（JSH2025・脳卒中治療GL2021〔改訂2025〕に基づく補助判定）';
   return t;
@@ -800,25 +956,31 @@ function renderSaved(){
 /* ======================= イベント ======================= */
 document.addEventListener('input', e=>{ if(e.target.closest('#f')) render(); });
 document.addEventListener('change', e=>{ if(e.target.closest('#f')) render(); });
-$('#goResult').addEventListener('click', ()=>$('#result').scrollIntoView({behavior:'smooth'}));
-$('#dockBtn').addEventListener('click', ()=>$('#result').scrollIntoView({behavior:'smooth'}));
-$('#resetBtn').addEventListener('click', ()=>{ writeForm({scene:'general',adl:1,prot:'A1'}); render(); window.scrollTo({top:0}); });
 $('#copyBtn').addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(summaryText()); toast('コピーしました'); }catch(e){ toast('コピーできませんでした'); } });
 $('#saveBtn').addEventListener('click', ()=>{
   const label=($('#saveLabel').value||'').trim()||'無題';
   const a=loadRecs(); const now=new Date();
-  a.unshift({label, date:`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`, data:readForm()});
+  a.unshift({v:2, label, date:`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`, ui:snapshot()});
   if(saveRecs(a.slice(0,30))){ $('#saveLabel').value=''; renderSaved(); toast('この端末に保存しました'); } else toast('この環境では保存できません');
 });
 $('#savedList').addEventListener('click', e=>{
   const a=loadRecs();
-  if(e.target.dataset.load!=null){ writeForm(a[+e.target.dataset.load].data); render(); toast('読み込みました'); window.scrollTo({top:0}); }
+  if(e.target.dataset.load!=null){ const r=a[+e.target.dataset.load]; if(r && r.ui){ restore(r.ui,true); render(); toast('読み込みました'); window.scrollTo({top:0}); } else toast('旧版の記録は読み込めません'); }
   if(e.target.dataset.del!=null){ a.splice(+e.target.dataset.del,1); saveRecs(a); renderSaved(); }
 });
+$('#appVer').textContent=APP_VER;
+$('#forceUpdate').addEventListener('click',async()=>{
+  toast('最新版を確認しています…');
+  try{if('serviceWorker' in navigator){const r=await navigator.serviceWorker.getRegistration('../');if(r)await r.update();}}catch(e){}
+  try{await fetch(location.href,{cache:'reload'});}catch(e){toast('通信できないため更新を確認できません');return;}
+  setTimeout(()=>location.reload(),800);
+});
+/* 共通プロファイルが変わったら再計算 */
+(function hookProfile(){ if(window.WardProfile){ try{WardProfile.onChange(()=>setTimeout(render,0));}catch(e){} } else setTimeout(hookProfile,200); })();
 
 /* init */
 renderRefs();
-try{ const dr=JSON.parse(localStorage.getItem('htnnavi.draft')||'null'); if(dr) writeForm(dr); }catch(e){}
+try{ const dr=JSON.parse(localStorage.getItem('htnnavi.draft')||'null'); if(dr && dr.v===2) restore(dr.ui,false); }catch(e){}
 renderSaved();
 render();
 
@@ -902,6 +1064,69 @@ render();
 })();
 </script>
 <!-- wc-clear:end -->
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
+<script src="../profile.js" defer></script>
 <script src="../share.js" defer></script>
 </body>
 </html>
