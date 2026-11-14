@@ -8,6 +8,8 @@
 ward-apps/
 ├─ index.html            … アプリ一覧（入口）
 ├─ share.js              … 共通のQR表示（右上「QR」ボタン。各アプリの </body> 直前で読み込む）
+├─ profile.js            … 共通の患者プロファイル（年齢区分・性別・体重・腎・肝・妊娠授乳・抗血栓。ヘッダー直下の帯、12時間で「別の患者ですか？」。各アプリは <script src="../profile.js" defer></script> と data-wp 属性で連動）
+├─ blocks/wc-sum.html    … 結果の固定表示（判定の要約をヘッダー下に固定）の流用用ブロック。各アプリの </body> 前、wc-clear の前に貼り、SRC と HOST だけ書き換える
 ├─ dm/                   … 糖尿病治療ナビ
 │  ├─ index.html
 │  ├─ manifest.webmanifest
@@ -110,3 +112,13 @@ ward-apps/
 - 更新：新しい `ext-data.enc` を作り、設定 →「新しいデータに更新」。パスフレーズを変えたときは各端末で取り込み直す。
 - 端末を手放すときは 設定 →「この端末のデータを全部消す」。
 - 「入力クリア」は検索語だけを消す。内線データ・お気に入りは残る。
+
+## 共通基盤（2026-11-14〜）
+- **患者プロファイル（profile.js）**：localStorage `ward-profile` に `{v:1, age, sex, weight, renal, liver, preg, at, updatedAt}`。氏名・IDは入れない。同じ端末・同じブラウザ（同じホーム画面アプリ）内の全アプリで共有。
+  - 値：age `lt65`/`65-74`/`ge75`、sex `m`/`f`、weight 数値、renal `ge60`/`30-59`/`15-29`/`lt15`（15未満・透析）、liver `normal`/`cpB`/`cpC`、preg `none`/`preg`/`lact`、at `none`/`ap`/`ac`/`both`。未設定は null。
+  - API：`WardProfile.get()`／`set({...})`（null で全消去）／`onChange(fn)`／`clear()`／`open()`／`label()`／`isStale()`。
+  - data属性：`data-wp="項目" data-wp-v="コード[,コード]"`（radio・checkbox・option・ボタン）、`<select data-wp>`、`<input data-wp="weight">`、`data-wp-show="項目:コード"`、`data-wp-ro`（書き戻さない）、`data-wp-host`（帯を置く場所）。詳しくは profile.js 冒頭のコメント。
+  - 入力クリア（wc-clear）の確認ダイアログに「患者プロファイルも消す」が自動で付く（wc-clear ブロック自体の変更は不要）。
+- **結果の固定表示（wc-sum）**：`blocks/wc-sum.html` を貼る。`.verdict` など画面に見えている最初の要素の要約（`.big` と `.pill`）をヘッダー下に表示し、入力のたびに更新。タップで元の場所へ。アプリから `wcSum.set("文",{tone:"crit",pill:"レッド"})` でも指定できる。
+- **入口**：検索（名前・キーワード。キーワードは index.html の KW か li の data-kw）、☆お気に入り（`ward-fav`）、よく使う＝最近開いた5件（`ward-recent`、share.js が各アプリを開いたときに記録）。
+- 連動済み：aed（性別・体重・Child-Pugh・妊娠）、atn（体重・性別・抗凝固薬）。

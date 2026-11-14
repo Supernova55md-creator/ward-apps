@@ -2371,3 +2371,14 @@ function init(){
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
+/* 病棟アプリ共通：最近開いたアプリを記録（入口の「よく使う」に使う。localStorage "ward-recent" = [{s:slug,t:時刻}]、新しい順に最大10件） */
+(function(){
+  try{
+    var m=/\/ward-apps\/([^\/]+)\/(?:index\.html)?$/.exec(location.pathname)||/^\/([^\/]+)\/(?:index\.html)?$/.exec(location.pathname);
+    if(!m||m[1]==="ward-apps")return;
+    var s=m[1],a=[];try{a=JSON.parse(localStorage.getItem("ward-recent")||"[]");}catch(e){}
+    if(!Array.isArray(a))a=[];
+    a=a.filter(function(x){return x&&x.s!==s;});a.unshift({s:s,t:Date.now()});
+    localStorage.setItem("ward-recent",JSON.stringify(a.slice(0,10)));
+  }catch(e){}
+})();
