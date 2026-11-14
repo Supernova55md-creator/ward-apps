@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f6e8c">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="低Naナビ">
+<title>低Na・電解質補正ナビ</title>
+<style>
+:root{
+  /* 電解質＝深い青緑 */
+  --accent:#0f6e8c; --accent-ink:#fff; --accent-soft:#e3f1f6;
+  --bg:#f3f6f7; --surface:#fff; --ink:#18232a; --muted:#5b6b73; --line:#d8e2e6;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --info:#2b5b9a; --info-soft:#e7eef8;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#6fcbe6; --accent-ink:#082a35; --accent-soft:#16313a;
+  --bg:#11171a; --surface:#1a2226; --ink:#e9f0f3; --muted:#a3b3ba; --line:#2f3d43;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:19px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.18)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+.view{display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:16px;margin:0 0 10px;line-height:1.4}
+h3{font-size:14px;margin:12px 0 6px}
+.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.q{margin:0 0 12px}
+.q:last-child{margin-bottom:0}
+.q>.lb{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:14px;line-height:1.3;cursor:pointer;user-select:none;min-height:36px}
+.chip span small{font-size:11.5px;opacity:.85}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chip input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=number]{font:inherit;font-size:17px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
+input.bignum{font-size:24px;font-weight:700;max-width:170px}
+.narow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cls:empty{display:none}
+.cls{font-size:13px;font-weight:700;border-radius:6px;padding:2px 8px;background:var(--accent-soft);color:var(--accent)}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;padding:5px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.chk small{color:var(--muted);font-size:12px}
+details.more{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-top:4px}
+details.more summary{font-size:14px;font-weight:700;color:var(--accent);cursor:pointer}
+details.more[open] summary{margin-bottom:8px}
+.hidden{display:none!important}
+.verdict{border-radius:12px;padding:14px;border:1.5px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.verdict.ok{background:var(--ok-soft);border-color:var(--ok)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.crit{background:var(--crit-soft);border-color:var(--crit)}
+.verdict.info{background:var(--info-soft);border-color:var(--info)}
+.pill{align-self:flex-start;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:#fff;background:var(--muted)}
+.verdict.ok .pill{background:var(--ok)}.verdict.warn .pill{background:var(--warn)}.verdict.crit .pill{background:var(--crit)}.verdict.info .pill{background:var(--info)}
+@media (prefers-color-scheme: dark){.pill{color:#111}}
+.big{font-size:18px;font-weight:700;line-height:1.45}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.item{border-left:4px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 11px}
+.item.do{border-left-color:var(--ok)}.item.avoid{border-left-color:var(--crit)}.item.caution{border-left-color:var(--warn)}.item.note{border-left-color:var(--info)}
+.item .t{font-weight:700;font-size:15px}
+.item .d{font-size:14px;margin-top:2px}
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:4px 0 2px}
+.nums .bx{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.nums .k{font-size:12px;color:var(--muted)}
+.nums .v{font-size:16.5px;font-weight:700;line-height:1.3;font-variant-numeric:tabular-nums}
+.nums .v small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:0 6px;margin-left:4px;vertical-align:1px}
+.tag.v{background:var(--ok-soft);color:var(--ok)}.tag.u{background:var(--warn-soft);color:var(--warn)}.tag.x{background:var(--info-soft);color:var(--info)}
+.src{font-size:11.5px;color:var(--muted);margin-top:4px}
+table.tl{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.tl th,table.tl td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+table.tl th{font-size:12px;color:var(--muted);font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px;position:sticky;top:var(--hh,110px);z-index:4}
+.seg button{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:7px;padding:8px 2px;background:transparent;color:var(--muted);cursor:pointer;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.ref{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.ref div{border-left:3px solid var(--accent);padding-left:8px}
+.ref small{display:block;color:var(--muted);font-size:12px}
+.fine{font-size:12px;color:var(--muted);line-height:1.7}
+.fine p{margin:0 0 6px}
+.btn{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:999px;padding:7px 14px;cursor:pointer;min-height:38px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+a{color:var(--info)}
+ul.pl{margin:4px 0 0;padding-left:1.2em;font-size:14px}
+ul.pl li{margin:2px 0}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>低Na・電解質補正ナビ</h1><small>補正の上限・3%食塩水・過補正の戻し方・原因検索</small></div>
+  <nav class="tabs" role="tablist" aria-label="画面">
+    <button type="button" role="tab" data-v="hypo" aria-selected="true">低Na</button>
+    <button type="button" role="tab" data-v="cause" aria-selected="false">原因検索</button>
+    <button type="button" role="tab" data-v="oth" aria-selected="false">その他の<br>電解質</button>
+    <button type="button" role="tab" data-v="ref" aria-selected="false">出典</button>
+  </nav>
+</header>
+
+<main>
+<!-- ===================== 低Na ===================== -->
+<div id="v-hypo" class="view">
+  <section class="card">
+    <div class="q"><span class="lb">① 血清Na（mEq/L）</span>
+      <div class="narow"><input type="number" class="bignum" id="na" inputmode="decimal" step="0.1" placeholder="例 118" data-s><span class="cls" id="na-cls"></span></div>
+    </div>
+    <div class="q"><span class="lb">② 症状の重さ</span><div class="chips">
+      <label class="chip"><input type="radio" name="sym" value="none" data-s><span>なし・軽い</span></label>
+      <label class="chip"><input type="radio" name="sym" value="mod" data-s><span>中等度<br><small>悪心・混乱・頭痛</small></span></label>
+      <label class="chip"><input type="radio" name="sym" value="sev" data-s><span>重度<br><small>嘔吐・痙攣・傾眠〜昏睡・呼吸の異常</small></span></label>
+    </div></div>
+    <div class="q"><span class="lb">③ 発症の速さ</span><div class="chips">
+      <label class="chip"><input type="radio" name="on" value="acute" data-s><span>48時間以内と分かる</span></label>
+      <label class="chip"><input type="radio" name="on" value="chronic" data-s><span>48時間超・不明</span></label>
+    </div></div>
+    <details class="more" id="h-more">
+      <summary>詳しく（浸透圧性脱髄の高リスク・体重・血糖）</summary>
+      <div class="q"><span class="lb">浸透圧性脱髄（ODS）の高リスク　<small>1つでもあれば上限を下げる</small></span>
+        <label class="chk"><input type="checkbox" id="r-105" disabled><span>Na 105以下 <small>（①から自動）</small></span></label>
+        <label class="chk"><input type="checkbox" id="r-k" data-s><span>低K血症</span></label>
+        <label class="chk"><input type="checkbox" id="r-alc" data-s><span>アルコール多飲</span></label>
+        <label class="chk"><input type="checkbox" id="r-mal" data-s><span>低栄養</span></label>
+        <label class="chk"><input type="checkbox" id="r-liv" data-wp="liver" data-wp-v="cpB,cpC" data-s><span>進行した肝疾患 <small>（プロファイルが Child-Pugh B・C なら自動）</small></span></label>
+      </div>
+      <div class="q"><span class="lb">急に水利尿が出て上がりすぎやすい状況</span>
+        <label class="chk"><input type="checkbox" id="aq" data-s><span>原因がすぐ外れる <small>（循環血漿量の補正、サイアザイド・デスモプレシン・SSRI等の中止、副腎不全へのステロイド開始、低張輸液の中止、心因性多飲）</small></span></label>
+      </div>
+      <div class="grid">
+        <label class="f">体重（kg）<input type="number" id="wt" data-wp="weight" inputmode="decimal" placeholder="プロファイルから"></label>
+        <label class="f">血糖（mg/dL）<input type="number" id="glu" inputmode="numeric" placeholder="高血糖のとき" data-s></label>
+      </div>
+      <p class="hint">体重はボーラス量（2 mL/kg）と戻しのブドウ糖液量（10 mL/kg）、見込み上昇の計算に使います。年齢・性別もプロファイルから取ります。</p>
+    </details>
+  </section>
+
+  <div id="h-out"></div>
+
+  <section class="card" id="rc-card">
+    <h2>再検したら（上がり幅の確認）</h2>
+    <div class="grid">
+      <label class="f">再検のNa<input type="number" id="rn" inputmode="decimal" step="0.1" placeholder="mEq/L" data-s></label>
+      <label class="f">治療開始からの時間（時間）<input type="number" id="rh" inputmode="decimal" step="0.5" placeholder="例 6" data-s></label>
+    </div>
+    <div id="rc-out" style="margin-top:10px"></div>
+  </section>
+
+  <section class="card" id="rl-card">
+    <h2>上がりすぎたときの戻し方</h2>
+    <div id="rl-out"></div>
+  </section>
+
+  <section class="card">
+    <h2>3%食塩水の作り方</h2>
+    <table class="tl">
+      <tr><th>作り方</th><th>量</th></tr>
+      <tr><td>生理食塩液 400 mL ＋ 10%塩化ナトリウム注 120 mL（20 mL × 6本）</td><td>520 mL</td></tr>
+      <tr><td>生理食塩液 100 mL ＋ 10%塩化ナトリウム注 30 mL（20 mL × 1.5本）</td><td>130 mL<br><small>ボーラス1回分</small></td></tr>
+    </table>
+    <p class="hint">どちらもNa 約513 mEq/L（計算値）。10%塩化ナトリウム注は大塚食塩注10%（20 mL＝Na 34 mEq）など。末梢静脈から入れられるが、血管外漏出に注意。院内に既製の3%製剤・手順があればそちらに従う。</p>
+  </section>
+
+  <section class="card">
+    <h2>脳神経内科で気をつけること</h2>
+    <ul class="list">
+      <li class="item note"><div class="t">低Naによる痙攣は3%食塩水が治療の中心</div><div class="d">抗てんかん薬だけでは止まりにくい。Naを5上げると脳浮腫の症状は多くが改善する。</div></li>
+      <li class="item caution"><div class="t">くも膜下出血の低Naでは水分制限をしない</div><div class="d">SIADHと中枢性塩類喪失（CSW）が混ざる。血管攣縮の時期に循環血漿量を減らさないよう、等張液と食塩の補充（必要ならフルドロコルチゾン：フロリネフ錠0.1 mg）で対応する。<span class="tag u">一般的な考え方</span></div></li>
+      <li class="item caution"><div class="t">ODSは補正の2〜6日後に出る</div><div class="d">構音・嚥下障害、四肢麻痺、意識障害、閉じ込め症候群。MRIは症状より遅れて（最大2週ほど）変化が出ることがある。過補正に気づいたら症状が出る前に戻す。</div></li>
+      <li class="item note"><div class="t">原因になりやすい神経の薬・病気</div><div class="d">カルバマゼピン（テグレトール）・オクスカルバゼピン（オクノベル）、SSRI・SNRI、グリセオール・マンニトール（高張性の偽の低Na）、IVIg（偽性）、ICIによる下垂体炎、ギラン・バレー症候群、髄膜炎・脳炎、LGI1抗体脳炎、下垂体術後。</div></li>
+    </ul>
+  </section>
+</div>
+
+<!-- ===================== 原因検索 ===================== -->
+<div id="v-cause" class="view hidden">
+  <section class="card">
+    <h2>最初に出す検査（できれば治療の前に）</h2>
+    <ul class="list">
+      <li class="item do"><div class="t">血液</div><div class="d">血清浸透圧、血糖、BUN・Cr・尿酸、K、TSH・FT4、コルチゾール（できれば早朝）・ACTH。脂質・総蛋白は偽性を疑うとき。</div></li>
+      <li class="item do"><div class="t">尿（同じ時刻に）</div><div class="d">尿浸透圧、尿Na、尿K（尿酸・Crも出すとFEUAが計算できる）。</div></li>
+      <li class="item do"><div class="t">診察と薬</div><div class="d">細胞外液量（皮膚・口腔、頸静脈、浮腫、体重の推移、起立時の血圧）、飲水量・食事量、輸液の内容、薬の一覧。</div></li>
+    </ul>
+    <p class="hint">重い症状があれば検査を待たずに3%食塩水を始める。採血・採尿は投与前に済ませておくと後で読める。</p>
+  </section>
+
+  <section class="card">
+    <h2>結果から絞る</h2>
+    <div class="q"><span class="lb">尿浸透圧</span><div class="chips">
+      <label class="chip"><input type="radio" name="uo" value="lo" data-s><span>100以下</span></label>
+      <label class="chip"><input type="radio" name="uo" value="hi" data-s><span>100超</span></label>
+    </div></div>
+    <div class="q" id="q-un"><span class="lb">尿Na（mEq/L）</span><div class="chips">
+      <label class="chip"><input type="radio" name="un" value="lo" data-s><span>30以下</span></label>
+      <label class="chip"><input type="radio" name="un" value="hi" data-s><span>30超</span></label>
+    </div></div>
+    <div class="q" id="q-ecf"><span class="lb">細胞外液量</span><div class="chips">
+      <label class="chip"><input type="radio" name="ecf" value="low" data-s><span>減少</span></label>
+      <label class="chip"><input type="radio" name="ecf" value="norm" data-s><span>正常</span></label>
+      <label class="chip"><input type="radio" name="ecf" value="high" data-s><span>増加（浮腫・腹水）</span></label>
+    </div></div>
+    <label class="chk"><input type="checkbox" id="diu" data-s><span>利尿薬を使用中 <small>（尿Naが当てにならない）</small></span></label>
+    <div id="c-out" style="margin-top:10px"></div>
+    <p class="hint">先に、血清浸透圧が低い（275未満が目安）ことで高張性（高血糖・マンニトール・グリセオール）と偽性（高脂血症・高蛋白）を除く。</p>
+  </section>
+
+  <section class="card">
+    <h2>SIADHの診断の要点（欧州ガイドライン）</h2>
+    <ul class="pl">
+      <li>実効血漿浸透圧 275 mOsm/kg 未満</li>
+      <li>尿浸透圧 100 mOsm/kg 超</li>
+      <li>臨床的に細胞外液量が正常</li>
+      <li>通常の食塩・水分摂取で尿Na 30 mEq/L 超</li>
+      <li>副腎・甲状腺・下垂体・腎の機能不全がない、最近の利尿薬がない</li>
+    </ul>
+    <p class="hint">補助：血清尿酸 4 mg/dL 未満、FEUA 12%超はSIADHを支持（利尿薬使用中でも使える）。</p>
+  </section>
+
+  <section class="card">
+    <h2>原因別の治療（重い症状がないとき）</h2>
+    <ul class="list">
+      <li class="item do"><div class="t">SIADH</div><div class="d">①水分制限（目安 1日 800〜1,000 mL）。(尿Na＋尿K)／血清Na が1を超えると効きにくい。②食塩の経口補充（塩化ナトリウム）＋少量のループ利尿薬（フロセミド：ラシックス錠20 mg）。③トルバプタン（サムスカOD錠7.5 mg・15 mg・30 mg）：入院下で 7.5 mg 1日1回から（Na 125未満などでは 3.75 mg から）、開始・増量の4〜6時間後と8〜12時間後にNa測定、24時間で10を超えて上げない。開始日は水分制限を外す。3%食塩水を使っている間は始めない。<span class="tag v">添付文書照合</span></div><div class="src">欧州ガイドラインはSIADHへのバプタンを推奨していない（過補正・肝障害）。尿素は国内では医薬品として未承認。<span class="tag u">未照合</span></div></li>
+      <li class="item do"><div class="t">細胞外液量の減少</div><div class="d">生理食塩液（または調整晶質液）0.5〜1.0 mL/kg/時。循環が戻るとADHが止まり、水利尿で急に上がるので尿量と2〜4時間ごとのNaを見る。</div></li>
+      <li class="item do"><div class="t">心不全・肝硬変</div><div class="d">水分制限、ループ利尿薬。3%食塩水は重い症状のときだけ。</div></li>
+      <li class="item caution"><div class="t">副腎不全</div><div class="d">ヒドロコルチゾン（ソル・コーテフ）で急に水利尿が出て上がりすぎることがある。開始後は頻回にNaを測る。</div></li>
+      <li class="item caution"><div class="t">サイアザイド</div><div class="d">中止。再投与はしない。中止後に水利尿で急に上がることがある。</div></li>
+    </ul>
+  </section>
+</div>
+
+<!-- ===================== その他の電解質 ===================== -->
+<div id="v-oth" class="view hidden">
+  <div class="seg" role="group" aria-label="電解質">
+    <button type="button" data-o="hyperna" aria-pressed="true">高Na</button>
+    <button type="button" data-o="hypok" aria-pressed="false">低K</button>
+    <button type="button" data-o="hyperk" aria-pressed="false">高K</button>
+    <button type="button" data-o="hypomg" aria-pressed="false">低Mg</button>
+  </div>
+
+  <!-- 高Na -->
+  <div id="o-hyperna" class="view">
+    <section class="card">
+      <div class="q"><span class="lb">血清Na（mEq/L）</span><input type="number" class="bignum" id="hn" inputmode="decimal" step="0.1" placeholder="例 162" data-s></div>
+      <div class="q"><span class="lb">発症の速さ</span><div class="chips">
+        <label class="chip"><input type="radio" name="hnon" value="acute" data-s><span>48時間以内と分かる</span></label>
+        <label class="chip"><input type="radio" name="hnon" value="chronic" data-s><span>48時間超・不明</span></label>
+      </div></div>
+      <div id="hn-out"></div>
+    </section>
+    <section class="card">
+      <h2>要点</h2>
+      <ul class="list">
+        <li class="item do"><div class="t">下げる速さ</div><div class="d">慢性・不明：24時間で10以内（1時間0.5以内）が従来の目安。急性（数時間で上がった：食塩中毒、下垂体術後の尿崩症など）：1時間1程度で正常まで下げてよい。集中治療室の後ろ向き研究では、0.5/時より速く下げても死亡・脳浮腫は増えなかった。</div></li>
+        <li class="item do"><div class="t">何を入れるか</div><div class="d">飲めれば水（経口・経管）。点滴は5%ブドウ糖液（大塚糖液5% ほか）。ショック・循環血漿量の著しい減少があれば先に生理食塩液。5%ブドウ糖液を多く入れると高血糖になるので血糖も見る。</div></li>
+        <li class="item note"><div class="t">中枢性尿崩症（下垂体術後・頭部外傷・脳死など）</div><div class="d">低張の多尿（尿浸透圧 300未満が目安）。デスモプレシン（ミニリンメルトOD錠、デスモプレシン点鼻液など）。術後の三相性の経過（尿崩症→SIADH→尿崩症）に注意。</div></li>
+        <li class="item caution"><div class="t">高齢・神経疾患で飲めない人に多い</div><div class="d">口渇の低下、嚥下障害、意識障害。維持輸液の自由水が足りているか、マンニトール・グリセオールの使用、経管栄養の水分量を見直す。</div></li>
+        <li class="item note"><div class="t">再検</div><div class="d">治療開始後は4〜6時間ごとを目安に（急性で速く下げるときは1〜2時間ごと）。<span class="tag u">目安</span></div></li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- 低K -->
+  <div id="o-hypok" class="view hidden">
+    <section class="card">
+      <div class="q"><span class="lb">血清K（mEq/L）</span><input type="number" class="bignum" id="lk" inputmode="decimal" step="0.1" placeholder="例 2.6" data-s></div>
+      <label class="chk"><input type="checkbox" id="lk-ecg" data-s><span>心電図変化・不整脈 <small>（U波、QT延長、期外収縮）</small></span></label>
+      <label class="chk"><input type="checkbox" id="lk-wk" data-s><span>筋力低下・麻痺・横紋筋融解</span></label>
+      <label class="chk"><input type="checkbox" id="lk-pp" data-s><span>周期性四肢麻痺（甲状腺中毒性など）を疑う</span></label>
+      <label class="chk"><input type="checkbox" id="lk-dig" data-s><span>ジゴキシン内服中</span></label>
+      <div id="lk-out" style="margin-top:10px"></div>
+    </section>
+    <section class="card">
+      <h2>要点</h2>
+      <ul class="list">
+        <li class="item do"><div class="t">静注の決まりごと</div><div class="d">塩化カリウム（KCL注20mEqキット「テルモ」、KCL補正液1mEq/mL）、L-アスパラギン酸カリウム（アスパラカリウム注10mEq）。末梢では濃度 40 mEq/L以下、速度 20 mEq/時以下、1日 100 mEqまで。原液のまま静注しない。ブドウ糖液に溶かすとインスリンでKが下がるので、生理食塩液に混ぜる。<span class="tag u">添付文書の目安・未照合</span></div></li>
+        <li class="item do"><div class="t">経口</div><div class="d">塩化カリウム徐放錠（スローケー錠600 mg：K 8 mEq）、グルコン酸カリウム（グルコンサンK）、L-アスパラギン酸カリウム（アスパラカリウム錠）。代謝性アルカローシスでは塩化カリウムが効く。</div></li>
+        <li class="item caution"><div class="t">Mgを先に・同時に</div><div class="d">低Mgがあると K は補っても上がりにくい。</div></li>
+        <li class="item caution"><div class="t">周期性四肢麻痺</div><div class="d">細胞内への移動が原因で総量は不足していない。少量ずつ補い、回復期の高K（リバウンド）に注意して頻回に測る。甲状腺中毒性ではβ遮断薬（プロプラノロール）も。</div></li>
+        <li class="item note"><div class="t">原因</div><div class="d">利尿薬、嘔吐・下痢、インスリン・β刺激薬、低Mg、アムホテリシンB、甘草（芍薬甘草湯などの偽アルドステロン症）、原発性アルドステロン症。</div></li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- 高K -->
+  <div id="o-hyperk" class="view hidden">
+    <section class="card">
+      <div class="q"><span class="lb">血清K（mEq/L）</span><input type="number" class="bignum" id="hk" inputmode="decimal" step="0.1" placeholder="例 6.8" data-s></div>
+      <label class="chk"><input type="checkbox" id="hk-ecg" data-s><span>心電図変化 <small>（テント状T、PR延長・P消失、QRS幅拡大、徐脈、不整脈）</small></span></label>
+      <label class="chk"><input type="checkbox" id="hk-acid" data-s><span>代謝性アシドーシスあり</span></label>
+      <label class="chk"><input type="checkbox" id="hk-dig" data-s><span>ジゴキシン内服中</span></label>
+      <div id="hk-out" style="margin-top:10px"></div>
+    </section>
+    <section class="card">
+      <h2>要点</h2>
+      <ul class="list">
+        <li class="item caution"><div class="t">まず偽性を除く</div><div class="d">溶血、駆血・手の握りしめ、白血球・血小板の著増。心電図変化がなく予想外の値なら、すぐに再採血（血液ガスのKも参考）。</div></li>
+        <li class="item note"><div class="t">原因</div><div class="d">腎不全、RAS阻害薬・MRA・ST合剤・NSAIDs・ヘパリン・カルシニューリン阻害薬・β遮断薬、横紋筋融解（重積の後など）、溶血、副腎不全。</div></li>
+        <li class="item caution"><div class="t">脳神経内科の注意</div><div class="d">長期臥床や脱神経（ギラン・バレー症候群、ALS、脊髄損傷、重症の多発ニューロパチー）ではスキサメトニウムで致死的な高Kが起こる。挿管時は麻酔科に伝える。</div></li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- 低Mg -->
+  <div id="o-hypomg" class="view hidden">
+    <section class="card">
+      <div class="q"><span class="lb">血清Mg（mg/dL）</span><input type="number" class="bignum" id="mg" inputmode="decimal" step="0.1" placeholder="例 1.0" data-s></div>
+      <label class="chk"><input type="checkbox" id="mg-tdp" data-s><span>torsades de pointes・心室性不整脈</span></label>
+      <label class="chk"><input type="checkbox" id="mg-sz" data-s><span>痙攣・テタニー・振戦</span></label>
+      <div data-wp-show="renal:15-29,lt15" hidden><p class="hint" style="color:var(--warn);font-weight:700">腎機能が低い（プロファイル）：量を半分程度にし、頻回に測る。</p></div>
+      <div id="mg-out" style="margin-top:10px"></div>
+    </section>
+    <section class="card">
+      <h2>要点</h2>
+      <ul class="list">
+        <li class="item do"><div class="t">薬</div><div class="d">硫酸マグネシウム（マグネゾール静注用20 mL：硫酸Mg水和物 2 g＝Mg 8.1 mEq、硫酸Mg補正液1mEq/mL）。経口は酸化マグネシウム（マグミット錠330 mg）だが吸収が少なく下痢しやすい。<span class="tag u">未照合</span></div></li>
+        <li class="item caution"><div class="t">低K・低Caが治りにくいときはMgを測る</div><div class="d">低Mgがあると K も Ca も補っても上がりにくい。</div></li>
+        <li class="item note"><div class="t">原因</div><div class="d">PPIの長期使用、利尿薬、アルコール、下痢、白金製剤、アミノグリコシド、リフィーディング症候群。</div></li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<!-- ===================== 出典 ===================== -->
+<div id="v-ref" class="view hidden">
+  <section class="card">
+    <h2>準拠したガイドラインと主な文献</h2>
+    <div class="ref">
+      <div><b>欧州 低Na血症ガイドライン（ESICM・ESE・ERBP 2014）</b><small>Spasovski G, et al. Clinical practice guideline on diagnosis and treatment of hyponatraemia. Eur J Endocrinol 2014;170:G1-47. 2026年11月時点で改訂版は確認できず。</small><a href="https://doi.org/10.1530/EJE-13-1020" target="_blank" rel="noopener">EJE（DOI）</a>　<a href="https://pubmed.ncbi.nlm.nih.gov/24569496/" target="_blank" rel="noopener">PubMed（NDT版）</a></div>
+      <div><b>米国 専門家パネル推奨（2013）</b><small>Verbalis JG, et al. Diagnosis, evaluation, and treatment of hyponatremia: expert panel recommendations. Am J Med 2013;126(10 Suppl 1):S1-42.</small><a href="https://pubmed.ncbi.nlm.nih.gov/24074529/" target="_blank" rel="noopener">PubMed</a></div>
+      <div><b>SALSA試験（3%食塩水 ボーラス vs 持続）</b><small>Baek SH, et al. Risk of overcorrection in rapid intermittent bolus vs slow continuous infusion therapies of hypertonic saline for patients with symptomatic hyponatremia. JAMA Intern Med 2021;181:81-92.</small><a href="https://pubmed.ncbi.nlm.nih.gov/33104189/" target="_blank" rel="noopener">PubMed</a></div>
+      <div><b>入院患者のODSの頻度</b><small>MacMillan TE, et al. Osmotic demyelination syndrome in patients hospitalized with hyponatremia. NEJM Evid 2023;2(4). 22,858入院でODS 12例（0.05%）、うち7例は急速補正なし。</small><a href="https://pubmed.ncbi.nlm.nih.gov/38320046/" target="_blank" rel="noopener">PubMed</a></div>
+      <div><b>補正速度と死亡</b><small>Seethapathy H, et al. Severe hyponatremia correction, mortality, and central pontine myelinolysis. NEJM Evid 2023;2(10). 補正が24時間で6未満の群は死亡が多かった（観察研究・交絡の可能性）。</small><a href="https://pubmed.ncbi.nlm.nih.gov/38320180/" target="_blank" rel="noopener">PubMed</a></div>
+      <div><b>HIT試験（入院中の慢性低Naを目標補正しても予後は変わらず）</b><small>Refardt J, et al. A randomized trial of targeted hyponatremia correction in hospitalized patients. NEJM Evid 2026;5(3). Na正常化は増えたが、30日の死亡・再入院は減らなかった。</small><a href="https://pubmed.ncbi.nlm.nih.gov/41733398/" target="_blank" rel="noopener">PubMed</a></div>
+      <div><b>高Na血症の補正速度</b><small>Chauhan K, et al. Rate of correction of hypernatremia and health outcomes in critically ill patients. Clin J Am Soc Nephrol 2019;14:656-663.</small><a href="https://pubmed.ncbi.nlm.nih.gov/30948456/" target="_blank" rel="noopener">PubMed</a></div>
+      <div><b>英国腎臓学会（UKKA）急性高K血症ガイドライン 2023</b><small>Clinical Practice Guidelines: Treatment of Acute Hyperkalaemia in Adults. UK Kidney Association, October 2023.</small><a href="https://www.renal.org/sites/renal.org/files/FINAL%20VERSION%20-%20UKKA%20CLINICAL%20PRACTICE%20GUIDELINE%20-%20MANAGEMENT%20OF%20HYPERKALAEMIA%20IN%20ADULTS%20-%20191223.pdf" target="_blank" rel="noopener">PDF</a></div>
+      <div><b>KDIGO カリウム異常の会議報告</b><small>Clase CM, et al. Potassium homeostasis and management of dyskalemia in kidney diseases. Kidney Int 2020;97:42-61.</small><a href="https://pubmed.ncbi.nlm.nih.gov/31706619/" target="_blank" rel="noopener">PubMed</a></div>
+      <div><b>添付文書</b><small>サムスカOD錠（SIADHの用法・用量、警告）、ロケルマ懸濁用散分包（用法・用量）を PMDA で照合。</small><a href="https://www.pmda.go.jp/PmdaSearch/bookSearch/01/04987035378754" target="_blank" rel="noopener">サムスカ</a>　<a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/670227_2190040B1020_1_05" target="_blank" rel="noopener">ロケルマ</a></div>
+    </div>
+  </section>
+  <section class="card">
+    <h2>数値の照合状況</h2>
+    <table class="tl">
+      <tr><th>項目</th><th>状況</th></tr>
+      <tr><td>3%食塩水 150 mL×最大3回（欧州）、2 mL/kg（SALSA）、初日+10の上限</td><td><span class="tag v">原典で確認</span></td></tr>
+      <tr><td>高リスク+8/24時間、48時間+18、最低+4〜8（米国）</td><td><span class="tag v">原典で確認</span></td></tr>
+      <tr><td>再検のタイミング、戻し方（10 mL/kg・デスモプレシン 2 μg）</td><td><span class="tag x">欧州・SALSAの記載</span></td></tr>
+      <tr><td>トルバプタン、ロケルマの用法・用量</td><td><span class="tag v">添付文書照合</span></td></tr>
+      <tr><td>カルチコール・インスリン・ブドウ糖の量、KCL・Mgの投与速度と量、TBW係数</td><td><span class="tag u">未照合（成書・一般的な目安）</span></td></tr>
+    </table>
+  </section>
+  <section class="card fine">
+    <p>診療判断の補助です。最終判断は診察と原典・添付文書、院内の手順で行ってください。デスモプレシン注・サルブタモール吸入の使い方は国内の適応外です。</p>
+    <p>入力はこの端末内にだけ保存されます。患者の氏名・IDは入れないでください。</p>
+    <p>アプリの版：<b id="ver"></b>　<button type="button" class="btn" id="forceUpdate">最新版に更新</button></p>
+  </section>
+</div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const VER="2026-11-14a";
+const KEY="na-nav-v1";
+const $=id=>document.getElementById(id);
+let tab="hypo", oth="hyperna";
+function num(id){const e=$(id);if(!e)return null;const v=parseFloat(e.value);return isFinite(v)?v:null}
+function rv(n){const r=document.querySelector('input[name="'+n+'"]:checked');return r?r.value:""}
+function ck(id){const e=$(id);return !!(e&&e.checked)}
+function prof(){try{return window.WardProfile?WardProfile.get():{}}catch(e){return {}}}
+function wt(){const w=num("wt");if(w&&w>20&&w<250)return w;const p=prof();return (p&&p.weight)||null}
+function r1(x){return Math.round(x*10)/10}
+function r10(x){return Math.round(x/10)*10}
+function fmt(x){return (Math.round(x*10)/10).toString()}
+function tbw(){
+  const w=wt();if(!w)return null;const p=prof();const old=p.age==="65-74"||p.age==="ge75";
+  let f,note="";
+  if(p.sex==="m")f=old?0.5:0.6;else if(p.sex==="f")f=old?0.45:0.5;else{f=0.5;note="性別未設定のため係数0.5"}
+  return {v:f*w,f:f,note:note};
+}
+function V(cls,pill,big,body){return '<section class="verdict '+cls+'"><span class="pill">'+pill+'</span><div class="big">'+big+'</div>'+(body||"")+'</section>'}
+function I(cls,t,d){return '<li class="item '+cls+'"><div class="t">'+t+'</div>'+(d?'<div class="d">'+d+'</div>':'')+'</li>'}
+
+/* ---------- 低Na ---------- */
+function hypoCtx(){
+  const na=num("na"),glu=num("glu"),sym=rv("sym"),on=rv("on");
+  let cna=na,gnote="";
+  if(na!=null&&glu!=null&&glu>100){cna=r1(na+2.4*(glu-100)/100);gnote="血糖補正Na "+fmt(cna)+"（Na＋2.4×(血糖−100)/100）";}
+  const r105=cna!=null&&cna<=105;$("r-105").checked=r105;
+  const rk=[r105&&"Na 105以下",ck("r-k")&&"低K",ck("r-alc")&&"アルコール多飲",ck("r-mal")&&"低栄養",ck("r-liv")&&"進行した肝疾患"].filter(Boolean);
+  const high=rk.length>0, acute=on==="acute";
+  const lim24=high?8:10, lim48=high?16:18;
+  return {na:na,cna:cna,gnote:gnote,sym:sym,on:on,acute:acute,high:high,rk:rk,lim24:lim24,lim48:lim48};
+}
+function bolusTxt(){
+  const w=wt();
+  if(w){const d=r10(2*w);return {ml:d,txt:"<b>150 mL</b>（欧州）または <b>2 mL/kg＝"+d+" mL</b>（体重"+fmt(w)+" kg・SALSA。小柄な人はこちら）"};}
+  return {ml:150,txt:"<b>150 mL</b>（欧州）。体重を入れると2 mL/kg（SALSA）の量も出します"};
+}
+function riseTxt(na,ml){
+  const t=tbw();if(!t||na==null)return "";
+  const d=(513-na)/(t.v+1)*ml/1000;
+  return "1回あたりの見込み上昇 約+"+fmt(d)+"（Adrogué-Madias式、TBW "+fmt(t.v)+" L"+(t.note?"・"+t.note:"")+"。水利尿が出ると式より上がる）";
+}
+function renderHypo(){
+  const c=hypoCtx();
+  const cls=c.cna==null?"":c.cna>=135?"正常範囲":c.cna>=130?"軽度（130〜134）":c.cna>=125?"中等度（125〜129）":"高度（125未満）";
+  $("na-cls").textContent=cls;
+  let h="";
+  if(c.na==null){$("h-out").innerHTML="";renderRe(c);renderRl(c);return;}
+  if(c.cna>=135){h=V("info","低Naではない",c.gnote?"血糖で補正すると "+fmt(c.cna)+"：高張性（高血糖）の可能性。低Naとしての補正は不要。":"Na "+fmt(c.na)+"：低Naではありません。");$("h-out").innerHTML=h;renderRe(c);renderRl(c);return;}
+  const B=bolusTxt();
+  const cl=x=>x>=140?"正常化まで":fmt(x)+"まで";const ceil24=cl(c.na+c.lim24), ceil48=cl(c.na+c.lim48);
+  const limBox='<div class="nums">'
+    +'<div class="bx"><div class="k">24時間の上限</div><div class="v">+'+c.lim24+'（'+ceil24+'）<small>'+(c.high?"ODS高リスク："+c.rk.join("・"):"欧州：初日+10、以後24時間ごと+8")+'</small></div></div>'
+    +'<div class="bx"><div class="k">48時間の上限</div><div class="v">+'+c.lim48+'（'+ceil48+'）<small>米国専門家パネル</small></div></div>'
+    +((c.sym==="sev"||c.sym==="mod")?'<div class="bx"><div class="k">最初の目標</div><div class="v">+5<small>欧州：症状の改善に必要な上げ幅</small></div></div>':(!c.acute&&c.cna<125?'<div class="bx"><div class="k">24時間の目標</div><div class="v">+4〜'+(c.high?6:8)+'<small>米国：これより遅くしすぎない</small></div></div>':''))
+    +'</div>';
+  const items=[];
+  let v="";
+  if(c.sym==="sev"){
+    v=V("crit","重度症状","3%食塩水を20分でボーラス → 20分後にNa再検。+5か症状改善まで最大3回",limBox);
+    items.push(I("do","① 1回量",B.txt+"を20分で静注。<br>"+riseTxt(c.na,150)));
+    items.push(I("do","② 再検","各ボーラスの20分後にNa。+5到達か症状改善で3%を止める（最大3回）。その後は6時間・12時間後、以後は安定まで毎日（欧州）。2 mL/kg法（SALSA）は6時間ごとに測り、+5〜9に届かず症状が残れば6時間ごとに追加。"));
+    items.push(I("do","③ +5で改善しないとき","3%を続けて1時間に+1を目安に。症状が改善する、合計+10、またはNa 130 のどれかで止める。続ける間は4時間ごとにNa（欧州）。"));
+    items.push(I("caution","④ 止めた後","最小限の生理食塩液で静脈路を保ち、原因別の治療へ。"+(c.acute?"急性（48時間以内が確か）は ODS のリスクが低い。米国は急性の症候性に上限を設けていないが、欧州は初日+10まで。":"慢性・不明なので、上の上限を守る。")));
+    items.push(I("note","並行して","気道・痙攣の管理、ICU・HCUへ。治療前に血清・尿の浸透圧とNaを採っておく（原因検索タブ）。"));
+  }else if(c.sym==="mod"){
+    v=V("warn","中等度症状","3%食塩水を20分で1回 → 1・6・12時間後にNa再検",limBox);
+    items.push(I("do","① 1回量",B.txt+"を20分で1回静注。<br>"+riseTxt(c.na,150)));
+    items.push(I("do","② 目標と再検","24時間で+5を目標に。Naは1・6・12時間後（欧州）。症状が悪くなれば重度として扱う。"));
+    items.push(I("do","③ 原因の治療","原因検索タブの最小セットを出し、原因別の治療へ。"));
+  }else if(c.sym==="none"&&c.acute){
+    v=V("warn","急性・症状なし","急に10以上下がったなら3%を20分で1回 → 4時間後に再検",limBox);
+    items.push(I("do","3%食塩水",B.txt+"を20分で1回（欧州：急な低下が10を超えるとき）。4時間後にNa。"));
+    items.push(I("do","原因を止める","低張輸液の中止、飲水・術中の灌流液・MDMA・運動誘発などを確認。"));
+  }else if(c.sym==="none"){
+    if(c.cna>=130){
+      v=V("ok","軽度・慢性","Naを上げるだけの治療は不要。原因を探して薬を見直す",limBox);
+      items.push(I("do","すること","原因検索タブの最小セット、薬の見直し（サイアザイド、SSRI、カルバマゼピンなど）。転倒・注意力低下の原因になるので放置はしない。"));
+    }else{
+      v=V(c.cna<125?"warn":"info",c.cna<125?"高度・慢性・無症状":"中等度・慢性","3%は不要。原因別に治療し、上限を守る",limBox);
+      items.push(I("do","すること","原因検索タブで原因を絞り、原因別の治療（SIADHなら水分制限から）。"));
+      items.push(I("do","再検","治療開始後は6時間ごとを目安に。水利尿（尿量100 mL/時超）が出たら2時間ごと。<span class=\"tag u\">目安</span>"));
+      items.push(I("note","補正の速さの最近の知見","遅すぎる補正（24時間で6未満）は死亡が多いという観察研究があるが、交絡の可能性が高い。入院中の慢性低Naを正常まで上げても30日の死亡・再入院は減らなかった（HIT試験 2026）。"));
+    }
+  }else{
+    v=V("info","症状と発症の速さを選ぶ","②と③を選ぶと、3%食塩水の要否と量を出します",limBox);
+  }
+  if(c.gnote)items.unshift(I("note","血糖で補正",c.gnote+"。この値で区分を判定。"));
+  if(ck("aq"))items.push(I("caution","上がりすぎに注意","原因が外れると水利尿で急に上がる。尿量を時間ごとに見て、100 mL/時を超えたら2時間ごとにNa。上限に近づいたら下の「戻し方」。ODS高リスクではデスモプレシンを先に使って上がり方を抑える方法（クランプ）もあり、腎臓内科・内分泌内科と相談。"));
+  if(!wt())items.push(I("note","体重が未入力","「詳しく」かプロファイルに体重を入れると、2 mL/kgの量と戻しの量を計算します。"));
+  h=v+'<ul class="list">'+items.join("")+'</ul>';
+  $("h-out").innerHTML='<section class="card" style="display:flex;flex-direction:column;gap:10px">'+h+'</section>';
+  renderRe(c);renderRl(c);
+}
+function renderRe(c){
+  const now=num("rn"),hr=num("rh");
+  let s="";
+  if(c.na==null){s='<p class="hint">①に治療前のNaを入れてから使います。</p>';}
+  else if(now==null||hr==null||hr<=0){s='<p class="hint">再検の値と経過時間を入れると、上がり幅を上限と比べます。</p>';}
+  else{
+    const d=r1(now-c.na),rate=r1(d/hr);
+    const lim=hr<=24?c.lim24:hr<=48?c.lim48:null;
+    const base="治療前 "+fmt(c.na)+" → "+fmt(now)+"（"+fmt(hr)+"時間で"+(d>=0?"+":"")+fmt(d)+"、1時間"+(rate>=0?"+":"")+fmt(rate)+"）";
+    if(lim!=null&&d>lim)s=V("crit","過補正","上限+"+lim+"を超えています。すぐ下の「戻し方」へ",'<div>'+base+'</div>');
+    else if(lim!=null&&d>=lim-2)s=V("warn","上限に近い","3%・生理食塩液・トルバプタンを止め、2時間ごとに再検",'<div>'+base+'。上限まであと'+fmt(lim-d)+'。</div>');
+    else if(d<0)s=V("warn","下がっている","低張輸液・飲水・原因の持続を確認",'<div>'+base+'</div>');
+    else if(c.sym==="sev"&&d>=5&&hr<=24)s=V("ok","目標+5に到達","3%食塩水を止め、原因別の治療へ",'<div>'+base+'</div>');
+    else s=V("ok","範囲内","上限の範囲内です",'<div>'+base+(lim!=null?'。'+(hr<=24?'24':'48')+'時間の上限まであと'+fmt(lim-d):'')+'</div>');
+  }
+  $("rc-out").innerHTML=s;
+}
+function renderRl(c){
+  const w=wt();
+  const vol=w?r10(10*w)+" mL（10 mL/kg×"+fmt(w)+" kg）":"10 mL/kg（体重を入れると量を表示）";
+  const target=c&&c.na!=null?"治療開始から24時間で <b>"+fmt(c.na+c.lim24)+"</b> 以下に戻す":"24時間の上限以下に戻す";
+  $("rl-out").innerHTML='<ul class="list">'
+   +I("avoid","① 上げる治療を止める","3%食塩水、生理食塩液、食塩、トルバプタンを中止。")
+   +I("do","② 自由水を入れる","5%ブドウ糖液 <b>"+vol+"</b> を1時間で。尿量と水分出納を厳密に見る。")
+   +I("do","③ デスモプレシン","2 μg 静注、8時間以上あけて繰り返し可（デスモプレシン注4協和 4 μg/mL。国内では適応外）。腎臓内科・内分泌内科と相談。")
+   +I("do","④ 再検","1時間ごとにNa。目標："+target+"。")
+   +'</ul><p class="hint">欧州ガイドライン（初日+10・以後+8を超えたとき）とSALSA試験（24時間で+10以上、48時間で+18以上で5%ブドウ糖10 mL/kgを1時間＋デスモプレシン2 μg）に基づく。</p>';
+}
+
+/* ---------- 原因検索 ---------- */
+function renderCause(){
+  const uo=rv("uo"),un=rv("un"),ecf=rv("ecf"),diu=ck("diu");
+  $("q-un").classList.toggle("hidden",uo==="lo");$("q-ecf").classList.toggle("hidden",uo==="lo");
+  let s="";
+  if(!uo){s='<p class="hint">尿浸透圧から選びます。</p>';}
+  else if(uo==="lo"){s=V("info","尿が十分に薄い","水の摂りすぎ・溶質の不足",'<ul class="pl"><li>心因性多飲、過剰な飲水（運動中など）</li><li>低溶質摂取（ビール多飲、茶とトースト）</li><li>原因を止めると水利尿で急に上がる：上がりすぎに注意</li></ul>');}
+  else if(!un||!ecf){s='<p class="hint">尿Naと細胞外液量を選びます。</p>';}
+  else{
+    let t="",l=[];
+    if(un==="lo"){
+      t="有効循環血漿量の低下";
+      if(ecf==="high")l=["心不全","肝硬変","ネフローゼ症候群"];
+      else l=["腎外からの喪失：嘔吐・下痢・サードスペース","以前の利尿薬（効果が切れた後）","摂取不足"];
+    }else{
+      if(ecf==="low"){t="腎からのNa喪失";l=["利尿薬（特にサイアザイド）","原発性副腎不全","中枢性塩類喪失（くも膜下出血・頭部外傷・脳外科術後）","塩類喪失性腎症","嘔吐（代謝性アルカローシスで尿Naが出る）"];}
+      else if(ecf==="norm"){t="SIADHなど";l=["SIADH（肺炎・肺癌・中枢神経疾患・術後・痛み・嘔気・薬）","続発性副腎不全（ICIの下垂体炎を含む）","甲状腺機能低下症（重度のとき）","利尿薬"];}
+      else{t="腎不全・利尿薬使用中の浮腫性疾患";l=["急性・慢性腎不全","心不全・肝硬変で利尿薬使用中"];}
+    }
+    if(diu)l.push("利尿薬使用中は尿Naが当てにならない。FEUA 12%超ならSIADHを支持");
+    s=V("info",t,"考えられる原因",'<ul class="pl">'+l.map(x=>"<li>"+x+"</li>").join("")+'</ul>');
+  }
+  $("c-out").innerHTML=s;
+}
+
+/* ---------- 高Na ---------- */
+function renderHN(){
+  const na=num("hn"),on=rv("hnon");let s="";
+  if(na==null){$("hn-out").innerHTML='<p class="hint">Naを入れると、自由水の不足量と下げる上限を出します。</p>';return;}
+  if(na<=145){$("hn-out").innerHTML=V("info","高Naではない","Na "+fmt(na));return;}
+  const t=tbw();
+  const cls=na>=160?"crit":na>=150?"warn":"info";
+  const pill=na>=160?"高度":na>=150?"中等度":"軽度";
+  const big=on==="acute"?"1時間に1程度で正常まで下げてよい（急性）":"24時間で10以内（"+fmt(na-10)+"まで）を目安に下げる";
+  let body='<div class="nums">';
+  if(t){
+    const def=t.v*(na/140-1);
+    const per=na/(t.v+1);
+    const need=on==="acute"?(na-140):Math.min(10,na-140);
+    const vol=need/per;
+    body+='<div class="bx"><div class="k">自由水の不足</div><div class="v">約'+fmt(def)+' L<small>TBW '+fmt(t.v)+' L（係数'+t.f+(t.note?"・"+t.note:"")+'）</small></div></div>'
+      +'<div class="bx"><div class="k">5%ブドウ糖液1 Lで</div><div class="v">約−'+fmt(per)+'<small>Adrogué-Madias式</small></div></div>'
+      +'<div class="bx"><div class="k">'+(on==="acute"?"140まで":"24時間で−"+fmt(need))+'に必要</div><div class="v">約'+fmt(vol)+' L<small>＋尿量・不感蒸泄など続く喪失分</small></div></div>';
+  }else body+='<div class="bx"><div class="k">自由水の不足</div><div class="v">体重が必要<small>低Naタブの「詳しく」かプロファイルに</small></div></div>';
+  body+='</div>';
+  $("hn-out").innerHTML=V(cls,pill+(on?"・"+(on==="acute"?"急性":"慢性・不明"):""),big,body);
+}
+/* ---------- 低K ---------- */
+function renderLK(){
+  const k=num("lk");if(k==null){$("lk-out").innerHTML="";return;}
+  if(k>=3.5){$("lk-out").innerHTML=V("info","低Kではない","K "+fmt(k));return;}
+  const sev=k<2.5||ck("lk-ecg")||ck("lk-wk");
+  let s;
+  const ren=prof().renal;const rnote=(ren==="15-29"||ren==="lt15")?'<div>腎機能が低い（プロファイル）：補充は控えめにし、頻回に測る。</div>':'';
+  if(ck("lk-pp"))s=V("warn","周期性四肢麻痺を疑う","少量ずつ補い、回復期の高Kに注意して1〜2時間ごとに測る",rnote);
+  else if(sev)s=V("crit","静注で補充","心電図モニター下で静注（末梢 20 mEq/時以下）。2〜4時間ごとにKを測る",'<div>Mgも測り、低ければ同時に補う。'+(ck("lk-dig")?"ジゴキシン内服中：中毒が出やすいので早めに補正。":"")+'</div>'+rnote);
+  else if(k<3.0)s=V("warn","中等度","経口で補う（飲めなければ静注）。Mgも確認",'<div>目安として K 1 低いと体内総量で200〜400 mEqの不足。<span class="tag u">目安</span></div>'+rnote);
+  else s=V("info","軽度","経口で補い、原因（利尿薬・下痢など）を見直す",rnote);
+  $("lk-out").innerHTML=s;
+}
+/* ---------- 高K ---------- */
+function renderHK(){
+  const k=num("hk");if(k==null){$("hk-out").innerHTML="";return;}
+  if(k<5.5){$("hk-out").innerHTML=V("info","高Kではない","K "+fmt(k)+"（UKKAは5.5以上を高K）");return;}
+  const ecg=ck("hk-ecg");
+  const sev=k>=6.5?"高度（6.5以上）":k>=6.0?"中等度（6.0〜6.4）":"軽度（5.5〜5.9）";
+  const cls=ecg||k>=6.5?"crit":k>=6.0?"warn":"info";
+  const big=ecg?"心電図変化あり：まずグルコン酸Ca静注、続けてインスリン＋ブドウ糖":k>=6.0?"インスリン＋ブドウ糖でKを細胞内へ、並行して原因を除く":"原因を除き、Kを下げる薬を見直す";
+  const it=[];
+  if(ecg)it.push(I("do","① 心筋保護","グルコン酸カルシウム（カルチコール注射液8.5% 10 mL）を10分かけて静注。心電図が戻らなければ5〜10分ごとに繰り返す。UKKAの量（10% 30 mL＝Ca 6.8 mmol）はカルチコールで約35 mLに相当し、10 mL 1本では少ない。"+(ck("hk-dig")?"ジゴキシン内服中：ゆっくり（20〜30分）入れる。":"")+'<span class="tag u">換算は計算値</span>'));
+  if(ecg||k>=6.0)it.push(I("do",(ecg?"② ":"① ")+"細胞内へ移す","速効型インスリン10単位（ヒューマリンR注）＋ブドウ糖25 g（50%ブドウ糖液50 mL）を15分で静注。投与前の血糖が126 mg/dL（7 mmol/L）未満なら、続けて10%ブドウ糖液を50 mL/時で5時間（UKKA）。血糖は6時間測る。効果は15〜30分で出て4〜6時間続く。"));
+  if(k>=6.5)it.push(I("do","補助","サルブタモール吸入 10〜20 mg（国内はベネトリン吸入液0.5%、高K血症には適応外）。単独では使わない。"));
+  if(ck("hk-acid"))it.push(I("do","アシドーシス","炭酸水素ナトリウム（メイロン静注）を考慮（UKKAは代謝性アシドーシスのあるときに限る）。"));
+  it.push(I("do","体外へ出す","ジルコニウムシクロケイ酸ナトリウム（ロケルマ懸濁用散分包5 g・10 g）：1回10 gを1日3回、2日間（最長3日）→ 1回5 gを1日1回（最大15 g）。透析中は非透析日に5 g。<span class=\"tag v\">添付文書照合</span><br>ループ利尿薬（ラシックス注）、難治・腎不全・横紋筋融解では透析。ポリスチレンスルホン酸Ca（カリメート）は効果が遅く、急性期には向かない。"));
+  it.push(I("note","再検","Kは1・2・4・6・24時間後（UKKA）。原因の薬（RAS阻害薬・MRA・ST合剤・NSAIDsなど）を止める。"));
+  $("hk-out").innerHTML=V(cls,sev+(ecg?"・心電図変化":""),big)+'<ul class="list" style="margin-top:10px">'+it.join("")+'</ul>';
+}
+/* ---------- 低Mg ---------- */
+function renderMG(){
+  const m=num("mg");if(m==null){$("mg-out").innerHTML="";return;}
+  if(m>=1.8){$("mg-out").innerHTML=V("info","低Mgではない","Mg "+fmt(m)+" mg/dL");return;}
+  const ren=prof().renal;const low=(ren==="15-29"||ren==="lt15");
+  let s;
+  if(ck("mg-tdp"))s=V("crit","torsades・不整脈","硫酸Mg 2 g（マグネゾール 20 mL 1本）を10〜15分で静注",'<div>続けて1〜2 gを1時間で。心電図モニター。<span class="tag u">未照合</span></div>');
+  else if(m<1.2||ck("mg-sz"))s=V("warn","高度・症状あり","静注で補う：硫酸Mg 1〜2 gを1時間で、以後12〜24時間かけて追加",'<div>1日の総量の目安 4〜8 g'+(low?"。腎機能が低いので半量程度に":"")+'。腱反射・呼吸・血圧を見る（過量で反射消失→呼吸抑制）。<span class="tag u">未照合</span></div>');
+  else s=V("info","軽度","経口（酸化マグネシウム）か少量の静注。原因（PPIなど）を見直す",low?'<div>腎機能が低い：補充は少なめに。</div>':'');
+  $("mg-out").innerHTML=s;
+}
+
+/* ---------- 共通 ---------- */
+function renderAll(){renderHypo();renderCause();renderHN();renderLK();renderHK();renderMG();sumOverride()}
+function sumOverride(){
+  try{if(!window.wcSum)return;
+    if(tab==="hypo"){const v=document.querySelector("#rc-out .verdict.crit");if(v){wcSum.set("過補正："+v.querySelector(".big").textContent,{tone:"crit",pill:"過補正"});return;}}
+    wcSum.set(null);
+  }catch(e){}
+}
+function save(){
+  const o={tab:tab,oth:oth,v:{}};
+  document.querySelectorAll("[data-s]").forEach(e=>{
+    if(e.type==="radio"){if(e.checked)o.v["r:"+e.name]=e.value;}
+    else if(e.type==="checkbox")o.v["c:"+e.id]=e.checked;
+    else o.v["i:"+e.id]=e.value;
+  });
+  try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}
+}
+function load(){
+  let o=null;try{o=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+  if(!o)return;
+  tab=o.tab||tab;oth=o.oth||oth;
+  const v=o.v||{};
+  document.querySelectorAll("[data-s]").forEach(e=>{
+    if(e.type==="radio"){if(v["r:"+e.name]===e.value)e.checked=true;}
+    else if(e.type==="checkbox"){if("c:"+e.id in v)e.checked=!!v["c:"+e.id];}
+    else if("i:"+e.id in v)e.value=v["i:"+e.id];
+  });
+}
+function setTab(t){
+  tab=t;
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===t?"true":"false"));
+  ["hypo","cause","oth","ref"].forEach(x=>$("v-"+x).classList.toggle("hidden",x!==t));
+  sumOverride();
+}
+function setOth(t){
+  oth=t;
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.o===t?"true":"false"));
+  ["hyperna","hypok","hyperk","hypomg"].forEach(x=>$("o-"+x).classList.toggle("hidden",x!==t));
+}
+document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-v]");if(b){setTab(b.dataset.v);save();window.scrollTo({top:0});}});
+document.querySelector(".seg").addEventListener("click",e=>{const b=e.target.closest("button[data-o]");if(b){setOth(b.dataset.o);save();}});
+document.addEventListener("input",e=>{if(e.target.closest("main")){renderAll();save()}});
+document.addEventListener("change",e=>{if(e.target.closest("main")){renderAll();save()}});
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),3500)}
+$("ver").textContent=VER;
+$("forceUpdate").addEventListener("click",async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(()=>location.reload(),800);});
+load();setTab(tab);setOth(oth);renderAll();
+function hh(){try{document.documentElement.style.setProperty('--hh',document.querySelector('header.top').offsetHeight+'px')}catch(e){}}hh();addEventListener('resize',hh);
+setInterval(hh,1500);
+document.addEventListener("DOMContentLoaded",()=>{try{if(window.WardProfile)WardProfile.onChange(()=>{renderAll();});}catch(e){}renderAll();});
+window.addEventListener("load",()=>{renderAll();hh();});
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["na-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
+<script src="../share.js" defer></script>
+</body>
+</html>

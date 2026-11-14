@@ -269,6 +269,18 @@
       ]
     },
     {
+      "name": "低Na・電解質補正ナビ",
+      "short_name": "低Naナビ",
+      "url": "na/",
+      "icons": [
+        {
+          "src": "na/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "指定難病・制度ナビ",
       "short_name": "難病・制度ナビ",
       "url": "nan/",
