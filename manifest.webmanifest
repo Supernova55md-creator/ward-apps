@@ -137,6 +137,18 @@
       ]
     },
     {
+      "name": "NCS・針筋電図 判読トレーニング",
+      "short_name": "NCS判読",
+      "url": "ncs/",
+      "icons": [
+        {
+          "src": "ncs/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "抗てんかん薬ナビ",
       "short_name": "抗てんかん薬",
       "url": "aed/",

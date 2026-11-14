@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NCS・針筋電図 判読トレーニング</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0F766E">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NCS判読">
+<style>
+:root{
+  --bg:#F3F6F5; --surface:#FFFFFF; --ink:#1A2422; --muted:#5A6865; --line:#D9E2DF;
+  --accent:#0F766E; --accent-strong:#0B5650; --accent-soft:#E1F2EF; --on-accent:#FFFFFF;
+  --ok:#2E7D4F; --ok-soft:#E3F3E9; --ng:#B42318; --ng-soft:#FDE8E6; --warn-soft:#FFF4DB;
+  --font:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#121716; --surface:#1B2220; --ink:#E7EEEC; --muted:#9FB0AC; --line:#2D3835;
+    --accent:#2DBFAF; --accent-strong:#6FDCCF; --accent-soft:#16332F; --on-accent:#06201D;
+    --ok:#5CC48A; --ok-soft:#163323; --ng:#F27A6E; --ng-soft:#3B1C1A; --warn-soft:#3A3017; color-scheme:dark}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+.app{max-width:680px;margin:0 auto;padding:0 calc(14px + env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;border:5px solid var(--accent);flex:none}
+.brand h1{font-size:19px;font-weight:900}
+.brand small{color:var(--muted);font-size:11px;margin-left:auto;text-align:right;line-height:1.3}
+.summary{margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 9px}
+.tile .k{font-size:11px;color:var(--muted);display:block}
+.tile .v{font-size:17px;font-weight:700;display:block}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:6px}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sm{min-height:36px;padding:5px 11px;font-size:14px}
+.btn:disabled{opacity:.55;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.set>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details.set>summary::-webkit-details-marker{display:none}
+details.set>summary::after{content:"＋";margin-left:auto;color:var(--muted);font-weight:400}
+details.set[open]>summary::after{content:"－"}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input{margin:0;accent-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px}
+input[type=search]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;min-height:44px}
+.sw{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--accent)}
+/* 出題 */
+.qhead{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.lv{letter-spacing:1px;color:var(--accent)}
+.regtag{margin-left:auto;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:1px 10px;font-weight:700}
+.pt{font-size:15.5px;margin:0 0 8px}
+ul.fd{margin:0;padding:0;list-style:none}
+ul.fd li{position:relative;padding:7px 0 7px 18px;border-top:1px dashed var(--line);font-size:15.5px;line-height:1.5}
+ul.fd li:first-child{border-top:0}
+ul.fd li::before{content:"";position:absolute;left:3px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.ask{font-weight:700;margin:12px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;font-size:15.5px;line-height:1.45;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:11px;padding:11px 12px;min-height:48px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ng{border-color:var(--ng);background:var(--ng-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.result{border-radius:10px;padding:9px 12px;font-weight:700;margin-bottom:10px}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.ng{background:var(--ng-soft);color:var(--ng)}
+.result .ans{display:block;color:var(--ink);font-size:17px;margin-top:2px}
+.result .syn{display:block;color:var(--muted);font-weight:400;font-size:13.5px}
+.ex h3{font-size:14.5px;margin:12px 0 4px;color:var(--accent-strong)}
+.why{margin:0;padding:0;list-style:none}
+.why li{padding:7px 0;border-top:1px dashed var(--line);font-size:15px;line-height:1.5}
+.why li:first-child{border-top:0}
+.why .f{display:block}
+.why .w{display:block;color:var(--muted);font-size:13.5px;padding-left:1.2em;text-indent:-1.2em}
+.why .w::before{content:"→ ";color:var(--accent)}
+.why .dn{font-weight:700;display:block}
+.pearl{background:var(--warn-soft);border-radius:10px;padding:9px 12px;font-size:14.5px;margin-top:12px}
+.pearl b{display:block;font-size:13px;color:var(--muted)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.nav .btn{flex:1 1 140px}
+/* 一覧 */
+details.site{border-top:1px solid var(--line)}
+details.site:first-of-type{border-top:0}
+details.site>summary{cursor:pointer;padding:9px 0;list-style:none}
+details.site>summary::-webkit-details-marker{display:none}
+details.site>summary b{display:block;font-size:15px}
+details.site>summary span{display:block;font-size:13px;color:var(--muted)}
+.lvb{font-size:11px;color:var(--accent);margin-left:6px;font-weight:400}
+.sub{font-size:12.5px;color:var(--muted);margin:8px 0 2px;font-weight:700}
+/* 成績 */
+table.st{width:100%;border-collapse:collapse;font-size:14.5px}
+table.st td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+table.st td.num{text-align:right;white-space:nowrap;width:1%}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{color:var(--muted);font-size:14px}
+/* タブ */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+nav.tabs .in{display:flex;max-width:680px;width:100%}
+nav.tabs button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:9px 0 10px;min-height:56px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;display:none;max-width:90%}
+.toast.on{display:block}
+.foot{font-size:11.5px;color:var(--muted);margin:16px 2px 0}
+/* NCS・EMG 判読 */
+.vig{font-size:15.5px;margin:0 0 6px}
+.who{font-size:13px;color:var(--muted);margin:0 0 6px}
+.sec{font-size:13.5px;font-weight:700;color:var(--accent-strong);margin:12px 0 4px;display:flex;align-items:center;gap:6px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px}
+table.dt{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.35}
+table.dt th,table.dt td{padding:5px 4px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+table.dt th{font-size:11.5px;color:var(--muted);font-weight:700;background:var(--bg)}
+table.dt td.l,table.dt th.l{text-align:left;white-space:normal}
+table.dt tr.nv td{background:var(--accent-soft);color:var(--accent-strong);font-weight:700;text-align:left;white-space:normal;font-size:13px}
+table.dt tr.fw td{color:var(--muted);font-size:12.5px}
+table.dt td.c-ab{background:var(--warn-soft);color:#8A5300;font-weight:700}
+table.dt td.c-dm{background:var(--ng-soft);color:var(--ng);font-weight:800}
+table.dt span.c-ab{background:var(--warn-soft);color:#8A5300;font-weight:700;border-radius:4px;padding:0 3px}
+table.dt span.c-dm{background:var(--ng-soft);color:var(--ng);font-weight:800;border-radius:4px;padding:0 3px}
+@media (prefers-color-scheme: dark){table.dt td.c-ab,table.dt span.c-ab{color:#F2C46D}}
+table.dt small{display:block;color:var(--muted);font-size:11px;font-weight:400}
+.legend{font-size:12px;color:var(--muted);margin:6px 0 0;display:flex;gap:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.legend .a{background:var(--warn-soft);border:1px solid #D9A441}.legend .d{background:var(--ng-soft);border:1px solid var(--ng)}
+.grp{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 4px}
+.pick{font:inherit;font-size:14.5px;line-height:1.35;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 10px;min-height:44px;cursor:pointer}
+.pick.on{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.pick.ok{border-color:var(--ok);background:var(--ok-soft);font-weight:700}
+.pick.ng{border-color:var(--ng);background:var(--ng-soft)}
+.pick:disabled{cursor:default;color:var(--ink)}
+.res2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.res2 .result{margin:0}
+.crit{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:10px;font-size:14px}
+.crit b{display:block;font-size:13px;color:var(--muted)}
+.crit.ok{border-color:var(--ok)}.crit.ng{border-color:var(--ng)}
+table.ref{width:100%;border-collapse:collapse;font-size:13.5px}
+table.ref th,table.ref td{padding:5px 4px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+table.ref th{font-size:12px;color:var(--muted)}
+.src li{margin:6px 0;font-size:13.5px;line-height:1.5}
+.src a{color:var(--accent-strong);word-break:break-all}
+.uv{display:inline-block;font-size:11px;border:1px solid #D9A441;color:#8A5300;border-radius:999px;padding:0 7px;margin-left:4px;font-weight:700;vertical-align:1px}
+@media (prefers-color-scheme: dark){.uv{color:#F2C46D}}
+table.dt td.l:first-child{min-width:6.8em}
+ul.pl{margin:4px 0 0;padding-left:1.2em}
+ul.pl li{margin:4px 0;font-size:14.5px}
+.dot-ab,.dot-dm{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}.dot-ab{background:#D9A441}.dot-dm{background:var(--ng)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><h1>NCS・針筋電図 判読</h1><small>トレーニング<br>病棟アプリ</small></div>
+  <div class="summary">
+    <div class="tile"><span class="k">回答数</span><span class="v" id="sN">0</span></div>
+    <div class="tile"><span class="k">完全正解率</span><span class="v" id="sR">—</span></div>
+    <div class="tile"><span class="k">連続正解</span><span class="v" id="sS">0</span></div>
+  </div>
+</header>
+
+<section class="view active" id="v-q" aria-label="出題">
+  <details class="card set" id="setBox">
+    <summary>出題範囲・設定 <span class="hint" id="setSum" style="margin:0 0 0 4px"></span></summary>
+    <div class="row" style="margin-top:8px">
+      <label for="modeSel" style="font-size:14px">検査</label>
+      <select id="modeSel"><option value="both">NCS＋針筋電図（両方）</option><option value="ncs">NCSのみ（反復刺激を含む）</option><option value="emg">針筋電図のみ</option></select>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <label for="lvSel" style="font-size:14px">難易度</label>
+      <select id="lvSel"><option value="1">基本（典型例）</option><option value="2">標準（軽症・合併例を含む）</option><option value="3">応用（紛らわしい例を含む）</option></select>
+    </div>
+    <p class="hint" style="margin-top:10px">出題する疾患</p>
+    <div class="chips" id="dxChips"></div>
+    <div class="row"><button class="btn sm" id="dxAll" type="button">すべて</button><button class="btn sm" id="dxNone" type="button">すべて外す</button></div>
+    <label class="sw"><input type="checkbox" id="weakOpt">間違えた疾患・まだ解いていない疾患を優先</label>
+    <p class="hint">数値は毎回ランダムに作ります（年齢・身長・異常の程度・どの神経に出るかが変わります）。「針筋電図のみ」ではNCSが正常の疾患などを中心に出します。</p>
+  </details>
+  <div id="qArea"></div>
+</section>
+
+<section class="view" id="v-a" aria-label="基準・出典">
+  <div id="aArea"></div>
+</section>
+
+<section class="view" id="v-s" aria-label="成績">
+  <div id="sArea"></div>
+</section>
+
+<p class="foot">自分用の学習ツールです。数値は典型像をもとに作った架空のもので、基準値は施設・機器・皮膚温で変わります。実際の判定は自施設の基準値と原典で行ってください。成績はこの端末内にのみ保存されます。</p>
+</div>
+
+<nav class="tabs" role="tablist" aria-label="画面切替"><div class="in">
+  <button role="tab" aria-selected="true" data-v="v-q" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg>出題</button>
+  <button role="tab" aria-selected="false" data-v="v-a" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>基準・出典</button>
+  <button role="tab" aria-selected="false" data-v="v-s" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>成績</button>
+</div></nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="ncs-v1",VER="2026-11-14a";
+
+/* ── 病態・疾患 ── */
+var P={dem:"脱髄",axo:"軸索障害",cb:"伝導ブロック",ahc:"前角障害",rad:"神経根障害",myo:"筋原性",nmj:"神経筋接合部障害"};
+var PK=Object.keys(P);
+var PDESC={
+ dem:"伝導速度・遠位潜時・F波潜時の高度な遅れ、時間的分散。CMAP振幅は比較的保たれる。",
+ axo:"CMAP・SNAPの振幅低下が主体。伝導速度・潜時は正常〜軽度の遅れにとどまる。",
+ cb:"近位で刺激するとCMAPが急に小さくなる（持続時間はあまり延びない）。遠位刺激のCMAPは保たれる。",
+ ahc:"CMAP低下とSNAP正常。針筋電図で複数領域に活動性＋慢性の脱神経（線維束自発電位を伴う）。",
+ rad:"SNAPは正常（後根神経節より近位の障害）。1つの筋節に限った脱神経と傍脊柱筋の異常。",
+ myo:"NCSはほぼ正常。針筋電図で低振幅・短持続・多相性MUPと早期動員。",
+ nmj:"反復刺激で漸減（MG）、または低いCMAPと運動後・高頻度刺激での漸増（LEMS）。"
+};
+var D={aidp:"AIDP（GBS 脱髄型）",aman:"AMAN（GBS 軸索型）",cidp:"CIDP",mmn:"MMN",dpn:"糖尿病性多発ニューロパチー",cts:"手根管症候群",une:"肘部管症候群",als:"ALS",rad:"神経根症（頸椎・腰椎）",myo:"筋炎",dm1:"筋強直性ジストロフィー1型",lems:"LEMS",mg:"MG"};
+var DK=Object.keys(D);
+var DP={aidp:"dem",aman:"axo",cidp:"dem",mmn:"cb",dpn:"axo",cts:"dem",une:"dem",als:"ahc",rad:"rad",myo:"myo",dm1:"myo",lems:"nmj",mg:"nmj"};
+/* 出題できる検査モード（emg2＝針のみは標準以上） */
+var MODES={aidp:["ncs","both"],aman:["ncs","both","emg2"],cidp:["ncs","both"],mmn:["ncs","both"],dpn:["ncs","both","emg"],cts:["ncs","both","emg2"],une:["ncs","both","emg2"],als:["ncs","both","emg"],rad:["both","emg"],myo:["both","emg"],dm1:["both","emg"],lems:["ncs","both"],mg:["ncs","both"]};
+
+/* ── 神経・基準値（学習用の目安。成人・皮膚温が保たれた条件・身長170cm前後を想定） ── */
+var MN={
+ med:{n:"正中神経",rec:"短母指外転筋",sites:["手関節","肘","腋窩"],dist:[230,120],nr:{dl:[3.2,4.0],amp:[6,11],cv:[52,60],f:[24,29],dur:[4.5,5.8]},L:{dl:4.4,amp:4.0,cv:49,f:31}},
+ uln:{n:"尺骨神経",rec:"小指外転筋",sites:["手関節","肘下","肘上","腋窩"],dist:[210,100,110],nr:{dl:[2.5,3.1],amp:[7.5,11],cv:[53,62],f:[25,30],dur:[5.0,6.2]},L:{dl:3.3,amp:6.0,cv:49,f:32}},
+ per:{n:"腓骨神経",rec:"短趾伸筋",sites:["足関節","腓骨頭下","膝窩"],dist:[290,100],nr:{dl:[4.0,5.5],amp:[3.0,7.0],cv:[43,50],f:[44,52],dur:[4.8,6.0]},L:{dl:6.5,amp:2.0,cv:40,f:56}},
+ tib:{n:"脛骨神経",rec:"母趾外転筋",sites:["足関節","膝窩"],dist:[400],nr:{dl:[3.6,5.0],amp:[8,15],cv:[42,49],f:[46,54],dur:[5.0,6.5]},L:{dl:5.8,amp:4.0,cv:40,f:58}}
+};
+var MK=["med","uln","per","tib"];
+var SN={
+ med:{n:"正中神経",rec:"第2指",nr:{amp:[18,45],cv:[50,62]},L:{amp:[12,8],cv:45}},
+ uln:{n:"尺骨神経",rec:"第5指",nr:{amp:[14,35],cv:[50,62]},L:{amp:[9,6],cv:45}},
+ sur:{n:"腓腹神経",rec:"外果後方",nr:{amp:[8,22],cv:[44,54]},L:{amp:[6,4],cv:40}}
+};
+var SK=["med","uln","sur"];
+var UNE_CV=50; /* 尺骨神経 肘部（肘下→肘上）の下限 */
+var RM={adm:"小指外転筋（尺骨神経）",trap:"僧帽筋（副神経）",nas:"鼻筋（顔面神経）"};
+var MU={tongue:["舌","延髄・舌下神経"],cpara:["頸部傍脊柱筋","頸髄 後枝"],deltoid:["三角筋","C5–6・腋窩神経"],biceps:["上腕二頭筋","C5–6・筋皮神経"],triceps:["上腕三頭筋","C7・橈骨神経"],fcr:["橈側手根屈筋","C6–7・正中神経"],edc:["総指伸筋","C7–8・橈骨神経"],fcu:["尺側手根屈筋","C8・尺骨神経"],apb:["短母指外転筋","C8–T1・正中神経"],fdi:["第1背側骨間筋","C8–T1・尺骨神経"],adm:["小指外転筋","C8–T1・尺骨神経"],tpara:["胸部傍脊柱筋","T10 後枝"],ilio:["腸腰筋","L2–3・大腿神経"],vl:["外側広筋","L3–4・大腿神経"],gmed:["中殿筋","L5・上殿神経"],ta:["前脛骨筋","L4–5・深腓骨神経"],tp:["後脛骨筋","L5・脛骨神経"],gastro:["腓腹筋内側頭","S1・脛骨神経"],lpara:["腰部傍脊柱筋","腰髄 後枝"]};
+var MUPL={N:"正常",neuro:"高振幅・長持続",myo:"低振幅・短持続・多相性",var:"波形が毎回変わる（不安定）"};
+var RECL={N:"正常",dec:"減少",early:"早期動員"};
+
+/* ── 乱数 ── */
+function R(a){return a[0]+Math.random()*(a[1]-a[0]);}
+function Rn(a,b){return a+Math.random()*(b-a);}
+function Ri(a,b){return Math.round(Rn(a,b));}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function chance(p){return Math.random()<p;}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function r1(x){return Math.round(x*10)/10;}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+/* 身長・年齢による補正（学習用の簡易補正） */
+function fULN(k,ht){return r1(MN[k].L.f*ht/170);}
+function sLLN(k,age){return SN[k].L.amp[age>=60?1:0];}
+
+/* ── 疾患ごとの所見の作り方 ── */
+function M(k,p){return MN[k].L[p];}
+/* 脱髄型の神経 */
+function demNerve(k,ht,o){
+  o=o||{};
+  var x={dl:M(k,"dl")*Rn(o.dl0||1.5,o.dl1||2.2),cv:M(k,"cv")*Rn(o.cv0||0.5,o.cv1||0.7),amp:M(k,"amp")*Rn(o.a0||0.7,o.a1||1.5)};
+  x.dur=R(MN[k].nr.dur)*Rn(1.1,1.5);
+  if(o.fabs||chance(o.fa==null?0.35:o.fa))x.f=null;else x.f=fULN(k,ht)*Rn(o.f0||1.3,o.f1||1.6);
+  x.fp=x.f===null?0:Ri(20,70);
+  return x;
+}
+function emg(m,o){o=o||{};return {m:m,fib:o.fib||0,fasc:!!o.fasc,myot:!!o.myot,mup:o.mup||"N",rec:o.rec||"N"};}
+function neuroAct(m,f){return emg(m,{fib:f||Ri(1,2),mup:"neuro",rec:"dec"});}
+
+var SPEC={
+aidp:function(l,c){
+  var o={mot:{},sen:{},acc:["dem"],note:[]};
+  var inv=l===1?MK.slice():shuffle(MK).slice(0,l===2?3:2);
+  inv.forEach(function(k){
+    if(l===3)o.mot[k]={dl:M(k,"dl")*Rn(1.15,1.45),cv:M(k,"cv")*Rn(0.8,0.95),f:chance(.5)?null:fULN(k,c.ht)*Rn(1.25,1.5),fp:0,amp:M(k,"amp")*Rn(.9,1.6)};
+    else o.mot[k]=demNerve(k,c.ht,{dl0:1.5,dl1:2.1,cv0:0.52,cv1:0.7});
+    if(o.mot[k].f!=null)o.mot[k].fp=Ri(20,60);
+  });
+  if(l===3){var k3=inv[0];o.mot[k3].f=fULN(k3,c.ht)*Rn(1.25,1.5);o.mot[k3].fp=Ri(20,50);o.mot[inv[1]].f=fULN(inv[1],c.ht)*Rn(1.22,1.45);o.mot[inv[1]].fp=Ri(20,50);
+    o.note.push("発症早期は伝導速度がまだ保たれ、F波潜時の延長・出現低下が最初の手がかりになりやすい。異常がはっきりしない時は1〜2週後に再検する。");}
+  if(l>=2&&chance(.5)){var kk=pick(inv.filter(function(k){return k!=="tib";}));if(kk){o.mot[kk].td=[];o.mot[kk].td[0]=Rn(.35,.7);o.note.push("時間的分散：近位刺激でCMAPの持続時間が30%を超えて延び、振幅も位相の打ち消し合いで下がる。");}}
+  if(l===1&&chance(.6)){var kc=pick(["med","uln"]);o.mot[kc].cb=[];o.mot[kc].cb[0]=Rn(.35,.55);o.acc.push("cb");}
+  o.sen.med={amp:chance(.3)?0:sLLN("med",c.age)*Rn(.2,.7),cv:SN.med.L.cv*Rn(.7,.9)};
+  o.sen.uln={amp:chance(.3)?0:sLLN("uln",c.age)*Rn(.2,.75),cv:SN.uln.L.cv*Rn(.7,.92)};
+  if(l===3)o.sen.uln=null;
+  o.sen.sur=null; /* 正常（sural sparing） */
+  o.emg=[emg("ta",{rec:"dec"}),emg("vl",{rec:"dec"}),emg("fdi",{rec:"dec"}),emg("biceps",{rec:chance(.5)?"dec":"N"})];
+  o.vig=[null,"2週間前に感冒症状。5日前から両下肢の脱力としびれが上行し、歩行が困難になった。腱反射は消失。","1週間前から四肢の脱力としびれが進行。腱反射は低下。","急性発症の四肢脱力（発症4日目）。"][l];
+  return o;
+},
+aman:function(l,c){
+  var o={mot:{},sen:{},acc:["axo"],note:[]};
+  var inv=l===1?MK.slice():shuffle(MK).slice(0,3);
+  inv.forEach(function(k){
+    o.mot[k]={amp:M(k,"amp")*Rn(.1,.45),dl:M(k,"dl")*Rn(.85,1.12),cv:M(k,"cv")*Rn(.88,1.1)};
+    if(chance(.45)){o.mot[k].f=null;o.mot[k].fp=0;}else{o.mot[k].fp=Ri(5,35);}
+  });
+  if(l===3){
+    var kr=pick(inv.filter(function(k){return k==="med"||k==="uln";}).concat(["uln"]));
+    if(!o.mot[kr])o.mot[kr]={amp:M(kr,"amp")*Rn(.4,.7),dl:M(kr,"dl")*Rn(.9,1.1),cv:M(kr,"cv")*Rn(.95,1.1),fp:Ri(10,40)};
+    o.mot[kr].amp=Math.max(o.mot[kr].amp,M(kr,"amp")*Rn(.45,.7));
+    o.mot[kr].cb=[];o.mot[kr].cb[0]=Rn(.35,.55);o.mot[kr].td=[];o.mot[kr].td[0]=Rn(0,.1);
+    o.acc.push("cb");
+    o.note.push("AMANでは発症早期にランヴィエ絞輪の障害で伝導ブロックや伝導速度低下に見える所見（可逆性伝導不全）が出る。時間的分散を伴わず、再検で速やかに戻るのが脱髄との違い。");
+  }
+  o.sen={med:null,uln:null,sur:null};
+  var f=l===1?Ri(1,2):Ri(1,3);
+  o.emg=[emg("ta",{fib:f,mup:l>=2?"myo":"N",rec:"dec"}),emg("fdi",{fib:f,mup:l>=2?"myo":"N",rec:"dec"}),emg("biceps",{fib:Ri(1,2),mup:"N",rec:"dec"}),emg("vl",{fib:Ri(0,2),rec:"dec"})];
+  if(c.mode!=="ncs"&&l>=2)o.note.push("発症から数週の再支配の初期には、MUPが低振幅・短持続・多相性（新生MUP）で筋原性に見えることがある。動員が「減少」なら神経原性、「早期動員」なら筋原性。");
+  if(c.mode==="emg"||(c.mode==="both"&&chance(.5)))o.rns=rnsNormal(c);
+  o.vig=[null,"10日前に下痢。3日前から四肢の脱力が急速に進行。感覚障害はない。腱反射は低下。","急性の四肢脱力（発症7日目）。感覚症状は乏しい。","急性発症の四肢脱力（発症2週目）。"][l];
+  if(c.mode==="emg")o.vig=["","3週間前に下痢。その後2〜3日で四肢の脱力が進行し、現在は横ばい。感覚障害はない。","3週間前から急に始まった四肢の脱力。感覚症状は乏しい。","3週前に急性発症した四肢脱力。"][l];
+  return o;
+},
+cidp:function(l,c){
+  var o={mot:{},sen:{},acc:["dem"],note:[]};
+  var inv=l===1?MK.slice():shuffle(MK).slice(0,l===2?3:2);
+  inv.forEach(function(k){
+    o.mot[k]=demNerve(k,c.ht,{dl0:1.5,dl1:2.4,cv0:0.45,cv1:0.68,a0:.4,a1:1.2,f0:1.3,f1:1.8});
+    if(k!=="tib"&&chance(l===1?.7:.5)){o.mot[k].td=[];o.mot[k].td[0]=Rn(.35,1.0);}
+    if(k==="tib"&&chance(.4)){o.mot[k].td=[];o.mot[k].td[0]=Rn(1.0,1.4);}
+  });
+  if(l>=2){var kc=pick(inv.filter(function(k){return k!=="tib";}).concat(["uln"]));if(!o.mot[kc])o.mot[kc]=demNerve(kc,c.ht,{});o.mot[kc].cb=[];o.mot[kc].cb[0]=Rn(.35,.6);o.mot[kc].td=[];o.mot[kc].td[0]=Rn(.05,.2);o.acc.push("cb");}
+  if(l===3){/* 2神経で基準を満たし、ほかは境界 */
+    MK.forEach(function(k){if(!o.mot[k])o.mot[k]={dl:M(k,"dl")*Rn(1.0,1.25),cv:M(k,"cv")*Rn(.8,.97),fp:Ri(40,80)};});
+  }
+  o.sen.med={amp:chance(.3)?0:sLLN("med",c.age)*Rn(.2,.7),cv:SN.med.L.cv*Rn(.65,.9)};
+  o.sen.uln={amp:sLLN("uln",c.age)*Rn(.3,.8),cv:SN.uln.L.cv*Rn(.7,.92)};
+  o.sen.sur=l===3?null:(chance(.4)?{amp:0}:{amp:sLLN("sur",c.age)*Rn(.3,.8),cv:SN.sur.L.cv*Rn(.75,.95)});
+  if(l===3)o.note.push("CIDPでも腓腹神経が保たれる（sural sparing）ことがあり、長さ依存性の軸索障害と区別する手がかりになる。");
+  o.emg=[emg("ta",{fib:Ri(0,1),mup:"neuro",rec:"dec"}),emg("fdi",{mup:"neuro",rec:"dec"}),emg("vl",{mup:chance(.5)?"neuro":"N",rec:"dec"}),emg("biceps",{rec:"N"})];
+  o.vig=[null,"6か月かけて四肢の脱力としびれが進行。近位筋にも筋力低下がある。腱反射は消失。","3か月で進行する四肢のしびれと脱力。","数か月の経過で進行・軽快をくり返す四肢の症状。"][l];
+  return o;
+},
+mmn:function(l,c){
+  var o={mot:{},sen:{med:null,uln:null,sur:null},acc:["cb"],note:[]};
+  function blk(k,seg){var m={amp:M(k,"amp")*Rn(1.3,2.2),cvs:[],cb:[],td:[]};m.cb[seg]=Rn(.5,.82);m.td[seg]=Rn(.03,.15);m.cvs[seg]=M(k,"cv")*Rn(.85,1.0);if(chance(.5)){m.f=null;m.fp=0;}else m.fp=Ri(10,40);return m;}
+  if(l===1){o.mot.uln=blk("uln",0);o.mot.med=blk("med",0);}
+  else if(l===2){var k=pick(["uln","med"]);o.mot[k]=blk(k,0);}
+  else{var k3=pick(["uln","med"]);o.mot[k3]=blk(k3,k3==="uln"?2:1);
+    o.note.push("伝導ブロックが上腕〜腕神経叢など近位にあると、手関節・肘の刺激だけでは見逃す。腋窩・Erb点まで刺激する。");}
+  o.note.push("伝導ブロックの部位の感覚神経（SNAP）は正常。同じ神経で感覚も落ちていれば、MMNよりCIDPの多巣性型（MADSAM）を考える。");
+  var hand=o.mot.med?["apb","fdi","adm"]:["fdi","adm"];
+  o.emg=hand.map(function(m){return emg(m,{fib:Ri(0,1),fasc:chance(.5),mup:"neuro",rec:"dec"});}).concat([emg(o.mot.med?"biceps":"apb"),emg("tongue"),emg("tpara")]);
+  if(c.mode==="both"&&l>=2)o.note.push("MMNでも線維束自発電位は出る。舌・胸部傍脊柱筋など離れた領域が正常で、伝導ブロックがあればALSよりMMN。");
+  o.vig=[null,"2年かけて緩徐に進行する右手の脱力（指が伸ばしにくい・握力低下）。感覚障害なし。上位運動ニューロン徴候なし。","緩徐進行性の右上肢遠位の脱力。感覚障害はない。","1年来の右手の筋力低下とこむら返り。"][l];
+  return o;
+},
+dpn:function(l,c){
+  var o={mot:{},sen:{},acc:["axo"],note:[]};
+  o.mot.per={amp:M("per","amp")*Rn(.15,.8),dl:M("per","dl")*Rn(.95,1.15),cv:M("per","cv")*Rn(.85,.98),f:fULN("per",c.ht)*Rn(1.0,1.12),fp:Ri(10,50)};
+  o.mot.tib={amp:M("tib","amp")*Rn(.5,1.2),dl:M("tib","dl")*Rn(.95,1.12),cv:M("tib","cv")*Rn(.88,1.0),f:fULN("tib",c.ht)*Rn(.98,1.1)};
+  o.sen.sur=chance(.5)?{amp:0}:{amp:sLLN("sur",c.age)*Rn(.25,.7),cv:SN.sur.L.cv*Rn(.85,1.0)};
+  o.sen.med={amp:sLLN("med",c.age)*Rn(.8,1.3),cv:SN.med.L.cv*Rn(.95,1.1)};
+  o.sen.uln={amp:sLLN("uln",c.age)*Rn(.75,1.3),cv:SN.uln.L.cv*Rn(.95,1.1)};
+  if(l>=2&&chance(.6)){o.mot.med={dl:M("med","dl")*Rn(1.15,1.4)};o.sen.med={amp:sLLN("med",c.age)*Rn(.4,.8),cv:Rn(34,42)};
+    o.note.push("糖尿病では手根管症候群の合併が多い。正中神経だけの遠位潜時延長・感覚伝導低下は局所の絞扼として別に読む（多発ニューロパチーの脱髄の根拠にしない）。");}
+  if(l===3){o.mot.per.amp=M("per","amp")*Rn(.1,.3);o.mot.per.cv=M("per","cv")*Rn(.74,.82);
+    o.note.push("軸索障害でCMAPが小さいと、速い線維が失われて伝導速度が少し落ちる（下限の70〜80%程度まで）。下限の70%以下・潜時150%以上でなければ脱髄とは言いにくい。");}
+  o.emg=[neuroAct("ta",1),emg("gastro",{fib:Ri(0,1),mup:"neuro",rec:"dec"}),emg("vl"),emg("fdi",{mup:chance(.4)?"neuro":"N"}),emg("biceps")];
+  o.vig=[null,"2型糖尿病20年。両足先のしびれが靴下型に広がってきた。アキレス腱反射は消失。","10年来の両足のしびれ。足関節の振動覚低下。","両足底の違和感が数年かけてゆっくり上行してきた。"][l];
+  if(c.mode==="emg")o.vig=["","2型糖尿病20年。両足先のしびれと、足趾の筋力低下。","10年来の両足のしびれと足先の脱力。","両足先の感覚低下が数年で上行。"][l];
+  return o;
+},
+cts:function(l,c){
+  var o={mot:{},sen:{},acc:["dem"],note:[]};
+  var dl=[0,Rn(1.3,1.7),Rn(1.1,1.3),Rn(1.0,1.1)][l];
+  o.mot.med={dl:M("med","dl")*dl,amp:M("med","amp")*(l===1?Rn(.5,1.5):Rn(1.1,2.2)),cv:M("med","cv")*Rn(1.03,1.15)};
+  if(l===1&&o.mot.med.amp<M("med","amp"))o.acc.push("axo");
+  o.sen.med=l===1?(chance(.4)?{amp:0}:{amp:sLLN("med",c.age)*Rn(.2,.6),cv:Rn(28,38)}):(l===2?{amp:sLLN("med",c.age)*Rn(.5,.9),cv:Rn(34,42)}:{amp:sLLN("med",c.age)*Rn(.9,1.3),cv:Rn(38,44)});
+  if(l===3)o.note.push("軽症の手根管症候群は運動線維より先に感覚線維の遅れが出る。正中・尺骨の比較（環指法・手掌刺激など）が感度を上げる。");
+  o.note.push("正中神経の遠位潜時が延びていても、前腕の伝導速度・尺骨神経・下肢が正常なら局所（手関節部）の障害。CIDP基準の遠位潜時の項目は手根管症候群を除いて数える。");
+  o.emg=[emg("apb",l===1?{fib:Ri(1,2),mup:"neuro",rec:"dec"}:(l===2?{mup:"neuro",rec:"dec"}:{})),emg("fdi"),emg("adm"),emg("fcr"),emg("biceps")];
+  o.vig=[null,"右母指〜中指の夜間のしびれで目が覚める。手を振ると楽になる。","右手のしびれ。母指球の軽い萎縮がある。","右手のしびれと脱力。"][l];
+  if(c.mode==="emg")o.vig=["","右母指〜中指のしびれと母指球の萎縮。","右手のしびれと母指球の萎縮。","右手の脱力（母指の外転が弱い）。"][l];
+  return o;
+},
+une:function(l,c){
+  var o={mot:{},sen:{},acc:["dem"],note:[]};
+  var cvs=[];cvs[0]=M("uln","cv")*Rn(1.1,1.25);cvs[1]=l===1?Rn(30,42):Rn(38,47);cvs[2]=M("uln","cv")*Rn(1.05,1.2);
+  o.mot.uln={amp:M("uln","amp")*Rn(.6,1.5),cvs:cvs};
+  if(l>=2&&chance(.6)){o.mot.uln.cb=[];o.mot.uln.cb[1]=Rn(.3,.5);o.mot.uln.td=[];o.mot.uln.td[1]=Rn(.03,.15);o.acc.push("cb");}
+  o.sen.uln=chance(.3)?{amp:0}:{amp:sLLN("uln",c.age)*Rn(.25,.8),cv:SN.uln.L.cv*Rn(.85,1.0)};
+  o.note.push("肘部管症候群の電気診断：肘をはさむ区間（10cm前後）の伝導速度が50 m/s未満、前腕より10 m/s以上遅い、肘部での振幅低下（伝導ブロック）などが手がかり（AANEMの実践指針）。");
+  if(l===3)o.note.push("C8神経根症との区別：尺骨神経の感覚（SNAP）が低下していれば後根神経節より遠位＝末梢神経。C8支配でも橈骨神経の総指伸筋が正常なら尺骨神経に限った障害。");
+  o.emg=[neuroAct("fdi"),emg("adm",{fib:Ri(0,1),mup:"neuro",rec:"dec"}),emg("fcu",chance(.5)?{fib:1,mup:"neuro",rec:"dec"}:{}),emg("apb"),emg("edc")];
+  o.vig=[null,"左環指・小指のしびれと、箸が使いにくい。肘を曲げていると悪化する。","左手の巧緻運動障害と小指側のしびれ。","左手内在筋の筋力低下。"][l];
+  return o;
+},
+als:function(l,c){
+  var o={mot:{},sen:{med:null,uln:null,sur:null},acc:["ahc"],note:[]};
+  o.mot.med={amp:M("med","amp")*Rn(.15,.6),dl:M("med","dl")*Rn(.9,1.12),cv:M("med","cv")*Rn(.82,1.0),fp:Ri(5,35)};
+  o.mot.uln={amp:M("uln","amp")*Rn(.75,1.25),fp:Ri(20,60)};
+  o.mot.per={amp:M("per","amp")*Rn(.25,1.1),cv:M("per","cv")*Rn(.85,1.02),fp:Ri(0,30)};
+  if(l>=2)o.mot.tib={amp:M("tib","amp")*Rn(.4,.9),fp:Ri(10,40)};
+  o.note.push("母指球（短母指外転筋・第1背側骨間筋）が小指球より強く痩せる「split hand」はALSに特徴的。CMAPでも正中＜尺骨となりやすい。");
+  if(l===3&&c.mode!=="emg"){o.rns=[{m:"adm",rest:o.mot.uln.amp,dec:Rn(10,18),inc:Rn(5,25)},{m:"trap",rest:Rn(4,8),dec:Rn(10,16),inc:Rn(0,20)}];
+    o.note.push("ALSでも再支配中の不安定な神経終末のため、3Hz反復刺激で10%を超える漸減が出ることがある。漸減＝MGと決めず、CMAP・針所見と合わせて読む。");}
+  o.emg=[emg("tongue",{fib:Ri(0,1),fasc:true,mup:"neuro",rec:"dec"}),emg("fdi",{fib:Ri(1,3),fasc:true,mup:"neuro",rec:"dec"}),emg("biceps",{fib:Ri(1,2),fasc:true,mup:"neuro",rec:"dec"}),emg("tpara",{fib:Ri(1,2),fasc:chance(.5)}),emg("ta",{fib:Ri(1,2),fasc:true,mup:"neuro",rec:"dec"}),emg("vl",{fib:l===3?0:Ri(0,1),fasc:true,mup:"neuro",rec:"dec"})];
+  if(l===3)o.note.push("Awaji基準・Gold Coast基準では、慢性脱神経（高振幅・長持続MUP）がある筋の線維束自発電位を、線維自発電位・陽性鋭波と同じ活動性脱神経として扱う。");
+  o.note.push("Gold Coast基準（2020）：進行性の運動障害があり、少なくとも1領域に上位・下位運動ニューロン障害、または2領域以上に下位運動ニューロン障害があり、他の疾患が除外されること。");
+  o.vig=[null,"1年半で進行する右手の筋萎縮と構音障害。腱反射は亢進。感覚障害はない。","1年で進行する右手の脱力と筋萎縮。線維束性収縮が目立つ。","緩徐進行性の右手の筋力低下。感覚障害はない。"][l];
+  return o;
+},
+rad:function(l,c){
+  var o={mot:{},sen:{med:null,uln:null,sur:null},acc:["rad"],note:[]};
+  var lv=pick(["C7","L5"]);o.lv=lv;
+  if(lv==="L5"){o.mot.per={amp:M("per","amp")*Rn(.9,1.4)};
+    o.emg=[neuroAct("ta"),neuroAct("tp",Ri(1,2)),emg("gmed",{fib:Ri(0,1),mup:"neuro",rec:"dec"}),emg("lpara",{fib:Ri(1,2)}),emg("vl"),emg("gastro")];
+    o.note.push("L5神経根症と腓骨神経麻痺の区別：腓骨神経以外のL5支配筋（後脛骨筋＝脛骨神経、中殿筋＝上殿神経）や傍脊柱筋に異常があれば神経根。");
+    o.vig=[null,"腰痛と、左下腿外側〜母趾への放散痛。母趾の背屈が弱い。","左下肢の痛みと足関節背屈の筋力低下。","左下垂足（数週間）。"][l];
+  }else{
+    o.emg=[neuroAct("triceps"),emg("fcr",{fib:Ri(1,2),mup:"neuro",rec:"dec"}),emg("edc",{fib:Ri(0,1),mup:"neuro",rec:"dec"}),emg("cpara",{fib:Ri(1,2)}),emg("biceps"),emg("deltoid"),emg("fdi")];
+    o.note.push("C7支配筋（上腕三頭筋＝橈骨神経、橈側手根屈筋＝正中神経）が神経をまたいで障害され、C5–6・C8支配筋が正常なら1つの髄節＝神経根。");
+    o.vig=[null,"頸部痛と、右上肢後面〜中指への放散痛。上腕三頭筋の筋力・反射が低下。","右上肢の痛みと肘の伸展の筋力低下。","右上肢のしびれと脱力。"][l];
+  }
+  o.note.push("感覚症状があっても感覚神経（SNAP）が正常なのは、障害が後根神経節より中枢側にあるため。");
+  if(l>=2)o.note.push("傍脊柱筋の線維自発電位は神経根（後枝の分岐より近位）の障害を示すが、高齢者や術後では正常でも出ることがある。");
+  return o;
+},
+myo:function(l,c){
+  var o={mot:{},sen:{med:null,uln:null,sur:null},acc:["myo"],note:[]};
+  o.emg=[emg("deltoid",{fib:Ri(1,2),mup:"myo",rec:"early"}),emg("biceps",{fib:Ri(0,2),mup:"myo",rec:"early"}),emg("ilio",{fib:Ri(1,2),mup:"myo",rec:"early"}),emg("vl",{fib:Ri(1,2),mup:"myo",rec:"early"}),emg(pick(["cpara","lpara"]),{fib:Ri(1,2)}),emg("fdi"),emg("ta",{mup:chance(.4)?"myo":"N"})];
+  if(l===3){o.emg[1]=emg("biceps",{fib:Ri(1,2),mup:"N",rec:"N"});o.note.push("筋炎の異常は斑状に分布する。1筋が正常でも否定できないので、症状のある近位筋と傍脊柱筋を複数調べる。");}
+  o.note.push("筋炎の線維自発電位・陽性鋭波は筋線維の壊死・炎症による。慢性期のステロイドミオパチーでは安静時活動が乏しい（筋炎の再燃との区別の手がかり）。");
+  if(c.mode!=="emg"&&chance(.5))o.rns=rnsNormal(c);
+  o.vig=[null,"2か月で進行する近位筋の脱力（階段・洗髪が困難）。CK 4,800 U/L。感覚障害なし。","数か月で進行する近位筋の脱力。筋痛がある。","亜急性の四肢近位筋の脱力。"][l];
+  return o;
+},
+dm1:function(l,c){
+  var o={mot:{},sen:{med:null,uln:null,sur:null},acc:["myo"],note:[]};
+  o.emg=[emg("fdi",{fib:Ri(0,1),myot:true,mup:"myo",rec:"early"}),emg("edc",{myot:true,mup:"myo",rec:"early"}),emg("ta",{fib:Ri(0,1),myot:true,mup:"myo",rec:"early"}),emg("deltoid",{myot:chance(.5)}),emg("vl")];
+  o.note.push("ミオトニー放電：周波数と振幅が増減をくり返す反復放電（急降下爆撃音）。筋強直性ジストロフィーでは遠位筋に強い。ミオトニーは先天性ミオトニー、ポンペ病、薬剤（スタチンなど）でも出る。");
+  o.vig=[null,"握った手が開きにくい。斧様顔貌、前頭部の脱毛、若年性白内障の既往。","遠位優位の筋力低下と、握った後に手が開きにくい。","緩徐進行性の遠位筋の筋力低下。"][l];
+  return o;
+},
+lems:function(l,c){
+  var o={mot:{},sen:{med:null,uln:null,sur:null},acc:["nmj"],note:[]};
+  MK.forEach(function(k){o.mot[k]={amp:M(k,"amp")*Rn(.2,.6)};});
+  var inc=[0,Rn(150,400),Rn(85,160),Rn(62,95)][l];
+  o.rns=[{m:"adm",rest:o.mot.uln.amp,dec:Rn(15,40),inc:inc},{m:"trap",rest:Rn(2,5),dec:Rn(10,25),inc:Rn(30,90)}];
+  if(l===3)o.note.push("増加率の目安は従来100%以上だが、60%以上にすると感度が上がり特異度はほぼ保たれる（Lipka 2020 など）。60〜100%の増加でもLEMSを考える。");
+  o.note.push("安静時のCMAPが全体に低いのに感覚神経が正常、という組み合わせは前角・運動神経・シナプス前のどれもあり得る。10秒の最大収縮の直後にもう一度CMAPを取ると区別がつく。");
+  o.emg=[emg("biceps",{mup:"var",rec:"early"}),emg("vl",{mup:"var",rec:"N"}),emg("fdi",{mup:"var"})];
+  o.vig=[null,"喫煙歴あり。数か月で進行する下肢近位筋の筋力低下と口渇。腱反射は低下し、運動直後に一時的に出る。","近位筋の脱力と口渇。腱反射は低下。","近位筋優位の易疲労性の脱力。"][l];
+  return o;
+},
+mg:function(l,c){
+  var o={mot:{},sen:{med:null,uln:null,sur:null},acc:["nmj"],note:[]};
+  o.rns=[{m:"adm",rest:M("uln","amp")*Rn(1.2,1.8),dec:l===3?Rn(2,8):Rn(10,25),inc:Rn(0,25)},{m:"trap",rest:Rn(4,9),dec:Rn(12,35),inc:Rn(0,25)},{m:"nas",rest:Rn(1.5,4),dec:Rn(15,40),inc:Rn(0,20)}];
+  if(l===3)o.note.push("MGの漸減は症状のある近位筋・顔面筋で出やすく、手の筋では正常のことが多い。3Hz刺激は複数の筋で行う。陰性なら単一線維筋電図を考える。");
+  o.note.push("MGでは安静時CMAPは正常で、運動直後に漸減が一時的に改善（修復）し、2〜4分後に悪化（運動後疲弊）する。運動後の大きな増加（60%以上）はLEMSを示す。");
+  o.emg=[emg("biceps",{mup:"var"}),emg("deltoid",{mup:chance(.5)?"var":"N"}),emg("fdi")];
+  o.vig=[null,"夕方に強くなる眼瞼下垂と複視。食事の途中で噛む力が落ちる。","易疲労性の四肢近位筋脱力と構音障害。","日によって変動する脱力。"][l];
+  return o;
+}
+};
+function rnsNormal(c){return [{m:"adm",rest:M("uln","amp")*Rn(1.1,1.8),dec:Rn(0,6),inc:Rn(0,25)},{m:"trap",rest:Rn(4,9),dec:Rn(0,7),inc:Rn(0,20)}];}
+
+/* 疾患ごとの解説 */
+var EXP={
+aidp:{why:"急性経過で、2神経以上に脱髄の範囲（遠位潜時・伝導速度・F波）の異常がある。正中・尺骨の感覚神経が落ちて腓腹神経が保たれる（sural sparing）のは脱髄型GBSの特徴。",
+ diff:["AMANとの違い：AMANは振幅低下が主で、潜時・伝導速度は保たれ、感覚神経は正常。","CIDPとの違い：経過（4週以内に極期＝GBS、8週以上進行＝CIDP）。急性発症のCIDP（A-CIDP）もあるので、8週以降の再燃・悪化に注意。"],
+ pearl:"GBSの病型分類は1回目の検査では誤ることがある。はっきりしない時は3〜8週で再検する。"},
+aman:{why:"急性の運動麻痺で、CMAPが2神経以上で低いのに、遠位潜時・伝導速度は保たれ（脱髄の範囲ではない）、感覚神経は正常。運動線維の軸索（またはランヴィエ絞輪）の障害。",
+ diff:["AIDPとの違い：AIDPは伝導速度・遠位潜時・F波の明らかな遅れ、時間的分散、sural sparing。","LEMSとの違い：LEMSも低CMAP＋SNAP正常だが、運動直後にCMAPが大きく増える。","ALSとの違い：経過（急性か慢性か）と、針筋電図の慢性脱神経（高振幅・長持続MUP）の有無。"],
+ pearl:"遠位CMAPが低い神経では、伝導速度の軽い低下を脱髄と読まない。可逆性伝導不全は時間的分散を伴わず、再検で戻る。"},
+cidp:{why:"8週以上進行する経過で、4神経に広く脱髄の範囲の異常（遠位潜時延長・伝導速度低下・F波延長や消失・時間的分散）があり、感覚神経にも異常がある。EAN/PNS 2021の運動伝導基準を2神経以上で満たす。",
+ diff:["糖尿病性多発ニューロパチーとの違い：伝導速度が下限の70%以下、遠位潜時が上限の150%以上、時間的分散・伝導ブロックは軸索障害では説明できない。","MMNとの違い：MMNは運動神経だけで、伝導ブロックの部位でも感覚神経は正常。"],
+ pearl:"CIDPの過剰診断が多い。境界の値を1つずつ拾わず、2神経以上で基準を満たすか、絞扼部位を除いているかを確かめる。"},
+mmn:{why:"運動神経の、絞扼を受けにくい部位（前腕・上腕）で遠位刺激のCMAPは保たれたまま近位刺激で振幅が大きく下がり、持続時間はほとんど延びない＝伝導ブロック。同じ神経の感覚神経は正常。",
+ diff:["ALSとの違い：伝導ブロックの有無、舌・胸部傍脊柱筋など離れた領域の正常、上位運動ニューロン徴候がない。","時間的分散との違い：持続時間が30%を超えて延び、それに見合って振幅が下がるなら時間的分散（真の伝導ブロックとは言えない）。"],
+ pearl:"EFNS/PNS 2010の基準：持続時間の延長が30%以下でCMAPが50%以上低下すれば確実な伝導ブロック（面積で評価、遠位CMAPが十分あることが前提）。"},
+dpn:{why:"下肢遠位から（腓腹神経の感覚・腓骨神経のCMAP）の振幅低下が目立ち、上肢は保たれる長さ依存性のパターン。伝導速度の低下は軽く、脱髄の範囲に入らない＝軸索障害。",
+ diff:["CIDPとの違い：伝導速度・遠位潜時の遅れの程度（脱髄の範囲か）、時間的分散・伝導ブロックの有無、上肢・近位の障害。","手根管症候群の合併：正中神経だけの遠位潜時延長は局所の絞扼として別に読む。"],
+ pearl:"高齢者では腓腹神経のSNAPが正常でも小さい。年齢の基準値で判定し、左右差や他の神経と合わせて読む。"},
+cts:{why:"正中神経の遠位潜時と手関節部をまたぐ感覚伝導が遅れ、前腕の伝導速度と尺骨神経は正常＝手関節部の局所の脱髄（絞扼）。CMAP低下・短母指外転筋の脱神経があれば軸索障害も加わった重症例。",
+ diff:["多発ニューロパチーとの違い：尺骨神経・下肢が正常で、正中神経の手関節部に限る。","C6–7神経根症との違い：神経根症ではSNAPは正常。"],
+ pearl:"軽症では運動より感覚の遅れが先に出る。正中・尺骨の比較法（環指・手掌刺激）で感度が上がる。"},
+une:{why:"尺骨神経の肘をはさむ区間だけで伝導速度が落ち（50 m/s未満・前腕より10 m/s以上遅い）、肘部で振幅が下がることもある。尺骨神経のSNAPが低く、尺骨神経支配の手内筋に脱神経がある＝肘部の局所障害。",
+ diff:["C8神経根症との違い：神経根症ではSNAPが正常で、総指伸筋（橈骨神経）など他の神経のC8支配筋も障害される。","Guyon管との違い：肘部の伝導が正常で、尺骨神経背側皮枝や尺側手根屈筋が保たれる。"],
+ pearl:"肘の角度（軽く屈曲）と区間の長さ（10cm前後）で値が変わる。検査条件をそろえ、短い区間のインチング法で障害部位を絞り込む。"},
+als:{why:"CMAPが低いのに感覚神経は正常で、伝導速度は保たれる。針筋電図で脳幹・頸髄・胸髄・腰仙髄の複数領域に活動性（線維自発電位・陽性鋭波、線維束自発電位）と慢性（高振幅・長持続MUP、動員減少）の脱神経＝前角障害。",
+ diff:["MMNとの違い：伝導ブロックがない、舌・胸部傍脊柱筋に異常がある、split hand、上位運動ニューロン徴候。","頸椎症（多髄節の神経根症）との違い：胸部傍脊柱筋・舌・下肢に異常が及ぶ。"],
+ pearl:"胸部傍脊柱筋（T10前後）は頸椎症・腰椎症の影響を受けにくく、ALSの診断に役立つ。"},
+rad:{why:"感覚神経が正常（後根神経節より近位）で、1つの筋節に属する、異なる末梢神経の支配筋に脱神経があり、傍脊柱筋にも異常がある＝神経根障害。",
+ diff:["末梢神経障害（腓骨神経麻痺・肘部管症候群など）との違い：神経根症ではSNAPが保たれ、異常が神経をまたいで筋節に一致する。","前角障害との違い：異常が1〜2髄節に限られる。"],
+ pearl:"脱神経が針筋電図に出るまで2〜3週かかる。発症直後の検査が正常でも否定できない。"},
+myo:{why:"NCSは正常で、近位筋に低振幅・短持続・多相性MUPと早期動員（弱い収縮で多数のMUPが動員）がある。線維自発電位・陽性鋭波は筋線維の壊死・炎症を示す＝炎症性筋疾患。",
+ diff:["神経原性との違い：神経原性は高振幅・長持続MUPと動員減少。初期の再支配の新生MUPは小さいが、動員は減少する。","筋強直性ジストロフィーとの違い：ミオトニー放電と遠位優位の分布。"],
+ pearl:"生検する筋は、針で異常があった筋の反対側の同名筋を選ぶ（針の刺入による変化を避ける）。"},
+dm1:{why:"遠位優位の筋にミオトニー放電と、低振幅・短持続・多相性MUP・早期動員。NCSはほぼ正常＝筋原性（筋強直性ジストロフィー）。",
+ diff:["炎症性筋疾患との違い：ミオトニー放電、遠位優位、全身症状（白内障・脱毛・不整脈・耐糖能異常）。","先天性ミオトニーとの違い：筋力低下・筋原性MUPが乏しく、筋肥大がある。"],
+ pearl:"ミオトニー放電は寒冷で目立ちやすい。遺伝学的検査（CTGリピート）で確定する。"},
+lems:{why:"安静時のCMAPが全神経で低く、感覚神経は正常。3Hzで漸減し、10秒の運動直後（または高頻度刺激）でCMAPが大きく増える（60%以上、典型的には100%以上）＝シナプス前の神経筋接合部障害。",
+ diff:["MGとの違い：MGは安静時CMAPが正常で、運動後の大きな増加がない。","AMAN・ALSとの違い：運動直後の増加の有無を必ず確かめる。"],
+ pearl:"LEMSの約半数は肺小細胞癌に伴う。診断したらCT・PET-CTなどで腫瘍を探し、陰性でも一定期間くり返す。"},
+mg:{why:"NCSは正常で、症状のある筋（顔面筋・近位筋）の3Hz反復刺激で10%を超える漸減がある。安静時CMAPは正常で、運動後の大きな増加はない＝シナプス後の神経筋接合部障害。",
+ diff:["LEMSとの違い：LEMSは安静時CMAPが低く、運動後に大きく増える。","ALSとの違い：ALSでも漸減は出るが、CMAP低下と針筋電図の脱神経がある。"],
+ pearl:"反復刺激の感度は全身型で高く、眼筋型では低い。陰性なら単一線維筋電図（ジッター）を行う。"}
+};
+
+/* ── 状態 ── */
+var st;
+function defaults(){return {set:{mode:"both",lvl:2,dx:DK.slice(),weak:false},cur:null,sp:{},sd:{},hist:[],cnt:0,full:0,streak:0};}
+try{st=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){st=null;}
+if(!st||typeof st!=="object")st=defaults();
+var d0=defaults();
+Object.keys(d0).forEach(function(k){if(st[k]===undefined)st[k]=d0[k];});
+Object.keys(d0.set).forEach(function(k){if(st.set[k]===undefined)st.set[k]=d0.set[k];});
+if(st.cur&&!D[st.cur.d])st.cur=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+
+/* ── 症例を作る ── */
+function allowed(d,mode,lvl){var m=MODES[d];return m.indexOf(mode)>=0||(mode==="emg"&&lvl>=2&&m.indexOf("emg2")>=0);}
+function pool(){return DK.filter(function(d){return st.set.dx.indexOf(d)>=0&&allowed(d,st.set.mode,st.set.lvl);});}
+function pickDx(){
+  var c=pool();if(!c.length)return null;
+  var last=st.cur&&st.cur.d;if(c.length>1)c=c.filter(function(d){return d!==last;});
+  var w=c.map(function(d){if(!st.set.weak)return 1;var r=st.sd[d];if(!r||!r.n)return 3;return 1+4*(1-r.c/r.n);});
+  var s=w.reduce(function(a,b){return a+b;},0),x=Math.random()*s;
+  for(var i=0;i<c.length;i++){x-=w[i];if(x<=0)return c[i];}
+  return c[c.length-1];
+}
+var AGE={aidp:[25,75],aman:[18,60],cidp:[40,75],mmn:[30,55],dpn:[55,80],cts:[40,75],une:[35,75],als:[50,78],rad:[40,75],myo:[35,70],dm1:[25,55],lems:[50,75],mg:[25,80]};
+function buildMot(k,m,c){
+  var N=MN[k],nr=N.nr;m=m||{};
+  var old=c.age>=70;
+  var dl=m.dl!=null?m.dl:R(nr.dl);
+  var amp=m.amp!=null?m.amp:R(nr.amp)*(old?0.85:1);
+  var dur=m.dur!=null?m.dur:R(nr.dur);
+  var cvb=m.cv!=null?m.cv:R(nr.cv)-(old?2:0);
+  var s=[{lat:r1(dl),amp:r1(amp),dur:r1(dur),cv:null}];
+  var lat=dl,a=amp,du=dur;
+  for(var i=0;i<N.dist.length;i++){
+    var cv;
+    if(m.cvs&&m.cvs[i]!=null)cv=m.cvs[i];
+    else if(m.cv!=null)cv=cvb*Rn(.97,1.03);
+    else cv=cvb+Rn(-2.5,3);
+    if(k==="uln"&&i===1&&!(m.cvs&&m.cvs[1]!=null))cv=Math.max(m.cv!=null?cv:52,cv-Rn(0,3));
+    var drop=k==="tib"?Rn(.06,.22):Rn(0,.07),inc=k==="tib"?Rn(.05,.2):Rn(0,.05);
+    if(m.td&&m.td[i]!=null){inc=m.td[i];drop=Math.min(.55,inc*Rn(.35,.55));}
+    if(m.cb&&m.cb[i]!=null)drop=m.cb[i];
+    cv=Math.round(cv);
+    lat=lat+N.dist[i]/cv;a=a*(1-drop);du=du*(1+inc);
+    s.push({lat:r1(lat),amp:r1(Math.max(a,0.1)),dur:r1(du),cv:cv});
+  }
+  var f;
+  if(m.f===null)f={lat:null,pers:0};
+  else f={lat:r1(m.f!=null?m.f:R(nr.f)*c.ht/170),pers:m.fp!=null?Math.round(m.fp):(k==="per"?Ri(20,90):Ri(60,100))};
+  return {sites:s,f:f};
+}
+function buildSen(k,m,c){
+  var N=SN[k];
+  if(m&&m.amp===0)return {amp:0,cv:null};
+  var amp=m&&m.amp!=null?m.amp:R(N.nr.amp)*(c.age>=60?0.7:1);
+  var cv=m&&m.cv!=null?m.cv:R(N.nr.cv)-(c.age>=60?2:0);
+  return {amp:amp<10?r1(amp):Math.round(amp),cv:Math.round(cv)};
+}
+function makeCase(d,lvl,mode){
+  var c={age:Ri(AGE[d][0],AGE[d][1]),sex:chance(d==="cts"||d==="mg"?.65:.4)?"女性":"男性",mode:mode,lvl:lvl};
+  c.ht=c.sex==="女性"?Ri(148,168):Ri(160,185);
+  var o=SPEC[d](lvl,c);
+  var q={d:d,lvl:lvl,mode:mode,age:c.age,sex:c.sex,ht:c.ht,vig:o.vig,acc:o.acc,note:o.note||[],mot:null,sen:null,rns:null,emg:null,pk:{p:null,d:null},ans:null,no:st.cnt+1};
+  if(mode!=="emg"){
+    q.mot={};MK.forEach(function(k){q.mot[k]=buildMot(k,o.mot[k],c);});
+    q.sen={};SK.forEach(function(k){q.sen[k]=buildSen(k,o.sen[k],c);});
+    if(o.rns)q.rns=o.rns.map(function(x){return {m:x.m,rest:r1(x.rest),dec:Math.round(x.dec),inc:Math.round(x.inc)};});
+  }
+  if(mode!=="ncs"&&o.emg)q.emg=shuffle(o.emg);
+  if(q.emg){q.emg=q.emg.filter(function(x){return MU[x.m];});}
+  return q;
+}
+function newQ(d,fixed){
+  if(fixed){var q=JSON.parse(JSON.stringify(fixed));q.pk={p:null,d:null};q.ans=null;q.no=st.cnt+1;st.cur=q;save();renderQ();return;}
+  var dx=d||pickDx();
+  if(!dx){st.cur=null;save();renderQ();return;}
+  var mode=st.set.mode;if(!allowed(dx,mode,st.set.lvl))mode="both";
+  st.cur=makeCase(dx,st.set.lvl,mode);save();renderQ();
+  try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}
+}
+
+/* ── 判定 ── */
+function pct(x){return Math.round(x*100);}
+function judge(q){
+  var J={cell:{},items:[],dmN:{},pat:[]};
+  function mark(id,cls,txt){J.cell[id]=cls;if(txt)J.items.push({cls:cls,t:txt});}
+  var exclMedDL=q.d==="cts"||(q.d==="dpn"&&q.mot&&q.mot.med.sites[0].lat>MN.med.L.dl);
+  if(q.mot)MK.forEach(function(k){
+    var N=MN[k],L=N.L,m=q.mot[k],s=m.sites,nm=N.n;
+    var types={};
+    var a0=s[0].amp;
+    if(s[0].lat>L.dl){var r=s[0].lat/L.dl;var dm=r>=1.5;
+      mark(k+"-0-lat",dm?"c-dm":"c-ab",nm+"：遠位潜時 "+s[0].lat+" ms（上限 "+L.dl+"、"+pct(r)+"%）"+(dm?"→ 脱髄の範囲（上限の150%以上）":"→ 延長（脱髄の範囲ではない）")+(dm&&k==="med"&&exclMedDL?"。ただし手根管部の局所障害で説明でき、CIDP基準では数えない":""));
+      if(dm&&!(k==="med"&&exclMedDL))types.dl=1;}
+    if(a0<L.amp)mark(k+"-0-amp",a0<L.amp*0.2?"c-dm":"c-ab",nm+"：遠位CMAP "+a0+" mV（下限 "+L.amp+"）→ 低下"+(a0<L.amp*0.2?"（下限の20%未満。脱髄の判定には使いにくい）":""));
+    for(var i=1;i<s.length;i++){
+      var cv=s[i].cv,seg=N.sites[i-1]+"→"+N.sites[i];
+      var lim=(k==="uln"&&i===2)?UNE_CV:L.cv;
+      if(cv<lim){var dmv=cv<=L.cv*0.7&&!(k==="uln"&&i===2);
+        var t=nm+"（"+seg+"）：伝導速度 "+cv+" m/s（下限 "+lim+"）";
+        if(k==="uln"&&i===2){var fore=s[1].cv;t+=fore>=L.cv?"。前腕 "+fore+" m/sより "+(fore-cv)+" m/s 遅い → 肘部の局所の伝導遅延":"。前腕も遅く、肘部に限った遅れではない";}
+        else t+=dmv?" → 脱髄の範囲（下限の70%以下）":" → 低下（下限の"+pct(cv/L.cv)+"%、脱髄の範囲ではない）";
+        mark(k+"-"+i+"-cv",dmv||(k==="uln"&&i===2)?"c-dm":"c-ab",t);
+        if(dmv)types.cv=1;}
+      var dropAdj=1-s[i].amp/s[i-1].amp,dropDist=1-s[i].amp/a0,inc=s[i].dur/s[i-1].dur-1,incD=s[i].dur/s[0].dur-1;
+      var drop=Math.max(dropAdj,dropDist);
+      var tdLim=k==="tib"?1.0:0.3;
+      var prevD=1-s[i-1].amp/a0,prevI=s[i-1].dur/s[0].dur-1;
+      var td=inc>tdLim||(incD>tdLim&&prevI<=tdLim);
+      var tdAny=Math.max(inc,incD)>tdLim;
+      if(td){mark(k+"-"+i+"-dur","c-dm",nm+"（"+N.sites[i]+"刺激）：持続時間 "+s[i].dur+" ms（遠位 "+s[0].dur+" msの"+pct(1+incD)+"%）→ 異常な時間的分散（"+(k==="tib"?"脛骨は100%超":"30%超")+"）");types.td=1;}
+      if((dropAdj>=0.3||(dropDist>=0.3&&prevD<0.3))&&k!=="tib"&&a0>=L.amp*0.2){
+        var tdm=!tdAny;
+        mark(k+"-"+i+"-amp",tdm?"c-dm":"c-ab",nm+"（"+N.sites[i]+"刺激）：振幅 "+s[i].amp+" mV（遠位から"+pct(dropDist)+"%低下）"+(tdm?"、持続時間の延長は"+pct(Math.max(0,incD))+"%にとどまる → 伝導ブロック"+(k==="uln"&&i===2?"（肘部＝絞扼部位）":""):" → 時間的分散による位相の打ち消し合いが主で、真の伝導ブロックとは言えない"));
+        if(tdm&&!(k==="uln"&&i===2)&&!(k==="per"&&i===2))types.cb=1;}
+      else if(dropDist>=0.3&&prevD<0.3&&k==="tib")J.items.push({cls:"",t:nm+"：膝窩刺激で振幅が"+pct(dropDist)+"%低下。脛骨神経は正常でも膝窩で低下しやすく、伝導ブロックの判定から除く"});
+    }
+    var fu=fULN(k,q.ht);
+    if(m.f.lat===null){mark(k+"-f","c-ab",nm+"：F波 出現なし"+(a0>=L.amp*0.2?"（遠位CMAPは下限の20%以上あり、他の脱髄所見と合わせれば基準の1項目）":"（遠位CMAPが小さく評価できない）"));if(a0>=L.amp*0.2)types.fabs=1;}
+    else{
+      var fr=m.f.lat/fu,need=a0<L.amp*0.8?1.5:1.2;
+      if(m.f.lat>fu){var fdm=fr>=need;mark(k+"-f",fdm?"c-dm":"c-ab",nm+"：F波最短潜時 "+m.f.lat+" ms（上限 "+fu+"、"+pct(fr)+"%）"+(fdm?"→ 脱髄の範囲（上限の"+pct(need)+"%以上）":"→ 延長（脱髄の範囲ではない）"));if(fdm)types.f=1;}
+      if(m.f.pers<50&&k!=="per")mark(k+"-fp","c-ab",nm+"：F波出現率 "+m.f.pers+"%（低下）");
+    }
+    J.dmN[k]=types;
+  });
+  if(q.sen)SK.forEach(function(k){
+    var N=SN[k],s=q.sen[k],lo=sLLN(k,q.age);
+    if(s.amp===0)mark("s-"+k+"-amp","c-dm",N.n+"（感覚）：SNAP 導出不能");
+    else{
+      if(s.amp<lo)mark("s-"+k+"-amp","c-ab",N.n+"（感覚）：SNAP "+s.amp+" µV（下限 "+lo+(q.age>=60?"、60歳以上の目安":"")+"）→ 低下");
+      if(s.cv<N.L.cv)mark("s-"+k+"-cv","c-ab",N.n+"（感覚）：伝導速度 "+s.cv+" m/s（下限 "+N.L.cv+"）→ 低下");
+    }
+  });
+  if(q.rns)q.rns.forEach(function(x,i){
+    if(x.dec>=10)mark("r-"+i+"-dec","c-dm",RM[x.m]+"：3Hz刺激で "+x.dec+"%の漸減（10%以上で異常）");
+    if(x.inc>=60)mark("r-"+i+"-inc","c-dm",RM[x.m]+"：運動直後に "+x.inc+"%増加（60%以上で異常、100%以上が典型）");
+    if(x.m==="adm"&&q.mot&&x.rest<MN.uln.L.amp)mark("r-"+i+"-rest","c-ab",null);
+  });
+  if(q.emg)q.emg.forEach(function(x,i){
+    var nm=MU[x.m][0],f=[];
+    if(x.fib){mark("e-"+i+"-fib","c-dm",null);f.push("線維自発電位・陽性鋭波 "+x.fib+"+");}
+    if(x.fasc){mark("e-"+i+"-fasc","c-dm",null);f.push("線維束自発電位");}
+    if(x.myot){mark("e-"+i+"-myot","c-dm",null);f.push("ミオトニー放電");}
+    if(x.mup!=="N"){mark("e-"+i+"-mup","c-ab",null);f.push("MUP "+MUPL[x.mup]);}
+    if(x.rec!=="N"){mark("e-"+i+"-rec","c-ab",null);f.push("動員 "+RECL[x.rec]);}
+    if(f.length)J.items.push({cls:"c-ab",t:nm+"（"+MU[x.m][1]+"）："+f.join("、")});
+  });
+  /* パターン */
+  if(q.mot){
+    var cnt={dl:0,cv:0,f:0,fabs:0,cb:0,td:0},nerves=0,other=0;
+    MK.forEach(function(k){var t=J.dmN[k];var any=0;Object.keys(t).forEach(function(p){cnt[p]++;if(p!=="fabs")any=1;});if(any)nerves++;});
+    var ok=[],why=[];
+    [["dl","遠位潜時（上限の150%以上）"],["cv","伝導速度（下限の70%以下）"],["f","F波潜時（上限の120%以上、CMAPが低ければ150%）"],["td","時間的分散"],["cb","伝導ブロック"]].forEach(function(p){if(cnt[p[0]]>=2)ok.push(p[1]+"が"+cnt[p[0]]+"神経");});
+    if(!ok.length&&cnt.cb===1&&nerves>=2)ok.push("伝導ブロック1神経＋他の神経の脱髄所見");
+    if(!ok.length&&cnt.fabs>=2&&nerves>=1)ok.push("F波消失2神経＋他の神経の脱髄所見");
+    J.ean={ok:ok.length>0,t:ok.length?ok.join("、"):"脱髄の範囲の所見が2神経そろわない"};
+    if(q.sen){
+      var sm=q.sen.med,su=q.sen.uln,ss=q.sen.sur;
+      var upAb=(sm.amp<sLLN("med",q.age))||(su.amp<sLLN("uln",q.age)),surOk=ss.amp>=sLLN("sur",q.age)&&ss.cv>=SN.sur.L.cv;
+      if(upAb&&surOk&&q.d!=="cts"&&q.d!=="une"&&q.d!=="dpn")J.pat.push("sural sparing：正中・尺骨の感覚神経が落ちているのに腓腹神経は正常。長さ依存性の軸索障害では逆になるので、脱髄性（AIDP・CIDP）を示す。");
+      var allS=SK.every(function(k){var s=q.sen[k];return s.amp>=sLLN(k,q.age)&&s.cv>=SN[k].L.cv;});
+      var lowM=MK.filter(function(k){return q.mot[k].sites[0].amp<MN[k].L.amp;}).length;
+      if(allS&&lowM>=2)J.pat.push("運動神経だけの振幅低下＋感覚神経は正常：前角・運動神経の軸索・神経筋接合部（シナプス前）のどれか。経過・針筋電図・運動直後のCMAPで分ける。");
+      if(!surOk&&q.mot.per.sites[0].amp<MN.per.L.amp&&q.d==="dpn")J.pat.push("長さ依存性：腓腹神経・腓骨神経（足の筋）から落ち、上肢は保たれる。");
+    }
+    var ma=q.mot.med.sites[0].amp,ua=q.mot.uln.sites[0].amp;
+    if(ma<MN.med.L.amp&&ua>=MN.uln.L.amp*0.75&&ma/ua<0.6)J.pat.push("split hand：短母指外転筋（正中）のCMAPが小指外転筋（尺骨）に比べて目立って小さい（ALSで多い）。");
+    MK.forEach(function(k){var t=J.dmN[k],s=q.mot[k].sites;if(!t.dl&&!t.cv&&s[0].amp<MN[k].L.amp*0.6){var low=0;for(var i=1;i<s.length;i++)if(s[i].cv<MN[k].L.cv&&!(k==="uln"&&i===2))low=1;if(low)J.pat.push(MN[k].n+"：CMAPが小さく、伝導速度の低下は軽い（脱髄の範囲外）。速い線維が失われた軸索障害でも伝導速度は少し落ちる。");}});
+  }
+  if(q.emg){
+    var act=q.emg.filter(function(x){return x.fib||x.fasc;}).length,neu=q.emg.filter(function(x){return x.mup==="neuro";}).length,my=q.emg.filter(function(x){return x.mup==="myo";}),early=q.emg.filter(function(x){return x.rec==="early";}).length;
+    if(neu)J.pat.push("高振幅・長持続MUP＋動員減少："+neu+"筋で慢性の神経原性変化（再支配）。"+(act?"安静時活動もあり、活動性の脱神経が続いている。":""));
+    if(my.length&&early)J.pat.push("低振幅・短持続・多相性MUP＋早期動員：筋原性。");
+    if(my.length&&!early&&my.some(function(x){return x.rec==="dec";}))J.pat.push("低振幅・短持続・多相性MUPだが動員は減少：再支配の初期の新生MUP（神経原性）。筋原性と誤らない。");
+    if(q.emg.some(function(x){return x.myot;}))J.pat.push("ミオトニー放電：筋膜の興奮性の異常（筋強直性ジストロフィー、先天性ミオトニーなど）。");
+    if(q.emg.some(function(x){return x.mup==="var";}))J.pat.push("MUPの波形が刺激ごとに変わる：神経筋接合部の伝達が不安定（MG・LEMS、再支配の初期にも出る）。");
+  }
+  return J;
+}
+
+/* ── 表の表示 ── */
+function td(v,id,J,cls){var c=J&&J.cell[id]?" "+J.cell[id]:"";return '<td class="'+(cls||"")+c+'">'+v+'</td>';}
+function motTable(q,J){
+  var h='<div class="sec">運動神経伝導検査</div><div class="tw"><table class="dt"><thead><tr><th class="l">刺激部位</th><th>潜時<small>ms</small></th><th>振幅<small>mV</small></th><th>持続<small>ms</small></th><th>伝導速度<small>m/s</small></th></tr></thead><tbody>';
+  MK.forEach(function(k){
+    var N=MN[k],m=q.mot[k];
+    h+='<tr class="nv"><td colspan="5">'+N.n+'（記録：'+N.rec+'）</td></tr>';
+    m.sites.forEach(function(s,i){
+      h+='<tr><td class="l">'+N.sites[i]+'</td>'+td(s.lat.toFixed(1),k+"-"+i+"-lat",J)+td(s.amp.toFixed(1),k+"-"+i+"-amp",J)+td(s.dur.toFixed(1),k+"-"+i+"-dur",J)+td(s.cv==null?"—":s.cv,k+"-"+i+"-cv",J)+'</tr>';
+    });
+    var f=m.f;
+    var fl=f.lat===null?'出現なし':f.lat.toFixed(1)+' ms',fp=f.pers+'%';
+    var c1=J&&J.cell[k+"-f"]?J.cell[k+"-f"]:"",c2=J&&J.cell[k+"-fp"]?J.cell[k+"-fp"]:"";
+    h+='<tr class="fw"><td class="l" colspan="5">F波 最短潜時 <span class="'+c1+'">'+fl+'</span>／出現率 <span class="'+c2+'">'+fp+'</span></td></tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+function senTable(q,J){
+  var h='<div class="sec">感覚神経伝導検査（逆行性）</div><div class="tw"><table class="dt"><thead><tr><th class="l">神経（記録）</th><th>SNAP振幅<small>µV</small></th><th>伝導速度<small>m/s</small></th></tr></thead><tbody>';
+  SK.forEach(function(k){var s=q.sen[k];h+='<tr><td class="l">'+SN[k].n+'（'+SN[k].rec+'）</td>'+td(s.amp===0?"導出不能":s.amp,"s-"+k+"-amp",J)+td(s.cv==null?"—":s.cv,"s-"+k+"-cv",J)+'</tr>';});
+  return h+'</tbody></table></div>';
+}
+function rnsTable(q,J){
+  var h='<div class="sec">反復神経刺激試験</div><div class="tw"><table class="dt"><thead><tr><th class="l">筋（神経）</th><th>安静時CMAP<small>mV</small></th><th>3Hz 漸減<small>%（4〜5発目）</small></th><th>10秒運動直後<small>振幅の増加 %</small></th></tr></thead><tbody>';
+  q.rns.forEach(function(x,i){h+='<tr><td class="l">'+RM[x.m]+'</td>'+td(x.rest.toFixed(1),"r-"+i+"-rest",J)+td(x.dec,"r-"+i+"-dec",J)+td((x.inc>0?"+":"")+x.inc,"r-"+i+"-inc",J)+'</tr>';});
+  return h+'</tbody></table></div>';
+}
+function emgTable(q,J){
+  var h='<div class="sec">針筋電図</div><div class="tw"><table class="dt"><thead><tr><th class="l">筋（髄節・神経）</th><th>Fib<br>PSW</th><th>Fasc</th><th>ミオ<br>トニー</th><th class="l" style="min-width:5.5em">MUP</th><th class="l">動員</th></tr></thead><tbody>';
+  q.emg.forEach(function(x,i){
+    h+='<tr><td class="l">'+MU[x.m][0]+'<small>'+MU[x.m][1]+'</small></td>'+td(x.fib?x.fib+"+":"なし","e-"+i+"-fib",J)+td(x.fasc?"あり":"なし","e-"+i+"-fasc",J)+td(x.myot?"あり":"なし","e-"+i+"-myot",J)+td(MUPL[x.mup],"e-"+i+"-mup",J,"l")+td(RECL[x.rec],"e-"+i+"-rec",J,"l")+'</tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+function refBox(q){
+  var h='<details class="set" style="margin-top:10px"><summary style="font-size:14px">基準値（この症例）<span class="uv">未照合の目安</span></summary><div class="tw"><table class="ref"><tr><th>運動</th><th>遠位潜時</th><th>CMAP</th><th>伝導速度</th><th>F波</th></tr>';
+  MK.forEach(function(k){var L=MN[k].L;h+='<tr><td>'+MN[k].n.replace("神経","")+'</td><td>≤'+L.dl+'</td><td>≥'+L.amp+'</td><td>≥'+L.cv+(k==="uln"?'<br><small>肘部 ≥'+UNE_CV+'</small>':'')+'</td><td>≤'+fULN(k,q.ht)+'</td></tr>';});
+  h+='</table><table class="ref" style="margin-top:6px"><tr><th>感覚</th><th>SNAP</th><th>伝導速度</th></tr>';
+  SK.forEach(function(k){h+='<tr><td>'+SN[k].n.replace("神経","")+'</td><td>≥'+sLLN(k,q.age)+' µV</td><td>≥'+SN[k].L.cv+'</td></tr>';});
+  h+='</table></div><p class="hint">F波の上限は身長'+q.ht+'cmで簡易補正（170cm基準×身長比）。SNAPの下限は'+(q.age>=60?'60歳以上の目安':'60歳未満の目安')+'。反復刺激：漸減10%以上、運動後の増加60%以上（典型100%以上）を異常。</p></details>';
+  return h;
+}
+
+/* ── 出題画面 ── */
+var qArea=document.getElementById("qArea");
+function lvDots(n){return "●●●".slice(0,n)+"○○○".slice(0,3-n);}
+var MODEL={both:"NCS＋針筋電図",ncs:"NCSのみ",emg:"針筋電図のみ"};
+function renderQ(){
+  var q=st.cur;
+  if(!q){
+    var c=pool().length;
+    qArea.innerHTML='<div class="card"><h2>はじめる</h2><p class="hint" style="font-size:14px">出題範囲：'+c+'疾患（'+MODEL[st.set.mode]+'）。検査の数値を読み、①病態と②疾患を選んでください。答えると、どの数値が異常か（色）と、その読み方を解説します。</p><div class="nav"><button class="btn primary" type="button" id="goQ"'+(c?'':' disabled')+'>問題を出す</button></div>'+(c?'':'<p class="hint">この検査モードで出せる疾患がありません。設定で疾患を選んでください。</p>')+'</div>';
+    var g=document.getElementById("goQ");if(g)g.onclick=function(){newQ();};
+    return;
+  }
+  var J=q.ans?judge(q):null;
+  var h='<div class="card"><div class="qhead"><span>第'+q.no+'問</span><span class="lv" title="難易度">'+lvDots(q.lvl)+'</span><span class="regtag">'+MODEL[q.mode]+'</span></div>';
+  h+='<p class="who">'+q.age+'歳・'+q.sex+'・身長'+q.ht+'cm</p><p class="vig">'+esc(q.vig||"")+'</p>';
+  if(q.mot)h+=motTable(q,J);
+  if(q.sen)h+=senTable(q,J);
+  if(q.rns)h+=rnsTable(q,J);
+  if(q.emg)h+=emgTable(q,J)+'<p class="hint" style="margin-top:4px">Fib・PSW＝線維自発電位・陽性鋭波、Fasc＝線維束自発電位、MUP＝運動単位電位</p>';
+  if(J)h+='<div class="legend"><span><i class="a"></i>基準外</span><span><i class="d"></i>脱髄の範囲・病的な所見</span></div>';
+  if(q.mot)h+=refBox(q);
+  h+='<p class="ask">① 病態は？</p><div class="grp">'+PK.map(function(k){return pickBtn("p",k,P[k],q);}).join("")+'</div>';
+  h+='<p class="ask">② 最も考えられる疾患は？</p><div class="grp">'+DK.map(function(k){return pickBtn("d",k,D[k],q);}).join("")+'</div>';
+  if(!q.ans)h+='<div class="nav"><button class="btn primary" type="button" id="subBtn"'+(q.pk.p&&q.pk.d?'':' disabled')+'>答え合わせ</button><button class="btn sm" type="button" id="giveBtn">わからない（解説へ）</button><button class="btn sm" type="button" id="skipBtn">別の問題</button></div>';
+  h+='</div>';
+  if(q.ans)h+=explain(q,J);
+  qArea.innerHTML=h;
+  Array.prototype.forEach.call(qArea.querySelectorAll(".pick"),function(b){b.onclick=function(){if(q.ans)return;q.pk[b.getAttribute("data-g")]=b.getAttribute("data-k");save();renderQ();};});
+  var b;
+  if((b=document.getElementById("subBtn")))b.onclick=function(){answer(false);};
+  if((b=document.getElementById("giveBtn")))b.onclick=function(){answer(true);};
+  if((b=document.getElementById("skipBtn")))b.onclick=function(){newQ();};
+  if((b=document.getElementById("nextBtn")))b.onclick=function(){newQ();};
+  if((b=document.getElementById("sameBtn")))b.onclick=function(){newQ(q.d);};
+}
+function pickBtn(g,k,label,q){
+  var cls="";
+  if(q.ans){
+    var right=g==="p"?q.acc.indexOf(k)>=0:k===q.d;
+    if(right)cls=" ok";else if(q.pk[g]===k)cls=" ng";
+  }else if(q.pk[g]===k)cls=" on";
+  return '<button type="button" class="pick'+cls+'" data-g="'+g+'" data-k="'+k+'"'+(q.ans?' disabled':'')+'>'+esc(label)+'</button>';
+}
+function bump(o,k,ok){var r=o[k]||(o[k]={n:0,c:0});r.n++;if(ok)r.c++;}
+function answer(give){
+  var q=st.cur;if(!q||q.ans)return;
+  var pOk=!give&&q.acc.indexOf(q.pk.p)>=0,dOk=!give&&q.pk.d===q.d;
+  q.ans={p:pOk,d:dOk,give:give};
+  bump(st.sp,DP[q.d],pOk);bump(st.sd,q.d,dOk);
+  st.cnt++;if(pOk&&dOk){st.full++;st.streak++;}else st.streak=0;
+  var copy=JSON.parse(JSON.stringify(q));delete copy.ans;copy.pk={p:null,d:null};
+  st.hist.unshift({q:copy,p:pOk,dd:dOk,t:Date.now()});
+  if(st.hist.length>30)st.hist.length=30;
+  save();renderQ();renderTop();
+  setTimeout(function(){var e=document.getElementById("exCard");if(e)try{e.scrollIntoView({behavior:"smooth",block:"start"});}catch(x){}},60);
+}
+function explain(q,J){
+  var e=EXP[q.d];
+  var h='<div class="card ex" id="exCard"><div class="res2">';
+  h+='<div class="result '+(q.ans.p?'ok':'ng')+'">①病態 '+(q.ans.give?'':(q.ans.p?'正解':'不正解'))+'<span class="ans">'+q.acc.map(function(k){return P[k];}).join("／")+'</span></div>';
+  h+='<div class="result '+(q.ans.d?'ok':'ng')+'">②疾患 '+(q.ans.give?'':(q.ans.d?'正解':'不正解'))+'<span class="ans">'+esc(D[q.d])+'</span></div></div>';
+  if(q.acc.length>1)h+='<p class="hint" style="margin:-4px 0 8px">病態は「'+P[q.acc[0]]+'」が主で、「'+q.acc.slice(1).map(function(k){return P[k];}).join("・")+'」も正解にしています。</p>';
+  h+='<h3>なぜこの病態・疾患か</h3><p style="margin:0;font-size:15px">'+esc(e.why)+'</p>';
+  h+='<p class="hint">'+esc(P[DP[q.d]])+'のパターン：'+esc(PDESC[DP[q.d]])+'</p>';
+  var it=J.items.filter(function(x){return x.t;});
+  h+='<h3>異常な数値・所見</h3>'+(it.length?'<ul class="why">'+it.map(function(x){return '<li><span class="f">'+(x.cls?'<span class="'+x.cls.replace("c-","dot-")+'"></span>':'')+esc(x.t)+'</span></li>';}).join("")+'</ul>':'<p class="empty">基準外の数値はありません。</p>');
+  if(J.pat.length)h+='<h3>パターンの読み</h3><ul class="why">'+J.pat.map(function(t){return '<li><span class="w">'+esc(t)+'</span></li>';}).join("")+'</ul>';
+  if(J.ean)h+='<div class="crit '+(J.ean.ok?'ok':'')+'"><b>EAN/PNS 2021 のCIDP運動神経伝導基準（電気生理の部分）</b>'+(J.ean.ok?'満たす：':'満たさない：')+esc(J.ean.t)+(q.d==="aman"&&J.ean.ok?'<span style="display:block;margin:4px 0 0;font-weight:700">AMANでも初回検査では、可逆性伝導不全（時間的分散を伴わない伝導ブロック・F波消失）で脱髄の基準を満たしてしまうことがある。再検で速やかに戻れば軸索型。</span>':'')+(q.d!=="cidp"&&q.d!=="aidp"&&q.d!=="aman"&&J.ean.ok?'<span style="display:block;margin:4px 0 0;font-weight:700">電気生理だけで基準を満たしても、臨床像が合わなければCIDPとは診断しない。</span>':'')+'<span class="hint" style="display:block;margin:2px 0 0">診断には臨床基準と感覚神経の異常（2神経）も必要。GBSの病型分類にはHadden・Rajabally・Unciniらの別の基準を使う。</span></div>';
+  h+='<h3>紛らわしい疾患との違い</h3><ul class="why">'+e.diff.map(function(t){return '<li><span class="w">'+esc(t)+'</span></li>';}).join("")+'</ul>';
+  if(q.note.length)h+='<h3>この問題の注意点</h3><ul class="why">'+q.note.map(function(t){return '<li><span class="w">'+esc(t)+'</span></li>';}).join("")+'</ul>';
+  h+='<h3>基準値について</h3><ul class="why"><li><span class="w">F波潜時は身長（肢長）にほぼ比例し、身長'+q.ht+'cmの上限を簡易補正しています。下肢の伝導速度は高身長でやや遅く、加齢でも少しずつ下がります。</span></li><li><span class="w">感覚神経の振幅は加齢で下がり（特に腓腹神経）、'+(q.age>=60?'この症例（'+q.age+'歳）は60歳以上の下限を使っています。':'60歳以上では下限を下げて判定します。')+'皮膚温が低いと潜時が延び伝導速度が落ちるので、上肢32℃・下肢31℃以上に保ちます。</span></li></ul>';
+  h+='<div class="pearl"><b>ポイント</b>'+esc(e.pearl)+'</div>';
+  h+='<div class="nav"><button class="btn primary" type="button" id="nextBtn">次の問題</button><button class="btn" type="button" id="sameBtn">同じ疾患をもう一度（数値は変わる）</button></div>';
+  return h+'</div>';
+}
+
+/* ── 設定 ── */
+var dxChips=document.getElementById("dxChips");
+function renderSet(){
+  dxChips.innerHTML=DK.map(function(k){var on=st.set.dx.indexOf(k)>=0;var can=allowed(k,st.set.mode,st.set.lvl);
+    return '<label class="chip'+(on?' on':'')+'"'+(can?'':' style="opacity:.5"')+'><input type="checkbox" data-d="'+k+'"'+(on?' checked':'')+'>'+esc(D[k])+'</label>';}).join("");
+  Array.prototype.forEach.call(dxChips.querySelectorAll("input"),function(el){el.onchange=function(){
+    var k=el.getAttribute("data-d"),i=st.set.dx.indexOf(k);
+    if(el.checked&&i<0)st.set.dx.push(k);if(!el.checked&&i>=0)st.set.dx.splice(i,1);
+    save();renderSet();if(!st.cur)renderQ();};});
+  document.getElementById("modeSel").value=st.set.mode;
+  document.getElementById("lvSel").value=String(st.set.lvl);
+  document.getElementById("weakOpt").checked=!!st.set.weak;
+  document.getElementById("setSum").textContent="（"+MODEL[st.set.mode]+"・"+pool().length+"疾患）";
+}
+document.getElementById("dxAll").onclick=function(){st.set.dx=DK.slice();save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("dxNone").onclick=function(){st.set.dx=[];save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("modeSel").onchange=function(){st.set.mode=this.value;save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("lvSel").onchange=function(){st.set.lvl=+this.value;save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("weakOpt").onchange=function(){st.set.weak=this.checked;save();};
+
+/* ── 基準・出典 ── */
+var SRC=[
+ ["Van den Bergh PYK, et al. European Academy of Neurology/Peripheral Nerve Society guideline on diagnosis and treatment of chronic inflammatory demyelinating polyradiculoneuropathy: Report of a joint Task Force—Second revision. Eur J Neurol 2021;28:3556-3583.","https://pubmed.ncbi.nlm.nih.gov/34327760/"],
+ ["同（J Peripher Nerv Syst 2021;26:242-268）","https://pubmed.ncbi.nlm.nih.gov/34085743/"],
+ ["Chen S, et al. AANEM practice topic: Electrodiagnostic reference values for upper and lower limb nerve conduction studies in adult populations. Muscle Nerve 2016;54:371-377.","https://pubmed.ncbi.nlm.nih.gov/27238640/"],
+ ["Dillingham T, et al. Establishing high-quality reference values for nerve conduction studies: a report from the Normative Data Task Force of the AANEM. Muscle Nerve 2016;54:366-370.","https://pubmed.ncbi.nlm.nih.gov/27238858/"],
+ ["Joint Task Force of the EFNS and the PNS. EFNS/PNS guideline on management of multifocal motor neuropathy—first revision. J Peripher Nerv Syst 2010;15:295-301.","https://pubmed.ncbi.nlm.nih.gov/21199100/"],
+ ["Rajabally YA, et al. Electrophysiological diagnosis of Guillain-Barré syndrome subtype: could a single study suffice? J Neurol Neurosurg Psychiatry 2015;86:115-119.","https://doi.org/10.1136/jnnp-2014-307815"],
+ ["Uncini A, et al. Optimizing the electrodiagnostic accuracy in Guillain-Barré syndrome subtypes: criteria sets and sparse linear discriminant analysis. Clin Neurophysiol 2017;128:1176-1183.","https://doi.org/10.1016/j.clinph.2017.03.048"],
+ ["Uncini A, Kuwabara S. The electrodiagnosis of Guillain-Barré syndrome subtypes: Where do we stand? Clin Neurophysiol 2018;129:2586-2593.","https://doi.org/10.1016/j.clinph.2018.09.025"],
+ ["Shefner JM, et al. A proposal for new diagnostic criteria for ALS (Gold Coast criteria). Clin Neurophysiol 2020;131:1975-1978.","https://pubmed.ncbi.nlm.nih.gov/32387049/"],
+ ["AAEM/AAN/AAPM&R. Practice parameter for electrodiagnostic studies in ulnar neuropathy at the elbow: summary statement. Muscle Nerve 1999;22:408-411.","https://pubmed.ncbi.nlm.nih.gov/10086904/"],
+ ["Lipka AF, et al. Lowering the cutoff value for increment increases the sensitivity for the diagnosis of Lambert-Eaton myasthenic syndrome. Muscle Nerve 2020.","https://doi.org/10.1002/mus.26885"]
+];
+function renderAtlas(){
+  var h='<div class="card"><h2>採用した判定基準</h2>';
+  h+='<p class="hint" style="font-size:13.5px">脱髄の範囲は <b>EAN/PNS 2021（CIDPガイドライン第2版）の運動神経伝導基準</b>に従って色を付けます（照合済み）。</p>';
+  h+='<table class="ref"><tr><th>項目</th><th>脱髄の範囲（EAN/PNS 2021）</th></tr>'+
+   '<tr><td>遠位潜時</td><td>上限の150%以上（手根管症候群による正中神経は除く）</td></tr>'+
+   '<tr><td>伝導速度</td><td>下限の70%以下</td></tr>'+
+   '<tr><td>F波潜時</td><td>上限の120%以上（遠位CMAPが下限の80%未満なら150%以上）</td></tr>'+
+   '<tr><td>F波消失</td><td>遠位CMAPが下限の20%以上ある神経で2神経＋他の神経に脱髄所見1つ</td></tr>'+
+   '<tr><td>伝導ブロック</td><td>近位CMAP振幅が遠位より30%以上低下（脛骨神経は除く、遠位CMAPが下限の20%以上）。2神経、または1神経＋他の神経の脱髄所見</td></tr>'+
+   '<tr><td>時間的分散</td><td>近位と遠位のCMAP持続時間の差が30%超（脛骨は100%以上）を2神経</td></tr>'+
+   '<tr><td>遠位CMAP持続時間</td><td>延長（基準値はフィルタ設定で変わる）。<span class="uv">本アプリでは判定に使わない</span></td></tr></table>';
+  h+='<p class="hint">CIDPの電気生理診断は、上のいずれかを2神経以上で満たす（伝導ブロック・F波消失は条件付きで1神経）こと。加えて臨床基準と感覚神経の異常（2神経）が必要です。</p>';
+  h+='<table class="ref" style="margin-top:8px"><tr><th>その他</th><th>このアプリで使う目安</th></tr>'+
+   '<tr><td>MMNの伝導ブロック</td><td>持続時間の延長30%以下でCMAPが50%以上低下＝確実（EFNS/PNS 2010、面積で評価）。照合済み</td></tr>'+
+   '<tr><td>肘部管症候群</td><td>肘をはさむ区間の伝導速度50 m/s未満、前腕より10 m/s以上遅い（AANEM実践指針）。照合済み</td></tr>'+
+   '<tr><td>反復刺激（MG）</td><td>3Hzで10%以上の漸減 <span class="uv">未照合</span></td></tr>'+
+   '<tr><td>反復刺激（LEMS）</td><td>10秒運動後・高頻度刺激で60%以上の増加（従来は100%以上）。照合済み（Lipka 2020）</td></tr>'+
+   '<tr><td>ALS</td><td>Gold Coast基準（2020）。照合済み</td></tr></table></div>';
+  h+='<div class="card"><h2>基準値（学習用の目安）<span class="uv">未照合</span></h2><p class="hint" style="font-size:13.5px">AANEM Normative Data Task Force（Chen 2016）の推奨値と一般的な検査室の値を参考に、丸めた値です。原典の表とは1つずつ照合していません。実際は自施設の基準値を使ってください。</p>';
+  h+='<div class="tw"><table class="ref"><tr><th>運動（記録筋）</th><th>遠位潜時 ms</th><th>CMAP mV</th><th>伝導速度 m/s</th><th>F波 ms<br><small>170cm</small></th></tr>';
+  MK.forEach(function(k){var L=MN[k].L;h+='<tr><td>'+MN[k].n+'<br><small>'+MN[k].rec+'</small></td><td>≤'+L.dl+'</td><td>≥'+L.amp+'</td><td>≥'+L.cv+(k==="uln"?'<br><small>肘部 ≥'+UNE_CV+'</small>':'')+'</td><td>≤'+L.f+'</td></tr>';});
+  h+='</table></div><div class="tw"><table class="ref" style="margin-top:8px"><tr><th>感覚（記録）</th><th>SNAP µV<br><small>60歳未満／以上</small></th><th>伝導速度 m/s</th></tr>';
+  SK.forEach(function(k){var L=SN[k].L;h+='<tr><td>'+SN[k].n+'<br><small>'+SN[k].rec+'</small></td><td>≥'+L.amp[0]+'／≥'+L.amp[1]+'</td><td>≥'+L.cv+'</td></tr>';});
+  h+='</table></div><ul class="pl"><li>年齢：感覚神経の振幅は加齢で下がる（腓腹神経で目立つ）。運動神経の伝導速度も高齢で少し下がる。本アプリは60歳以上でSNAPの下限を下げています。</li><li>身長：F波潜時は肢長にほぼ比例する。本アプリは170cm基準の上限に身長比をかけた簡易補正です（原典の補正式ではありません）。高身長では下肢の伝導速度もやや遅い。</li><li>F波の出現率：腓骨神経は正常でも低いことがあるので、本アプリでは判定しません。</li><li>皮膚温：上肢32℃・下肢31℃以上で測る前提です。</li></ul></div>';
+  h+='<div class="card"><h2>針筋電図のパターン</h2><table class="ref"><tr><th>病態</th><th>安静時</th><th>MUP</th><th>動員</th></tr>'+
+   '<tr><td>神経原性（急性）</td><td>線維自発電位・陽性鋭波（2〜3週以降）</td><td>正常</td><td>減少</td></tr>'+
+   '<tr><td>神経原性（慢性）</td><td>±、前角障害では線維束自発電位</td><td>高振幅・長持続・多相性</td><td>減少</td></tr>'+
+   '<tr><td>再支配の初期</td><td>あり</td><td>低振幅・多相性（新生MUP）</td><td>減少</td></tr>'+
+   '<tr><td>筋原性（炎症・壊死）</td><td>線維自発電位・陽性鋭波</td><td>低振幅・短持続・多相性</td><td>早期動員</td></tr>'+
+   '<tr><td>筋強直性疾患</td><td>ミオトニー放電</td><td>筋原性</td><td>早期動員</td></tr>'+
+   '<tr><td>神経筋接合部</td><td>なし</td><td>波形が不安定</td><td>正常〜早期</td></tr></table></div>';
+  h+='<div class="card"><h2>出典</h2><ol class="src">'+SRC.map(function(s){return '<li>'+esc(s[0])+'<br><a href="'+s[1]+'" target="_blank" rel="noopener">'+s[1]+'</a></li>';}).join("")+'</ol><p class="hint">AIDP・AMANの病型分類の数値基準（Hadden 1998、Rajabally 2015、Uncini 2017）は原典の表と照合していないため、本アプリでは「脱髄の範囲」をEAN/PNS 2021の値で示し、GBSの病型は所見の組み合わせで解説しています。本の文章・図は使っていません。</p></div>';
+  h+='<div class="card"><h2>このアプリについて</h2><p class="hint" style="font-size:13.5px">版 '+VER+'。数値は乱数で作った架空のデータです。診療の判断は自施設の基準値・原典・臨床所見で行ってください。</p><div class="nav"><button class="btn sm" type="button" id="updBtn">最新版に更新</button></div></div>';
+  document.getElementById("aArea").innerHTML=h;
+  document.getElementById("updBtn").onclick=function(){
+    try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)navigator.serviceWorker.getRegistration().then(function(r){if(r)r.update().then(function(){location.reload();},function(){location.reload();});else location.reload();},function(){location.reload();});else location.reload();}catch(e){location.reload();}
+  };
+}
+
+/* ── 成績 ── */
+var sArea=document.getElementById("sArea"),resetArm=false;
+function rateRows(keys,obj,labels,btn){
+  return '<table class="st">'+keys.map(function(k){var r=obj[k]||{n:0,c:0};var p=r.n?Math.round(r.c/r.n*100):null;
+    return '<tr><td>'+esc(labels[k])+'</td><td style="width:30%"><div class="bar"><i style="width:'+(p||0)+'%"></i></div></td><td class="num">'+(r.n?p+'%':'—')+'</td><td class="num hint" style="margin:0">'+r.c+'/'+r.n+'</td>'+(btn?'<td class="num"><button class="btn sm" type="button" data-w="'+k+'"'+(allowed(k,st.set.mode,st.set.lvl)||allowed(k,"both",3)?'':' disabled')+'>出題</button></td>':'')+'</tr>';}).join("")+'</table>';
+}
+function renderStats(){
+  var h='';
+  if(!st.cnt)h+='<div class="card"><p class="empty">まだ回答がありません。</p></div>';
+  else{
+    h+='<div class="card"><h2>病態別の正答率（①）</h2>'+rateRows(PK,st.sp,P,false)+'</div>';
+    var weakP=PK.filter(function(k){var r=st.sp[k];return r&&r.n&&r.c<r.n;}).sort(function(a,b){return st.sp[a].c/st.sp[a].n-st.sp[b].c/st.sp[b].n;});
+    h+='<div class="card"><h2>苦手な病態</h2>'+(weakP.length?'<p style="margin:0">'+weakP.slice(0,3).map(function(k){var r=st.sp[k];return esc(P[k])+'（'+r.c+'/'+r.n+'）';}).join("、")+'</p><p class="hint">'+esc(PDESC[weakP[0]])+'</p>':'<p class="empty">間違えた病態はまだありません。</p>')+'</div>';
+    var dk=DK.filter(function(k){return st.sd[k]&&st.sd[k].n;}).sort(function(a,b){return st.sd[a].c/st.sd[a].n-st.sd[b].c/st.sd[b].n||st.sd[b].n-st.sd[a].n;});
+    h+='<div class="card"><h2>疾患別の正答率（②）</h2>'+(dk.length?rateRows(dk,st.sd,D,true):'<p class="empty">まだありません。</p>')+'<p class="hint">正答率の低い順。「出題」でその疾患を出します。</p></div>';
+  }
+  var wr=st.hist.filter(function(x){return !(x.p&&x.dd)&&x.q&&D[x.q.d];}).slice(0,15);
+  h+='<div class="card"><h2>最近間違えた問題</h2>'+(wr.length?'<table class="st">'+wr.map(function(x,i){var d=new Date(x.t);return '<tr><td>'+esc(D[x.q.d])+'<span class="hint" style="display:block;margin:0">'+(d.getMonth()+1)+'/'+d.getDate()+'・'+(x.p?'病態○':'病態×')+(x.dd?'・疾患○':'・疾患×')+'</span></td><td class="num"><button class="btn sm" type="button" data-h="'+i+'">同じ問題</button></td></tr>';}).join("")+'</table><p class="hint">「同じ問題」は前回と同じ数値で出題します。</p>':'<p class="empty">まだありません。</p>')+'</div>';
+  h+='<div class="card"><button class="btn sm" type="button" id="resetBtn">'+(resetArm?'もう一度押すと成績を消去':'成績を消去')+'</button><p class="hint">成績と履歴だけを消します。右上の「入力クリア」は設定と出題中の問題を消し、成績は残します。</p></div>';
+  sArea.innerHTML=h;
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-w]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-w"));show("v-q");};});
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-h]"),function(b){b.onclick=function(){newQ(null,wr[+b.getAttribute("data-h")].q);show("v-q");};});
+  document.getElementById("resetBtn").onclick=function(){
+    if(!resetArm){resetArm=true;renderStats();setTimeout(function(){resetArm=false;if(document.getElementById("v-s").classList.contains("active"))renderStats();},4000);return;}
+    resetArm=false;st.sp={};st.sd={};st.hist=[];st.cnt=0;st.full=0;st.streak=0;save();renderStats();renderTop();toast("成績を消去しました");
+  };
+}
+function renderTop(){
+  document.getElementById("sN").textContent=st.cnt;
+  document.getElementById("sR").textContent=st.cnt?Math.round(st.full/st.cnt*100)+"%":"—";
+  document.getElementById("sS").textContent=st.streak||0;
+}
+
+/* ── タブ ── */
+var tabs=document.querySelectorAll("nav.tabs button");
+function show(v){
+  Array.prototype.forEach.call(document.querySelectorAll("section.view"),function(s){s.classList.toggle("active",s.id===v);});
+  Array.prototype.forEach.call(tabs,function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===v?"true":"false");});
+  if(v==="v-a")renderAtlas();if(v==="v-s")renderStats();
+  window.scrollTo(0,0);
+}
+Array.prototype.forEach.call(tabs,function(b){b.onclick=function(){show(b.getAttribute("data-v"));};});
+var tt;function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on");},2600);}
+window.__ncsToast=toast;
+window.__ncs={makeCase:makeCase,judge:judge,DK:DK,allowed:allowed,state:function(){return st;}};
+
+renderSet();renderTop();renderQ();
+})();
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    var onClaude=/claude\.ai$|claudeusercontent|claude\.site/.test(h);
+    if(!("serviceWorker" in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller&&window.__ncsToast)window.__ncsToast("新しい版を取り込みました。次に開いたときに反映されます");
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[{"k":"ncs-v1","keep":["sp","sd","hist","cnt","full","streak"]}];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>
