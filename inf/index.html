@@ -175,7 +175,6 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
     <div id="wpNote"></div>
     <p class="hint" id="crclNote"></p>
     <div class="row-btn" style="margin-top:8px">
-      <button class="btn" id="btnClear" type="button">入力をクリア</button>
       <button class="btn primary" type="button" data-go="v-focus">Focusを選ぶ →</button>
       <button class="btn" type="button" data-go="v-flow">起因菌不明フロー →</button>
     </div>
@@ -272,6 +271,7 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
     <p style="font-size:14px;margin:0">出典：サンフォード感染症治療ガイド2026（日本語版）。表1（臓器別）、表2（菌別）、表3（期間）、表5A〜E・表6（耐性菌）、表10A/C/D（用量・副作用）、表11A/B、表14A/B、表17A（腎障害時の用量）、表21A（商品名）。各項目の末尾に原本ページを表示しています。</p>
     <div class="alert">原本の推奨は米国の承認・流通を前提にしたもので、国内未承認の薬剤や国内承認用量と異なる用量を含みます。投与前に添付文書・院内採用・感受性結果・アレルギー歴を確認してください。自分用の参照ツールで、他者への配布は想定していません。</div>
     <p class="hint">データ版：<span id="dataVer"></span></p>
+    <div class="row-btn" style="align-items:center;font-size:12px;color:var(--muted)">アプリの版：<b id="appVer"></b><button type="button" class="btn" id="forceUpdate" style="min-height:32px;padding:4px 10px;font-size:12px">最新版に更新</button></div>
   </div>
 </section>
 </div>
@@ -355,7 +355,6 @@ $("#rcat").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
   if(K.use!=null&&st.rrt==="none")return; /* 数値があるときは数値を優先 */
   st.rcat=st.rcat===b.dataset.v&&e.isTrusted?null:b.dataset.v;save();renderPt();renderAllDrugDeps();});
 $("#rrt").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.rrt=b.dataset.v;save();renderPt();renderAllDrugDeps();});
-$("#btnClear").addEventListener("click",()=>{["age","sex","wt","ht","cr","crclManual","rcat"].forEach(k=>st[k]=null);st.rrt="none";save();renderPt();renderAllDrugDeps();});
 
 /* ---------- CrCl 行の判定 ---------- */
 function norm(s){return String(s).replace(/CrCI|CrC1|CrcI|Crcl|CCr/g,"CrCl").replace(/[＜]/g,"<").replace(/[＞]/g,">").replace(/[≦]/g,"≤").replace(/[≧]/g,"≥").replace(/[〜～]/g,"~").replace(/[－―ー−–]/g,"-").replace(/\s+/g," ");}
@@ -665,6 +664,14 @@ simpleCard("#agCard","アミノグリコシドの投与法（表10C）",DATA.ag)
 simpleCard("#extCard","長時間・持続静注（表10D）",DATA.ext);
 simpleCard("#prefaceCard","腎障害時の用量の前提（表17A）",{rows:DATA.preface,notes:DATA.noAdjust&&DATA.noAdjust.length?["腎機能による用量調整が不要とされる薬剤："+DATA.noAdjust.join("、")]:[],pages:DATA.prefacePages});
 $("#dataVer").textContent=DATA.version;
+const APP_VER="inf-2026-11-14b";
+$("#appVer").textContent=APP_VER;
+$("#forceUpdate").addEventListener("click",async()=>{
+  const b=$("#forceUpdate");b.textContent="確認しています…";
+  try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}
+  try{await fetch(location.href,{cache:"reload"});}catch(e){b.textContent="通信できないため確認できません";return;}
+  setTimeout(()=>location.reload(),800);
+});
 
 
 /* ---------- 起因菌不明フロー ---------- */
