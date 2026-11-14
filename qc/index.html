@@ -54,6 +54,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .row>.nf{flex:0 0 auto}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 8px}
+.g2>*,.g3>*,.row>*{min-width:0}
+input[type=month],input[type=date]{min-width:0;-webkit-appearance:none;appearance:none}
 @media (max-width:520px){.g2.r{grid-template-columns:1fr}}
 .btn{font:inherit;font-size:14px;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:9px;padding:8px 12px;min-height:40px;cursor:pointer;font-weight:600}
 .btn.p{background:var(--accent);color:var(--accent-ink)}
@@ -107,6 +109,8 @@ details.tip li{margin:2px 0}
 .sent{font-weight:700;background:var(--accent-soft);border-radius:8px;padding:8px 10px;margin:8px 0}
 .small{font-size:13px;color:var(--muted)}
 table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.flow tr{cursor:pointer}
+table.flow td{padding:8px 4px!important}
 table.t td,table.t th{border-bottom:1px solid var(--line);padding:4px;vertical-align:top}
 /* 報告書 */
 .rep h2{border-bottom:3px solid var(--accent);padding-bottom:2px;margin-top:22px}
@@ -114,7 +118,7 @@ table.t td,table.t th{border-bottom:1px solid var(--line);padding:4px;vertical-a
 .rep .kv div:nth-child(odd){color:var(--muted)}
 .rep p.tx{white-space:pre-wrap;margin:4px 0;font-size:14.5px}
 @media print{
-  header.top,.pager,.figbar,.btns,.noprint,details.tip{display:none!important}
+  header.top,.pager,.figbar,.btns,.noprint,details.tip,#wcClrBtn,#wcQrBtn{display:none!important}
   body{background:#fff;color:#000;padding:0;font-size:12pt}
   main{max-width:none;padding:0}
   .fig{border:none;padding:0;break-inside:avoid;page-break-inside:avoid}
@@ -142,20 +146,21 @@ table.t td,table.t th{border-bottom:1px solid var(--line);padding:4px;vertical-a
 "use strict";
 const LKEY="qc-story-v1", LIB="qc-story-lib-v1", UKEY="qc-story-ui-v1";
 const STEPS=[
- {k:"top",n:"概要",f:"プロジェクト"},
+ {k:"top",n:"はじめに"},
  {k:"theme",n:"1 テーマ選定"},
  {k:"now",n:"2 現状把握"},
- {k:"goal",n:"3 目標設定"},
- {k:"plan",n:"4 活動計画"},
- {k:"cause",n:"5 要因解析"},
- {k:"meas",n:"6 対策立案"},
- {k:"impl",n:"7 対策実施"},
- {k:"eff",n:"8 効果確認"},
- {k:"std",n:"9 標準化・定着"},
- {k:"ref",n:"10 反省・今後"},
+ {k:"goal",n:"2 目標設定"},
+ {k:"plan",n:"3 活動計画"},
+ {k:"cause",n:"4 要因解析"},
+ {k:"meas",n:"5 対策立案"},
+ {k:"impl",n:"5 対策実施"},
+ {k:"eff",n:"6 効果確認"},
+ {k:"std",n:"7 標準化・定着"},
+ {k:"ref",n:"8 反省・今後"},
  {k:"rep",n:"報告書"}
 ];
-const PLAN_STEPS=["テーマ選定","現状把握","目標設定","活動計画","要因解析","対策立案","対策実施","効果確認","標準化と管理の定着","反省と今後の課題"];
+const APP_VERSION="qc-2026-11-14a";
+const PLAN_STEPS=["テーマの選定","現状の把握と目標の設定","活動計画の作成","要因の解析","対策の検討と実施","効果の確認","標準化と管理の定着","反省と今後の対応"];
 const TPL={
  med:{n:"医療版（患者・スタッフ・手順・物品設備・環境・管理）",b:["患者","スタッフ","手順・方法","物品・設備","環境","管理・体制"]},
  m4:{n:"4M（人・機械・方法・材料）",b:["人","機械・設備","方法","材料・物品"]},
@@ -199,7 +204,7 @@ function sample(){
     cats:[{n:"トイレへの移動時",v:"18",a:"6"},{n:"ベッドからの起き上がり時",v:"11",a:"5"},{n:"車椅子への移乗時",v:"6",a:"4"},{n:"廊下の歩行中",v:"4",a:"3"},{n:"入浴・更衣時",v:"2",a:"1"},{n:"その他",v:"3",a:"2"}],
     focus:"「トイレへの移動時」と「ベッドからの起き上がり時」で全体の約66%を占めるため、この2つを重点に取り組む。"};
   p.goal={what:"転倒・転落件数",base:"44",target:"22",unit:"件/3か月",due:"2026-10",dir:"down",reason:"重点2項目を半分にできれば全体で半減できる見込み"};
-  const pl=[["B","2026-04","2026-04","2026-04","2026-04"],["C","2026-04","2026-05","2026-04","2026-06"],["B","2026-05","2026-05","2026-06","2026-06"],["B","2026-05","2026-05","2026-06","2026-06"],["D","2026-06","2026-06","2026-06","2026-07"],["E","2026-06","2026-07","2026-07","2026-07"],["全員","2026-07","2026-09","2026-07","2026-09"],["C","2026-08","2026-10","2026-08","2026-10"],["F","2026-10","2026-10","2026-10","2026-11"],["全員","2026-10","2026-10","2026-11","2026-11"]];
+  const pl=[["B","2026-04","2026-04","2026-04","2026-04"],["C","2026-04","2026-05","2026-04","2026-06"],["B","2026-05","2026-05","2026-06","2026-06"],["D","2026-06","2026-06","2026-06","2026-07"],["E・全員","2026-06","2026-09","2026-07","2026-09"],["C","2026-08","2026-10","2026-08","2026-10"],["F","2026-10","2026-10","2026-10","2026-11"],["全員","2026-10","2026-10","2026-11","2026-11"]];
   p.plan=PLAN_STEPS.map((s,i)=>({s,o:pl[i][0],ps:pl[i][1],pe:pl[i][2],as:pl[i][3],ae:pl[i][4]}));
   p.cause={effect:"トイレ移動時・起き上がり時の転倒が多い",tpl:"med",bones:[
     {n:"患者",subs:[{n:"ナースコールを押さずに動く",k:true,leaf:"遠慮して呼ばない\n押し方を覚えていない"},{n:"夜間に頻尿がある",k:false,leaf:"利尿薬を内服中"},{n:"筋力・バランスの低下",k:false,leaf:"片麻痺\n長期の臥床"}]},
@@ -243,7 +248,9 @@ function load(){
   try{const w=JSON.parse(s&&s.getItem(LKEY)||"null");P=w&&w.cur?upgrade(w.cur):blank()}catch(e){P=blank()}
   try{const u=JSON.parse(s&&s.getItem(UKEY)||"null");if(u&&STEPS.some(x=>x.k===u.step))cur=u.step}catch(e){}
 }
-function upgrade(p){const b=blank();for(const k in b){if(p[k]==null)p[k]=b[k];else if(typeof b[k]==="object"&&!Array.isArray(b[k]))for(const j in b[k])if(p[k][j]==null)p[k][j]=b[k][j]}return p}
+function upgrade(p){const b=blank();
+  if(Array.isArray(p.plan)&&p.plan.length===10){const o=p.plan,mg=(a,c)=>({s:"",o:[a.o,c.o].filter(has).filter((v,i,x)=>x.indexOf(v)===i).join("・"),ps:[a.ps,c.ps].filter(has).sort()[0]||"",pe:[a.pe,c.pe].filter(has).sort().pop()||"",as:[a.as,c.as].filter(has).sort()[0]||"",ae:[a.ae,c.ae].filter(has).sort().pop()||""});
+    p.plan=[o[0],mg(o[1],o[2]),o[3],o[4],mg(o[5],o[6]),o[7],o[8],o[9]].map((r,i)=>Object.assign({},r,{s:PLAN_STEPS[i]}))}for(const k in b){if(p[k]==null)p[k]=b[k];else if(typeof b[k]==="object"&&!Array.isArray(b[k]))for(const j in b[k])if(p[k][j]==null)p[k][j]=b[k][j]}return p}
 function hasContent(p){return has(p.meta.title)||p.theme.cands.some(c=>has(c.n))||p.now.cats.some(c=>has(c.v))}
 function saveNow(){
   const s=ls();if(!s)return;
@@ -447,7 +454,7 @@ function svgGantt(){
   const ds=[];P.plan.forEach(r=>["ps","pe","as","ae"].forEach(k=>{if(/^\d{4}-\d{2}$/.test(r[k]||""))ds.push(r[k])}));
   if(!ds.length)return empty("予定の開始・終了月を入力すると活動計画表が出ます");
   ds.sort();const ms=monthsBetween(ds[0],ds[ds.length-1]);
-  const lw=150,ow=48,W=Math.max(640,lw+ow+ms.length*44),cw=(W-lw-ow-10)/ms.length,rh=30,top=56;
+  const lw=178,ow=52,W=Math.max(640,lw+ow+ms.length*44),cw=(W-lw-ow-10)/ms.length,rh=30,top=56;
   let b=tx(W/2,22,"活動計画表"+(has(P.meta.title)?"　"+P.meta.title:""),{a:"middle",fs:15,b:1});
   b+=`<rect x="${lw+ow}" y="${top-24}" width="${cw*ms.length}" height="24" fill="${C.acL}"/>`+tx(lw/2,top-8,"ステップ",{a:"middle",fs:12,b:1})+tx(lw+ow/2,top-8,"担当",{a:"middle",fs:12,b:1});
   ms.forEach((m,i)=>{const [y,mo]=m.split("-");b+=tx(lw+ow+cw*(i+.5),top-8,(i===0||mo==="01"?y.slice(2)+"/":"")+(+mo)+"月",{a:"middle",fs:11.5,b:1})});
@@ -546,34 +553,70 @@ function goalSentence(){
 }
 
 const R={};
+const FLOW=[
+ ["theme","1 テーマの選定","職場の問題を洗い出し、評価表で1つに絞る","評価マトリックス"],
+ ["now","2 現状の把握","データを層別し、重点（攻撃対象）を決める","チェックシート・パレート図"],
+ ["goal","2 目標の設定","何を・いつまでに・どれだけ","—"],
+ ["plan","3 活動計画の作成","ステップごとの担当と日程","ガントチャート"],
+ ["cause","4 要因の解析","要因を出し尽くし、データで主要因を確かめる","特性要因図・なぜなぜ"],
+ ["meas","5 対策の検討","主要因ごとに案を出して評価・採用","対策評価表・系統図"],
+ ["impl","5 対策の実施","5W1Hで実行し、実施状況を記録","5W1H表"],
+ ["eff","6 効果の確認","目標と同じ指標で対策前後を比べる","パレート図（前後）・グラフ"],
+ ["std","7 標準化と管理の定着","手順書・チェック表にして続いているか見る","5W1H表・管理グラフ"],
+ ["ref","8 反省と今後の対応","よかった点・反省点・次のテーマ","—"]
+];
+const SOURCES=[
+ ["日本品質管理学会規格 JSQC-Std 31-001:2015「小集団改善活動の指針」","https://jsqc.org/jsqcstd/"],
+ ["日本品質管理学会規格 JSQC-Std 00-001:2023「品質管理用語」","https://jsqc.org/jsqcstd/"],
+ ["日本品質管理学会規格 JSQC-Std 62-001:2024「根本原因分析（RCA）の指針」","https://jsqc.org/jsqcstd/"],
+ ["JIS Q 9028:2021「マネジメントシステムのパフォーマンス改善―小集団改善活動の指針」（日本規格協会・英訳版の見本）","https://webdesk.jsa.or.jp/preview/pre_jis_q_09028_000_000_2021_e_ed10_ch.pdf"]
+];
 R.top=()=>{
   const m="meta.";const list=Object.values(LIBR).sort((a,b)=>String(b.updated).localeCompare(String(a.updated)));
-  return `<h2>プロジェクト</h2><p class="lead">QCストーリー（問題解決型）の各ステップを順に入力すると、パレート図・特性要因図・効果確認のグラフや表が自動でできます。図は「画像で保存」でスライドに貼れます。</p>
-  <div class="note w"><p><b>患者さんの氏名・ID・個人が特定できる情報は入力しないでください。</b>入力内容はこの端末の中だけに保存され、外部には送られません。</p></div>
+  const nx=FLOW.find(f=>!done(f[0]));const started=hasContent(P);
+  return `<div class="card" style="margin-top:4px">
+    ${started?`<b style="display:block;font-size:16px">${esc(P.meta.title||"（テーマ未設定）")}</b><div class="small">${esc(P.meta.circle||"")}</div>
+      <div class="btns"><button type="button" class="btn p" data-go="${nx?nx[0]:"rep"}">${nx?"続き："+esc(nx[1]):"報告書を見る"} ›</button><button type="button" class="btn" data-go="rep">報告書</button></div>`
+    :`<b style="display:block;font-size:16px">QCストーリー（問題解決型）を順に入力すると、図と報告書ができます</b>
+      <div class="btns"><button type="button" class="btn p" data-a="new">＋ 新しく始める</button><button type="button" class="btn" data-a="sample">サンプルで試す</button></div>`}
+  </div>
+  <h3>8つのステップ（タップで移動）</h3>
+  <div class="card" style="padding:4px 10px">
+  <table class="t flow"><tbody>${FLOW.map(f=>`<tr data-go="${f[0]}"><td style="width:1.4em">${done(f[0])?'<span style="color:var(--ok);font-weight:800">✓</span>':""}</td><td><b>${f[1]}</b><div class="small">${f[2]}</div></td><td class="small" style="text-align:right;width:34%">${f[3]}</td></tr>`).join("")}</tbody></table>
+  </div>
+  ${TIP("QC七つ道具の使いどころ",["<b>チェックシート</b>：データを漏れなく集める（現状把握）","<b>パレート図</b>：大きい順に並べ、重点を決める（現状把握・効果確認）","<b>特性要因図</b>：結果と要因の関係を整理する（要因解析）","<b>グラフ・管理図</b>：時間の推移や安定を見る（現状把握・効果確認・定着）","<b>ヒストグラム</b>：ばらつきの形を見る（待ち時間・所要時間など）","<b>散布図</b>：2つの量の関係を見る（主要因の検証）","<b>層別</b>：場面・時間帯・職種などに分けて違いを見る（すべてのステップ）"])}
+  ${TIP("よくある指摘（全体）",["テーマに手段（導入・徹底など）を入れない","「その他」が大きいパレート図は層別をやり直す","主要因は話し合いだけで決めず、データで検証する","「注意する」「徹底する」は対策にならない。仕組み・道具・手順で変える","効果確認は目標と同じ指標・同じ集計方法で","標準化は誰がやっても同じにできる形（手順書・チェック表）にする"])}
+  <div class="note w"><p><b>患者さんの氏名・ID・個人が特定できる情報は入力しないでください。</b>入力はこの端末の中だけに保存され、外部には送られません。</p></div>
+  <h3>プロジェクトの情報</h3>
   <div class="card">
     ${L("サークル名・チーム名")}${I(m+"circle","例：あゆみサークル")}
     <div class="g2 r"><div>${L("部署")}${I(m+"dept","例：A病棟")}</div><div>${L("リーダー")}${I(m+"leader","")}</div></div>
     ${L("メンバー")}${I(m+"members","例：看護師C、D、介護福祉士E")}
-    <div class="g2 r"><div>${L("指導者・推進者")}${I(m+"advisor","")}</div><div>${L("活動期間")}<div class="row">${I(m+"start","","month")}<span class="nf" style="padding-bottom:10px">〜</span>${I(m+"end","","month")}</div></div></div>
-    ${L("テーマ（1 テーマ選定で決めます）")}${I(m+"title","例：A病棟における転倒・転落件数の低減")}
+    ${L("指導者・推進者")}${I(m+"advisor","")}
+    ${L("活動期間")}<div class="row">${I(m+"start","","month")}<span class="nf" style="padding-bottom:10px">〜</span>${I(m+"end","","month")}</div>
+    ${L("テーマ（1 テーマの選定で決めます）")}${I(m+"title","例：A病棟における転倒・転落件数の低減")}
   </div>
-  <h3>進み具合</h3>
-  <div class="prog">${STEPS.slice(1,11).map(s=>`<button type="button" data-go="${s.k}" class="${done(s.k)?"on":""}">${s.n}</button>`).join("")}</div>
   <h3>保存したプロジェクト</h3>
   <div class="card">
-    <div class="btns"><button type="button" class="btn p" data-a="new">＋ 新しいプロジェクト</button><button type="button" class="btn" data-a="sample">サンプルを開く</button><button type="button" class="btn" data-a="dup">今のものを複製</button></div>
-    ${list.length?`<ul class="lib">${list.map(p=>`<li class="${p.id===P.id?"cur":""}"><div class="t"><b>${esc(p.meta.title||p.theme.cands.find(c=>has(c.n))?.n||"（無題）")}</b><span>${esc(p.meta.circle||"")}　更新 ${esc(String(p.updated||"").slice(0,10))}</span></div>${p.id===P.id?'<span class="pill">開いています</span>':`<button type="button" class="btn s" data-a="open" data-i="${p.id}">開く</button>`}<button type="button" class="x" data-a="delp" data-i="${p.id}" aria-label="削除">×</button></li>`).join("")}</ul>`:`<p class="small">まだありません。テーマ・候補・件数のどれかを入力すると自動で保存されます。</p>`}
+    <div class="btns"><button type="button" class="btn" data-a="new">＋ 新しいプロジェクト</button><button type="button" class="btn" data-a="sample">サンプルを開く</button><button type="button" class="btn" data-a="dup">今のものを複製</button></div>
+    ${list.length?`<ul class="lib">${list.map(p=>`<li class="${p.id===P.id?"cur":""}"><div class="t"><b>${esc(p.meta.title||(p.theme.cands.find(c=>has(c.n))||{}).n||"（無題）")}</b><span>${esc(p.meta.circle||"")}　更新 ${esc(String(p.updated||"").slice(0,10))}</span></div>${p.id===P.id?'<span class="pill">開いています</span>':`<button type="button" class="btn s" data-a="open" data-i="${p.id}">開く</button>`}<button type="button" class="x" data-a="delp" data-i="${p.id}" aria-label="削除">×</button></li>`).join("")}</ul>`:`<p class="small">まだありません。テーマ・候補・件数のどれかを入力すると自動で保存されます。</p>`}
   </div>
   <h3>メンバーと共有・バックアップ</h3>
   <div class="card">
-    <p class="small" style="margin-top:0">今開いているプロジェクトをファイル（.json）にして、メールやTeams等で他のメンバーに渡せます。受け取った人は「ファイルを読み込む」で同じ内容を開けます。</p>
+    <p class="small" style="margin-top:0">今開いているプロジェクトをファイル（.json）にして、メールやTeamsなどでメンバーに渡せます。受け取った人は「ファイルを読み込む」で同じ内容を開けます（iPhoneは共有メニューから「ファイルに保存」）。ホーム画面のアイコンごとにデータが分かれることがあるので、端末を替えるときも書き出しを使います。</p>
     <div class="btns"><button type="button" class="btn" data-a="exp">このプロジェクトを書き出す</button><button type="button" class="btn" data-a="imp">ファイルを読み込む</button><button type="button" class="btn ghost" data-a="expall">全部をバックアップ</button></div>
   </div>
-  ${TIP("QCストーリー（問題解決型）の流れ",["<b>テーマ選定</b>：問題を洗い出し、評価して1つに絞る","<b>現状把握</b>：データを層別し、パレート図で重点（攻撃対象）を決める","<b>目標設定</b>：何を・いつまでに・どれだけ","<b>活動計画</b>：ステップごとの担当と日程","<b>要因解析</b>：特性要因図で要因を出し、データで主要因を検証する","<b>対策立案・実施</b>：主要因ごとに対策を評価して採用、5W1Hで実施","<b>効果確認</b>：目標と同じ指標で対策前後を比べる（有形・無形・波及効果）","<b>標準化と管理の定着</b>：手順書・チェック表に落とし込み、続いているか確認","<b>反省と今後の課題</b>"])}`;
+  <h3>出典・版</h3>
+  <div class="card small">
+    <p style="margin-top:0">ステップ構成は問題解決型QCストーリーの一般的な8ステップに合わせています（課題達成型は未対応）。各ステップの「ポイント」「よくある指摘」は下記の規格の考え方を参考に、院内QC活動向けに自分の言葉でまとめたもので、規格の本文ではありません。</p>
+    <ul style="padding-left:18px;margin:4px 0">${SOURCES.map(r=>`<li><a href="${r[1]}" target="_blank" rel="noopener">${esc(r[0])}</a></li>`).join("")}</ul>
+    <p>院内QC活動用のツールです（診療判断には使いません）。</p>
+    <div class="row" style="align-items:center"><span>アプリの版：<b>${APP_VERSION}</b></span><button type="button" class="btn s nf" id="forceUpdate">最新版に更新</button></div>
+  </div>`;
 };
 R.theme=()=>{
   const t=P.theme,tot=themeTotals(),rk=rankOf(tot),sel=themeSel();
-  return `<h2>1 テーマ選定</h2><p class="lead">職場の困りごとを候補に挙げ、評価項目ごとに◎○△をつけて点数の高いものを選びます。</p>
+  return `<h2>1 テーマの選定</h2><p class="lead">職場の困りごとを候補に挙げ、評価項目ごとに◎○△をつけて点数の高いものを選びます。</p>
   ${t.cands.map((c,i)=>`<div class="card"><div class="row">${I(`theme.cands.${i}.n`,"候補 "+(i+1)+"：例 転倒・転落件数の低減")}<button type="button" class="x" data-a="delcand" data-i="${i}" aria-label="削除">×</button></div>
     <div class="scgrid">${t.crit.map((cr,j)=>`<div><label>${esc(cr)}</label>${S(`theme.cands.${i}.s.${j}`,SC)}</div>`).join("")}</div>
     <div class="tot"><span>合計 <b class="big" data-calc="tt${i}">${isFinite(tot[i])?tot[i]:"—"}</b> 点</span><span class="pill" data-calc="tr${i}">${rk[i]?rk[i]+"位":"—"}</span>
@@ -588,7 +631,7 @@ R.theme=()=>{
 };
 R.now=()=>{
   const n=P.now,d=pdata("v");
-  return `<h2>2 現状把握</h2><p class="lead">問題をデータで層別（場面・時間帯・種類など）し、件数を入力するとパレート図ができます。「その他」は自動で最後に置きます。</p>
+  return `<h2>2 現状の把握</h2><p class="lead">問題をデータで層別（場面・時間帯・種類など）し、件数を入力するとパレート図ができます。「その他」は自動で最後に置きます。</p>
   <div class="card">${L("指標（何を数えたか）")}${I("now.metric","例：転倒・転落件数（インシデント報告）")}
   <div class="g3"><div>${L("単位")}${I("now.unit","件")}</div><div style="grid-column:span 2">${L("期間")}${I("now.period","例：2026年4〜6月（3か月）")}</div></div>
   ${L("データの出所")}${I("now.source","例：インシデント報告システム")}</div>
@@ -603,7 +646,7 @@ R.now=()=>{
 };
 R.goal=()=>{
   const g=P.goal,d=pdata("v"),miss=lintGoal(g);
-  return `<h2>3 目標設定</h2><p class="lead">目標は「何を・いつまでに・どれだけ」の3つをそろえます。</p>
+  return `<h2>2 目標の設定</h2><p class="lead">目標は「何を・いつまでに・どれだけ」の3つをそろえます。</p>
   <div class="card">${L("何を（管理特性）")}<div class="row">${I("goal.what","例：転倒・転落件数")}<button type="button" class="btn s nf" data-a="gwhat">現状把握から</button></div>
   <div class="g2 r"><div>${L("現状値")}<div class="row">${N("goal.base","例：44")}<button type="button" class="btn s nf" data-a="gbase">合計 ${fmt(d.tot,1)}</button></div></div><div>${L("目標値")}${N("goal.target","例：22")}</div></div>
   <div class="g3"><div>${L("単位")}${I("goal.unit","例：件/3か月")}</div><div>${L("期限")}${I("goal.due","","month")}</div><div>${L("方向")}${S("goal.dir",[["down","減らす"],["up","増やす"]])}</div></div>
@@ -612,14 +655,14 @@ R.goal=()=>{
   ${L("目標値の根拠")}${T("goal.reason","例：重点2項目を半分にできれば全体で半減できる見込み／病院目標／他病棟の水準")}</div>
   ${TIP("ポイントとよくある指摘",["目標値には根拠を（重点項目をどれだけ減らせば全体がいくつになるか）","効果確認では同じ指標・同じ集計方法で比べる","高すぎる目標・低すぎる目標はどちらも指摘されやすい"])}`;
 };
-R.plan=()=>`<h2>4 活動計画</h2><p class="lead">ステップごとに担当と予定・実績の月を入れると、活動計画表（ガントチャート）ができます。</p>
+R.plan=()=>`<h2>3 活動計画の作成</h2><p class="lead">ステップごとに担当と予定・実績の月を入れると、活動計画表（ガントチャート）ができます。</p>
   ${P.plan.map((r,i)=>`<div class="card"><div class="row"><b style="flex:1">${i+1}. ${esc(r.s)}</b><div class="nf" style="width:120px">${I(`plan.${i}.o`,"担当")}</div></div>
-  <div class="g2"><div>${L("予定")}<div class="row">${I(`plan.${i}.ps`,"","month")}${I(`plan.${i}.pe`,"","month")}</div></div><div>${L("実績")}<div class="row">${I(`plan.${i}.as`,"","month")}${I(`plan.${i}.ae`,"","month")}</div></div></div></div>`).join("")}
+  <div class="g2 r"><div>${L("予定（開始〜終了）")}<div class="row">${I(`plan.${i}.ps`,"","month")}${I(`plan.${i}.pe`,"","month")}</div></div><div>${L("実績（開始〜終了）")}<div class="row">${I(`plan.${i}.as`,"","month")}${I(`plan.${i}.ae`,"","month")}</div></div></div></div>`).join("")}
   ${FIG("gantt",1)}
   ${TIP("ポイント",["計画（点線）と実績（塗り）を並べ、遅れた理由は「反省」に書く","担当を全員に割り振ると「全員参加」の評価につながる"])}`;
 R.cause=()=>{
   const c=P.cause;
-  return `<h2>5 要因解析</h2><p class="lead">特性（結果）に対して、大骨（分類）→中骨（要因）→小骨（さらに細かい要因）を出します。主要因の候補に★をつけ、データで検証します。</p>
+  return `<h2>4 要因の解析</h2><p class="lead">特性（結果）に対して、大骨（分類）→中骨（要因）→小骨（さらに細かい要因）を出します。主要因の候補に★をつけ、データで検証します。</p>
   <div class="card">${L("特性（魚の頭：解決したい結果）")}<div class="row">${I("cause.effect","例：トイレ移動時・起き上がり時の転倒が多い")}<button type="button" class="btn s nf" data-a="ceff">重点から</button></div>
   ${L("大骨のひな形")}<div class="row">${S("cause.tpl",Object.entries(TPL).map(([k,v])=>[k,v.n]))}<button type="button" class="btn s nf" data-a="ctpl">当てはめる</button></div></div>
   ${c.bones.map((b,i)=>`<div class="card bone"><div class="row">${I(`cause.bones.${i}.n`,"大骨")}<button type="button" class="x" data-a="delbone" data-i="${i}" aria-label="大骨を削除">×</button></div>
@@ -639,7 +682,7 @@ R.cause=()=>{
 };
 R.meas=()=>{
   const fac=P.cause.verify.filter(v=>v.j==="主要因").map(v=>v.f.split("／").pop());
-  return `<h2>6 対策立案</h2><p class="lead">主要因ごとに対策案を出し、効果・実現性・コストで評価します。合計7点以上を自動で「採用」にします（個別に変更可）。</p>
+  return `<h2>5 対策の検討</h2><p class="lead">主要因ごとに対策案を出し、効果・実現性・コストで評価します。合計7点以上を自動で「採用」にします（個別に変更可）。</p>
   ${fac.length?`<div class="note"><p>検証で主要因と判定：${fac.map(esc).join("、")}</p></div>`:""}
   ${P.meas.map((m,i)=>{const t=measTotal(m),ad=adopted(m);return `<div class="card"><div class="row">${fac.length?`<div>${L("主要因")}${S(`meas.${i}.f`,[["","—"]].concat(fac.map(f=>[f,f])).concat(has(m.f)&&!fac.includes(m.f)?[[m.f,m.f]]:[]))}</div>`:`<div>${L("主要因")}${I(`meas.${i}.f`,"対象の主要因")}</div>`}<button type="button" class="x" data-a="delmeas" data-i="${i}" aria-label="削除">×</button></div>
     ${L("対策案")}${T(`meas.${i}.idea`,"例：「動く前に押してね」カードを渡し、一緒に押す練習をする",2)}
@@ -653,16 +696,16 @@ R.meas=()=>{
 function w5(i){return `<div class="g2 r" style="margin-top:4px"><div>${L("何を（対策名）")}${I(`meas.${i}.what`,"例：コール指導カード")}</div><div>${L("誰が")}${I(`meas.${i}.who`,"例：受け持ち看護師")}</div><div>${L("いつ")}${I(`meas.${i}.when`,"例：入院当日と毎夕")}</div><div>${L("どのように")}${I(`meas.${i}.how`,"例：ベッド柵にカードを付け一緒に押す")}</div></div>`}
 R.impl=()=>{
   const ad=P.meas.map((m,i)=>({m,i})).filter(o=>adopted(o.m)&&has(o.m.idea));
-  return `<h2>7 対策実施</h2><p class="lead">採用した対策の実施日と、やってみた結果（実施率・気づき）を記録します。</p>
+  return `<h2>5 対策の実施</h2><p class="lead">採用した対策の実施日と、やってみた結果（実施率・気づき）を記録します。</p>
   ${ad.length?ad.map(o=>`<div class="card"><b>${esc(o.m.what||o.m.idea)}</b><div class="small">主要因：${esc(o.m.f||"—")}</div>
-    <div class="g2 r"><div>${L("実施日")}${I(`meas.${o.i}.done`,"","date")}</div><div>${L("誰が・いつ・どのように")}<div class="small" style="padding-top:6px">${esc([o.m.who,o.m.when,o.m.how].filter(has).join("／")||"6 対策立案で入力")}</div></div></div>
-    ${L("実施内容と結果")}${T(`meas.${o.i}.res`,"例：対象32名に実施。夜間のコールが増えた／実施率 78%→91%",2)}</div>`).join(""):`<div class="note w">採用した対策がまだありません。「6 対策立案」で評価してください。</div>`}
+    <div class="g2 r"><div>${L("実施日")}${I(`meas.${o.i}.done`,"","date")}</div><div>${L("誰が・いつ・どのように")}<div class="small" style="padding-top:6px">${esc([o.m.who,o.m.when,o.m.how].filter(has).join("／")||"5 対策立案で入力")}</div></div></div>
+    ${L("実施内容と結果")}${T(`meas.${o.i}.res`,"例：対象32名に実施。夜間のコールが増えた／実施率 78%→91%",2)}</div>`).join(""):`<div class="note w">採用した対策がまだありません。「5 対策立案」で評価してください。</div>`}
   ${FIG("meas5w",1)}
   ${TIP("ポイント",["実施状況（実施率・遵守率）もデータで追うと、効果が出ない理由の切り分けに役立つ","うまくいかなかった対策も消さずに記録し、修正内容を書く"])}`;
 };
 R.eff=()=>{
   const n=P.now,b=pdata("v"),a=pdata("a"),ach=achieve();
-  return `<h2>8 効果確認</h2><p class="lead">現状把握と同じ指標・同じ集計方法で、対策後のデータを入れます。対策前後のパレート図・目標と実績・推移を自動で作ります。</p>
+  return `<h2>6 効果の確認</h2><p class="lead">現状把握と同じ指標・同じ集計方法で、対策後のデータを入れます。対策前後のパレート図・目標と実績・推移を自動で作ります。</p>
   <div class="card">${L("対策後の期間")}${I("eff.period","例：2026年8〜10月（3か月）")}
   <b style="display:block;margin-top:10px">項目別の件数（対策後）</b>
   ${n.cats.map((c,i)=>`<div class="row" style="margin-top:6px"><div style="padding-bottom:10px">${esc(c.n||"（項目 "+(i+1)+"）")}<span class="small">　前 ${esc(c.v||"—")}</span></div><div class="nf" style="width:96px">${N(`now.cats.${i}.a`,"対策後")}</div></div>`).join("")}
@@ -686,8 +729,8 @@ R.eff=()=>{
   ${FIG("radar")}
   ${TIP("ポイントとよくある指摘",["目標と同じ指標・同じ期間の長さで比べる（季節変動にも注意）","重点項目（攻撃対象）が減ったかを、対策前と同じ目盛りのパレート図で示す","目標未達でも、原因を考察して次の手を書けば評価される","有形効果は金額や時間に換算できると説得力が増す"])}`;
 };
-function achHtml(ach){if(ach==null)return `<div class="small">現状値・目標値（3 目標設定）と実績値がそろうと達成率を出します。</div>`;return `<div class="note ${ach>=100?"ok":"w"}"><p>目標達成率 <b class="big">${fmt(ach,0)}%</b>　${ach>=100?"目標達成":"目標未達"}</p><p class="small">達成率＝（現状値−実績値）÷（現状値−目標値）×100</p></div>`}
-R.std=()=>`<h2>9 標準化と管理の定着</h2><p class="lead">効果のあった対策を、手順書・基準・チェック表などに落とし込み（5W1H）、続いているかを確かめます。</p>
+function achHtml(ach){if(ach==null)return `<div class="small">現状値・目標値（2 目標の設定）と実績値がそろうと達成率を出します。</div>`;return `<div class="note ${ach>=100?"ok":"w"}"><p>目標達成率 <b class="big">${fmt(ach,0)}%</b>　${ach>=100?"目標達成":"目標未達"}</p><p class="small">達成率＝（現状値−実績値）÷（現状値−目標値）×100</p></div>`}
+R.std=()=>`<h2>7 標準化と管理の定着</h2><p class="lead">効果のあった対策を、手順書・基準・チェック表などに落とし込み（5W1H）、続いているかを確かめます。</p>
   ${P.std.map((s,i)=>`<div class="card"><div class="row">${I(`std.${i}.what`,"何を（標準化する対策）")}<button type="button" class="x" data-a="delstd" data-i="${i}" aria-label="削除">×</button></div>
   <div class="g2 r"><div>${L("なぜ")}${I(`std.${i}.why`,"")}</div><div>${L("誰が")}${I(`std.${i}.who`,"")}</div><div>${L("いつ")}${I(`std.${i}.when`,"")}</div><div>${L("どのように（手順書・基準・チェック表）")}${I(`std.${i}.how`,"")}</div></div></div>`).join("")}
   <div class="btns"><button type="button" class="btn" data-a="addstd">＋ 項目</button><button type="button" class="btn ghost" data-a="stdfrom">採用した対策から作る</button></div>
@@ -695,7 +738,7 @@ R.std=()=>`<h2>9 標準化と管理の定着</h2><p class="lead">効果のあっ
   <div class="card">${L("管理の定着（どう見守るか）")}${T("keep.method","例：毎月の病棟会で件数グラフとチェック表の実施率を確認",2)}
   ${L("定着の確認結果")}${T("keep.check","例：11月 実施率92%、転倒7件",2)}</div>
   ${TIP("ポイント",["標準化は「誰がやっても同じにできる」形（手順書・チェック表・電子カルテのセット）にする","新人・異動者への教育方法も決めておく","効果が続いているか、標準化後もしばらくデータを取る"])}`;
-R.ref=()=>`<h2>10 反省と今後の課題</h2>
+R.ref=()=>`<h2>8 反省と今後の対応</h2>
   <div class="card">${L("よかった点")}${T("ref.good","例：データで主要因を確かめてから対策を立てられた")}
   ${L("反省点")}${T("ref.bad","例：要因解析が計画より1か月遅れた")}
   ${L("今後の課題・次のテーマ")}${T("ref.next","例：次は点滴ルートの自己抜去に取り組む")}</div>
@@ -706,17 +749,17 @@ R.rep=()=>{
   return `<div class="btns noprint"><button type="button" class="btn p" data-a="print">印刷・PDFにする</button><button type="button" class="btn" data-a="exp">ファイルに書き出す</button></div>
   <div class="rep"><h1 style="font-size:21px;margin:6px 0">${esc(m.title||"（テーマ未設定）")}</h1>
   ${kv([["サークル",m.circle],["部署",m.dept],["リーダー",m.leader],["メンバー",m.members],["指導者",m.advisor],["活動期間",[m.start,m.end].filter(has).join(" 〜 ")]])}
-  <h2>1 テーマ選定</h2>${fg("theme")}${p(P.theme.reason)}
-  <h2>2 現状把握</h2>${kv([["指標",P.now.metric],["期間",P.now.period],["出所",P.now.source]])}${fg("pareto")}${p(P.now.focus)}
-  <h2>3 目標設定</h2><p class="tx"><b>${esc(goalSentence())}</b></p>${p(P.goal.reason)}
-  <h2>4 活動計画</h2>${fg("gantt")}
-  <h2>5 要因解析</h2>${fg("fish")}${P.cause.verify.some(v=>has(v.f))?fg("verify"):""}
-  <h2>6 対策立案</h2>${fg("meas")}
-  <h2>7 対策実施</h2>${fg("meas5w")}
-  <h2>8 効果確認</h2>${fg("pb")}${fg("pa")}${fg("goalbar")}${P.eff.trend.filter(r=>has(r.v)).length>1?fg("trend"):""}
+  <h2>1 テーマの選定</h2>${fg("theme")}${p(P.theme.reason)}
+  <h2>2 現状の把握と目標の設定</h2>${kv([["指標",P.now.metric],["期間",P.now.period],["出所",P.now.source]])}${fg("pareto")}${p(P.now.focus)}
+  <h3>目標</h3><p class="tx"><b>${esc(goalSentence())}</b></p>${p(P.goal.reason)}
+  <h2>3 活動計画の作成</h2>${fg("gantt")}
+  <h2>4 要因の解析</h2>${fg("fish")}${P.cause.verify.some(v=>has(v.f))?fg("verify"):""}
+  <h2>5 対策の検討と実施</h2>${fg("meas")}
+  ${fg("meas5w")}
+  <h2>6 効果の確認</h2>${fg("pb")}${fg("pa")}${fg("goalbar")}${P.eff.trend.filter(r=>has(r.v)).length>1?fg("trend"):""}
   ${has(P.eff.tangible)?"<h3>有形効果</h3>"+p(P.eff.tangible):""}${has(P.eff.ripple)?"<h3>波及効果</h3>"+p(P.eff.ripple):""}${has(P.eff.intangible)?"<h3>無形効果</h3>"+p(P.eff.intangible):""}${P.eff.radar.some(r=>has(r.a))?fg("radar"):""}
-  <h2>9 標準化と管理の定着</h2>${fg("std")}${kv([["管理の方法",P.keep.method],["定着の確認",P.keep.check]])}
-  <h2>10 反省と今後の課題</h2>${kv([["よかった点",P.ref.good],["反省点",P.ref.bad],["今後の課題",P.ref.next]])}
+  <h2>7 標準化と管理の定着</h2>${fg("std")}${kv([["管理の方法",P.keep.method],["定着の確認",P.keep.check]])}
+  <h2>8 反省と今後の対応</h2>${kv([["よかった点",P.ref.good],["反省点",P.ref.bad],["今後の課題",P.ref.next]])}
   <p class="small">QCストーリー支援で作成　${esc(today())}</p></div>`;
 };
 
@@ -811,6 +854,7 @@ document.addEventListener("click",e=>{
   const r=fn(a.dataset.i!=null&&/^\d+$/.test(a.dataset.i)?+a.dataset.i:undefined,a.dataset.j!=null?+a.dataset.j:undefined,a.dataset.i,a.dataset.f);
   if(r===false)return;saveNow();render(true);
 });
+document.addEventListener("click",e=>{if(!e.target.closest||!e.target.closest("#forceUpdate"))return;(async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update()}}catch(_){}try{await fetch(location.href,{cache:"reload"})}catch(_){toast("通信できないため更新を確認できません");return}setTimeout(()=>location.reload(),800)})()});
 $("prev").addEventListener("click",()=>{const i=STEPS.findIndex(s=>s.k===cur);if(i>0)go(STEPS[i-1].k)});
 $("next").addEventListener("click",()=>{const i=STEPS.findIndex(s=>s.k===cur);if(i<STEPS.length-1)go(STEPS[i+1].k)});
 $("fimp").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
