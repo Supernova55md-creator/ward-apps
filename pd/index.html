@@ -70,6 +70,8 @@ li{margin:3px 0}
 .med .row button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:4px 8px;min-height:34px;min-width:40px;cursor:pointer}
 .med .row button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:700}
 .med .row input{font:inherit;font-size:15px;width:7em;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.med .row.doses button.dz{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.med .row.doses button.dz b{font-weight:800}
 .med .nt{font-size:12.5px;color:var(--muted);margin-top:4px}
 .verdict{border-radius:12px;padding:12px;margin:0 0 12px;border:1px solid var(--line);background:var(--surface)}
 .verdict.ok{background:var(--ok-soft);border-color:transparent}.verdict.warn{background:var(--warn-soft);border-color:transparent}
@@ -257,7 +259,7 @@ a{color:var(--info)}
       <li>ロチゴチン：Jost 2023 は放出量（mg/24h）×30.3。日本の表示は含有量で、2.25mg＝1mg/24h（面積 5cm²）なので、日本の表示 mg ×13.47。</li>
       <li>ハルロピテープ：Jost 2023 に係数がないため、添付文書の切り替え表（本剤 8mg ≒ ロピニロール経口 2mg）から ×5 とした<span class="tag u">換算は推定</span>。</li>
       <li>L-dopa 単剤（ドパストン）：DCI 配合剤 100mg ≒ 単剤 500mg の目安（成書）から ×0.2<span class="tag u">未照合</span>。</li>
-      <li>エンタカポン：服用回数分の L-dopa にだけ ×0.33（L-dopa の1回量は1日量を回数で割った平均）。オピカポンは全 L-dopa に ×0.5。イストラデフィリンは L-dopa の LED ×0.2（Jost）。成書は「ノウリアスト 40mg ≒ L-dopa 100mg」と推定。</li>
+      <li>COMT 阻害薬（Jost 2023 の注 a）：まず L-dopa 製剤の LED を出し、それに ×0.33（エンタカポン）・×0.5（オピカポン）を掛けて足す。エンタカポンの上乗せは服用後の数時間だけ（200mg で約4時間）とされるため、<b>一緒に飲む回の L-dopa だけ</b>に掛ける（論文の例：エンタカポン 200mg×3＋L-dopa 100mg×3 → 100＋300＝400）。全部の回で一緒に飲めば「全 L-dopa ×0.33」と同じ。オピカポンは1日中効くため全 L-dopa に掛ける（例：50mg＋L-dopa 150mg×4 → 300＋600＝900）。スタレボは L-dopa 分 ×1＋その ×0.33。</li><li>イストラデフィリン（注 d）：L-dopa と COMT 阻害薬の LED の小計 ×0.2（例：20mg＋L-dopa 100mg×3 → 60＋300＝360）。成書は「ノウリアスト 40mg ≒ L-dopa 100mg」と推定。</li>
       <li>ゾニサミドは用量によらず 100（日本以外では使わない式）、サフィナミドは 50・100mg とも 150、トリヘキシフェニジルは単回で効果が明らかな人だけ 100 とされるため、既定では 0。</li>
     </ul>
   </div>
@@ -281,7 +283,7 @@ const DRUGS=[
  {id:"ldo",ch:"ドパストン（単剤）",cls:"ld",g:"L-dopa",nm:"レボドパ単剤",br:"ドパストンカプセル250mg・散",mode:"pd",doses:[125,250,500],times:[1,2,3,4,5,6],f:0.2,ng:"散は胃管から可（未照合）。",note:"DCI配合剤100mg≒単剤500mg の目安で換算（成書）"},
  {id:"lcig",cls:"ld",g:"L-dopa",nm:"L-dopa・カルビドパ 経腸用液（空腸持続）",br:"デュオドーパ配合経腸用液",mode:"num",unit:"L-dopa mg/日（朝＋持続＋追加）",f:1.11,ng:"ポンプ停止時は同量前後の経口 L-dopa へ（主治医と事前に決めておく）。"},
  {id:"fos",cls:"ld",g:"L-dopa",nm:"ホスレボドパ・ホスカルビドパ 持続皮下注",br:"ヴィアレブ配合持続皮下注",mode:"num",unit:"ホスレボドパ mg/日",f:0.75,ng:"皮下注のため絶食中も継続できる。"},
- {id:"ent",cls:"comt",g:"COMT・MAO-B",nm:"エンタカポン",br:"コムタン錠100mg（L-dopa と同時に）",mode:"pd",doses:[100,200],times:[1,2,3,4,5,6,7,8],special:1,ng:"胃管からの可否は薬剤部に確認（未照合）。絶食中は一時中止でよい。"},
+ {id:"ent",cls:"comt",g:"COMT・MAO-B",nm:"エンタカポン",br:"コムタン錠100mg（L-dopa と同時に）",mode:"ent",doses:[100,200],special:1,ng:"胃管からの可否は薬剤部に確認（未照合）。絶食中は一時中止でよい。"},
  {id:"opi",cls:"comt",g:"COMT・MAO-B",nm:"オピカポン",br:"オンジェンティス錠25mg（1日1回、L-dopa と1時間以上あける）",mode:"day",days:[25],special:1,ng:"絶食中は一時中止でよい。胃管からは薬剤部に確認（未照合）。"},
  {id:"sel",cls:"maob",g:"COMT・MAO-B",nm:"セレギリン",br:"エフピーOD錠2.5",mode:"day",days:[2.5,5,7.5,10],f:10,ng:"OD錠。絶食中は一時中止でよい。"},
  {id:"ras",cls:"maob",g:"COMT・MAO-B",nm:"ラサギリン",br:"アジレクト錠0.5mg・1mg",mode:"day",days:[0.5,1],f:100,ng:"絶食中は一時中止でよい（半減期は短いが MAO-B 阻害は数日続く）。"},
@@ -308,34 +310,43 @@ const CLS_COL={ld:"ld",comt:"en",maob:"en",da:"da",oth:"ot"};
 /* ---------- 状態 ---------- */
 let S={meds:[],tab:"led",dur:null,gut:null,del:null,mc:"wo"};
 function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)S=Object.assign(S,o);}catch(e){}
-  S.meds=(S.meds||[]).filter(m=>DM[m.id]);}
+  S.meds=(S.meds||[]).filter(m=>DM[m.id]);
+  S.meds.forEach(m=>{const d=DM[m.id];if(d.mode==="pd"&&!Array.isArray(m.list)){m.list=(m.d&&m.n)?Array(m.n).fill(m.d):[];delete m.d;delete m.n;}
+    if(d.id==="ent")delete m.n;});}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 const fmt=(x,d=0)=>{if(!isFinite(x))return"—";const p=Math.pow(10,d);return String(Math.round(x*p)/p);};
 const r5=x=>Math.round(x/5)*5;
 
 /* ---------- LEDD ---------- */
-function daily(m){const d=DM[m.id];if(d.mode==="pd")return (m.d||0)*(m.n||0);if(d.mode==="num")return parseFloat(m.v)||0;return m.d||0;}
+const LDIDS=["lc","lb","ldo"]; // エンタカポンと一緒に飲める L-dopa（スタレボは配合済み）
+function list(m){return Array.isArray(m.list)?m.list:[];}
+function daily(m){const d=DM[m.id];if(d.mode==="pd")return list(m).reduce((a,x)=>a+x,0);if(d.mode==="num")return parseFloat(m.v)||0;
+  if(d.mode==="ent")return (m.d||0)*entDoses().filter(x=>!(m.off||[]).includes(x.k)).length;return m.d||0;}
+/* L-dopa の1回分を消したとき、コムタンの「一緒に飲まない回」の印をずらす（j=-1 は全部消す） */
+function shiftOff(id,j){const e=S.meds.find(x=>x.id==="ent");if(!e||!e.off)return;
+  e.off=e.off.map(k=>{const [a,b]=k.split(":");const n=+b;if(a!==id)return k;if(j<0||n===j)return null;return n>j?a+":"+(n-1):k;}).filter(Boolean);}
+function entDoses(){const o=[];S.meds.forEach(m=>{if(!LDIDS.includes(m.id))return;const d=DM[m.id];list(m).forEach((x,j)=>o.push({k:m.id+":"+j,id:m.id,j,mg:x,led:x*d.f}));});return o;}
 function calc(){
-  const r={rows:{},ld:0,comt:0,maob:0,da:0,oth:0,ldOral:0,ldAll:0,ldTimes:0,ldIRtotal:0,stL:0,total:0,daRows:[]};
+  const r={rows:{},ld:0,comt:0,maob:0,da:0,oth:0,ldOral:0,ldAll:0,ldTimes:0,stL:0,total:0,daRows:[]};
   // L-dopa 系
   S.meds.forEach(m=>{const d=DM[m.id],dd=daily(m);if(d.cls!=="ld")return;
     let led=0;
     if(d.id==="st"){led=dd*1;r.stL+=dd;}else led=dd*d.f;
     r.rows[m.id]=led;r.ld+=led;r.ldAll+=led;
     if(d.id!=="lcig"&&d.id!=="fos"){r.ldOral+=led;}
-    if(d.id==="lc"||d.id==="lb"||d.id==="ldo"){r.ldIRtotal+=led;r.ldTimes=Math.max(r.ldTimes,m.n||0);}
+    if(d.mode==="pd")r.ldTimes=Math.max(r.ldTimes,list(m).length);
   });
   // COMT
   S.meds.forEach(m=>{const d=DM[m.id];
-    if(d.id==="ent"){const n=m.n||0;const frac=r.ldTimes?Math.min(1,n/r.ldTimes):0;const led=0.33*r.ldIRtotal*frac;r.rows.ent=led;r.comt+=led;}
+    if(d.id==="ent"){const off=m.off||[];const led=(m.d||0)>0?0.33*entDoses().filter(x=>!off.includes(x.k)).reduce((a,x)=>a+x.led,0):0;r.rows.ent=led;r.comt+=led;}
     if(d.id==="opi"&&(m.d||0)>0){const led=0.5*r.ldOral;r.rows.opi=led;r.comt+=led;}
   });
   // スタレボ内のエンタカポン
-  if(r.stL>0){const led=0.33*r.stL;r.rows.st=(r.rows.st||0)+led;r.comt+=0;r.ld+=led;r.stEnt=led;}
+  if(r.stL>0){const led=0.33*r.stL;r.rows.st=(r.rows.st||0)+led;r.comt+=led;r.stEnt=led;}
   // その他
   S.meds.forEach(m=>{const d=DM[m.id],dd=daily(m);if(d.cls==="ld"||d.cls==="comt")return;
     let led=0;
-    if(d.id==="ist"){led=dd>0?0.2*r.ldAll:0;}
+    if(d.id==="ist"){led=dd>0?0.2*(r.ld+r.comt):0;}
     else if(d.fix!=null){led=dd>0?d.fix:0;}
     else led=dd*d.f;
     r.rows[m.id]=led;r[d.cls]+=led;
@@ -356,8 +367,15 @@ function renderMeds(r){
   $("medList").innerHTML=S.meds.map((m,i)=>{const d=DM[m.id];
     let rows="";
     if(d.mode==="pd"){
-      rows=`<div class="row"><span class="lb">1回</span>${d.doses.map(x=>`<button type="button" data-i="${i}" data-f="d" data-x="${x}" aria-pressed="${m.d===x}">${doseLabel(x)}</button>`).join("")}<span class="muted">mg</span></div>
-      <div class="row"><span class="lb">回/日</span>${d.times.map(x=>`<button type="button" data-i="${i}" data-f="n" data-x="${x}" aria-pressed="${m.n===x}">${x}</button>`).join("")}</div>`;
+      const L=list(m);
+      rows=`<div class="row"><span class="lb">足す</span>${d.doses.map(x=>`<button type="button" data-i="${i}" data-push="${x}">${doseLabel(x)}</button>`).join("")}<span class="muted">mg</span></div>
+      <div class="row doses"><span class="lb">飲み方</span>${L.length?L.map((x,j)=>`<button type="button" class="dz" data-i="${i}" data-pop="${j}" aria-label="${j+1}回目 ${x}mg を消す">${j+1}回目 <b>${doseLabel(x)}</b> ×</button>`).join(""):`<span class="muted">1回分ずつタップ（朝・昼・夕…の順）</span>`}</div>
+      ${L.length?`<div class="row"><span class="lb"></span><button type="button" data-i="${i}" data-again="1">同じ量をもう1回</button><button type="button" data-i="${i}" data-clr="1">やり直す</button><span class="muted">計 ${fmt(daily(m),3)}mg/日・${L.length}回</span></div>`:""}`;
+    }else if(d.mode==="ent"){
+      const E=entDoses(),off=m.off||[];
+      rows=`<div class="row"><span class="lb">1回</span>${d.doses.map(x=>`<button type="button" data-i="${i}" data-f="d" data-x="${x}" aria-pressed="${m.d===x}">${x}</button>`).join("")}<span class="muted">mg</span></div>
+      <div class="row doses"><span class="lb">一緒に</span>${E.length?E.map(x=>`<button type="button" data-i="${i}" data-tog="${x.k}" aria-pressed="${!off.includes(x.k)}">${DM[x.id].id==="ldo"?"単剤 ":""}${x.j+1}回目 ${doseLabel(x.mg)}</button>`).join(""):`<span class="muted">先に L-dopa を入れると、ここに各回が並びます</span>`}</div>
+      ${E.length?`<div class="row"><span class="lb"></span><span class="muted">コムタンを一緒に飲む L-dopa の回を選ぶ（既定は全部）。計 ${daily(m)}mg/日</span></div>`:""}`;
     }else if(d.mode==="day"){
       rows=`<div class="row"><span class="lb">1日</span>${d.days.map(x=>`<button type="button" data-i="${i}" data-f="d" data-x="${x}" aria-pressed="${m.d===x}">${doseLabel(x)}</button>`).join("")}<span class="muted">mg</span></div>`;
     }else{
@@ -365,8 +383,6 @@ function renderMeds(r){
     }
     const led=r.rows[m.id]||0;const dd=daily(m);
     let nt="";
-    if(d.id==="ent"&&r.ldTimes&&(m.n||0)>r.ldTimes)nt="L-dopa の回数より多い分は計算に入れていません。";
-    if(d.id==="ent"&&!r.ldIRtotal)nt="L-dopa（配合錠・単剤）を入れると計算します。";
     if(d.id==="opi"&&S.meds.some(x=>x.id==="ent"||x.id==="st"))nt="オピカポンとエンタカポン（スタレボ含む）は通常併用しない。";
     if(d.id==="st"&&r.stEnt)nt=`うちエンタカポン分 ${fmt(r.stEnt)} mg`;
     if(d.note)nt=(nt?nt+"　":"")+d.note;
@@ -384,7 +400,7 @@ function renderLed(){
     const parts=[["ld",r.ld],["en",r.comt+r.maob],["da",r.da],["ot",r.oth]];
     $("ledBars").innerHTML=parts.map(([c,x])=>x>0?`<span style="width:${x/r.total*100}%;background:var(--${c})"></span>`:"").join("");
     const daPct=r.total?Math.round(r.da/r.total*100):0;
-    $("ledBreak").textContent=`L-dopa ${fmt(r.ld)}（うち配合剤エンタカポン分 ${fmt(r.stEnt||0)}）／COMT ${fmt(r.comt)}／MAO-B ${fmt(r.maob)}／DA ${fmt(r.da)}（全体の${daPct}%）／その他 ${fmt(r.oth)}`;
+    $("ledBreak").textContent=`L-dopa ${fmt(r.ld)}／COMT ${fmt(r.comt)}${r.stEnt?`（スタレボ分 ${fmt(r.stEnt)} を含む）`:""}／MAO-B ${fmt(r.maob)}／DA ${fmt(r.da)}（全体の${daPct}%）／その他 ${fmt(r.oth)}`;
     v.className="verdict ok";
   }
   // プロファイルからの注意
@@ -414,9 +430,9 @@ function profWarnings(){
 function renderFactorTable(){
   const rows=DRUGS.map(d=>{let f;
     if(d.id==="st")f="L-dopa量×1 ＋ L-dopa量×0.33";
-    else if(d.id==="ent")f="併用する L-dopa 量×0.33";
+    else if(d.id==="ent")f="一緒に飲む L-dopa の LED×0.33";
     else if(d.id==="opi")f="全 L-dopa 量×0.5";
-    else if(d.id==="ist")f="L-dopa の LED×0.2";
+    else if(d.id==="ist")f="（L-dopa＋COMT の LED）×0.2";
     else if(d.fix!=null)f=d.fix?`一律 ${d.fix}`:"0（条件付き100）";
     else f="1日量×"+(Math.round(d.f*100)/100);
     return `<tr><td>${d.nm}<br><span class="muted">${d.br}</span></td><td class="n">${f}</td></tr>`;}).join("");
@@ -597,12 +613,17 @@ document.addEventListener("click",e=>{
   const a=e.target.closest("[data-add]");if(a){const id=a.dataset.add;if(!S.meds.some(m=>m.id===id)){const d=DM[id];const m={id};
       if(d.mode==="day"&&d.days.length===1)m.d=d.days[0];
       if(d.id==="ent"){m.d=100;}
+      if(d.mode==="pd")m.list=[];
       S.meds.push(m);}
     save();renderAll();toast(DM[id].nm+" を追加しました");return;}
   const x=e.target.closest("[data-del]");if(x){S.meds.splice(+x.dataset.del,1);save();renderAll();return;}
-  const b=e.target.closest("button[data-i]");if(b){const m=S.meds[+b.dataset.i];if(!m)return;const v=parseFloat(b.dataset.x);
-    m[b.dataset.f]=v;
-    const d=DM[m.id];if(d.mode==="pd"&&b.dataset.f==="d"&&m.d&&!m.n){m.n=d.id==="apo"?1:3;}
+  const b=e.target.closest("button[data-i]");if(b){const m=S.meds[+b.dataset.i];if(!m)return;
+    if(b.dataset.push){m.list=list(m).concat(parseFloat(b.dataset.push));}
+    else if(b.dataset.pop!=null){const j=+b.dataset.pop,L=list(m).slice();L.splice(j,1);m.list=L;shiftOff(m.id,j);}
+    else if(b.dataset.again){const L=list(m);if(L.length)m.list=L.concat(L[L.length-1]);}
+    else if(b.dataset.clr){m.list=[];shiftOff(m.id,-1);}
+    else if(b.dataset.tog){const o=(m.off||[]).slice(),k=b.dataset.tog,j=o.indexOf(k);if(j>=0)o.splice(j,1);else o.push(k);m.off=o;}
+    else m[b.dataset.f]=parseFloat(b.dataset.x);
     save();renderAll();return;}
   const s=e.target.closest(".seg[data-k] button");if(s){const k=s.closest(".seg").dataset.k;S[k]=(S[k]===s.dataset.val&&k!=="mc")?null:s.dataset.val;save();renderAll();return;}
   if(e.target.id==="forceUpdate"){(async()=>{toast("最新版を確認しています…");
