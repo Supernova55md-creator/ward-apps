@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>髄液所見 鑑別トレーニング</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0F766E">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="髄液トレーニング">
+<style>
+:root{
+  --bg:#F3F6F5; --surface:#FFFFFF; --ink:#1A2422; --muted:#5A6865; --line:#D9E2DF;
+  --accent:#0F766E; --accent-strong:#0B5650; --accent-soft:#E1F2EF; --on-accent:#FFFFFF;
+  --ok:#2E7D4F; --ok-soft:#E3F3E9; --ng:#B42318; --ng-soft:#FDE8E6; --warn-soft:#FFF4DB;
+  --font:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#121716; --surface:#1B2220; --ink:#E7EEEC; --muted:#9FB0AC; --line:#2D3835;
+    --accent:#2DBFAF; --accent-strong:#6FDCCF; --accent-soft:#16332F; --on-accent:#06201D;
+    --ok:#5CC48A; --ok-soft:#163323; --ng:#F27A6E; --ng-soft:#3B1C1A; --warn-soft:#3A3017; color-scheme:dark}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+.app{max-width:680px;margin:0 auto;padding:0 calc(14px + env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;border:5px solid var(--accent);flex:none}
+.brand h1{font-size:19px;font-weight:900}
+.brand small{color:var(--muted);font-size:11px;margin-left:auto;text-align:right;line-height:1.3}
+.summary{margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 9px}
+.tile .k{font-size:11px;color:var(--muted);display:block}
+.tile .v{font-size:17px;font-weight:700;display:block}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:6px}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sm{min-height:36px;padding:5px 11px;font-size:14px}
+.btn:disabled{opacity:.55;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.set>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details.set>summary::-webkit-details-marker{display:none}
+details.set>summary::after{content:"＋";margin-left:auto;color:var(--muted);font-weight:400}
+details.set[open]>summary::after{content:"－"}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input{margin:0;accent-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px}
+input[type=search]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;min-height:44px}
+.sw{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--accent)}
+/* 出題 */
+.qhead{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.lv{letter-spacing:1px;color:var(--accent)}
+.regtag{margin-left:auto;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:1px 10px;font-weight:700}
+.pt{font-size:15.5px;margin:0 0 8px}
+ul.fd{margin:0;padding:0;list-style:none}
+ul.fd li{position:relative;padding:7px 0 7px 18px;border-top:1px dashed var(--line);font-size:15.5px;line-height:1.5}
+ul.fd li:first-child{border-top:0}
+ul.fd li::before{content:"";position:absolute;left:3px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.ask{font-weight:700;margin:12px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;font-size:15.5px;line-height:1.45;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:11px;padding:11px 12px;min-height:48px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ng{border-color:var(--ng);background:var(--ng-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.result{border-radius:10px;padding:9px 12px;font-weight:700;margin-bottom:10px}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.ng{background:var(--ng-soft);color:var(--ng)}
+.result .ans{display:block;color:var(--ink);font-size:17px;margin-top:2px}
+.result .syn{display:block;color:var(--muted);font-weight:400;font-size:13.5px}
+.ex h3{font-size:14.5px;margin:12px 0 4px;color:var(--accent-strong)}
+.why{margin:0;padding:0;list-style:none}
+.why li{padding:7px 0;border-top:1px dashed var(--line);font-size:15px;line-height:1.5}
+.why li:first-child{border-top:0}
+.why .f{display:block}
+.why .w{display:block;color:var(--muted);font-size:13.5px;padding-left:1.2em;text-indent:-1.2em}
+.why .w::before{content:"→ ";color:var(--accent)}
+.why .dn{font-weight:700;display:block}
+.pearl{background:var(--warn-soft);border-radius:10px;padding:9px 12px;font-size:14.5px;margin-top:12px}
+.pearl b{display:block;font-size:13px;color:var(--muted)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.nav .btn{flex:1 1 140px}
+/* 一覧 */
+details.site{border-top:1px solid var(--line)}
+details.site:first-of-type{border-top:0}
+details.site>summary{cursor:pointer;padding:9px 0;list-style:none}
+details.site>summary::-webkit-details-marker{display:none}
+details.site>summary b{display:block;font-size:15px}
+details.site>summary span{display:block;font-size:13px;color:var(--muted)}
+.lvb{font-size:11px;color:var(--accent);margin-left:6px;font-weight:400}
+.sub{font-size:12.5px;color:var(--muted);margin:8px 0 2px;font-weight:700}
+/* 成績 */
+table.st{width:100%;border-collapse:collapse;font-size:14.5px}
+table.st td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+table.st td.num{text-align:right;white-space:nowrap;width:1%}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{color:var(--muted);font-size:14px}
+/* タブ */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+nav.tabs .in{display:flex;max-width:680px;width:100%}
+nav.tabs button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:9px 0 10px;min-height:56px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;display:none;max-width:90%}
+.toast.on{display:block}
+.foot{font-size:11.5px;color:var(--muted);margin:16px 2px 0}
+</style>
+<style>
+.sub{font-size:12.5px;color:var(--muted);margin:10px 0 4px;font-weight:700;display:flex;align-items:center;gap:8px}
+.legend{margin-left:auto;font-weight:400;display:inline-flex;align-items:center;gap:4px}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:3px;background:var(--key);border:1px solid var(--key-line)}
+:root{--key:#FFF1C2;--key-line:#E0A800;--fu:#B42318;--fd:#1D5FD1}
+@media (prefers-color-scheme: dark){:root{--key:#3D3410;--key-line:#C99A12;--fu:#F27A6E;--fd:#7FB0FF}}
+dl.clin{display:grid;grid-template-columns:5.2em 1fr;gap:3px 8px;margin:0;font-size:14.5px;line-height:1.5;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+dl.clin dt{color:var(--muted);font-size:12.5px;padding-top:1px}
+dl.clin dd{margin:0}
+dl.clin.key{background:var(--key);border-color:var(--key-line)}
+table.csf{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.4}
+table.csf th{font-size:11.5px;color:var(--muted);font-weight:700;text-align:left;padding:3px 6px;border-bottom:1px solid var(--line)}
+table.csf td{padding:5px 6px;border-top:1px solid var(--line);vertical-align:top}
+table.csf td:first-child{color:var(--muted);font-size:13px}
+table.csf tr.sr td:first-child{padding-left:16px;font-size:12.5px}
+table.csf{table-layout:fixed}
+table.csf col.c1{width:30%}table.csf.done col.c1{width:24%}table.csf.done col.c3{width:36%}
+table.csf td:nth-child(2){font-weight:700}
+table.csf .ref{font-size:12px;color:var(--muted);font-weight:400}
+table.csf tr.key td{background:var(--key)}
+table.csf tr.key td:first-child{box-shadow:inset 4px 0 0 var(--key-line);color:var(--ink);font-weight:700}
+.abs{font-weight:400;color:var(--muted);font-size:12.5px}
+.na{font-weight:400;color:var(--muted)}
+.fu{color:var(--fu)}.fd{color:var(--fd)}
+.nc{display:inline-block;margin-left:4px;font-size:10.5px;border:1px solid var(--line);border-radius:6px;padding:0 4px;color:var(--muted)}
+.calc{background:var(--accent-soft);border-radius:10px;padding:9px 12px;font-size:14px;margin-top:10px;line-height:1.6}
+.calc>b:first-child{display:block;font-size:13px;color:var(--accent-strong)}
+.why .kp{display:inline-block;background:var(--key);border:1px solid var(--key-line);border-radius:6px;padding:0 6px;font-size:12.5px;font-weight:700;margin-right:6px}
+.why .pick{margin-left:6px;font-size:11px;font-weight:700;color:var(--ng);border:1px solid var(--ng);border-radius:6px;padding:0 4px}
+ul.nx{margin:0;padding-left:1.2em;font-size:14.5px;line-height:1.55}
+ul.nx li{margin:2px 0}
+.tx{background:var(--ng-soft);border:1px solid var(--ng);border-radius:10px;padding:9px 12px;margin-top:12px;font-size:14.5px}
+.tx>b{display:block;color:var(--ng);font-size:13.5px}
+.tx ul{margin:4px 0 0;padding-left:1.2em}
+.tx.soft{background:var(--accent-soft);border-color:var(--accent)}
+.tx.soft>b{color:var(--accent-strong)}
+.seg{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.seg button{flex:1 1 30%;font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 8px;min-height:40px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-strong);font-weight:700}
+.urg{font-size:10.5px;color:var(--ng);border:1px solid var(--ng);border-radius:6px;padding:0 4px;margin-left:6px;font-weight:700}
+p.rng{font-size:13px;margin:0 0 4px;line-height:1.5}
+table.st.ref td{font-size:13.5px}
+table.st.ref td:first-child{white-space:nowrap;color:var(--muted);width:1%}
+ul.src{margin:0;padding-left:1.1em;font-size:13.5px;line-height:1.5}
+ul.src li{margin:6px 0}
+ul.src a{color:var(--accent-strong)}
+</style>
+
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><h1>髄液所見 鑑別トレーニング</h1><small>髄液から診断を推論<br>病棟アプリ</small></div>
+  <div class="summary">
+    <div class="tile"><span class="k">回答数</span><span class="v" id="sN">0</span></div>
+    <div class="tile"><span class="k">正答率</span><span class="v" id="sR">—</span></div>
+    <div class="tile"><span class="k">連続正解</span><span class="v" id="sS">0</span></div>
+  </div>
+</header>
+
+<section class="view active" id="v-q" aria-label="出題">
+  <details class="card set" id="setBox">
+    <summary>出題範囲・設定 <span class="hint" id="setSum" style="margin:0 0 0 4px"></span></summary>
+    <div class="seg" id="modeSeg" role="group" aria-label="モード">
+      <button type="button" data-m="inf" aria-pressed="false">感染症のみ</button><button type="button" data-m="non" aria-pressed="false">非感染性のみ</button><button type="button" data-m="mix" aria-pressed="true">混合</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label for="lvSel" style="font-size:14px">難易度</label>
+      <select id="lvSel"><option value="1">基本（典型例・選択肢4）</option><option value="2">標準（選択肢5）</option><option value="3">応用（紛らわしい例を含む・選択肢6）</option></select>
+    </div>
+    <label class="sw"><input type="checkbox" id="hideOpt">選択肢を隠して、先に自分で考える</label>
+    <label class="sw"><input type="checkbox" id="weakOpt">間違えた疾患・まだ解いていない疾患を優先</label>
+    <p class="hint">応用では、抗菌薬前投与の細菌性、早期に多核球優位のウイルス性、結核とクリプトコックス、traumatic tapの補正などが出ます。基準値は答えたあとに表示します。</p>
+  </details>
+  <div id="qArea"></div>
+</section>
+
+<section class="view" id="v-a" aria-label="早見表">
+  <div id="aList"></div>
+</section>
+
+<section class="view" id="v-s" aria-label="成績">
+  <div id="sArea"></div>
+</section>
+
+<section class="view" id="v-r" aria-label="出典">
+  <div id="srcArea"></div>
+</section>
+
+<p class="foot">自分用の学習ツールです。症例は自動生成した架空のもので、数値は典型像の目安です。実際の診療では原典・診察で判断してください。成績はこの端末内にのみ保存されます。</p>
+</div>
+
+<nav class="tabs" role="tablist" aria-label="画面切替"><div class="in">
+  <button role="tab" aria-selected="true" data-v="v-q" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg>出題</button>
+  <button role="tab" aria-selected="false" data-v="v-a" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg>早見表</button>
+  <button role="tab" aria-selected="false" data-v="v-s" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>成績</button>
+  <button role="tab" aria-selected="false" data-v="v-r" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h9l3 3v15H6z"/><path d="M9 10h6M9 14h6M9 18h4"/></svg>出典</button>
+</div></nav>
+<div class="toast" id="toast" role="status"></div>
+<script>
+/* 髄液所見 鑑別トレーニング：出題データ
+   数値の範囲はガイドライン・原著（出典タブ）と成書の一般的な目安から作った典型像。実症例の分布そのものではない。 */
+var CATS={inf:"感染症",non:"非感染性"};
+var DX={
+bact:{name:"細菌性髄膜炎",cat:"inf",urg:true,
+ sig:"急性・発熱、多核球優位の著増（数百〜数千/μL）、糖比<0.4、乳酸・蛋白の上昇",
+ near:["tb","viral","drug","lm","crypto"],
+ next:["血液培養2セット（抗菌薬の前に。ただし抗菌薬を遅らせない）","髄液グラム染色・細菌培養","FilmArray 髄膜炎・脳炎パネル（約1時間。感受性は出ないので培養と並行）","肺炎球菌抗原（尿・髄液）","LP前の頭部CT：意識障害・局所神経徴候・けいれん・乳頭浮腫・免疫不全があるとき"],
+ tx:[
+  "来院1時間以内に抗菌薬。CT・腰椎穿刺で遅れるなら先に投与する",
+  "16〜49歳・免疫正常：セフトリアキソン（ロセフィン）2 g 12時間ごと＋バンコマイシン（塩酸バンコマイシン）15〜20 mg/kg 8〜12時間ごと（TDM）。代替はメロペネム（メロペン）2 g 8時間ごと＋バンコマイシン",
+  "50歳以上：上記にアンピシリン（ビクシリン）2 g 4時間ごとを加える（リステリア）",
+  "免疫不全・慢性消耗疾患：アンピシリン＋セフタジジム（モダシン）＋バンコマイシン、またはメロペネム＋バンコマイシン。脳外科術後・頭部外傷後：メロペネム（またはセフタジジム）＋バンコマイシン",
+  "デキサメタゾン（デキサート）0.15 mg/kg 6時間ごと 4日間を、初回抗菌薬の前か同時に。肺炎球菌・インフルエンザ菌以外なら中止、リステリアなら直ちに中止"],
+ txNote:"レジメンの組み合わせは『細菌性髄膜炎・単純ヘルペス脳炎診療ガイドライン2026』の学会講演要旨（ケアネット報道）で確認。1回量・間隔は成書・ESCMID 2016の標準量で、添付文書・GL本文とは未照合。腎機能で調整する。",
+ pearl:"糖比<0.23、細胞>2000/μL、多核球>1180/μL、蛋白>220 mg/dL のどれか1つで細菌性をほぼ確定できるが、どれも『否定』には使えない（Spanos 1989）。"},
+tb:{name:"結核性髄膜炎",cat:"inf",
+ sig:"亜急性（週単位）、単核球優位（数十〜数百/μL）、蛋白の著増、糖比低下、ADA上昇",
+ near:["crypto","bact","viral","lm","syph"],
+ next:["髄液の抗酸菌塗抹・培養（なるべく多量に、くり返し）","髄液 Xpert MTB/RIF Ultra（核酸増幅）","造影MRI（脳底部の髄膜造影・水頭症・穿通枝梗塞）","胸部CT、IGRA（参考。陰性でも否定できない）","血清Na（SIADH）、HIV検査"],
+ txShort:"疑いが強ければ培養結果を待たずに4剤＋デキサメタゾン（Thwaites 2004）を感染症科と開始する。",
+ pearl:"ADA>8 U/Lは結核を支持するが、細菌性髄膜炎とは区別できない（Tuon 2010）。経過の長さ・蛋白の高さ・脳底部病変で疑う。"},
+crypto:{name:"クリプトコックス髄膜炎",cat:"inf",
+ sig:"免疫抑制、初圧の著明な上昇、細胞数は少なめ（とくにHIV）、糖比低下",
+ near:["tb","lm","viral","bact","iih"],
+ next:["クリプトコックス抗原（髄液・血清。LFA）","墨汁染色・真菌培養","HIV検査とCD4数","初圧が高ければ治療的な排液をくり返す（25 cmH₂O以上で頭蓋内圧亢進症状があるとき）"],
+ txShort:"導入はアムホテリシンBリポソーム（アムビゾーム）＋フルシトシン（アンコチル）が基本（IDSA 2010、HIVではWHO 2022の単回高用量レジメン）。",
+ pearl:"初圧が高いのに細胞は少ない。墨汁染色より抗原検査の感度が高い。頭蓋内圧の管理（くり返しの排液）が予後を左右する（IDSA 2010）。"},
+viral:{name:"ウイルス性髄膜炎",cat:"inf",
+ sig:"急性・発熱、単核球優位（数十〜数百/μL）、糖比正常、乳酸<35 mg/dL、蛋白は軽度上昇まで、意識は清明",
+ near:["hsv","bact","drug","tb","ae"],
+ next:["FilmArray 髄膜炎・脳炎パネル（エンテロウイルス・HSV・VZVなど）","HSV・VZVのPCR（脳炎症状があれば必須）","HIV検査（急性HIV感染）","全身状態が悪い・多核球優位なら、経験的抗菌薬を続けて培養結果を待つ"],
+ pearl:"糖比正常・乳酸<35 mg/dL・単核球優位なら無菌性を考えるが、HSV脳炎・結核・初期の細菌性を見落とさない。成人ではVZVも多い（皮疹がないこともある）。"},
+hsv:{name:"単純ヘルペス脳炎",cat:"inf",urg:true,
+ sig:"脳炎症状（意識障害・異常行動・けいれん・失語）、単核球優位（数十〜数百/μL）、糖正常、赤血球の混入",
+ near:["viral","ae","bact","tb","drug"],
+ next:["髄液HSV-DNA（リアルタイムPCR）。発症72時間以内の陰性は偽陰性がありうるので3〜7日後に再検","MRI（FLAIR・DWI：側頭葉内側・島回・帯状回）","脳波（周期性放電）","治療後に悪化・再燃したら、PCR再検と抗NMDAR抗体（HSE後の自己免疫性脳炎）"],
+ tx:[
+  "疑った時点で検査結果を待たずに開始（受診から6時間以内が目標）",
+  "アシクロビル（ゾビラックス点滴静注用）10 mg/kg 8時間ごと点滴静注。免疫正常で14〜21日、免疫不全で21日以上。高感度PCRが2回陰性になるまで",
+  "腎機能で減量し、補液で結晶性腎症を防ぐ",
+  "細菌性髄膜炎を否定できなければ、抗菌薬（＋デキサメタゾン）も併用する"],
+ txNote:"『細菌性髄膜炎・単純ヘルペス脳炎診療ガイドライン2026』の学会講演要旨（ケアネット報道）で確認。添付文書・GL本文とは未照合。",
+ pearl:"脳炎症状があればPCRの結果を待たずにアシクロビル。細胞数が正常でも、PCRが早期に陰性でも、臨床的に疑えば治療を続ける。"},
+syph:{name:"神経梅毒",cat:"inf",
+ sig:"慢性〜亜急性、単核球優位の軽〜中等度上昇、蛋白軽度上昇、糖正常、血清梅毒反応陽性",
+ near:["viral","tb","ae","ms","lm"],
+ next:["髄液VDRL（特異度は高いが感度は低い）","髄液FTA-ABS（陰性なら否定に役立つ）","血清RPR・TP抗体","HIV検査","眼科（ぶどう膜炎）・耳鼻科（感音難聴）"],
+ txShort:"ベンジルペニシリンカリウム（注射用ペニシリンGカリウム）の大量静注10〜14日が標準（CDC 2021）。",
+ pearl:"髄液VDRL陽性なら診断的だが感度は低い。髄液FTA-ABSは感度が高く、陰性なら神経梅毒を否定しやすい（CDC 2021）。"},
+ae:{name:"自己免疫性脳炎",cat:"non",
+ sig:"亜急性（3か月以内）の記憶障害・精神症状・けいれん、軽度の単核球増多またはほぼ正常、OCB陽性のことあり、糖正常、無熱〜微熱",
+ near:["hsv","viral","ms","mog","syph"],
+ next:["神経表面抗体（NMDAR・LGI1・CASPR2・GABA-B・AMPAなど。血清と髄液の両方）","HSV PCRで感染を除外","MRI（辺縁系のFLAIR高信号）、脳波","腫瘍検索（若年女性は卵巣奇形腫、高齢者は全身CT）"],
+ pearl:"Graus 2016基準では、髄液の細胞増多はMRI・脳波と並ぶ支持所見の1つ。髄液が正常でも自己免疫性脳炎は否定できない（とくにLGI1）。"},
+gbs:{name:"ギラン・バレー症候群（蛋白細胞解離）",cat:"non",
+ sig:"先行感染後の上行性の弛緩性麻痺・腱反射消失、蛋白↑で細胞数は正常（<50/μL）",
+ near:["lm","ms","nmo","viral","syph"],
+ next:["神経伝導検査（くり返し）","抗ガングリオシド抗体（GM1・GQ1bなど）","肺活量・自律神経の監視","細胞数が50/μLを超えたら、HIV・ライム病・CMV多発神経根炎・悪性リンパ腫・サルコイドーシスを考える"],
+ pearl:"蛋白細胞解離は支持所見。発症1週以内は蛋白が正常のことも多く、正常でもGBSは否定できない（Leonhard 2019、EAN/PNS 2023）。"},
+ms:{name:"多発性硬化症（MS）",cat:"non",
+ sig:"細胞・蛋白はほぼ正常、髄液に限局したOCB陽性、IgG index上昇",
+ near:["mog","nmo","ae","syph"],
+ next:["脳・脊髄MRI（造影を含む）","血清AQP4抗体・MOG抗体（cell-based assay）で鑑別","κFLC index（2024年McDonald改訂で採用）","視覚誘発電位、眼科（OCT）"],
+ pearl:"髄液限局のOCBは時間的多発の代わりになる（McDonald 2017）。細胞数>50/μL、多核球優位、蛋白>100 mg/dL ならMS以外を考える（成書の目安、未照合）。"},
+nmo:{name:"視神経脊髄炎スペクトラム障害（NMOSD）",cat:"non",
+ sig:"急性期の細胞増多（好中球・好酸球を含む）、OCBは多くで陰性、長大脊髄炎・重い視神経炎・最後野症候群",
+ near:["mog","ms","viral","bact","gbs"],
+ next:["血清AQP4抗体（cell-based assay）","脊髄MRI（3椎体以上の長大病変）、脳MRI（最後野・視床下部）","MOG抗体","感染を除外しつつ、早期にステロイドパルス・血漿交換"],
+ pearl:"AQP4抗体陽性NMOでは急性期の約半数で細胞増多（中央値19/μL、6〜380）があり、好中球・好酸球を含むことがある。OCBは多くで陰性（Jarius 2011）。"},
+mog:{name:"MOG抗体関連疾患（MOGAD）",cat:"non",
+ sig:"細胞増多（単核球主体で好中球も）、OCBは約9割で陰性、ADEM様脳症・両側視神経炎（乳頭浮腫）・円錐部脊髄炎",
+ near:["nmo","ms","ae","viral"],
+ next:["血清MOG抗体（cell-based assay、高力価ほど特異的）","AQP4抗体","脳・脊髄MRI","髄液のみ陽性の例もあり、強く疑えば髄液でも測る"],
+ pearl:"MOGADの髄液は半数以上で細胞増多（中央値31/μL）、4割以上で好中球を認め、OCBは約9割で陰性（Jarius 2020）。NMOSDとは髄液だけでは分けられない。"},
+lm:{name:"癌性髄膜症",cat:"non",
+ sig:"担癌、多発脳神経麻痺・神経根痛・水頭症、蛋白↑・糖比↓・初圧↑、細胞診で悪性細胞",
+ near:["tb","crypto","gbs","syph"],
+ next:["細胞診の再提出（10 mL以上、すぐに処理、陰性なら1回くり返す）","造影MRI（脳・全脊髄）","原発巣の検索","血液腫瘍が疑わしければフローサイトメトリー"],
+ pearl:"細胞診の偽陰性を減らすには、10.5 mL以上採り、すぐ処理し、陰性なら1回くり返す（Glantz 1998）。細胞診が陰性でも、典型的なMRIと臨床で診断することがある（EANO-ESMO 2023）。"},
+sah:{name:"くも膜下出血（キサントクロミー）",cat:"non",
+ sig:"雷鳴頭痛、赤血球が最後の試験管まで減らない、遠心後の上清が黄色（キサントクロミー）",
+ near:["tap","bact","iih","viral"],
+ next:["CTアンギオグラフィー（動脈瘤）、必要なら脳血管撮影","髄液ビリルビンの分光光度測定（発症12時間以降）","脳神経外科へ連絡"],
+ pearl:"キサントクロミーは発症からおよそ12時間で出そろう。赤血球<2000/μL かつキサントクロミーなしなら、動脈瘤性SAHはほぼ否定できる（Perry 2015）。"},
+tap:{name:"traumatic tap（穿刺時の血液混入）",cat:"non",
+ sig:"後の試験管ほど赤血球が減る、遠心後の上清は無色、白血球は血液と同じ比率",
+ near:["sah","bact","viral","iih"],
+ next:["白血球の補正計算（解説参照）","試験管1本目と最後の本の赤血球数を比べる","疑いが残れば別の椎間で再穿刺"],
+ pearl:"予想される白血球＝髄液赤血球×（血液白血球÷血液赤血球）。赤血球500〜1000個につき白血球1個が目安（成書の目安、未照合）。蛋白も赤血球1000個/μLにつき約1 mg/dL上がる（同）。"},
+iih:{name:"特発性頭蓋内圧亢進症",cat:"non",
+ sig:"肥満の若年女性、乳頭浮腫、初圧↑（成人25 cmH₂O以上）で成分は正常",
+ near:["crypto","sah","lm","tap"],
+ next:["MRI・MRV（静脈洞血栓症・占拠性病変の除外）","眼科（乳頭浮腫・視野）","原因薬の確認（テトラサイクリン系・ビタミンA製剤など）","体重管理、アセタゾラミド（ダイアモックス）"],
+ pearl:"初圧は側臥位で脚を伸ばし力を抜いて測る。成人で25 cmH₂O以上、かつ髄液成分が正常であることが基準の条件（Friedman 2013）。"},
+drug:{name:"薬剤性無菌性髄膜炎",cat:"non",
+ sig:"被疑薬（IVIg・NSAIDs・ST合剤・ラモトリギン）投与後、多核球優位のことが多いが糖比は正常、培養陰性",
+ near:["viral","bact","ae","hsv"],
+ next:["グラム染色・培養・PCRで感染を除外（陰性を確かめるまで経験的抗菌薬を続けるか判断）","被疑薬の中止と記録（再投与で再発しやすい）","膠原病（SLE・MCTD）の有無"],
+ pearl:"IVIgやNSAIDs（とくに膠原病患者のイブプロフェン）、ST合剤、ラモトリギンが代表。多核球優位で細菌性に似るが糖比は保たれる（Jolles 2000、Yelehe-Okouma 2018）。"}
+};
+var DXKEYS=Object.keys(DX);
+
+/* 症例テンプレート
+   v：髄液の値の範囲 [下限,上限]。wbc・rbc は対数一様。ratio は髄液/血糖比。null は「未提出」。
+   why：決め手 [項目, 説明]。項目は表の行ID、または clin（臨床情報）。 */
+var T=[
+/* ── 細菌性 ── */
+{id:"bact_typ",dx:"bact",lvl:1,
+ clin:function(R){var a=R.i(18,85);return {age:a,onset:R.p(["半日前から","昨夜から","数時間前から"])+"急速に悪化",fever:R.p(["39.2","39.8","38.9","40.1"])+"℃",immuno:a>=60?R.p(["なし","糖尿病"]):"なし",
+  sx:R.k(["激しい頭痛と項部硬直","意識障害（JCS Ⅱ-10）","嘔吐","数日前から中耳炎","下肢に点状出血","けいれん1回"],3)};},
+ v:{op:[26,45],wbc:[1200,9000],pmn:[82,96],eos:[0,1],rbc:[0,20],prot:[150,480],ratio:[0.04,0.3],lac:[45,120],ada:[3,14],ocb:null,igg:null,cyto:["好中球主体、異型細胞なし",null]},
+ why:[["wbc","細胞が数千/μLで多核球優位"],["ratio","糖比が0.4未満（0.23未満なら細菌性をほぼ確定）"],["lac","乳酸が35 mg/dL以上"],["prot","蛋白の著増"],["clin","数時間〜1日の急性経過と高熱"]]},
+{id:"bact_old",dx:"bact",lvl:2,label:"高齢者で症状がはっきりしない",
+ clin:function(R){return {age:R.i(72,92),onset:"昨日から"+R.p(["反応が鈍い","食事をとらない","つじつまの合わないことを言う"]),fever:R.p(["37.6","38.0","37.4"])+"℃",immuno:R.p(["なし","糖尿病","ステロイド内服中"]),
+  sx:R.k(["項部硬直ははっきりしない","施設で転倒","認知症と言われている","尿路感染で治療中"],2)};},
+ v:{op:[20,35],wbc:[300,2500],pmn:[70,92],eos:[0,1],rbc:[0,30],prot:[110,350],ratio:[0.1,0.35],lac:[38,90],ada:[3,12],ocb:null,igg:null,cyto:null},
+ why:[["ratio","糖比の低下"],["lac","乳酸の上昇"],["pmn","多核球優位"],["clin","高齢者では発熱・項部硬直が目立たず、意識障害がせん妄・認知症と誤られる"]],
+ pearl:"古典的三徴（発熱・項部硬直・意識障害）がそろうのは成人の一部だけで、高齢者では発熱も目立たないことがある（van de Beek 2004）。"},
+{id:"bact_lis",dx:"bact",lvl:3,label:"リステリア（単核球優位に見える）",
+ clin:function(R){return {age:R.i(66,88),onset:R.p(["3日前から","4日前から"])+"発熱と頭痛、昨日からふらつき",fever:R.p(["38.6","38.9"])+"℃",immuno:R.p(["関節リウマチでプレドニゾロン内服中","腎移植後で免疫抑制薬内服中","化学療法中"]),
+  sx:R.k(["複視","構音障害","顔面のしびれ","嚥下障害"],2)};},
+ v:{op:[20,32],wbc:[150,900],pmn:[30,48],eos:[0,1],rbc:[0,30],prot:[100,260],ratio:[0.25,0.42],lac:[36,65],ada:[5,12],ocb:null,igg:null,cyto:null},
+ why:[["ratio","単核球優位でも糖比が低下"],["lac","乳酸が35 mg/dL以上"],["clin","高齢・免疫抑制と脳幹症状（菱脳炎）"]],
+ pearl:"リステリアでは単核球優位に見えることがある。高齢・免疫抑制・妊娠では疑い、アンピシリンを必ず加える。デキサメタゾンはリステリアと判明したら中止する（GL2026）。"},
+{id:"bact_pre",dx:"bact",lvl:3,label:"抗菌薬が先に投与されている",
+ clin:function(R){return {age:R.i(20,75),onset:"3日前から発熱・頭痛",fever:R.p(["38.4","38.7","38.1"])+"℃",immuno:"なし",
+  sx:R.k(["前医で"+R.p(["セフトリアキソン1 gを1回点滴","経口セフェムを2日内服","レボフロキサシンを内服"]),"頭痛が悪化し項部硬直","嘔吐"],3)};},
+ v:{op:[20,34],wbc:[400,2500],pmn:[60,85],eos:[0,1],rbc:[0,20],prot:[65,160],ratio:[0.38,0.55],lac:[28,55],ada:[3,10],ocb:null,igg:null,cyto:null},
+ why:[["wbc","細胞数と多核球の多さは前投与でもあまり変わらない"],["lac","乳酸は前投与で感度が下がるが、上昇していれば手がかり"],["clin","前医での抗菌薬投与"]],
+ next:["血液培養（陽性になることがある）","グラム染色・培養の陽性率が下がるため、FilmArray・PCRと抗原検査を活用","細菌性として全量で治療を続ける"],
+ pearl:"前投与があると糖は上がり蛋白は下がるが、細胞数・好中球数は大きく変わらない（Nigrovic 2008、小児）。乳酸の感度も下がる（Sakushima 2011）。多核球優位で数百以上なら『無菌性』と決めつけない。"},
+{id:"bact_tap",dx:"bact",lvl:3,label:"traumatic tapが重なっている",tap:"bact",
+ clin:function(R){return {age:R.i(30,80),onset:"昨日から発熱と頭痛、今朝からぼんやり",fever:R.p(["39.0","39.4"])+"℃",immuno:"なし",
+  sx:R.k(["穿刺に3回かかった","項部硬直","嘔吐"],3),bw:R.i(14000,21000),br:R.i(400,480)*1e4};},
+ v:{op:[24,38],rbc:[12000,45000],pmn:[85,95],eos:[0,1],prot:[160,360],ratio:[0.08,0.28],lac:[50,110],ada:[4,12],ocb:null,igg:null,cyto:null,addw:[700,3000]},
+ why:[["wbc","補正しても白血球は大幅に多い（下の補正計算）"],["ratio","血液の混入では糖比は下がらない"],["lac","乳酸の上昇も混入では説明できない"],["rbc","赤血球は後の試験管ほど減る（混入）"]],
+ pearl:"血液が混入しても、補正後の白血球・糖比・乳酸で判断できる。糖比の低下と乳酸の上昇は、混入では起こらない。"},
+/* ── ウイルス性 ── */
+{id:"viral_typ",dx:"viral",lvl:1,
+ clin:function(R){var a=R.i(18,48);return {age:a,onset:R.p(["2日前から","3日前から","昨日から"])+"頭痛と発熱",fever:R.p(["38.2","38.5","37.9"])+"℃",immuno:"なし",
+  sx:R.k(["羞明","軽い項部硬直","意識は清明","夏に"+R.p(["子どもが手足口病","家族が発熱"]),"嘔気"],3)};},
+ v:{op:[14,24],wbc:[25,400],pmn:[3,20],eos:[0,1],rbc:[0,10],prot:[40,95],ratio:[0.55,0.75],lac:[14,28],ada:[1,5],ocb:null,igg:null,cyto:null},
+ why:[["mono","単核球優位"],["ratio","糖比は正常"],["lac","乳酸が35 mg/dL未満"],["clin","急性、意識清明で全身状態が保たれる"]]},
+{id:"viral_vzv",dx:"viral",lvl:2,label:"VZV（皮疹を伴う）",
+ clin:function(R){return {age:R.i(55,82),onset:"5日前から右胸の帯状疱疹、2日前から頭痛",fever:R.p(["37.6","38.0"])+"℃",immuno:R.p(["なし","糖尿病"]),
+  sx:R.k(["項部硬直","意識は清明","水疱は痂皮化しつつある"],2)};},
+ v:{op:[14,24],wbc:[30,350],pmn:[2,15],eos:[0,1],rbc:[0,10],prot:[50,120],ratio:[0.5,0.7],lac:[16,30],ada:[2,6],ocb:null,igg:null,cyto:null},
+ why:[["mono","単核球優位"],["ratio","糖比正常"],["clin","帯状疱疹の先行"]],
+ next:["髄液VZV-DNA PCR","脳炎・血管炎（脳梗塞）症状がないか確認","アシクロビル静注を検討"],
+ pearl:"成人の無菌性髄膜炎ではVZVが多い。皮疹が出ない（zoster sine herpete）こともある。"},
+{id:"viral_early",dx:"viral",lvl:3,label:"発症早期で多核球優位",
+ clin:function(R){return {age:R.i(18,40),onset:R.p(["今朝から","半日前から"])+"頭痛と発熱",fever:R.p(["38.3","38.6"])+"℃",immuno:"なし",
+  sx:R.k(["羞明","意識は清明","全身状態は良好","職場でかぜが流行"],3)};},
+ v:{op:[14,22],wbc:[80,450],pmn:[55,78],eos:[0,1],rbc:[0,10],prot:[40,80],ratio:[0.56,0.72],lac:[16,30],ada:[1,4],ocb:null,igg:null,cyto:null},
+ why:[["ratio","多核球優位でも糖比は正常"],["lac","乳酸が35 mg/dL未満"],["wbc","細胞数は数百まで"],["clin","発症から24時間以内、全身状態良好"]],
+ next:["FilmArray（エンテロウイルス）","細菌性を否定しきれなければ経験的抗菌薬を始め、培養結果を待つ","6〜24時間後の再穿刺で単核球へのシフトを確認する方法もある"],
+ pearl:"発症24時間以内のウイルス性は多核球優位のことがある。糖比・乳酸が正常なら手がかりになるが、細菌性を否定しきれないときは抗菌薬を入れて培養を待つ（成書の目安、未照合）。"},
+/* ── HSV ── */
+{id:"hsv_typ",dx:"hsv",lvl:1,
+ clin:function(R){return {age:R.i(30,80),onset:R.p(["4日前から","3日前から"])+"発熱、昨日から言動がおかしい",fever:R.p(["38.4","38.8","39.1"])+"℃",immuno:"なし",
+  sx:R.k(["物忘れ・同じことを何度も聞く","言葉が出にくい（失語）","焦点てんかん発作","MRIで左側頭葉内側にFLAIR高信号","においが変だと言う"],3)};},
+ v:{op:[16,28],wbc:[20,320],pmn:[3,20],eos:[0,1],rbc:[10,600],prot:[50,150],ratio:[0.55,0.72],lac:[18,32],ada:[2,7],ocb:null,igg:null,cyto:null},
+ why:[["clin","脳炎症状（意識・行動の変化、失語、けいれん）と側頭葉病変"],["mono","単核球優位"],["ratio","糖比は正常"],["rbc","赤血球の混入（出血性壊死を反映することがある）"]]},
+{id:"hsv_early",dx:"hsv",lvl:3,label:"発症早期で細胞数がほぼ正常",
+ clin:function(R){return {age:R.i(35,75),onset:"昨日から発熱、今朝から"+R.p(["ぼんやりして会話がかみ合わない","異常な言動"]),fever:R.p(["38.2","38.6"])+"℃",immuno:"なし",
+  sx:R.k(["けいれん1回","MRIで右側頭葉内側にDWI高信号","項部硬直なし"],3)};},
+ v:{op:[14,24],wbc:[2,8],pmn:[0,20],eos:[0,0],rbc:[0,30],prot:[38,62],ratio:[0.58,0.75],lac:[15,26],ada:[1,4],ocb:null,igg:null,cyto:null},
+ why:[["clin","発熱を伴う急性の脳炎症状と側頭葉病変"],["wbc","細胞数正常でもHSV脳炎は否定できない"]],
+ pearl:"発症早期は細胞数が正常のこともあり、PCRも72時間以内は偽陰性がありうる（4〜24%、GL2026講演要旨）。臨床的に疑えばアシクロビルを続け、3〜7日後に再検する。"},
+/* ── 結核 ── */
+{id:"tb_typ",dx:"tb",lvl:2,
+ clin:function(R){return {age:R.i(30,85),onset:R.p(["3週間前から","1か月前から","2週間前から"])+"頭痛と微熱、徐々に悪化",fever:R.p(["37.6","38.0","37.8"])+"℃",immuno:R.p(["なし","糖尿病","関節リウマチでTNF阻害薬使用中","HIV感染"]),
+  sx:R.k(["体重減少・寝汗","右外転神経麻痺","低Na血症（128 mEq/L）","徐々に傾眠","MRIで脳底部の髄膜造影と水頭症"],3)};},
+ v:{op:[20,40],wbc:[60,450],pmn:[8,30],eos:[0,1],rbc:[0,20],prot:[150,520],ratio:[0.18,0.42],lac:[32,60],ada:[10,26],ocb:null,igg:null,cyto:[null,"リンパ球主体、異型細胞なし"]},
+ why:[["clin","週単位の亜急性経過、脳神経麻痺・低Na・脳底部病変"],["prot","蛋白の著増"],["ratio","単核球優位なのに糖比が低い"],["ada","ADA>8 U/L"]]},
+{id:"tb_pmn",dx:"tb",lvl:3,label:"早期に多核球優位",
+ clin:function(R){return {age:R.i(40,80),onset:"10日前から頭痛と微熱、徐々に悪化",fever:R.p(["37.8","38.2"])+"℃",immuno:R.p(["糖尿病","なし","透析中"]),
+  sx:R.k(["数年前に肺結核の家族歴","傾眠","左動眼神経麻痺","胸部CTで粟粒影"],3)};},
+ v:{op:[20,36],wbc:[150,600],pmn:[50,68],eos:[0,1],rbc:[0,20],prot:[180,450],ratio:[0.2,0.4],lac:[32,55],ada:[11,24],ocb:null,igg:null,cyto:null},
+ why:[["clin","10日以上かけて悪化する亜急性経過"],["prot","蛋白の著増"],["ada","ADAの上昇"],["ratio","糖比の低下"]],
+ pearl:"結核性髄膜炎は早期に多核球優位のことがある。細菌性としての治療も並行しつつ、経過の長さ・蛋白の高さ・画像で結核を疑う。ADAだけでは細菌性と区別できない（Tuon 2010）。"},
+/* ── クリプトコックス ── */
+{id:"cr_typ",dx:"crypto",lvl:2,
+ clin:function(R){return {age:R.i(30,80),onset:R.p(["2週間前から","1か月前から","3週間前から"])+"頭痛が続く",fever:R.p(["なし","37.4℃","37.8℃"]),immuno:R.p(["HIV感染（未治療）","腎移植後でタクロリムス内服","ステロイド長期内服","肝硬変"]),
+  sx:R.k(["視力低下・霧視","複視（外転神経麻痺）","嘔吐","軽い意識障害","乳頭浮腫"],3)};},
+ v:{op:[32,55],wbc:[4,90],pmn:[2,20],eos:[0,2],rbc:[0,10],prot:[45,140],ratio:[0.22,0.48],lac:[25,45],ada:[2,7],ocb:null,igg:null,cyto:[null,null,"円形の酵母様構造（真菌疑い）"]},
+ why:[["op","初圧の著明な上昇"],["clin","免疫抑制と週単位の経過"],["ratio","糖比の低下"],["wbc","細胞数は少なめ（とくにHIV）"]]},
+{id:"cr_ada",dx:"crypto",lvl:3,label:"ADAが上がって結核に似る",
+ clin:function(R){return {age:R.i(55,85),onset:"1か月前から頭痛、物忘れが出てきた",fever:R.p(["37.5℃","なし"]),immuno:R.p(["ネフローゼ症候群でプレドニゾロン内服中","サルコイドーシスでステロイド内服中","慢性リンパ性白血病"]),
+  sx:R.k(["歩行が不安定","傾眠","乳頭浮腫"],2)};},
+ v:{op:[34,50],wbc:[60,320],pmn:[5,25],eos:[0,3],rbc:[0,10],prot:[80,210],ratio:[0.2,0.4],lac:[30,50],ada:[8.5,15],ocb:null,igg:null,cyto:null},
+ why:[["op","初圧の著明な上昇（結核よりかなり高いことが多い）"],["clin","非HIVの免疫抑制"],["ratio","糖比の低下"]],
+ pearl:"ADAは結核以外（クリプトコックス、リンパ腫、細菌性）でも上がる（成書の目安、未照合）。免疫抑制＋高い初圧ならクリプトコックス抗原を必ず出す。結核とクリプトコックスは同時に検査する。"},
+/* ── 神経梅毒 ── */
+{id:"syph",dx:"syph",lvl:2,
+ clin:function(R){return {age:R.i(35,72),sex:"男性",onset:R.p(["半年前から物忘れと性格変化","2か月前から視力低下","3週間前から頭痛と難聴"]),fever:"なし",immuno:R.p(["なし","HIV感染（治療中）"]),
+  sx:R.k(["対光反射が消失し輻輳反射は保たれる瞳孔","ぶどう膜炎","血清RPR 64倍・TP抗体陽性","過去に皮疹を自然軽快"],2)};},
+ v:{op:[12,22],wbc:[10,160],pmn:[0,8],eos:[0,1],rbc:[0,5],prot:[50,130],ratio:[0.5,0.68],lac:[14,24],ada:[1,5],ocb:["陽性","陰性"],igg:[0.7,1.3],cyto:null},
+ why:[["clin","慢性経過、瞳孔異常・眼症状・難聴、血清梅毒反応"],["mono","単核球優位の軽〜中等度の増多"],["prot","蛋白の軽度上昇"],["ratio","糖比は正常"]]},
+/* ── 自己免疫性脳炎 ── */
+{id:"ae_nmdar",dx:"ae",lvl:2,label:"抗NMDAR脳炎の典型",
+ clin:function(R){return {age:R.i(18,35),sex:"女性",onset:"3週間前に発熱・頭痛、2週間前から"+R.p(["奇異な言動・不眠","幻覚・興奮"]),fever:R.p(["なし","37.4℃"]),immuno:"なし",
+  sx:R.k(["けいれん","口部ジスキネジア","徐々に反応低下","中枢性低換気"],2)};},
+ v:{op:[14,24],wbc:[8,80],pmn:[0,8],eos:[0,1],rbc:[0,5],prot:[28,65],ratio:[0.6,0.75],lac:[12,22],ada:[1,4],ocb:["陽性","陽性","陰性"],igg:[0.6,1.1],cyto:null},
+ why:[["clin","若年女性の精神症状→けいれん・不随意運動・意識低下"],["mono","軽度の単核球増多"],["ocb","OCB陽性のことがある"],["ratio","糖比正常（感染より自己免疫を示唆）"]]},
+{id:"ae_lgi1",dx:"ae",lvl:3,label:"抗LGI1脳炎（髄液ほぼ正常）",
+ clin:function(R){return {age:R.i(58,80),sex:"男性",onset:"2か月前から物忘れが急に進んだ",fever:"なし",immuno:"なし",
+  sx:R.k(["1日数十回、片側の顔と腕が一瞬つっぱる発作","低Na血症（127 mEq/L）","夜間の異常行動"],3)};},
+ v:{op:[12,20],wbc:[0,4],pmn:[0,0],eos:[0,0],rbc:[0,5],prot:[30,55],ratio:[0.6,0.75],lac:[12,20],ada:[1,3],ocb:"陰性",igg:[0.45,0.65],cyto:null},
+ why:[["clin","顔面上肢ジストニア発作、急速な記憶障害、低Na血症"],["wbc","髄液ほぼ正常でも自己免疫性脳炎は否定できない"]],
+ pearl:"抗LGI1脳炎では髄液がほぼ正常のことが多い。顔面上肢ジストニア発作の段階で治療すると認知機能の予後がよい。"},
+/* ── GBS ── */
+{id:"gbs_typ",dx:"gbs",lvl:1,
+ clin:function(R){return {age:R.i(20,80),onset:R.p(["10日前から","2週間前から"])+"両足のしびれと脱力が上へ広がる",fever:"なし",immuno:"なし",
+  sx:R.k([R.p(["3週間前に下痢","2週間前にかぜ"]),"腱反射が全身で消失","両側顔面神経麻痺","歩行に介助が必要"],3)};},
+ v:{op:[10,20],wbc:[0,6],pmn:[0,5],eos:[0,0],rbc:[0,5],prot:[80,320],ratio:[0.58,0.75],lac:[11,20],ada:[1,3],ocb:["陰性",null],igg:[0.4,0.65],cyto:null},
+ why:[["prot","蛋白↑"],["wbc","細胞数は正常（蛋白細胞解離）"],["clin","先行感染後の上行性の弛緩性麻痺と腱反射消失"]]},
+{id:"gbs_early",dx:"gbs",lvl:3,label:"発症早期で蛋白が正常",
+ clin:function(R){return {age:R.i(25,75),onset:"3日前から両手足のしびれ、今日は立てない",fever:"なし",immuno:"なし",
+  sx:R.k(["2週間前に下痢","腱反射が消失","感覚レベルなし・膀胱障害なし"],3)};},
+ v:{op:[10,20],wbc:[0,5],pmn:[0,0],eos:[0,0],rbc:[0,5],prot:[25,48],ratio:[0.6,0.75],lac:[11,20],ada:[1,3],ocb:null,igg:null,cyto:null},
+ why:[["clin","先行感染、急速な弛緩性四肢麻痺と腱反射消失、脊髄の所見なし"],["prot","発症早期は蛋白が正常のことが多い"]]},
+/* ── MS ── */
+{id:"ms",dx:"ms",lvl:1,
+ clin:function(R){return {age:R.i(20,42),sex:R.p(["女性","女性","男性"]),onset:R.p(["1週間前から右眼の見えにくさと眼球運動時痛","2週間前から両脚のしびれ","5日前から複視"]),fever:"なし",immuno:"なし",
+  sx:R.k(["2年前にも一時的なしびれ","MRIで脳室周囲に卵円形の病変","首を前に曲げると背中に電気が走る"],2)};},
+ v:{op:[10,20],wbc:[0,14],pmn:[0,3],eos:[0,0],rbc:[0,5],prot:[22,52],ratio:[0.6,0.75],lac:[11,20],ada:[1,3],ocb:"陽性",igg:[0.8,1.5],cyto:null},
+ why:[["ocb","髄液に限局したOCB陽性"],["igg","IgG index上昇（髄腔内IgG産生）"],["wbc","細胞・蛋白はほぼ正常"],["clin","若年、時間的に離れた中枢神経症状"]]},
+/* ── NMOSD ── */
+{id:"nmo",dx:"nmo",lvl:2,
+ clin:function(R){return {age:R.i(30,65),sex:"女性",onset:R.p(["5日前から両脚の脱力と胸から下のしびれ","1週間前から吃逆と嘔吐が続き、その後左眼が見えない"]),fever:"なし",immuno:"なし",
+  sx:R.k(["MRIでC2〜Th1の長大な脊髄病変","シェーグレン症候群の既往","膀胱障害"],2)};},
+ v:{op:[12,22],wbc:[8,90],pmn:[10,40],eos:[0,8],rbc:[0,5],prot:[45,130],ratio:[0.58,0.72],lac:[16,28],ada:[1,5],ocb:"陰性",igg:[0.45,0.68],cyto:null},
+ why:[["clin","長大脊髄炎・最後野症候群、中年女性"],["pmn","好中球（・好酸球）を含む細胞増多"],["ocb","OCB陰性（MSとの違い）"]]},
+{id:"nmo_hi",dx:"nmo",lvl:3,label:"細胞数が多く感染に似る",
+ clin:function(R){return {age:R.i(35,65),sex:"女性",onset:"4日前から急速に進む対麻痺",fever:"なし",immuno:"なし",
+  sx:R.k(["胸髄から腰髄の長大病変","膀胱直腸障害","3年前に視神経炎"],3)};},
+ v:{op:[14,24],wbc:[110,380],pmn:[40,62],eos:[2,10],rbc:[0,5],prot:[80,200],ratio:[0.55,0.7],lac:[24,34],ada:[2,6],ocb:"陰性",igg:[0.45,0.65],cyto:null},
+ why:[["clin","発熱なし、長大脊髄炎と視神経炎の既往"],["eos","好酸球の混在"],["ratio","糖比は正常"],["ocb","OCB陰性"]],
+ pearl:"細胞数が数百で好中球優位でも、発熱がなく長大脊髄炎や視神経炎があればNMOSDを考える。感染を除外しつつ、早期にステロイドパルス・血漿交換を検討する。"},
+/* ── MOGAD ── */
+{id:"mog",dx:"mog",lvl:2,
+ clin:function(R){var ad=R.ch(.5);return {age:ad?R.i(6,16):R.i(18,40),onset:ad?"1週間前にかぜ、3日前から頭痛と傾眠":"4日前から両眼の視力低下と眼球運動時痛",fever:ad?"37.6℃":"なし",immuno:"なし",
+  sx:ad?R.k(["MRIで両側大脳白質・視床に境界不明瞭な病変","けいれん","歩行が不安定"],2):R.k(["眼底で両側の乳頭浮腫","MRIで視神経の長い造影病変（視神経鞘まで）","左右差は小さい"],2)};},
+ v:{op:[14,25],wbc:[10,160],pmn:[8,30],eos:[0,2],rbc:[0,5],prot:[38,95],ratio:[0.58,0.72],lac:[15,26],ada:[1,5],ocb:"陰性",igg:[0.45,0.68],cyto:null},
+ why:[["clin","ADEM様脳症、または乳頭浮腫を伴う両側視神経炎"],["wbc","細胞増多（単核球主体で好中球も）"],["ocb","OCB陰性"]]},
+/* ── 癌性髄膜症 ── */
+{id:"lm",dx:"lm",lvl:2,
+ clin:function(R){return {age:R.i(45,80),onset:R.p(["3週間前から","1か月前から"])+"頭痛と嘔気",fever:"なし",immuno:R.p(["肺腺癌で治療中","乳癌の既往（5年前）","胃癌で化学療法中"]),
+  sx:R.k(["右顔面神経麻痺と左外転神経麻痺","腰から脚への神経根痛","難聴","水頭症"],3)};},
+ v:{op:[20,38],wbc:[6,90],pmn:[0,10],eos:[0,2],rbc:[0,10],prot:[85,320],ratio:[0.15,0.45],lac:[30,60],ada:[3,10],ocb:null,igg:null,cyto:"クラスⅤ（腺癌細胞）"},
+ why:[["cyto","細胞診で悪性細胞"],["clin","担癌と多発脳神経麻痺・神経根痛"],["prot","蛋白↑"],["ratio","糖比↓"]]},
+{id:"lm_neg",dx:"lm",lvl:3,label:"1回目の細胞診が陰性",
+ clin:function(R){return {age:R.i(45,78),onset:"1か月前から頭痛、2週間前から複視",fever:"なし",immuno:R.p(["肺腺癌（EGFR変異）で治療中","乳癌の既往"]),
+  sx:R.k(["左外転神経麻痺と右三叉神経領域のしびれ","臀部から脚への痛み","髄液は2 mLだけ提出された"],3)};},
+ v:{op:[20,34],wbc:[5,40],pmn:[0,8],eos:[0,1],rbc:[0,10],prot:[80,220],ratio:[0.25,0.45],lac:[28,48],ada:[3,9],ocb:null,igg:null,cyto:"クラスⅡ（悪性細胞なし）"},
+ why:[["clin","担癌と多発脳神経・神経根障害"],["prot","蛋白↑"],["ratio","糖比↓（感染がないのに低い）"],["cyto","少量の1回の細胞診は偽陰性が多い"]]},
+/* ── SAH ── */
+{id:"sah",dx:"sah",lvl:1,tap:"sah",
+ clin:function(R){return {age:R.i(35,75),onset:R.p(["昨夜","16時間前","前日の夕方"])+"、突然の人生最悪の頭痛",fever:"なし",immuno:"なし",
+  sx:R.k(["頭部CTは発症10時間後で異常なし","嘔吐","項部硬直","穿刺は1回で入った"],3),bw:R.i(7000,11000),br:R.i(420,490)*1e4};},
+ v:{op:[20,34],rbc:[8000,120000],pmn:[55,75],eos:[0,1],prot:[45,90],ratio:[0.55,0.72],lac:[18,32],ada:[1,4],ocb:null,igg:null,cyto:null,
+  app:"血性（4本目まで均一）、遠心後の上清は黄色（キサントクロミー）",wf:[1.2,2.5]},
+ why:[["app","キサントクロミー（遠心後の上清が黄色）"],["rbc","赤血球が最後の試験管まで減らない"],["clin","雷鳴頭痛、発症から12時間以上たった穿刺"]]},
+/* ── traumatic tap ── */
+{id:"tap",dx:"tap",lvl:1,tap:"tap",
+ clin:function(R){return {age:R.i(25,75),onset:R.p(["2日前から頭痛","1週間前から頭痛とふらつき","数日前からの頭痛"]),fever:"なし",immuno:"なし",
+  sx:R.k(["穿刺に3回かかった","項部硬直なし","意識清明","頭部CT異常なし"],3),bw:R.i(5500,9000),br:R.i(420,500)*1e4};},
+ v:{op:[12,20],rbc:[800,20000],pmn:[50,70],eos:[0,1],prot:[25,40],ratio:[0.6,0.75],lac:[12,20],ada:[1,3],ocb:null,igg:null,cyto:null,
+  app:"淡血性（1本目→4本目で薄くなる）、遠心後の上清は無色",wf:[0.85,1.1]},
+ why:[["app","後の試験管ほど薄くなり、上清は無色"],["wbc","補正すると白血球は正常範囲（下の補正計算）"],["ratio","糖比・乳酸は正常"]]},
+/* ── IIH ── */
+{id:"iih",dx:"iih",lvl:1,
+ clin:function(R){return {age:R.i(18,40),sex:"女性",onset:"3か月前から毎日の頭痛",fever:"なし",immuno:"なし",
+  sx:R.k(["BMI 34","数秒間目の前が暗くなる","拍動性の耳鳴り","眼底で両側乳頭浮腫","MRI・MRVで異常なし"],3)};},
+ v:{op:[28,45],wbc:[0,3],pmn:[0,0],eos:[0,0],rbc:[0,3],prot:[14,32],ratio:[0.6,0.75],lac:[10,18],ada:[0.5,2],ocb:null,igg:null,cyto:null},
+ why:[["op","初圧の上昇（25 cmH₂O以上）"],["wbc","成分は正常"],["clin","肥満女性、乳頭浮腫、画像で他の原因なし"]]},
+/* ── 薬剤性 ── */
+{id:"drug",dx:"drug",lvl:2,
+ clin:function(R){var c=R.p(["CIDPで免疫グロブリン大量静注（IVIg）2日目","SLEで頭痛にイブプロフェンを内服した数時間後","尿路感染でST合剤を開始して2日目","てんかんでラモトリギンを開始して2週間"]);
+  return {age:R.i(20,70),onset:"今日から激しい頭痛と項部硬直",fever:R.p(["37.8","38.3","38.0"])+"℃",immuno:/SLE/.test(c)?"SLE（少量プレドニゾロン）":"なし",
+  sx:[c].concat(R.k(["意識は清明","以前も同じ薬の後に頭痛があった","全身状態は保たれている"],2))};},
+ v:{op:[14,26],wbc:[120,1800],pmn:[60,90],eos:[0,8],rbc:[0,10],prot:[50,150],ratio:[0.52,0.68],lac:[20,33],ada:[1,5],ocb:null,igg:null,cyto:null},
+ why:[["clin","被疑薬の投与と発症のタイミング"],["ratio","多核球優位でも糖比は正常"],["lac","乳酸は35 mg/dL未満"],["eos","好酸球を含むことがある"]]}
+];
+
+/* 基準値（解答後に表に出す）。chk: 1=原典の抄録で照合、0=成書の目安・原典本文未照合 */
+var REF={
+ op:{l:"初圧",u:"cmH₂O",s:"6〜20（25以上で上昇）",ref:"6〜20（成人25以上で上昇）",chk:0,src:"Friedman 2013（基準の25 cmH₂O。本文未照合）"},
+ app:{l:"外観",ref:"水様透明",chk:0},
+ wbc:{l:"細胞数",u:"/μL",s:"5以下",ref:"5以下（単核球）",chk:0},
+ pmn:{l:"　多核球",u:"%",ref:"通常0",chk:0},
+ mono:{l:"　単核球",u:"%",ref:"ほぼ全部",chk:0},
+ eos:{l:"　好酸球",u:"%",ref:"0",chk:0},
+ rbc:{l:"赤血球",u:"/μL",s:"0",ref:"0（穿刺の混入で増える）",chk:0},
+ prot:{l:"蛋白",u:"mg/dL",s:"15〜45（高齢で〜69）",ref:"15〜45（年齢で上限53〜69）",chk:1,src:"Hegen 2016"},
+ glu:{l:"糖",u:"mg/dL",ref:"50〜80",chk:0},
+ ratio:{l:"髄液/血糖比",s:"0.6前後。<0.4で低下、<0.23は細菌性",ref:"0.6前後（0.4未満で低下、0.23未満は細菌性を強く示唆）",chk:1,src:"Spanos 1989（0.23）"},
+ lac:{l:"乳酸",u:"mg/dL",s:"<25程度。≥35で細菌性を示唆",ref:"25未満程度（35以上で細菌性を示唆）",chk:1,src:"Sakushima 2011（35 mg/dL）。正常上限は未照合"},
+ ada:{l:"ADA",u:"U/L",s:"≤4で結核ほぼ否定、>8で支持",ref:"4以下で結核はほぼ否定、8超で結核を支持",chk:1,src:"Tuon 2010"},
+ ocb:{l:"OCB",s:"陰性",ref:"陰性（髄液に限局したバンドなし）",chk:0},
+ igg:{l:"IgG index",s:"≤0.7程度",ref:"0.7以下程度（施設基準による）",chk:0},
+ cyto:{l:"細胞診",ref:"陰性",chk:0}
+};
+var ROWS=["op","app","wbc","pmn","mono","eos","rbc","prot","glu","ratio","lac","ada","ocb","igg","cyto"];
+
+var SOURCES=[
+ {g:"髄液の基準・細菌性の鑑別",items:[
+  ["Spanos A, et al. Differential diagnosis of acute meningitis. An analysis of the predictive value of initial observations. JAMA 1989;262:2700-7.","https://pubmed.ncbi.nlm.nih.gov/2810603/","糖比<0.23・糖<34 mg/dL・蛋白>220 mg/dL・白血球>2000/μL・多核球>1180/μLで細菌性を99%以上の確からしさで予測（抄録で照合）"],
+  ["Sakushima K, et al. Diagnostic accuracy of cerebrospinal fluid lactate for differentiating bacterial meningitis from aseptic meningitis: a meta-analysis. J Infect 2011;62:255-62.","https://pubmed.ncbi.nlm.nih.gov/21382412/","乳酸の感度0.93・特異度0.96、前投与で感度0.49、境界35 mg/dL（抄録で照合）"],
+  ["Nigrovic LE, et al. Effect of antibiotic pretreatment on cerebrospinal fluid profiles of children with bacterial meningitis. Pediatrics 2008;122:726-30.","https://pubmed.ncbi.nlm.nih.gov/18829794/","前投与で糖は上がり蛋白は下がるが、白血球・好中球数は変わらない（抄録で照合）"],
+  ["Hegen H, et al. Upper reference limits for cerebrospinal fluid total protein and albumin quotient based on a large cohort of control patients. Clin Chem Lab Med 2016;54:285-92.","https://pubmed.ncbi.nlm.nih.gov/26079822/","18〜70歳の蛋白の上限530〜690 mg/L（抄録で照合）"],
+  ["Deisenhammer F, et al. Guidelines on routine cerebrospinal fluid analysis. Report from an EFNS task force. Eur J Neurol 2006;13:913-22.","https://pubmed.ncbi.nlm.nih.gov/16930354/","髄液検査の手順全般（本文未照合）"],
+  ["van de Beek D, et al. ESCMID guideline: diagnosis and treatment of acute bacterial meningitis. Clin Microbiol Infect 2016;22 Suppl 3:S37-62.","https://pubmed.ncbi.nlm.nih.gov/27062097/","抗菌薬の1回量の参照（本文未照合）"],
+  ["van de Beek D, et al. Clinical features and prognostic factors in adults with bacterial meningitis. N Engl J Med 2004;351:1849-59.","https://pubmed.ncbi.nlm.nih.gov/15509818/",""],
+  ["de Gans J, van de Beek D. Dexamethasone in adults with bacterial meningitis. N Engl J Med 2002;347:1549-56.","https://pubmed.ncbi.nlm.nih.gov/12432041/",""],
+  ["細菌性髄膜炎・単純ヘルペス脳炎診療ガイドライン2026（日本神経学会・日本神経感染症学会監修、南江堂、2026年3月）— 改訂点の講演要旨（ケアネット 2026/6/10）","https://www.carenet.com/news/general/carenet/62988","年齢・リスク別の組み合わせ、デキサメタゾン4日間、1時間以内の投与、FilmArrayの位置づけ（報道で確認。GL本文は未照合）"],
+  ["細菌性髄膜炎診療ガイドライン2014（日本神経学会ほか）","https://www.neurology-jp.org/guidelinem/pdf/zuimaku_guide_2014_01.pdf","旧版"]]},
+ {g:"ウイルス・脳炎",items:[
+  ["同GL2026 — 単純ヘルペス脳炎の改訂点の講演要旨（ケアネット 2026/6/11）","https://www.carenet.com/news/general/carenet/62989","アシクロビル10 mg/kg 8時間ごと、14〜21日、6時間以内の開始、72時間以内のPCR偽陰性（報道で確認。GL本文は未照合）"],
+  ["単純ヘルペス脳炎診療ガイドライン2017（日本神経感染症学会ほか）","https://neurology-jp.org/guidelinem/hse/herpes_simplex_2017.pdf","旧版"],
+  ["Tunkel AR, et al. The management of encephalitis: clinical practice guidelines by the IDSA. Clin Infect Dis 2008;47:303-27.","https://pubmed.ncbi.nlm.nih.gov/18582201/",""],
+  ["Venkatesan A, et al. Case definitions, diagnostic algorithms, and priorities in encephalitis: consensus statement of the international encephalitis consortium. Clin Infect Dis 2013;57:1114-28.","https://pubmed.ncbi.nlm.nih.gov/23861361/",""],
+  ["Graus F, et al. A clinical approach to diagnosis of autoimmune encephalitis. Lancet Neurol 2016;15:391-404.","https://pubmed.ncbi.nlm.nih.gov/26906964/",""]]},
+ {g:"結核・真菌・梅毒",items:[
+  ["Marais S, et al. Tuberculous meningitis: a uniform case definition for use in clinical research. Lancet Infect Dis 2010;10:803-12.","https://pubmed.ncbi.nlm.nih.gov/20822958/","髄液の目安（本文未照合）"],
+  ["Tuon FF, et al. Adenosine deaminase and tuberculous meningitis—a systematic review with meta-analysis. Scand J Infect Dis 2010;42:198-207.","https://pubmed.ncbi.nlm.nih.gov/20001225/","ADA 1〜4 U/Lで除外に役立ち、8 U/L超で結核を支持、細菌性とは区別できない（抄録で照合）"],
+  ["Thwaites GE, et al. Dexamethasone for the treatment of tuberculous meningitis in adolescents and adults. N Engl J Med 2004;351:1741-51.","https://pubmed.ncbi.nlm.nih.gov/15496623/",""],
+  ["Perfect JR, et al. Clinical practice guidelines for the management of cryptococcal disease: 2010 update by the IDSA. Clin Infect Dis 2010;50:291-322.","https://pubmed.ncbi.nlm.nih.gov/20047480/","排液の目安（本文未照合）"],
+  ["WHO. Guidelines for diagnosing, preventing and managing cryptococcal disease among adults, adolescents and children living with HIV. 2022.","https://www.who.int/publications/i/item/9789240052178","単回高用量アムホテリシンBリポソーム＋フルシトシン＋フルコナゾール"],
+  ["Workowski KA, et al. Sexually Transmitted Infections Treatment Guidelines, 2021. MMWR Recomm Rep 2021;70(4):1-187.","https://pubmed.ncbi.nlm.nih.gov/34292926/","神経梅毒の髄液検査・治療（本文未照合）"]]},
+ {g:"脱髄・GBS",items:[
+  ["Leonhard SE, et al. Diagnosis and management of Guillain-Barré syndrome in ten steps. Nat Rev Neurol 2019;15:671-83.","https://pubmed.ncbi.nlm.nih.gov/31541214/",""],
+  ["van Doorn PA, et al. EAN/PNS Guideline on diagnosis and treatment of Guillain-Barré syndrome. Eur J Neurol 2023;30:3646-74.","https://pubmed.ncbi.nlm.nih.gov/37814552/",""],
+  ["Thompson AJ, et al. Diagnosis of multiple sclerosis: 2017 revisions of the McDonald criteria. Lancet Neurol 2018;17:162-73.","https://pubmed.ncbi.nlm.nih.gov/29275977/",""],
+  ["Montalban X, et al. Diagnosis of multiple sclerosis: 2024 revisions of the McDonald criteria. Lancet Neurol 2025;24:850-65.","https://pubmed.ncbi.nlm.nih.gov/40975101/","κFLC indexの採用"],
+  ["Freedman MS, et al. Recommended standard of cerebrospinal fluid analysis in the diagnosis of multiple sclerosis: a consensus statement. Arch Neurol 2005;62:865-70.","https://pubmed.ncbi.nlm.nih.gov/15956157/",""],
+  ["Stangel M, et al. The utility of cerebrospinal fluid analysis in patients with multiple sclerosis. Nat Rev Neurol 2013;9:267-76.","https://pubmed.ncbi.nlm.nih.gov/23528543/",""],
+  ["Wingerchuk DM, et al. International consensus diagnostic criteria for neuromyelitis optica spectrum disorders. Neurology 2015;85:177-89.","https://pubmed.ncbi.nlm.nih.gov/26092914/",""],
+  ["Jarius S, et al. Cerebrospinal fluid findings in aquaporin-4 antibody positive neuromyelitis optica: results from 211 lumbar punctures. J Neurol Sci 2011;306:82-90.","https://pubmed.ncbi.nlm.nih.gov/21550068/","細胞増多は約50%、中央値19/μL（6〜380）、好中球・好酸球、OCBは多くで陰性（抄録で照合）"],
+  ["Banwell B, et al. Diagnosis of myelin oligodendrocyte glycoprotein antibody-associated disease: International MOGAD Panel proposed criteria. Lancet Neurol 2023;22:268-82.","https://pubmed.ncbi.nlm.nih.gov/36706773/",""],
+  ["Jarius S, et al. Cerebrospinal fluid findings in patients with myelin oligodendrocyte glycoprotein (MOG) antibodies. Part 1. J Neuroinflammation 2020;17:261.","https://pubmed.ncbi.nlm.nih.gov/32883348/","OCB陰性は約9割、細胞増多は半数以上（中央値31/μL）、好中球は4割以上（抄録で照合）"]]},
+ {g:"癌性髄膜症・出血・その他",items:[
+  ["Glantz MJ, et al. Cerebrospinal fluid cytology in patients with cancer: minimizing false-negative results. Cancer 1998;82:733-9.","https://pubmed.ncbi.nlm.nih.gov/9477107/","10.5 mL以上、すぐ処理、陰性なら1回くり返す（抄録で照合）"],
+  ["Le Rhun E, et al. Leptomeningeal metastasis from solid tumours: EANO-ESMO Clinical Practice Guideline. ESMO Open 2023;8:101624.","https://pubmed.ncbi.nlm.nih.gov/37863528/",""],
+  ["Perry JJ, et al. Differentiation between traumatic tap and aneurysmal subarachnoid hemorrhage: prospective cohort study. BMJ 2015;350:h568.","https://pubmed.ncbi.nlm.nih.gov/25694274/","赤血球<2000×10⁶/L かつキサントクロミーなしで動脈瘤性SAHを除外（感度100%、抄録で照合）"],
+  ["Cruickshank A, et al. Revised national guidelines for analysis of cerebrospinal fluid for bilirubin in suspected subarachnoid haemorrhage. Ann Clin Biochem 2008;45:238-44.","https://pubmed.ncbi.nlm.nih.gov/18482910/","発症12時間以降の採取（本文未照合）"],
+  ["Friedman DI, et al. Revised diagnostic criteria for the pseudotumor cerebri syndrome in adults and children. Neurology 2013;81:1159-65.","https://pubmed.ncbi.nlm.nih.gov/23966248/","成人25 cmH₂O以上（本文未照合）"],
+  ["Jolles S, et al. Drug-induced aseptic meningitis: diagnosis and management. Drug Saf 2000;22:215-26.","https://pubmed.ncbi.nlm.nih.gov/10738845/",""],
+  ["Yelehe-Okouma M, et al. Drug-induced aseptic meningitis: a mini-review. Fundam Clin Pharmacol 2018;32:252-60.","https://pubmed.ncbi.nlm.nih.gov/29364542/",""]]}
+];
+
+</script>
+<script>
+(function(){
+"use strict";
+var KEY="csf-v1",VER="2026-11-14a";
+var tById={};T.forEach(function(t){tById[t.id]=t;});
+function rnd(n){return Math.floor(Math.random()*n);}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),x=a[i];a[i]=a[j];a[j]=x;}return a;}
+function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+var R={u:function(a,b){return a+Math.random()*(b-a);},i:function(a,b){return a+rnd(b-a+1);},p:function(a){return a[rnd(a.length)];},
+  k:function(a,n){return shuffle(a).slice(0,Math.min(n,a.length));},ch:function(p){return Math.random()<p;},
+  lg:function(a,b){if(a<=0)a=0.5;return Math.exp(Math.log(a)+Math.random()*(Math.log(b)-Math.log(a)));}};
+function pickv(x){return Array.isArray(x)?x[rnd(x.length)]:x;}
+function fmt(n){return Math.round(n).toLocaleString("ja-JP");}
+
+/* ── 症例の生成 ── */
+function gen(tid){
+  var t=tById[tid],v=t.v,c=t.clin(R),o={};
+  if(!c.sex)c.sex=R.ch(.5)?"男性":"女性";
+  var bg=R.i(88,150);if(/糖尿病/.test(c.immuno||""))bg=R.i(160,240);
+  o.op=Math.round(R.u(v.op[0],v.op[1]));
+  o.rbc=v.rbc?Math.round(v.rbc[1]<=30?R.u(v.rbc[0],v.rbc[1]):R.lg(Math.max(v.rbc[0],1),v.rbc[1])):0;
+  if(o.rbc<3&&R.ch(.6))o.rbc=0;
+  var exp=0;
+  if(c.bw&&o.rbc){exp=o.rbc*c.bw/c.br;}
+  if(t.tap){
+    var w=exp*(v.wf?R.u(v.wf[0],v.wf[1]):1)+(v.addw?R.lg(v.addw[0],v.addw[1]):0)+R.i(0,2);
+    o.wbc=Math.max(0,Math.round(w));
+  }else{
+    o.wbc=Math.round(v.wbc[1]<=15?R.u(v.wbc[0],v.wbc[1]):R.lg(Math.max(v.wbc[0],1),v.wbc[1]));
+  }
+  if(o.wbc<=2){o.pmn=0;o.eos=0;}
+  else{o.pmn=Math.round(R.u(v.pmn[0],v.pmn[1]));o.eos=Math.round(R.u(v.eos[0],v.eos[1]));}
+  if(o.pmn+o.eos>100)o.eos=100-o.pmn;
+  o.mono=o.wbc<=2?(o.wbc?100:0):100-o.pmn-o.eos;
+  var pr=R.u(v.prot[0],v.prot[1]);if(t.tap)pr+=o.rbc/1000;
+  o.prot=Math.round(pr);
+  var ratio=R.u(v.ratio[0],v.ratio[1]);
+  o.bg=bg;o.glu=Math.max(1,Math.round(bg*ratio));o.ratio=Math.round(o.glu/bg*100)/100;
+  o.lac=Math.round(R.u(v.lac[0],v.lac[1]));
+  o.ada=Math.round(R.u(v.ada[0],v.ada[1])*10)/10;
+  o.ocb=v.ocb==null?null:pickv(v.ocb);
+  o.igg=v.igg==null?null:Math.round(R.u(v.igg[0],v.igg[1])*100)/100;
+  if(o.ocb==null&&v.igg)o.igg=null;
+  o.cyto=v.cyto==null?null:pickv(v.cyto);
+  o.app=v.app||appearance(o);
+  return {tid:tid,dx:t.dx,c:c,v:o,exp:exp?Math.round(exp*10)/10:0};
+}
+function appearance(o){
+  var a;
+  if(o.rbc>=20000)a="血性";else if(o.rbc>=1500)a="淡血性";
+  else if(o.wbc>=1000)a="混濁";else if(o.wbc>=300)a="微混濁";else if(o.wbc>=80)a="日光微塵";else a="水様透明";
+  if(o.prot>=250&&o.rbc<1500)a+="・淡黄色";
+  return a;
+}
+
+/* ── 状態 ── */
+var st;
+function defaults(){return {set:{mode:"mix",lvl:3,hide:false,weak:false},cur:null,st:{},hist:[],cnt:0,streak:0};}
+try{st=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){st=null;}
+if(!st||typeof st!=="object")st=defaults();
+var d0=defaults();
+Object.keys(d0).forEach(function(k){if(st[k]===undefined)st[k]=d0[k];});
+Object.keys(d0.set).forEach(function(k){if(st.set[k]===undefined)st.set[k]=d0.set[k];});
+if(st.cur&&(!tById[st.cur.tid]||!DX[st.cur.dx]))st.cur=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+
+function inMode(dx){var m=st.set.mode;return m==="mix"||DX[dx].cat===m;}
+function pool(){return T.filter(function(t){return inMode(t.dx)&&t.lvl<=st.set.lvl;});}
+function pickT(){
+  var c=pool();if(!c.length)return null;
+  var last=st.cur&&st.cur.tid;
+  if(c.length>1)c=c.filter(function(t){return t.id!==last;});
+  /* 疾患ごとに均等になるよう、テンプレート数で割る */
+  var nT={};c.forEach(function(t){nT[t.dx]=(nT[t.dx]||0)+1;});
+  var w=c.map(function(t){var b=1/nT[t.dx];if(!st.set.weak)return b;var r=st.st[t.dx];if(!r||!r.n)return b*3;return b*(1+4*(1-r.c/r.n));});
+  var sum=w.reduce(function(a,b){return a+b;},0),x=Math.random()*sum;
+  for(var i=0;i<c.length;i++){x-=w[i];if(x<=0)return c[i].id;}
+  return c[c.length-1].id;
+}
+function options(dx){
+  var n=st.set.lvl+3,opts=[dx];
+  DX[dx].near.forEach(function(d){if(opts.length<n&&opts.indexOf(d)<0&&inMode(d))opts.push(d);});
+  var rest=shuffle(DXKEYS.filter(function(d){return opts.indexOf(d)<0&&inMode(d);}));
+  while(opts.length<n&&rest.length)opts.push(rest.shift());
+  return shuffle(opts);
+}
+function newQ(tid,fixed){
+  var id=tid||pickT();
+  if(!id){st.cur=null;save();renderQ();return;}
+  var q=fixed?JSON.parse(JSON.stringify(fixed)):gen(id);
+  q.o=options(q.dx);q.ans=null;q.hint=false;q.reveal=!st.set.hide;q.no=st.cnt+1;
+  st.cur=q;save();renderQ();
+  try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}
+}
+
+/* ── 表示用 ── */
+function val(k,o){
+  var x=o[k];
+  switch(k){
+    case"op":return x+" cmH₂O";
+    case"app":return x;
+    case"wbc":return fmt(x)+" /μL";
+    case"pmn":case"mono":case"eos":return o.wbc?x+"%"+(o.wbc>=20&&x>0?'<span class="abs">（'+fmt(o.wbc*x/100)+'/μL）</span>':""):"—";
+    case"rbc":return fmt(x)+" /μL";
+    case"prot":return x+" mg/dL";
+    case"glu":return x+' mg/dL<span class="abs">（同時血糖 '+o.bg+'）</span>';
+    case"ratio":return x.toFixed(2);
+    case"lac":return x+" mg/dL";
+    case"ada":return x.toFixed(1)+" U/L";
+    case"ocb":return x==null?'<span class="na">未提出</span>':x;
+    case"igg":return x==null?'<span class="na">未提出</span>':x.toFixed(2);
+    case"cyto":return x==null?'<span class="na">未提出</span>':esc(x);
+  }
+  return esc(x);
+}
+/* 異常の向き：1=高い/陽性、-1=低い、0=正常 */
+function flag(k,o){
+  var x=o[k];
+  switch(k){
+    case"op":return x>20?1:0;
+    case"app":return /透明/.test(x)?0:1;
+    case"wbc":return x>5?1:0;
+    case"pmn":return o.wbc>5&&x>=10?1:0;
+    case"mono":return 0;
+    case"eos":return o.wbc>2&&x>=3?1:0;
+    case"rbc":return x>=50?1:0;
+    case"prot":return x>45?1:0;
+    case"glu":return x<45?-1:0;
+    case"ratio":return x<0.5?-1:0;
+    case"lac":return x>=25?1:0;
+    case"ada":return x>4?1:0;
+    case"ocb":return x==="陽性"?1:0;
+    case"igg":return x!=null&&x>0.7?1:0;
+    case"cyto":return x&&/Ⅴ|悪性細胞あり|腺癌|酵母/.test(x)&&!/なし/.test(x)?1:0;
+  }
+  return 0;
+}
+function keysOf(q){var t=tById[q.tid];return t.why.map(function(w){return w[0];});}
+function table(q){
+  var o=q.v,ans=!!q.ans,keys=ans?keysOf(q):[];
+  var kk=keys.slice();if(kk.indexOf("mono")>=0||kk.indexOf("pmn")>=0||kk.indexOf("eos")>=0)kk.push("wbc");
+  var h='<table class="csf'+(ans?' done':'')+'"><colgroup><col class="c1"><col class="c2">'+(ans?'<col class="c3">':'')+'</colgroup><thead><tr><th>項目</th><th>結果</th>'+(ans?'<th>基準・目安</th>':'')+'</tr></thead><tbody>';
+  ROWS.forEach(function(k){
+    var f=ans?flag(k,o):0,key=ans&&keys.indexOf(k)>=0;
+    var mk=f>0?'<b class="fu">↑</b>':(f<0?'<b class="fd">↓</b>':'');
+    if(k==="app"||k==="ocb"||k==="cyto")mk=f?'<b class="fu">＊</b>':'';
+    h+='<tr class="'+(key?'key':'')+(k==="pmn"||k==="mono"||k==="eos"?' sr':'')+'"><td>'+REF[k].l+'</td><td>'+val(k,o)+(ans?' '+mk:'')+'</td>'+(ans?'<td class="ref">'+esc(REF[k].s||REF[k].ref)+(REF[k].chk?'':'<span class="nc">目安</span>')+'</td>':'')+'</tr>';
+  });
+  return h+'</tbody></table>';
+}
+function clinBox(q){
+  var c=q.c,ans=!!q.ans,key=ans&&keysOf(q).indexOf("clin")>=0;
+  var rows=[["年齢・性別",c.age+"歳・"+c.sex],["発症",c.onset],["発熱",c.fever],["免疫抑制",c.immuno],["随伴症状",(c.sx||[]).join("、")]];
+  if(c.bw)rows.push(["血液","白血球 "+fmt(c.bw)+"/μL、赤血球 "+(c.br/1e4).toFixed(0)+"万/μL"]);
+  return '<dl class="clin'+(key?' key':'')+'">'+rows.map(function(r){return '<dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd>';}).join("")+'</dl>';
+}
+
+/* ── 出題画面 ── */
+var qArea=document.getElementById("qArea");
+function lvDots(n){return "●●●".slice(0,n)+"○○○".slice(0,3-n);}
+var MODEL={mix:"混合",inf:"感染症のみ",non:"非感染性のみ"};
+function renderQ(){
+  var q=st.cur;
+  if(!q){
+    var c=pool().length;
+    qArea.innerHTML='<div class="card"><h2>はじめる</h2><p class="hint" style="font-size:14px">出題範囲：'+MODEL[st.set.mode]+'・'+c+'パターン。髄液所見と臨床情報を読み、診断を選んでください。答えると、決め手になった所見（表で色付け）、基準値、次に出す検査を解説します。数値は毎回作り直します。</p><div class="nav"><button class="btn primary" type="button" id="goQ"'+(c?'':' disabled')+'>問題を出す</button></div></div>';
+    var g=document.getElementById("goQ");if(g)g.onclick=function(){newQ();};
+    return;
+  }
+  var t=tById[q.tid];
+  var h='<div class="card"><div class="qhead"><span>第'+q.no+'問</span><span class="lv" title="難易度">'+lvDots(t.lvl)+'</span>'+((q.hint||q.ans)?'<span class="regtag">'+CATS[DX[q.dx].cat]+'</span>':'')+'</div>';
+  h+='<div class="sub">臨床情報</div>'+clinBox(q);
+  h+='<div class="sub">髄液所見'+(q.ans?'<span class="legend"><i></i>決め手</span>':'')+'</div>'+table(q);
+  if(q.ans&&q.exp)h+=tapCalc(q);
+  h+='<p class="ask">診断は？</p>';
+  if(!q.reveal&&!q.ans){
+    h+='<div class="nav"><button class="btn primary" type="button" id="revBtn">考えたら選択肢を表示</button></div>';
+  }else{
+    h+='<div class="opts">'+q.o.map(function(d,k){
+      var cls="";if(q.ans){if(d===q.dx)cls=" ok";else if(k===q.ans.k)cls=" ng";}
+      return '<button type="button" class="opt'+cls+'" data-k="'+k+'"'+(q.ans?' disabled':'')+'><span class="n">'+(k+1)+'</span><span>'+esc(DX[d].name)+'</span></button>';
+    }).join("")+'</div>';
+  }
+  if(!q.ans)h+='<div class="nav"><button class="btn sm" type="button" id="hintBtn"'+(q.hint?' disabled':'')+'>ヒント（感染／非感染）</button><button class="btn sm" type="button" id="giveBtn">わからない（解説へ）</button><button class="btn sm" type="button" id="skipBtn">別の問題</button></div>';
+  h+='</div>';
+  if(q.ans)h+=explain(q);
+  qArea.innerHTML=h;
+  var b;
+  if((b=document.getElementById("revBtn")))b.onclick=function(){q.reveal=true;save();renderQ();};
+  if((b=document.getElementById("hintBtn")))b.onclick=function(){q.hint=true;save();renderQ();};
+  if((b=document.getElementById("giveBtn")))b.onclick=function(){answer(-1);};
+  if((b=document.getElementById("skipBtn")))b.onclick=function(){newQ();};
+  Array.prototype.forEach.call(qArea.querySelectorAll(".opt"),function(el){el.onclick=function(){answer(+el.getAttribute("data-k"));};});
+  if((b=document.getElementById("nextBtn")))b.onclick=function(){newQ();};
+  if((b=document.getElementById("sameBtn")))b.onclick=function(){newQ(q.tid);};
+}
+function tapCalc(q){
+  var o=q.v,c=q.c,e=q.exp,corr=Math.max(0,Math.round(o.wbc-e));
+  return '<div class="calc"><b>血液混入の補正</b>予想される白血球 ＝ 髄液赤血球 '+fmt(o.rbc)+' × 血液白血球 '+fmt(c.bw)+' ÷ 血液赤血球 '+(c.br/1e4).toFixed(0)+'万 ＝ <b>約'+fmt(e)+'/μL</b><br>実測 '+fmt(o.wbc)+'/μL − 予想 '+fmt(e)+' ＝ <b>補正後 約'+fmt(corr)+'/μL</b>'+(corr>5?'（髄液そのものに細胞増多あり）':'（正常範囲）')+'<br><span class="hint" style="margin:0">蛋白も赤血球1,000/μLにつき約1 mg/dL上乗せされる（成書の目安、未照合）。</span></div>';
+}
+function answer(k){
+  var q=st.cur;if(!q||q.ans)return;
+  var ok=k>=0&&q.o[k]===q.dx;
+  q.ans={k:k,ok:ok};q.reveal=true;
+  var r=st.st[q.dx]||(st.st[q.dx]={n:0,c:0});r.n++;if(ok)r.c++;
+  st.cnt++;st.streak=ok?st.streak+1:0;
+  var hq={tid:q.tid,dx:q.dx,c:q.c,v:q.v,exp:q.exp};
+  st.hist.unshift({q:hq,ok:ok,pick:k>=0?q.o[k]:null,t:Date.now()});
+  if(st.hist.length>60)st.hist.length=60;
+  save();renderQ();renderTop();
+  setTimeout(function(){var e=document.getElementById("exCard");if(e)try{e.scrollIntoView({behavior:"smooth",block:"start"});}catch(x){}},60);
+}
+function explain(q){
+  var t=tById[q.tid],d=DX[q.dx];
+  var h='<div class="card ex" id="exCard">';
+  h+='<div class="result '+(q.ans.ok?'ok':'ng')+'">'+(q.ans.ok?'正解':(q.ans.k<0?'解説':'不正解'))+'<span class="ans">'+esc(d.name)+'</span>'+(t.label?'<span class="syn">'+esc(t.label)+'</span>':'')+'</div>';
+  h+='<h3>決め手になった所見</h3><ul class="why">'+t.why.map(function(w){
+    var lab=w[0]==="clin"?"臨床情報":REF[w[0]].l.trim();
+    return '<li><span class="kp">'+esc(lab)+'</span>'+esc(w[1])+'</li>';}).join("")+'</ul>';
+  var others=q.o.filter(function(x){return x!==q.dx;});
+  if(q.ans.k>=0&&!q.ans.ok){var p=q.o[q.ans.k];others=[p].concat(others.filter(function(x){return x!==p;}));}
+  h+='<h3>ほかの選択肢との違い</h3><ul class="why">'+others.map(function(x){
+    return '<li><span class="dn">'+esc(DX[x].name)+(q.ans.k>=0&&q.o[q.ans.k]===x?'<span class="pick">あなたの解答</span>':'')+'</span><span class="w">この疾患なら：'+esc(DX[x].sig)+'</span></li>';}).join("")+'</ul>';
+  h+='<h3>次に出す検査・対応</h3><ul class="nx">'+(t.next||d.next).map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>';
+  if(d.tx){
+    h+='<div class="tx"><b>すぐ治療を始める：経験的治療の要点</b><ul>'+d.tx.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><p class="hint" style="margin:4px 0 0">'+esc(d.txNote)+'</p></div>';
+  }else if(d.txShort){
+    h+='<div class="tx soft"><b>治療の一言</b>'+esc(d.txShort)+'<span class="hint" style="display:block;margin:2px 0 0">用量は原典・添付文書で確認（ここでは未照合）。</span></div>';
+  }
+  h+='<div class="pearl"><b>ポイント</b>'+esc(t.pearl||d.pearl)+'</div>';
+  h+='<div class="nav"><button class="btn primary" type="button" id="nextBtn">次の問題</button><button class="btn" type="button" id="sameBtn">同じパターンで数値を変えて</button></div>';
+  return h+'</div>';
+}
+
+/* ── 設定 ── */
+function renderSet(){
+  Array.prototype.forEach.call(document.querySelectorAll("#modeSeg button"),function(b){b.setAttribute("aria-pressed",b.getAttribute("data-m")===st.set.mode?"true":"false");});
+  document.getElementById("lvSel").value=String(st.set.lvl);
+  document.getElementById("hideOpt").checked=!!st.set.hide;
+  document.getElementById("weakOpt").checked=!!st.set.weak;
+  var c=pool(),dx={};c.forEach(function(t){dx[t.dx]=1;});
+  document.getElementById("setSum").textContent="（"+MODEL[st.set.mode]+"・"+Object.keys(dx).length+"疾患・"+c.length+"パターン）";
+}
+Array.prototype.forEach.call(document.querySelectorAll("#modeSeg button"),function(b){b.onclick=function(){st.set.mode=b.getAttribute("data-m");save();renderSet();if(!st.cur||st.cur.ans)renderQ();};});
+document.getElementById("lvSel").onchange=function(){st.set.lvl=+this.value;save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("hideOpt").onchange=function(){st.set.hide=this.checked;save();};
+document.getElementById("weakOpt").onchange=function(){st.set.weak=this.checked;save();};
+
+/* ── 早見表 ── */
+var aList=document.getElementById("aList");
+function rangeTxt(t){
+  var v=t.v,s=[];
+  s.push("初圧 "+v.op[0]+"〜"+v.op[1]);
+  if(v.wbc)s.push("細胞 "+v.wbc[0]+"〜"+fmt(v.wbc[1]));else s.push("細胞：血液の比率どおり"+(v.addw?"＋"+fmt(v.addw[0])+"〜"+fmt(v.addw[1]):""));
+  s.push("多核球 "+v.pmn[0]+"〜"+v.pmn[1]+"%");
+  s.push("蛋白 "+v.prot[0]+"〜"+v.prot[1]);
+  s.push("糖比 "+v.ratio[0]+"〜"+v.ratio[1]);
+  s.push("乳酸 "+v.lac[0]+"〜"+v.lac[1]);
+  s.push("ADA "+v.ada[0]+"〜"+v.ada[1]);
+  if(v.ocb)s.push("OCB "+(Array.isArray(v.ocb)?"陽性のことあり":v.ocb));
+  if(typeof v.cyto==="string")s.push("細胞診 "+v.cyto);
+  return s.join("／");
+}
+function renderAtlas(){
+  var h='<div class="card"><h2>基準値と鑑別の目安</h2><table class="st ref">'+ROWS.map(function(k){return '<tr><td>'+REF[k].l.trim()+'</td><td>'+esc(REF[k].ref)+'<span class="hint" style="display:block;margin:0">'+(REF[k].chk?'照合：'+esc(REF[k].src):'成書の目安（未照合）'+(REF[k].src?'／'+esc(REF[k].src):''))+'</span></td></tr>';}).join("")+'</table>'+
+   '<div class="calc" style="margin-top:10px"><b>traumatic tap の補正</b>予想白血球＝髄液赤血球×血液白血球÷血液赤血球。目安は赤血球500〜1,000個に白血球1個、蛋白は赤血球1,000/μLにつき約1 mg/dL（いずれも成書の目安、未照合）。キサントクロミーがなく赤血球<2,000/μLなら動脈瘤性SAHはほぼ否定（Perry 2015）。</div>'+
+   '<p class="hint">このアプリの症例は、出典の数値と成書の典型像から作った範囲で数値を生成しています（下の各疾患の範囲）。単位：初圧 cmH₂O、細胞 /μL、蛋白・乳酸 mg/dL、ADA U/L。</p></div>';
+  ["inf","non"].forEach(function(cat){
+    h+='<div class="card"><h2>'+CATS[cat]+'</h2>'+DXKEYS.filter(function(d){return DX[d].cat===cat;}).map(function(d){
+      var x=DX[d],r=st.st[d],ts=T.filter(function(t){return t.dx===d;});
+      return '<details class="site"><summary><b>'+esc(x.name)+(x.urg?'<span class="urg">即治療</span>':'')+'<span class="lvb">'+(r&&r.n?r.c+'/'+r.n:'')+'</span></b><span>'+esc(x.sig)+'</span></summary>'+
+        ts.map(function(t){return '<div class="sub">'+esc(t.label||"典型")+' <span class="lvb">'+lvDots(t.lvl)+'</span></div><p class="rng">'+esc(rangeTxt(t))+'</p>';}).join("")+
+        '<div class="sub">次に出す検査</div><ul class="nx">'+x.next.map(function(n){return '<li>'+esc(n)+'</li>';}).join("")+'</ul>'+
+        '<div class="pearl"><b>ポイント</b>'+esc(x.pearl)+'</div><div class="nav"><button class="btn sm" type="button" data-q="'+d+'">この疾患で出題</button></div></details>';
+    }).join("")+'</div>';
+  });
+  aList.innerHTML=h;
+  Array.prototype.forEach.call(aList.querySelectorAll("[data-q]"),function(b){b.onclick=function(){
+    var d=b.getAttribute("data-q"),ts=T.filter(function(t){return t.dx===d&&t.lvl<=st.set.lvl;});if(!ts.length)ts=T.filter(function(t){return t.dx===d;});
+    var keep=st.set.mode;if(!inMode(d))st.set.mode="mix";newQ(R.p(ts).id);st.set.mode=keep;save();renderSet();show("v-q");};});
+}
+
+/* ── 成績 ── */
+var sArea=document.getElementById("sArea"),resetArm=false;
+function renderStats(){
+  var tot=0;Object.keys(st.st).forEach(function(k){if(DX[k])tot+=st.st[k].n;});
+  var h='<div class="card"><h2>分野別の正答率</h2>';
+  if(!tot)h+='<p class="empty">まだ回答がありません。</p>';
+  else{
+    h+='<table class="st">'+["inf","non"].map(function(cat){var n=0,c=0;DXKEYS.forEach(function(d){if(DX[d].cat===cat&&st.st[d]){n+=st.st[d].n;c+=st.st[d].c;}});var p=n?Math.round(c/n*100):null;
+      return '<tr><td>'+CATS[cat]+'</td><td style="width:34%"><div class="bar"><i style="width:'+(p||0)+'%"></i></div></td><td class="num">'+(n?p+'%':'—')+'</td><td class="num hint" style="margin:0">'+c+'/'+n+'</td></tr>';}).join("")+'</table>';
+    h+='<div class="sub" style="margin-top:10px">疾患別</div><table class="st">'+DXKEYS.map(function(d){var r=st.st[d];var n=r?r.n:0,c=r?r.c:0,p=n?Math.round(c/n*100):null;
+      return '<tr><td>'+esc(DX[d].name)+'</td><td style="width:26%"><div class="bar"><i style="width:'+(p||0)+'%"></i></div></td><td class="num">'+(n?p+'%':'—')+'</td><td class="num hint" style="margin:0">'+c+'/'+n+'</td></tr>';}).join("")+'</table>';
+  }
+  h+='</div>';
+  var weak=Object.keys(st.st).filter(function(k){return DX[k]&&st.st[k].n&&st.st[k].c<st.st[k].n;}).sort(function(a,b){return st.st[a].c/st.st[a].n-st.st[b].c/st.st[b].n||st.st[b].n-st.st[a].n;}).slice(0,8);
+  h+='<div class="card"><h2>苦手な疾患</h2>'+(weak.length?'<table class="st">'+weak.map(function(k){var r=st.st[k];return '<tr><td>'+esc(DX[k].name)+'</td><td class="num">'+r.c+'/'+r.n+'</td><td class="num"><button class="btn sm" type="button" data-w="'+k+'">出題</button></td></tr>';}).join("")+'</table>':'<p class="empty">間違えた疾患はまだありません。</p>')+'</div>';
+  var conf={};st.hist.forEach(function(x){if(!x.ok&&x.pick&&DX[x.pick]&&DX[x.q.dx]){var k=x.q.dx+">"+x.pick;conf[k]=(conf[k]||0)+1;}});
+  var ck=Object.keys(conf).sort(function(a,b){return conf[b]-conf[a];}).slice(0,6);
+  if(ck.length)h+='<div class="card"><h2>取り違えやすい組み合わせ</h2><table class="st">'+ck.map(function(k){var p=k.split(">");return '<tr><td>'+esc(DX[p[0]].name)+' を <b>'+esc(DX[p[1]].name)+'</b> と解答</td><td class="num">'+conf[k]+'回</td></tr>';}).join("")+'</table></div>';
+  var wr=st.hist.filter(function(x){return !x.ok&&tById[x.q.tid];}).slice(0,15);
+  h+='<div class="card"><h2>最近間違えた問題</h2>'+(wr.length?'<table class="st">'+wr.map(function(x,i){var d=new Date(x.t),t=tById[x.q.tid];return '<tr><td>'+esc(DX[x.q.dx].name)+(t.label?'<span class="hint" style="display:block;margin:0">'+esc(t.label)+'</span>':'')+'<span class="hint" style="display:block;margin:0">'+(d.getMonth()+1)+'/'+d.getDate()+'</span></td><td class="num"><button class="btn sm" type="button" data-h="'+i+'">同じ問題</button></td></tr>';}).join("")+'</table><p class="hint">「同じ問題」は前回と同じ数値で出題します（選択肢の順は変わります）。</p>':'<p class="empty">まだありません。</p>')+'</div>';
+  h+='<div class="card"><button class="btn sm" type="button" id="resetBtn">'+(resetArm?'もう一度押すと成績を消去':'成績を消去')+'</button><p class="hint">成績と履歴だけを消します。右上の「入力クリア」は設定と出題中の問題を消し、成績は残します。</p></div>';
+  sArea.innerHTML=h;
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-w]"),function(b){b.onclick=function(){var d=b.getAttribute("data-w"),ts=T.filter(function(t){return t.dx===d&&t.lvl<=st.set.lvl;});if(!ts.length)ts=T.filter(function(t){return t.dx===d;});newQ(R.p(ts).id);show("v-q");};});
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-h]"),function(b){b.onclick=function(){var x=wr[+b.getAttribute("data-h")];newQ(x.q.tid,x.q);show("v-q");};});
+  document.getElementById("resetBtn").onclick=function(){
+    if(!resetArm){resetArm=true;renderStats();setTimeout(function(){resetArm=false;if(document.getElementById("v-s").classList.contains("active"))renderStats();},4000);return;}
+    resetArm=false;st.st={};st.hist=[];st.cnt=0;st.streak=0;save();renderStats();renderTop();toast("成績を消去しました");
+  };
+}
+function renderTop(){
+  var tot=0,cor=0;Object.keys(st.st).forEach(function(k){tot+=st.st[k].n;cor+=st.st[k].c;});
+  document.getElementById("sN").textContent=tot;
+  document.getElementById("sR").textContent=tot?Math.round(cor/tot*100)+"%":"—";
+  document.getElementById("sS").textContent=st.streak||0;
+}
+
+/* ── 出典 ── */
+function renderSrc(){
+  var h='<div class="card"><h2>このアプリについて</h2><p class="hint" style="font-size:14px">髄液所見と臨床情報から診断を推論する自分用の学習ツール。症例と数値は出典の値と成書の典型像から自動生成した架空のもので、実際の分布や個々の患者を表すものではない。診療判断は診察・原典で行う。成績はこの端末内にのみ保存。</p>'+
+    '<p class="hint" style="font-size:14px">「照合」＝原典の抄録で数値を確認したもの。「未照合・目安」＝成書の一般的な目安、または原典本文で確認していないもの。薬の用量は添付文書と照合していない。</p>'+
+    '<div class="row" style="margin-top:8px"><span>アプリの版：<b>'+VER+'</b></span><button type="button" class="btn sm" id="forceUpdate">最新版に更新</button></div></div>';
+  SOURCES.forEach(function(g){
+    h+='<div class="card"><h2>'+esc(g.g)+'</h2><ul class="src">'+g.items.map(function(s){return '<li><a href="'+s[1]+'" target="_blank" rel="noopener">'+esc(s[0])+'</a>'+(s[2]?'<span class="hint" style="display:block;margin:2px 0 0">'+esc(s[2])+'</span>':'')+'</li>';}).join("")+'</ul></div>';
+  });
+  document.getElementById("srcArea").innerHTML=h;
+  document.getElementById("forceUpdate").onclick=async function(){toast("最新版を確認しています…");try{if("serviceWorker" in navigator){var r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(function(){location.reload();},800);};
+}
+
+/* ── タブ ── */
+var tabs=document.querySelectorAll("nav.tabs button");
+function show(v){
+  Array.prototype.forEach.call(document.querySelectorAll("section.view"),function(s){s.classList.toggle("active",s.id===v);});
+  Array.prototype.forEach.call(tabs,function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===v?"true":"false");});
+  if(v==="v-a")renderAtlas();if(v==="v-s")renderStats();if(v==="v-r")renderSrc();
+  window.scrollTo(0,0);
+}
+Array.prototype.forEach.call(tabs,function(b){b.onclick=function(){show(b.getAttribute("data-v"));};});
+var tt;function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on");},2600);}
+window.__csfToast=toast;
+window.__csf={gen:gen,st:function(){return st;},T:T};
+
+renderSet();renderTop();renderQ();
+})();
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    var onClaude=/claude\.ai$|claudeusercontent|claude\.site/.test(h)||!!window.claude;
+    if(!("serviceWorker" in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller&&window.__csfToast)window.__csfToast("新しい版を取り込みました。次に開いたときに反映されます");
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[{"k":"csf-v1","keep":["st","hist","cnt"]}];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>
