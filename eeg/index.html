@@ -160,6 +160,32 @@ body.fsopen{overflow:hidden}
 .fsv .btn.sm{min-height:30px;padding:3px 10px;font-size:13px}
 .fsv .ctl{gap:4px}
 @media (orientation:landscape){.fsbar{flex-wrap:nowrap}.fsctl{width:auto;flex:1;display:flex;flex-wrap:wrap;gap:4px}.fsctl .ctl{margin:0}.fsv .par{display:none}}
+
+/* 判読画面（病院のデジタル脳波に寄せる。配色はダークモードでも固定） */
+.viewer{border:1px solid #AEB8C1;border-radius:6px;overflow:hidden;background:#FFFFFF;margin:6px -8px 2px}
+.viewer .trace{border:0;border-radius:0;background:#FFFFFF}
+.viewer .vbar{background:linear-gradient(#EEF1F4,#E1E6EA);border-bottom:1px solid #AEB8C1;padding:4px 6px 5px;color:#1F2A33}
+.viewer .vbar .ctl{margin:3px 0 0;gap:5px}
+.viewer .vbar .ctl:first-child{margin-top:0}
+.viewer .seg{border-color:#9FAAB4;border-radius:4px;background:#FFFFFF}
+.viewer .seg button{background:#FFFFFF;color:#1F2A33;border-left-color:#C5CDD4;min-height:30px;padding:3px 8px;font-size:12px}
+.viewer .seg button.on{background:#2F5D8A;color:#FFFFFF}
+.viewer .ss{color:#4A5862;font-size:11.5px}
+.viewer .ss select{background:#FFFFFF;color:#1F2A33;border:1px solid #9FAAB4;border-radius:4px;min-height:30px;font-size:12px;padding:2px 4px}
+.viewer .btn.sm{min-height:30px;padding:3px 10px;font-size:12.5px;background:#FFFFFF;color:#1F2A33;border-color:#9FAAB4;border-radius:4px}
+.viewer .vstat{background:#E7EBEE;border-top:1px solid #AEB8C1;color:#33404A;font-size:11px;line-height:1.35;padding:4px 8px;display:flex;flex-wrap:wrap;gap:2px 10px}
+.viewer .vstat .cur{color:#C62828;font-weight:700;width:100%}
+.viewer canvas.sig{cursor:crosshair}
+.viewer canvas.lab{border-right:0}
+.fsbody.viewer{margin:0;border-radius:0;border:0}
+.fsv .fsbar{background:linear-gradient(#EEF1F4,#E1E6EA);border-bottom:1px solid #AEB8C1;color:#1F2A33}
+.fsv .fsbar .seg{border-color:#9FAAB4;border-radius:4px;background:#FFFFFF}
+.fsv .fsbar .seg button{background:#FFFFFF;color:#1F2A33;border-left-color:#C5CDD4}
+.fsv .fsbar .seg button.on{background:#2F5D8A;color:#FFFFFF}
+.fsv .fsbar .ss{color:#4A5862}
+.fsv .fsbar .ss select,.fsv .fsbar .btn.sm{background:#FFFFFF;color:#1F2A33;border:1px solid #9FAAB4;border-radius:4px}
+.fsv{background:#FFFFFF}
+.viewer .vstat .hint2{color:#5B6870;width:100%}
 </style>
 </head>
 <body>
@@ -221,6 +247,7 @@ body.fsopen{overflow:hidden}
       <li><span class="dn">縦の双極導出</span><span class="w">ACNSの縦双極（LB-18.1）：左側頭→右側頭→左傍矢状→右傍矢状→正中。隣り合う2チャンネルが逆向きに振れる電極（位相逆転）に電位の最大がある。</span></li>
       <li><span class="dn">基準導出</span><span class="w">同側の耳朶（A1・A2）を基準にし、正中は両耳朶の平均（表示は「-A」）。側頭部の電位は耳朶にも乗る（耳朶の活性化）ので、側頭部の所見は双極導出とあわせて見る。</span></li>
       <li><span class="dn">感度・時定数</span><span class="w">感度は画面上の1 mmあたりの電位。時定数0.3秒は約0.53 Hz、0.1秒は約1.6 Hzの低域遮断に相当する。電極名は旧称（T3＝T7、T4＝T8、T5＝P7、T6＝P8）。</span></li>
+      <li><span class="dn">画面</span><span class="w">病院のデジタル脳波の判読画面に寄せて、白地・黒線、上に時刻、1秒ごとの縦線（0.2秒の補助線）、左にチャンネル番号、技師の記録（開眼・閉眼・呼名など）を表示する。「左青・右赤」で左右を色分けできる。波形をタップすると計測カーソルが出て、2点の時間差と周波数を表示する（棘波の幅は「横：×2」で測る）。</span></li>
       <li><span class="dn">スマホで見る</span><span class="w">横スクロールで10秒を送る。「横：画面幅」で全体、「×2」で棘波の幅まで見える。「大きく表示」で全画面にし、スマホを横向きにすると広く見える。「側頭」「傍矢状」「左」「右」でチャンネルを減らせる。</span></li>
     </ul>
   </div>
@@ -247,7 +274,7 @@ body.fsopen{overflow:hidden}
 </div>
 <div id="fsv" class="fsv" hidden role="dialog" aria-label="波形の全画面表示">
   <div class="fsbar"><b>波形（全画面）</b><button type="button" class="btn sm" id="fsClose">閉じる</button><div id="fsCtl" class="fsctl"></div></div>
-  <div class="fsbody"><p class="par" id="fsPar"></p><div class="trace" id="fsTr"></div></div>
+  <div class="fsbody viewer"><div class="trace" id="fsTr"></div><div class="vstat" id="fsPar"></div></div>
 </div>
 <nav class="tabs" role="tablist" aria-label="画面切替"><div class="in">
   <button role="tab" aria-selected="true" data-v="v-q" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12h3l2-6 3 12 3-9 2 5 2-2h5"/></svg>出題</button>
@@ -429,7 +456,7 @@ var PATS=[
   for(i=0;i<NT;i++){var t=i/FS-PRE;env[i]=(open&&t>to&&t<tc)?.06:1;}
   bgAwake(g,{af:f,aa:a,gate:smooth(env,.15)});
   if(open){blink(g,to+.02,g.U(120,170));blink(g,tc-.05,g.U(110,160));}
-  return {focus:"後頭部（O1・O2）",state:"覚醒（安静閉眼）",awake:false,detail:[f.toFixed(1)+" Hz、振幅 約"+Math.round(a*2)+" µV（頂点間）。O1・O2に最大で、P3・P4・T5・T6まで広がる",open?("開眼（"+to.toFixed(1)+"秒）で抑制され、閉眼（"+tc.toFixed(1)+"秒）で再び出る＝反応性あり。開閉眼の瞬間の前頭極の振れは眼球運動"):"閉眼のまま連続し、漸増・漸減している"]};}},
+  return {marks:open?[{t:to,l:"開眼"},{t:tc,l:"閉眼"}]:[],focus:"後頭部（O1・O2）",state:"覚醒（安静閉眼）",awake:false,detail:[f.toFixed(1)+" Hz、振幅 約"+Math.round(a*2)+" µV（頂点間）。O1・O2に最大で、P3・P4・T5・T6まで広がる",open?("開眼（"+to.toFixed(1)+"秒）で抑制され、閉眼（"+tc.toFixed(1)+"秒）で再び出る＝反応性あり。開閉眼の瞬間の前頭極の振れは眼球運動"):"閉眼のまま連続し、漸増・漸減している"]};}},
 {id:"n_vertex",grp:"norm",lvl:1,name:"頭蓋頂鋭波（瘤波）",en:"vertex sharp transient（V wave）",mean:["norm"],chk:"gen",
  sig:"眠気〜睡眠1・2期に、Cz中心で左右対称に出る陰性の鋭い一過波",
  key:{dist:"Cz最大で左右対称（Fz・C3・C4へ広がる）。双極導出ではFz-CzとCz-Pzで向きが逆になる（Czで位相逆転）",freq:"単発、または数秒おきに反復（周期性はない）",morph:"陰性主体の二相性で、持続は150〜250 ms前後。高い時は100〜200 µVに達し、小児ほど高く鋭い",occur:"入眠期〜睡眠2期。覚醒で消える。背景はα律動が消えてθが増えている"},
@@ -616,7 +643,7 @@ var PATS=[
  gen:function(g){bgAwake(g,{child:true,af:g.U(8,9.5),aa:g.U(25,40)});var t0=g.U(1.5,4),dur=g.U(2.6,4.5),A=g.U(180,300),f0=g.U(3.6,4.1),f1=g.U(2.2,2.7),wv=W0(),t=t0,k=0;
   while(t<t0+dur){var fr=f0+(f1-f0)*(t-t0)/dur,cyc=1/fr,a=A*Math.min(1,(t-t0)/.4+.5)*g.U(.92,1.05);spk(wv,t,.06,-a*.38);bump(wv,t+.045,.06,a*.12);bump(wv,t+cyc*.5,cyc*.62,-a);t+=cyc;k++;}
   addW(g,wv,wGen(g,.42,.45,.12));
-  return {focus:"全般性（前頭部優位）",state:"覚醒（過呼吸中）",awake:true,detail:["約"+dur.toFixed(1)+"秒の群発（"+k+"個）","開始時 約"+f0.toFixed(1)+" Hz → 終わりに約"+f1.toFixed(1)+" Hzへ遅くなる","両側同期・対称で、Fz・F3・F4に最大（振幅 約"+Math.round(A)+" µV）"]};}},
+  return {marks:[{t:t0+Math.min(1.2,dur/2),l:"呼名"}],focus:"全般性（前頭部優位）",state:"覚醒（過呼吸中）",awake:true,detail:["約"+dur.toFixed(1)+"秒の群発（"+k+"個）","開始時 約"+f0.toFixed(1)+" Hz → 終わりに約"+f1.toFixed(1)+" Hzへ遅くなる","両側同期・対称で、Fz・F3・F4に最大（振幅 約"+Math.round(A)+" µV）"]};}},
 {id:"e_psw",grp:"ep",lvl:2,name:"多棘徐波（全般性）",en:"polyspike-and-wave",mean:["epi"],chk:"gen",aed:1,sens:15,
  sig:"複数の棘波に徐波が続く複合が、3.5〜6 Hz前後で不規則に群発する（全般性）",
  key:{dist:"全般性・両側同期で、前頭中心部優位",freq:"3.5〜6 Hz前後で不規則。1〜数秒の群発",morph:"2〜数個の棘波（多棘）に徐波が続く",occur:"覚醒直後・睡眠不足・光刺激で誘発されやすい。背景活動は正常のことが多い（若年ミオクロニーてんかん）"},
@@ -794,7 +821,7 @@ var PATS=[
 <script>
 (function(){
 "use strict";
-var APP_VERSION="2026-11-14b";
+var APP_VERSION="2026-11-14c";
 var KEY="eeg-v1",DSKEY="eeg-disp";
 var byId={};PATS.forEach(function(p){byId[p.id]=p;});
 function rnd(n){return Math.floor(Math.random()*n);}
@@ -811,7 +838,7 @@ if(!st||typeof st!=="object")st=defaults();
 var d0=defaults();Object.keys(d0).forEach(function(k){if(st[k]===undefined)st[k]=d0[k];});Object.keys(d0.set).forEach(function(k){if(st.set[k]===undefined)st.set[k]=d0.set[k];});
 if(st.cur&&!byId[st.cur.pid])st.cur=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
-var DS={mont:"bip",view:"all",tc:.3,hff:60,xz:"1",vz:1,ecg:true};
+var DS={mont:"bip",view:"all",tc:.3,hff:60,xz:"1",vz:1,ecg:true,color:"mono"};
 try{var dd=JSON.parse(localStorage.getItem(DSKEY)||"null");if(dd)Object.keys(DS).forEach(function(k){if(dd[k]!==undefined)DS[k]=dd[k];});}catch(e){}
 function saveDS(){try{localStorage.setItem(DSKEY,JSON.stringify(DS));}catch(e){}}
 
@@ -824,63 +851,93 @@ function build(pid,seed,x){var k=pid+"|"+seed+"|"+(x?1:0);if(cache[k])return cac
   var vs=info.vig||P.vig||[""],v=vs[Math.floor(g.r()*vs.length)]||"";
   info.vigT=v.replace(/\{S\}/g,info.side?SIDEJ[info.side]:"");
   info.mean=info.mean||P.mean;
+  info.t0=info.t0||(8*3600+Math.floor(g.r()*9*3600));info.marks=info.marks||[];
   var o={rec:new Rec(g),info:info,P:P};
   var keys=Object.keys(cache);if(keys.length>12)delete cache[keys[0]];
   cache[k]=o;return o;}
 
 /* ── 描画 ── */
 function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||"#000";}
+var CUR={};
+function hms(sec){sec=Math.floor(sec)%86400;var h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return (h<10?"0":"")+h+":"+(m<10?"0":"")+m+":"+(x<10?"0":"")+x;}
+/* 病院のデジタル脳波の判読画面に寄せた描画：白地・黒線・1秒の縦線と0.2秒の補助線・上に時刻・技師の記録（開眼など）・チャンネル番号 */
 function drawTrace(host,B,o){
   var prevL=host.firstChild?host.scrollLeft:0;
   host.innerHTML="";
-  var d=B.rec.get(o.tc,o.hff),ch=chans(o.mont,o.view),rows=ch.length+(o.ecg?1:0);
-  var labW=52,top=18,bot=26,ngap=0,pg=null;ch.forEach(function(c){if(pg!==null&&c.grp!==pg)ngap++;pg=c.grp;});if(o.ecg)ngap++;
-  var chH=o.fitH?Math.max(9,(o.fitH-top-bot)/(rows+ngap*.35)):Math.max(16,6.5*3.78*o.vz);
-  var gap=chH*.35,ys=[],yc=top+chH/2;pg=null;
+  var d=B.rec.get(o.tc,o.hff),ch=chans(o.mont,o.view),rows=ch.length+(o.ecg?1:0),info=B.info||{};
+  var labW=62,top=30,bot=24,ngap=0,pg=null;ch.forEach(function(c){if(pg!==null&&c.grp!==pg)ngap++;pg=c.grp;});if(o.ecg)ngap++;
+  var chH=o.fitH?Math.max(9,(o.fitH-top-bot)/(rows+ngap*.15)):Math.max(16,6.5*3.78*o.vz);
+  var gap=chH*.15,ys=[],yc=top+chH/2;pg=null;
   ch.forEach(function(c){if(pg!==null&&c.grp!==pg)yc+=gap;ys.push(yc);yc+=chH;pg=c.grp;});
   var ecgY=0;if(o.ecg){yc+=gap;ecgY=yc;yc+=chH;}
   var H=Math.round(yc-chH/2+bot);
   var avail=host.clientWidth||340;
   var pps=o.xz==="fit"?Math.max(24,(avail-labW-10)/DUR):113.4*parseFloat(o.xz);
-  var Wd=Math.round(pps*DUR)+10,kuv=(chH/6.5)/o.sens,dpr=Math.min(2,window.devicePixelRatio||1);
+  var Wd=Math.round(pps*DUR)+12,kuv=(chH/6.5)/o.sens,dpr=Math.min(2,window.devicePixelRatio||1);
   var inn=document.createElement("div");inn.className="in";
-  var cl=document.createElement("canvas"),cs=document.createElement("canvas");cl.className="lab";
+  var cl=document.createElement("canvas"),cs=document.createElement("canvas");cl.className="lab";cs.className="sig";
   [[cl,labW],[cs,Wd]].forEach(function(a){a[0].width=Math.round(a[1]*dpr);a[0].height=Math.round(H*dpr);a[0].style.width=a[1]+"px";a[0].style.height=H+"px";});
   inn.appendChild(cl);inn.appendChild(cs);host.appendChild(inn);
-  var ink=css("--ink"),mut=css("--muted"),line=css("--line"),sur=css("--surface"),ngc=css("--ng"),acc=css("--accent");
-  var x=cl.getContext("2d");x.scale(dpr,dpr);x.fillStyle=sur;x.fillRect(0,0,labW,H);x.fillStyle=ink;x.font="600 10.5px system-ui,sans-serif";x.textAlign="right";x.textBaseline="middle";
-  ch.forEach(function(c,i){x.fillText(c.lab,labW-5,ys[i]);});if(o.ecg){x.fillStyle=ngc;x.fillText("ECG",labW-5,ecgY);}
-  var c2=cs.getContext("2d");c2.scale(dpr,dpr);c2.fillStyle=sur;c2.fillRect(0,0,Wd,H);
-  var x0=5,s;
-  for(s=0;s<=DUR*5;s++){var xx=x0+s*pps/5;if(s%5){if(pps<55)continue;c2.strokeStyle=line;c2.globalAlpha=.45;}else{c2.strokeStyle=line;c2.globalAlpha=1;}c2.beginPath();c2.moveTo(xx+.5,top-4);c2.lineTo(xx+.5,H-bot+4);c2.stroke();}
-  c2.globalAlpha=1;c2.fillStyle=mut;c2.font="10px system-ui,sans-serif";c2.textBaseline="top";c2.textAlign="left";
-  for(s=0;s<DUR;s++)c2.fillText(s+" s",x0+s*pps+3,2);
-  var i0=tI(0),i1=tI(DUR),step=Math.max(1,Math.floor(FS/Math.max(60,pps*1.5)));
-  c2.lineWidth=1;c2.lineJoin="round";c2.strokeStyle=ink;
-  ch.forEach(function(c,k){var a=d.P[EI[c.a]],b=c.b==="Ae"?null:d.P[EI[c.b]],A1=d.P[EI.A1],A2=d.P[EI.A2],y0=ys[k];
+  /* 判読ソフトと同じく、配色はダークモードでも白地に固定 */
+  var BG="#FFFFFF",INK="#111111",G1="#9AA6B0",G2="#DCE2E7",TXT="#33404A",ECGC="#2E7D32",MK="#1565C0",CURC="#D32F2F";
+  var colL="#1F4E9E",colR="#B71C1C";
+  function colOf(c){if(o.color!=="lr")return INK;var sd=sideOf(c.a);return sd==="L"?colL:sd==="R"?colR:INK;}
+  var x=cl.getContext("2d");x.scale(dpr,dpr);x.fillStyle="#F4F6F8";x.fillRect(0,0,labW,H);
+  x.textBaseline="middle";
+  ch.forEach(function(c,i){x.fillStyle="#8A96A0";x.font="9px system-ui,sans-serif";x.textAlign="left";x.fillText(String(i+1),3,ys[i]);
+    x.fillStyle=colOf(c)===INK?TXT:colOf(c);x.font="600 10.5px system-ui,sans-serif";x.textAlign="right";x.fillText(c.lab,labW-5,ys[i]);});
+  if(o.ecg){x.fillStyle="#8A96A0";x.font="9px system-ui,sans-serif";x.textAlign="left";x.fillText(String(ch.length+1),3,ecgY);x.fillStyle=ECGC;x.font="600 10.5px system-ui,sans-serif";x.textAlign="right";x.fillText("ECG",labW-5,ecgY);}
+  x.fillStyle=TXT;x.font="600 9.5px system-ui,sans-serif";x.textAlign="left";x.textBaseline="middle";x.fillText(o.mont==="bip"?"縦双極":"基準",4,10);
+  x.strokeStyle="#C3CBD2";x.beginPath();x.moveTo(labW-.5,0);x.lineTo(labW-.5,H);x.stroke();
+  var c2=cs.getContext("2d");c2.scale(dpr,dpr);c2.fillStyle=BG;c2.fillRect(0,0,Wd,H);
+  c2.fillStyle="#F4F6F8";c2.fillRect(0,0,Wd,top-8);
+  var x0=6,s,t0=info.t0||36000;
+  /* 縦線：0.2秒は細い補助線、1秒は濃い線 */
+  for(s=0;s<=DUR*5;s++){var xx=Math.round(x0+s*pps/5)+.5;if(s%5){if(pps<45)continue;c2.strokeStyle=G2;}else c2.strokeStyle=G1;c2.lineWidth=1;c2.beginPath();c2.moveTo(xx,top-8);c2.lineTo(xx,H-bot+2);c2.stroke();}
+  c2.fillStyle=TXT;c2.font="10px system-ui,sans-serif";c2.textBaseline="middle";c2.textAlign="left";
+  for(s=0;s<DUR;s++){var lab=pps>=70?hms(t0+s):(s%2?"":hms(t0+s));if(lab)c2.fillText(lab,x0+s*pps+3,11);}
+  /* チャンネル間の基線（ごく薄く） */
+  c2.strokeStyle="#F0F2F4";ys.forEach(function(y){c2.beginPath();c2.moveTo(0,Math.round(y)+.5);c2.lineTo(Wd,Math.round(y)+.5);c2.stroke();});
+  /* 技師の記録（開眼・閉眼・HVなど） */
+  (info.marks||[]).forEach(function(m){if(m.t<0||m.t>DUR)return;var xx=Math.round(x0+m.t*pps)+.5;c2.strokeStyle=MK;c2.setLineDash([4,3]);c2.beginPath();c2.moveTo(xx,top-8);c2.lineTo(xx,H-bot);c2.stroke();c2.setLineDash([]);
+    c2.font="600 10.5px system-ui,sans-serif";var w=c2.measureText(m.l).width+8;c2.fillStyle="#E3F0FC";c2.fillRect(xx+2,top-7,w,15);c2.fillStyle=MK;c2.textAlign="left";c2.fillText(m.l,xx+6,top+1);});
+  var i0=tI(0),i1=tI(DUR);
+  c2.lineWidth=dpr>1?.9:1;c2.lineJoin="round";
+  ch.forEach(function(c,k){var a=d.P[EI[c.a]],b=c.b==="Ae"?null:d.P[EI[c.b]],A1=d.P[EI.A1],A2=d.P[EI.A2],y0=ys[k];c2.strokeStyle=colOf(c);
     c2.beginPath();for(var i=i0;i<=i1;i++){var v=a[i]-(b?b[i]:(A1[i]+A2[i])/2),px=x0+(i-i0)/FS*pps,py=y0+v*kuv;if(i===i0)c2.moveTo(px,py);else c2.lineTo(px,py);}c2.stroke();});
-  if(o.ecg){var kE=chH*.85/1000;c2.strokeStyle=ngc;c2.beginPath();for(var i=i0;i<=i1;i++){var px=x0+(i-i0)/FS*pps,py=ecgY-d.ecg[i]*kE;if(i===i0)c2.moveTo(px,py);else c2.lineTo(px,py);}c2.stroke();}
-  var cu=o.sens<=10?50:o.sens<=20?100:200,hw=Math.min(pps,140),bx=Wd-hw-10,by=H-8;
-  c2.strokeStyle=acc;c2.lineWidth=1.6;c2.beginPath();c2.moveTo(bx,by-cu*kuv);c2.lineTo(bx,by);c2.lineTo(bx+hw,by);c2.stroke();
-  c2.fillStyle=acc;c2.textAlign="right";c2.textBaseline="middle";c2.fillText(cu+" µV",bx-3,by-cu*kuv/2);
+  if(o.ecg){var kE=chH*.85/1000;c2.strokeStyle=ECGC;c2.beginPath();for(var i=i0;i<=i1;i++){var px=x0+(i-i0)/FS*pps,py=ecgY-d.ecg[i]*kE;if(i===i0)c2.moveTo(px,py);else c2.lineTo(px,py);}c2.stroke();}
+  /* 較正（右下）：縦＝電位、横＝1秒 */
+  var cu=o.sens<=10?50:o.sens<=20?100:200,hw=Math.min(pps,140),bx=Wd-hw-10,by=H-6;
+  c2.strokeStyle=INK;c2.lineWidth=1.4;c2.beginPath();c2.moveTo(bx,by-cu*kuv);c2.lineTo(bx,by);c2.lineTo(bx+hw,by);c2.stroke();
+  c2.fillStyle=INK;c2.font="10px system-ui,sans-serif";c2.textAlign="right";c2.textBaseline="middle";c2.fillText(cu+" µV",bx-3,by-cu*kuv/2);
   c2.textAlign="center";c2.textBaseline="bottom";c2.fillText(hw<pps?(hw/pps).toFixed(1)+" s":"1 s",bx+hw/2,by-2);
+  /* 計測カーソル（タップ2点で時間差と周波数） */
+  var cur=CUR[o.src]||[];
+  cur.forEach(function(t,k){var xx=Math.round(x0+t*pps)+.5;c2.strokeStyle=CURC;c2.lineWidth=1;c2.beginPath();c2.moveTo(xx,top-8);c2.lineTo(xx,H-bot);c2.stroke();
+    c2.fillStyle=CURC;c2.font="700 10px system-ui,sans-serif";c2.textAlign="left";c2.textBaseline="middle";c2.fillText(k?"B":"A",xx+3,top+10);});
+  cs.addEventListener("click",function(e){var r=cs.getBoundingClientRect(),t=(e.clientX-r.left-x0)/pps;if(t<0||t>DUR)return;var c=CUR[o.src]||[];if(c.length>=2)c=[];c.push(t);CUR[o.src]=c;if(o.onCur)o.onCur();});
   host.scrollLeft=prevL;
 }
-function parText(o){return MONT[o.mont].name+"・"+VIEWN[o.view]+"　感度 "+o.sens+" µV/mm　時定数 "+o.tc+" s　高域 "+(o.hff?o.hff+" Hz":"切")+"　1ページ10秒（"+(o.xz==="fit"?"画面幅に合わせて表示":"30 mm/s×"+o.xz)+"）";}
+function parText(o,B){var info=(B&&B.info)||{},t0=info.t0||36000,c=CUR[o.src]||[],r;
+  var h='<span>'+esc(MONT[o.mont].name)+'・'+esc(VIEWN[o.view])+'</span><span>'+o.sens+' µV/mm</span><span>TC '+o.tc+' s</span><span>HF '+(o.hff?o.hff+' Hz':'切')+'</span><span>'+(o.xz==="fit"?'画面幅':'30 mm/s×'+o.xz)+'</span><span>'+hms(t0)+'〜'+hms(t0+DUR)+'（1/1ページ・10秒）</span>';
+  if(c.length===1)r='カーソルA '+c[0].toFixed(2)+' s（もう1点タップで時間差）';
+  else if(c.length===2){var dt=Math.abs(c[1]-c[0]);r='A–B '+Math.round(dt*1000)+' ms（'+(dt>0?(1/dt).toFixed(1):'—')+' Hz）・タップでやり直し';}
+  else return h+'<span class="hint2">波形をタップすると時間を測れます（2点で時間差と周波数）</span>';
+  return h+'<span class="cur">'+r+'</span>';}
 function seg(name,opts,val){return '<div class="seg" role="group">'+opts.map(function(o){return '<button type="button" class="'+(String(val)===String(o[0])?'on':'')+'" data-ds="'+name+'" data-v="'+o[0]+'" aria-pressed="'+(String(val)===String(o[0]))+'">'+o[1]+'</button>';}).join("")+'</div>';}
 function sel(name,lb,opts,val,unit){return '<label class="ss">'+lb+'<select data-ds="'+name+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(val)===String(o[0])?' selected':'')+'>'+o[1]+'</option>';}).join("")+'</select>'+(unit||"")+'</label>';}
 function ctlHTML(sens,src,full){
-  var h='<div class="ctl">'+seg("mont",[["bip","縦双極"],["ref","基準"]],DS.mont)+seg("view",[["all","全"],["tmp","側頭"],["par","傍矢状"],["L","左"],["R","右"]],DS.view)+'</div>';
+  var h='<div class="ctl">'+seg("mont",[["bip","縦双極"],["ref","基準"]],DS.mont)+seg("view",[["all","全"],["tmp","側頭"],["par","傍矢状"],["L","左"],["R","右"]],DS.view)+seg("color",[["mono","白黒"],["lr","左青・右赤"]],DS.color)+'</div>';
   h+='<div class="ctl">'+sel("sens","感度",[[5,"5"],[7,"7"],[10,"10"],[15,"15"],[20,"20"],[30,"30"],[50,"50"]],sens,"µV/mm")+sel("tc","時定数",[[.1,"0.1"],[.3,"0.3"],[1,"1.0"]],DS.tc,"s")+sel("hff","高域",[[30,"30 Hz"],[60,"60 Hz"],[0,"切"]],DS.hff,"")+sel("xz","横",[["fit","画面幅"],["1","×1"],["1.5","×1.5"],["2","×2"]],DS.xz,"")+(full?"":sel("vz","縦",[[.75,"小"],[1,"中"],[1.3,"大"]],DS.vz,""))+
     '<label class="ss"><input type="checkbox" data-ds="ecg"'+(DS.ecg?' checked':'')+'>ECG</label>'+(full?'':'<button type="button" class="btn sm" data-full="'+src+'">大きく表示</button>')+'</div>';
   return h;}
-function opts(sens,extra){var o={mont:DS.mont,view:DS.view,sens:sens,tc:+DS.tc,hff:+DS.hff,xz:DS.xz,vz:+DS.vz,ecg:!!DS.ecg};if(extra)for(var k in extra)o[k]=extra[k];return o;}
+function opts(sens,extra){var o={mont:DS.mont,view:DS.view,sens:sens,tc:+DS.tc,hff:+DS.hff,xz:DS.xz,vz:+DS.vz,ecg:!!DS.ecg,color:DS.color};if(extra)for(var k in extra)o[k]=extra[k];return o;}
 
 /* 表示中の波形（出題・一覧の見本・全画面） */
 var VIEWS={};
 function view(src){if(src==="q"){var q=st.cur;if(!q)return null;return {B:build(q.pid,q.seed,q.x),sens:q.sens,host:document.getElementById("trQ"),par:document.getElementById("parQ"),ctl:document.getElementById("ctlQ")};}
   var v=VIEWS[src];if(!v||!document.body.contains(v.host))return null;return v;}
-function redraw(src){var v=view(src);if(!v||!v.host)return;var o=opts(v.sens);drawTrace(v.host,v.B,o);if(v.par)v.par.textContent=parText(o);if(v.ctl)v.ctl.innerHTML=ctlHTML(v.sens,src,false);}
+function redraw(src){var v=view(src);if(!v||!v.host)return;var o=opts(v.sens,{src:src,onCur:function(){redraw(src);}});drawTrace(v.host,v.B,o);if(v.par)v.par.innerHTML=parText(o,v.B);if(v.ctl)v.ctl.innerHTML=ctlHTML(v.sens,src,false);}
 function redrawAll(){redraw("q");Object.keys(VIEWS).forEach(redraw);if(fs.src)drawFull();}
 function setSens(src,n){if(src==="q"&&st.cur){st.cur.sens=n;save();}else if(VIEWS[src])VIEWS[src].sens=n;}
 document.addEventListener("click",function(e){var b=e.target.closest?e.target.closest("button[data-ds]"):null;
@@ -899,7 +956,7 @@ function openFull(src){if(!view(src))return;fs.src=src;fsv.hidden=false;document
 function closeFull(){fs.src=null;fsv.hidden=true;document.body.classList.remove("fsopen");["wcClrBtn","wcQrBtn"].forEach(function(id){var b=document.getElementById(id);if(b)b.style.visibility="";});redrawAll();}
 function drawFull(){var v=view(fs.src);if(!v){closeFull();return;}var host=document.getElementById("fsTr");
   document.getElementById("fsCtl").setAttribute("data-src",fs.src);document.getElementById("fsCtl").innerHTML=ctlHTML(v.sens,fs.src,true);
-  var o=opts(v.sens,{fitH:host.clientHeight-4});drawTrace(host,v.B,o);document.getElementById("fsPar").textContent=parText(o);}
+  var o=opts(v.sens,{fitH:host.clientHeight-4,src:fs.src,onCur:drawFull});drawTrace(host,v.B,o);document.getElementById("fsPar").innerHTML=parText(o,v.B);}
 document.getElementById("fsClose").onclick=closeFull;
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&fs.src)closeFull();});
 
@@ -917,7 +974,7 @@ function newQ(pid,seed,x){var id=pid||pick();if(!id){st.cur=null;save();renderQ(
   var P=byId[id];seed=seed||(Math.floor(Math.random()*2147483646)+1);if(x===undefined)x=st.set.lvl>=3&&Math.random()<.35;
   var B=build(id,seed,x),m=makeOpts(P,B.info);
   st.cur={pid:id,seed:seed,x:!!x,o:m.o,cl:m.cl,sens:P.sens||10,a1:null,a2:null,done:false,hint:false,reveal:!st.set.hide,no:st.cnt+1};
-  save();renderQ();try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}}
+  CUR.q=[];save();renderQ();try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}}
 var qArea=document.getElementById("qArea");
 function renderQ(){var q=st.cur;
   if(!q){var c=PATS.filter(inSet).length;
@@ -927,7 +984,7 @@ function renderQ(){var q=st.cur;
   var h='<div class="card"><div class="qhead"><span>第'+q.no+'問</span><span class="lv" title="難易度">'+lvDots(P.lvl)+'</span>'+((q.hint||q.done)?'<span class="regtag">'+esc(GRPN[P.grp])+'</span>':'')+'</div>';
   if(info.vigT)h+='<p class="pt">'+esc(info.vigT)+'</p>';
   if(q.hint&&!q.done)h+='<p class="hintbox">注目：'+esc(info.focus||"")+'　／　状態：'+esc(info.state||"")+'</p>';
-  h+='<div class="trwrap" data-src="q"><p class="par" id="parQ"></p><div class="trace" id="trQ"></div><div id="ctlQ"></div></div>';
+  h+='<div class="trwrap viewer" data-src="q"><div class="vbar" id="ctlQ"></div><div class="trace" id="trQ"></div><div class="vstat" id="parQ"></div></div>';
   h+='<p class="ask">① 所見名は？</p>';
   if(!q.reveal&&!q.done)h+='<div class="nav"><button class="btn primary" type="button" id="revBtn">考えたら選択肢を表示</button></div>';
   else{
@@ -996,7 +1053,7 @@ function renderAtlas(){var q=aQ.value.trim().toLowerCase(),h="";VIEWS={};
         '<p class="hint" style="margin-top:0">'+esc(p.en)+'　意味：'+p.mean.map(function(m){return MEAN[m].t;}).join("／")+'</p>'+
         '<div class="sub">見分ける決め手</div><ul class="why">'+keyList(p)+'</ul><div class="sub">紛らわしいもの</div><ul class="why">'+confList(p)+'</ul>'+
         '<div class="sub">臨床的な意味</div><p class="tx">'+esc(p.clin)+'</p>'+txBox(p)+'<p class="chk">'+esc(CHK[p.chk])+'</p>'+
-        '<div class="trwrap" data-src="a_'+p.id+'" hidden><p class="par"></p><div class="trace"></div><div class="ctlA"></div></div>'+
+        '<div class="trwrap viewer" data-src="a_'+p.id+'" hidden><div class="vbar ctlA"></div><div class="trace"></div><div class="vstat par"></div></div>'+
         '<div class="nav"><button class="btn sm" type="button" data-ex="'+p.id+'">見本の波形</button><button class="btn sm" type="button" data-q="'+p.id+'">この所見で出題</button></div></details>';}).join("")+'</div>';});
   aList.innerHTML=h||'<div class="card empty">該当する所見がありません。</div>';
   Array.prototype.forEach.call(aList.querySelectorAll("[data-q]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-q"));show("v-q");};});
