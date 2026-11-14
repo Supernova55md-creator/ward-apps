@@ -29,6 +29,7 @@
   --inj:#8db7f2; --inj-soft:#18263a; --po:#5fd39a; --po-soft:#173326; --top:#c9a6f2; --top-soft:#2b2238; --proc:#b3b8bb; --proc-soft:#2a2d2f; color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{margin:0}
+html{scroll-padding-top:calc(var(--hh,150px) + 8px)}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
 header.top .brand{max-width:760px;margin:0 auto}
@@ -39,9 +40,11 @@ nav.tabs button{font:inherit;font-size:13px;font-weight:700;border:0;border-radi
 nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
 @media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.18)}}
 main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+.view{display:flex;flex-direction:column;gap:12px}
 section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
-h2{font-size:17px;margin:0 0 10px;line-height:1.4}
-h3{font-size:14px;margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+h2{font-size:17px;margin:0 0 10px;line-height:1.4;display:flex;align-items:center;gap:8px}
+h2 .no{flex:none;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:13px}
+h3{font-size:14px;margin:14px 0 6px}
 h3:first-child{margin-top:0}
 .hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
 input[type=search],input[type=number],select{font:inherit;font-size:16px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);width:100%}
@@ -49,17 +52,24 @@ input[type=number]{font-size:18px;font-variant-numeric:tabular-nums}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .chips button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;min-height:34px;cursor:pointer}
 .chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chips.recent button{border-color:var(--accent);color:var(--accent);background:var(--surface);font-weight:700}
 .clist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .clist button{font:inherit;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;min-height:54px;cursor:pointer;display:flex;flex-direction:column;gap:2px}
 .clist button b{font-size:15px;line-height:1.35}
 .clist button span{font-size:11.5px;color:var(--muted)}
-.ghead{font-size:12.5px;font-weight:700;color:var(--muted);margin:10px 2px 6px}
+.ghead{font-size:12.5px;font-weight:700;color:var(--muted);margin:12px 2px 6px}
 .ghead:first-child{margin-top:0}
-.back{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;min-height:36px;align-self:flex-start}
+.dhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.back{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;min-height:36px}
+.dhead h2{margin:0;font-size:19px}
+.jump{position:sticky;top:var(--hh,150px);z-index:5;display:flex;gap:6px;overflow-x:auto;padding:6px 2px;margin:0 -2px;background:var(--bg);scrollbar-width:none}
+.jump::-webkit-scrollbar{display:none}
+.jump a{flex:none;font-size:13px;font-weight:700;text-decoration:none;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:5px 11px;background:var(--surface);white-space:nowrap}
 ul.lst,ol.lst{margin:0;padding-left:1.3em}
 ul.lst li,ol.lst li{margin:3px 0;font-size:15px}
-.red{background:var(--crit-soft);border-radius:10px;padding:10px 12px}
-.red h3{color:var(--crit);margin-top:0}
+.red{background:var(--crit-soft);border-color:transparent}
+.red h2{color:var(--crit)}
+.red h2 .no{background:var(--crit)}
 .rx{border:1px solid var(--line);border-left:5px solid var(--proc);border-radius:9px;padding:8px 10px;margin:6px 0;background:var(--surface)}
 .rx[data-c="注射"]{border-left-color:var(--inj)}
 .rx[data-c="内服"]{border-left-color:var(--po)}
@@ -67,44 +77,65 @@ ul.lst li,ol.lst li{margin:3px 0;font-size:15px}
 .rx .nm{font-weight:700;font-size:15px;line-height:1.4}
 .rx .ds{font-size:15px;margin-top:2px}
 .rx .nt{font-size:12.5px;color:var(--muted);margin-top:2px}
+.rx .wt{font-size:14px;margin-top:4px;font-family:var(--num);color:var(--info);font-weight:700}
+.rx .fl{font-size:13px;margin-top:4px;border-radius:6px;padding:3px 7px;background:var(--warn-soft);color:var(--warn);font-weight:600}
+.rx .fl.ng{background:var(--crit-soft);color:var(--crit)}
 .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;margin-right:6px;vertical-align:1px;background:var(--proc-soft);color:var(--proc)}
 .tag[data-c="注射"]{background:var(--inj-soft);color:var(--inj)}
 .tag[data-c="内服"]{background:var(--po-soft);color:var(--po)}
 .tag[data-c="外用・吸入"]{background:var(--top-soft);color:var(--top)}
 .tag.src{background:var(--accent-soft);color:var(--accent)}
-.dispo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tag.chk{background:var(--ok-soft);color:var(--ok)}
+.dispo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 @media (max-width:520px){.dispo{grid-template-columns:1fr}}
 .dispo>div{border-radius:10px;padding:10px 12px}
 .dispo .ad{background:var(--warn-soft)}
 .dispo .hm{background:var(--ok-soft)}
 .dispo b{font-size:13.5px}
-.pit{background:var(--info-soft);border-radius:10px;padding:10px 12px}
+.pit{background:var(--info-soft);border-color:transparent}
 .btnrow{display:flex;flex-wrap:wrap;gap:6px}
 .btnrow button,.btnrow a{font:inherit;font-size:13.5px;border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:999px;padding:6px 12px;text-decoration:none;cursor:pointer;min-height:34px;display:inline-flex;align-items:center}
+details.more{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
+details.more>summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--accent);list-style:none;padding:4px 0}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"＋ "}
+details.more[open]>summary::before{content:"－ "}
+details.sc{border:1px solid var(--line);border-radius:10px;padding:0 10px;margin:8px 0;background:var(--bg)}
+details.sc>summary{cursor:pointer;font-weight:700;font-size:14.5px;padding:10px 0;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.sc>summary::-webkit-details-marker{display:none}
+details.sc>summary .sv{font-family:var(--num);color:var(--muted);font-weight:700}
 .item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dotted var(--line);font-size:15px}
 .item:last-child{border-bottom:0}
 .item input[type=checkbox]{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--accent)}
 .item .pt{margin-left:auto;font-family:var(--num);color:var(--muted);font-size:13px;flex:none}
 .item label{flex:1;cursor:pointer}
-.item select{font-size:14.5px;padding:7px}
-.selrow{display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px dotted var(--line)}
-.selrow span{font-size:14px;font-weight:700}
-.result{border-radius:10px;padding:12px;margin-top:10px;font-size:15px}
-.result .score{font-family:var(--num);font-size:26px;font-weight:700;display:block;line-height:1.2}
+.selrow{padding:8px 0;border-bottom:1px dotted var(--line)}
+.selrow>span{display:block;font-size:14px;font-weight:700;margin-bottom:4px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 10px;min-height:36px;cursor:pointer;text-align:left}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.result{border-radius:10px;padding:10px 12px;margin:8px 0 10px;font-size:15px}
+.result .big{font-size:17px;font-weight:700;display:block;line-height:1.35}
 .result.ok{background:var(--ok-soft);color:var(--ok)}
 .result.warn{background:var(--warn-soft);color:var(--warn)}
 .result.crit{background:var(--crit-soft);color:var(--crit)}
+.result.info{background:var(--info-soft);color:var(--info)}
 .result p{margin:4px 0 0;color:var(--ink)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
-.grid2 label.f{white-space:nowrap}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
-.big{font-family:var(--num);font-size:30px;font-weight:700;color:var(--accent)}
-.muted{color:var(--muted)}
+table.qk{width:100%;border-collapse:collapse;font-size:14px}
+table.qk th,table.qk td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:left;vertical-align:top}
+table.qk th{width:30%;font-size:13px;color:var(--muted)}
+table.qk td b{font-weight:700}
+table.qk .w{display:block;font-family:var(--num);color:var(--info);font-size:13px;font-weight:700}
+.ver{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.ver button{font:inherit;font-size:12px;min-height:32px;padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer}
+.note{font-size:12.5px;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:8px}
 .foot{font-size:12px;color:var(--muted);text-align:center;margin:8px 0 0}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:1}
 [hidden]{display:none!important}
-mark{background:var(--warn-soft);color:inherit;border-radius:3px}
+a{color:var(--info)}
 </style>
 </head>
 <body>
@@ -121,12 +152,20 @@ mark{background:var(--warn-soft);color:inherit;border-radius:3px}
 <main>
   <!-- 主訴 -->
   <div id="v-cc" class="view">
-    <section class="card" id="ccList">
-      <input type="search" id="ccQ" placeholder="主訴・疾患名で検索（例：胸痛、解離、SAH）" autocomplete="off">
-      <div class="chips" id="ccG"></div>
-      <div id="ccItems" style="margin-top:12px"></div>
-    </section>
-    <div id="ccDetail" hidden style="display:flex;flex-direction:column;gap:12px"></div>
+    <div id="ccList" class="view">
+      <section class="card">
+        <input type="search" id="ccQ" placeholder="主訴・疾患・薬で検索" autocomplete="off">
+        <div class="chips recent" id="ccRecent"></div>
+        <div class="chips" id="ccG"></div>
+        <div id="ccItems" style="margin-top:12px"></div>
+      </section>
+      <section class="card">
+        <h2>緊急薬の早見</h2>
+        <table class="qk" id="qk"></table>
+        <p class="hint">体重は上の患者プロファイル（帯）から計算します。</p>
+      </section>
+    </div>
+    <div id="ccDetail" class="view" hidden></div>
   </div>
   <!-- 薬剤 -->
   <div id="v-rx" class="view" hidden>
@@ -141,27 +180,25 @@ mark{background:var(--warn-soft);color:inherit;border-radius:3px}
   <div id="v-sc" class="view" hidden>
     <section class="card">
       <label class="f">スコアを選ぶ<select id="scSel"></select></label>
-      <p class="hint" id="scNote"></p>
-      <div id="scItems" style="margin-top:6px"></div>
-      <div id="scRes"></div>
-      <div class="btnrow" style="margin-top:10px"><button type="button" id="scReset">このスコアをリセット</button></div>
+      <div id="scBox" style="margin-top:8px"></div>
     </section>
   </div>
   <!-- 持続計算 -->
   <div id="v-inf" class="view" hidden>
     <section class="card">
       <h2>持続静注の流量計算</h2>
-      <label class="f">薬剤（よく使う調製）<select id="infSel"></select></label>
+      <div class="chips" id="infG"></div>
       <p class="hint" id="infPrep"></p>
       <div class="grid2" style="margin-top:10px">
-        <label class="f">体重（kg）<input type="number" id="infW" inputmode="decimal" min="1" max="250" step="0.1"></label>
+        <label class="f"><span>体重 kg</span><input type="number" id="infW" data-wp="weight" inputmode="decimal" min="1" max="250" step="0.1"></label>
         <label class="f"><span>濃度 <span id="infCu"></span></span><input type="number" id="infC" inputmode="decimal" min="0" step="any"></label>
         <label class="f"><span>投与量 <span id="infDu"></span></span><input type="number" id="infD" inputmode="decimal" min="0" step="any"></label>
-        <label class="f">流量 mL/時<input type="number" id="infR" inputmode="decimal" min="0" step="any"></label>
+        <label class="f"><span>流量 mL/時</span><input type="number" id="infR" inputmode="decimal" min="0" step="any"></label>
       </div>
-      <p class="hint">投与量を入れると流量、流量を入れると投与量を計算します（最後に触った方から計算）。目安：<span id="infRange"></span></p>
-      <div id="infOut" class="result ok" style="display:none"></div>
-      <p class="hint">濃度は施設の調製法に合わせて書き換えてください。</p>
+      <p class="hint">投与量を入れると流量、流量を入れると投与量を出します。目安：<span id="infRange"></span></p>
+      <div id="infOut" class="result info" hidden></div>
+      <div class="seg" id="infQuick" style="margin-top:4px"></div>
+      <p class="hint">濃度は施設の調製法に合わせて書き換えてください（書き換えた値は薬剤ごとに残ります）。</p>
     </section>
   </div>
   <!-- 出典 -->
@@ -169,16 +206,19 @@ mark{background:var(--warn-soft);color:inherit;border-radius:3px}
     <section class="card">
       <h2>使い方と注意</h2>
       <ul class="lst">
-        <li>成人の標準量です。腎機能・肝機能・体重・年齢・妊娠・授乳・相互作用で調整し、最終確認は添付文書と院内の取り決めで行ってください。</li>
-        <li>「適応外」「国内未承認」はその旨を書いています。</li>
-        <li>入力内容はこの端末にのみ保存されます。患者個人情報は入力しないでください。</li>
-        <li>関連アプリ（頭痛ナビ、抗てんかん薬ナビ、感染症治療ナビなど）へのボタンは各主訴の下にあります。</li>
+        <li>主訴を選ぶと「①危険サイン → ②初期対応 → ③初療の薬 → ④判断（スコア・入院/帰宅） → ⑤帰宅時処方 → ⑥落とし穴」の順に出ます。上の帯で各項目へ飛べます。</li>
+        <li>年齢・腎機能・妊娠・抗血栓薬・体重は、ヘッダーの患者プロファイルの帯から取り、該当する薬に注意を出し、体重あたりの量を計算します。</li>
+        <li>用量は成人の標準量です。<b>添付文書と照合済みの印（照合済）が付いたもの以外は、成書・ガイドラインからの一般的な目安で、添付文書とは未照合です。</b>最終確認は添付文書と院内の取り決めで行ってください。</li>
+        <li>診療判断の補助です。最終判断は診察と原典で行ってください。患者個人情報は入力しないでください。</li>
       </ul>
-      <h3>出典（2026年11月時点で確認）</h3>
+      <div class="ver">アプリの版：<b id="appVer"></b><button type="button" id="forceUpdate">最新版に更新</button></div>
+    </section>
+    <section class="card">
+      <h2>出典</h2>
       <ul class="lst" id="refList"></ul>
     </section>
   </div>
-  <p class="foot">ER業務支援ナビ ・ 内容更新 2026-11-14</p>
+  <p class="foot">診療判断の補助です。最終判断は診察と原典で。</p>
 </main>
 <div class="toast" id="toast"></div>
 <script>
@@ -659,27 +699,30 @@ const INF = [
 ];
 
 const REFS = [
- ["内科救急診療指針2022（日本内科学会 専門医制度審議会 救急委員会 編）","本アプリの主訴・各論の骨組み（Dropbox所蔵）"],
- ["問題解決型救急初期診療 第2版（医学書院）","主訴別アプローチ（Dropbox所蔵）"],
- ["JRC蘇生ガイドライン2025（日本蘇生協議会、2026年7月書籍版）","心肺停止・ALS"],
- ["2025年改訂版 心不全診療ガイドライン（日本循環器学会/日本心不全学会）","急性心不全"],
- ["2025年改訂版 肺血栓塞栓症・深部静脈血栓症および肺高血圧症に関するガイドライン（日本循環器学会ほか）","PE・DVT"],
- ["2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes","ACS"],
- ["日本版敗血症診療ガイドライン2024（J-SSCG2024）","敗血症・ショック"],
- ["アナフィラキシーガイドライン2022（日本アレルギー学会）","アナフィラキシー"],
- ["脳卒中治療ガイドライン2021〔改訂2023〕（日本脳卒中学会）","脳卒中・降圧目標"],
- ["頭痛の診療ガイドライン2021（日本神経学会/日本頭痛学会）","頭痛"],
- ["熱中症診療ガイドライン2024（日本救急医学会）","熱中症（Ⅳ度の新設）"],
- ["T-FLAVOR（JAMA Neurology 2026）","テネクテプラーゼ：国内未承認"]
+ ["内科救急診療指針2022（日本内科学会 専門医制度審議会 救急委員会 編）","主訴・各論の骨組み（Dropbox所蔵の書籍。本文はアプリに転載していない）",""],
+ ["問題解決型救急初期診療 第2版（医学書院）","主訴別アプローチの確認（Dropbox所蔵）",""],
+ ["JRC蘇生ガイドライン2025（日本蘇生協議会、2025年10月オンライン版・2026年7月書籍版）","心肺停止・ALS",""],
+ ["2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. Circulation 2025;151:e771–e862","胸痛・ACS","https://pubmed.ncbi.nlm.nih.gov/40014670/"],
+ ["2025年改訂版 心不全診療ガイドライン（日本循環器学会/日本心不全学会）","急性心不全",""],
+ ["2025年改訂版 肺血栓塞栓症・深部静脈血栓症および肺高血圧症に関するガイドライン（日本循環器学会/日本肺高血圧・肺循環学会）","PE・DVT",""],
+ ["日本版敗血症診療ガイドライン2024（J-SSCG2024）（日本集中治療医学会/日本救急医学会）","発熱・敗血症・ショック","https://www.jsicm.org/pdf/cq/J-SSCG2024/J-SSCG2024_Main.pdf"],
+ ["重篤副作用疾患別対応マニュアル アナフィラキシー（厚生労働省、令和8年2月改定）／アナフィラキシーガイドライン2022（日本アレルギー学会）","アナフィラキシー","https://www.pmda.go.jp/files/000279383.pdf"],
+ ["熱中症診療ガイドライン2024（日本救急医学会）","熱中症（Ⅳ度の新設）","https://www.mhlw.go.jp/seisakunitsuite/bunya/kenkou_iryou/kenkou/nettyuu/nettyuu_taisaku/pdf/heatstroke2024.pdf"],
+ ["脳卒中治療ガイドライン2021〔改訂2023〕（日本脳卒中学会）","脳卒中・降圧目標",""],
+ ["頭痛の診療ガイドライン2021（日本神経学会/日本頭痛学会）","頭痛",""],
+ ["Inoue M, et al. Standard-dose tenecteplase vs low-dose alteplase for acute ischemic stroke from large-vessel occlusion (T-FLAVOR). JAMA Neurol 2026;83:769-777","テネクテプラーゼは国内未承認","https://doi.org/10.1001/jamaneurol.2026.1590"],
+ ["用量の照合状況","ミダゾラム（ミダフレッサ）・ホスフェニトイン（ホストイン）・レベチラセタム（イーケプラ）は添付文書（PMDA）と照合済み（抗てんかん薬ナビ）。それ以外は成書・ガイドラインに基づく目安で、添付文書とは未照合",""]
 ];
 
 </script>
 <script>
 (function(){
 "use strict";
+var APP_VER="2026-11-14b";
 var KEY="er-nav-v1";
-var st={tab:"cc",cid:null,q:"",g:"",rq:"",rg:"",sc:"heart",scv:{},inf:{i:0,w:"",c:"",d:"",r:"",last:"d"}};
+var st={tab:"cc",cid:null,q:"",g:"",rq:"",rg:"",sc:"heart",scv:{},inf:{i:0,d:"",r:"",last:"d"},infc:{},recent:[]};
 try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in o)st[k]=o[k];}catch(e){}
+if(!Array.isArray(st.recent))st.recent=[];if(!st.infc)st.infc={};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
 function $(id){return document.getElementById(id);}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
@@ -687,21 +730,81 @@ function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");setTime
 window.toast=toast;
 function norm(s){return String(s).toLowerCase().replace(/[ァ-ン]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60);}).replace(/[Ａ-Ｚａ-ｚ０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/\s+/g,"");}
 function hit(text,q){if(!q)return true;var t=norm(text);return norm(q).split(/[,、]/).every(function(w){return !w||t.indexOf(w)>=0;});}
+function P(){try{return window.WardProfile?WardProfile.get():{};}catch(e){return {};}}
 
-/* ---- tabs ---- */
+/* ───── 薬の注意（患者プロファイルと照合） ───── */
+var NSAID=/ロキソニン|ロピオン|ボルタレン|セレコックス|ナイキサン/;
+var RULES=[
+ [NSAID,{renal:["30-59","15-29","lt15"],rm:"腎機能低下：NSAIDsは避ける（アセトアミノフェンを）",preg:"妊娠：後期は禁忌、それ以外も原則避ける（アセトアミノフェンを）",old:"高齢：腎障害・消化管出血に注意",at:"抗血栓薬と併用で出血リスクが上がる"}],
+ [/ゾシン|バンコマイシン|マキシピーム|ガスター|イーケプラ|ジゴシン|ユナシン|セファメジン|ケフレックス|ビクシリン|セフメタゾン|リスパダール|タリージェ|トラムセット/,{renal:["30-59","15-29","lt15"],rm:"腎機能低下：減量・投与間隔の調整が必要（腎機能・用量調整ナビ）"}],
+ [/エリキュース|イグザレルト|リクシアナ/,{renal:["30-59","15-29","lt15"],rm:"腎機能低下：DOACの減量基準・禁忌（CCr 15未満など）を確認",preg:"妊娠：DOACは避ける（ヘパリンへ）",at:"すでに抗血栓薬を内服中：併用は出血リスク"}],
+ [/ゾメタ|ゾレドロン/,{renal:["30-59","15-29","lt15"],rm:"腎機能低下：減量（CCr 30未満は避ける）",preg:"妊娠：避ける"}],
+ [/マグネゾール|マグセント/,{renal:["15-29","lt15"],rm:"高度腎機能低下：高Mg血症に注意"}],
+ [/スローケー|KCL注/,{renal:["15-29","lt15"],rm:"高度腎機能低下：高Kに注意（少量・頻回測定）"}],
+ [/プリンペラン/,{renal:["15-29","lt15"],rm:"高度腎機能低下：半量に",old:"高齢：錐体外路症状・アカシジア"}],
+ [/ナウゼリン/,{preg:"妊娠：禁忌",preg_ng:1}],
+ [/アタラックス/,{preg:"妊娠初期：禁忌",preg_ng:1,old:"高齢：抗コリン作用でせん妄・尿閉"}],
+ [/トラベルミン|ポララミン/,{old:"高齢：抗コリン作用でせん妄・尿閉・緑内障悪化"}],
+ [/ブスコパン/,{old:"高齢：緑内障・前立腺肥大・せん妄に注意"}],
+ [/セルシン|ホリゾン|サイレース|ドルミカム|ミダフレッサ/,{old:"高齢：呼吸抑制・せん妄。少量から"}],
+ [/セレネース|セロクエル|リスパダール/,{old:"高齢：少量から（錐体外路・転倒・QT延長）"}],
+ [/ソセゴン|レペタン|モルヒネ|フェンタニル/,{old:"高齢：呼吸抑制・せん妄。少量から"}],
+ [/ミオナール|トラムセット|タリージェ/,{old:"高齢：ふらつき・転倒"}],
+ [/アンカロン/,{preg:"妊娠：胎児の甲状腺障害。原則避ける（致死的不整脈は別）"}],
+ [/ホストイン|ノーベルバール/,{preg:"妊娠：催奇形性に注意（重積では救命優先）"}],
+ [/ヘパリン|バイアスピリン|エフィエント|プラビックス/,{at:"すでに抗血栓薬を内服中：重ねると出血リスク"}],
+ [/グルトパ|アクチバシン/,{at:"抗凝固薬内服中：最終服用時刻・凝固検査で適応を慎重に（再開通療法適応チェッカー）"}]
+];
+var CHECKED=/ミダフレッサ|ホストイン|イーケプラ/; /* 抗てんかん薬ナビで添付文書（PMDA）と照合済みの用量 */
+var INI_PO=/バイアスピリン|エフィエント|プラビックス|薬用炭|アセチルシステイン|ロケルマ|カリメート|ブドウ糖10g/;
+function flags(r,p){
+  var out=[],name=r[1];
+  RULES.forEach(function(x){if(!x[0].test(name))return;var f=x[1];
+    if(f.renal&&p.renal&&f.renal.indexOf(p.renal)>=0)out.push([f.rm,0]);
+    if(f.preg&&p.preg==="preg")out.push([f.preg,f.preg_ng?1:0]);
+    if(f.old&&p.age==="ge75")out.push([f.old,0]);
+    if(f.at&&p.at&&p.at!=="none")out.push([f.at,0]);
+  });
+  var seen={};return out.filter(function(f){if(seen[f[0]])return false;seen[f[0]]=1;return true;});
+}
+/* 体重あたりの量：用量文中の「○mg/kg」（/分・/時は除く）を体重で計算 */
+function rnd(v){return v<1?Math.round(v*100)/100:v<10?Math.round(v*10)/10:Math.round(v);}
+function wcalc(txt,w,name){
+  if(!(w>0))return "";
+  var re=/(\d+(?:\.\d+)?)(?:〜(\d+(?:\.\d+)?))?\s*(mg|µg|g|単位|IU|mEq|mL)\/kg(?!\/)/g,m,parts=[];
+  var mx=/最大(\d+(?:\.\d+)?)\s*(mg|g|単位|IU|mL)?/.exec(txt);var max=mx?parseFloat(mx[1]):null;
+  while((m=re.exec(txt))){var a=parseFloat(m[1])*w,b=m[2]?parseFloat(m[2])*w:null;
+    if(max!=null&&parts.length===0){a=Math.min(a,max);if(b!=null)b=Math.min(b,max);}
+    parts.push(m[0].replace(/\s+/g,"")+"→"+rnd(a)+(b!=null?"〜"+rnd(b):"")+m[3]);}
+  if(!parts.length)return "";
+  var s="体重"+w+"kg："+parts.join("、");
+  if(/グルトパ|アクチバシン/.test(name||"")){var t=Math.min(0.6*w,60);s+="（総量"+rnd(t)+"mg：ボーラス"+rnd(t*0.1)+"mg、残り"+rnd(t*0.9)+"mgを1時間）";}
+  if(max!=null)s+="（最大"+mx[1]+(mx[2]||"")+"）";
+  return s;
+}
+
+/* ───── タブ ───── */
 function setTab(t){st.tab=t;document.querySelectorAll("nav.tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false");});
-  document.querySelectorAll(".view").forEach(function(v){v.hidden=v.id!=="v-"+t;});save();window.scrollTo(0,0);}
-document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){setTab(b.dataset.tab);if(b.dataset.tab==="cc"&&st.cid){st.cid=null;renderCC();}});});
+  document.querySelectorAll("main>.view").forEach(function(v){v.hidden=v.id!=="v-"+t;});save();window.scrollTo(0,0);}
+document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){
+  if(b.dataset.tab==="cc"&&st.tab==="cc"&&st.cid){st.cid=null;renderCC();}setTab(b.dataset.tab);});});
 
-/* ---- 主訴 ---- */
+/* ───── 主訴 ───── */
 var CAT=["注射","内服","外用・吸入","処置"];
+var LINKS={stroke:[["rpt/","再開通療法適応チェッカー"]],lyte:[["na/","低Na・電解質補正ナビ"],["ren/","腎機能・用量調整ナビ"]],fever:[["pd/","PD薬剤調整ナビ（悪性症候群）"]],delirium:[["pd/","PD薬剤調整ナビ"]],seizure:[["preg/","妊娠・授乳と神経疾患薬ナビ"]]};
+function cById(id){return C.filter(function(x){return x.id===id;})[0];}
 function renderGroups(el,cur,list,cb){el.innerHTML="";["すべて"].concat(list).forEach(function(g){var b=document.createElement("button");b.type="button";b.textContent=g;var v=g==="すべて"?"":g;b.setAttribute("aria-pressed",cur===v?"true":"false");b.addEventListener("click",function(){cb(v);});el.appendChild(b);});}
 function ccText(c){return [c.t,c.k,c.g,(c.red||[]).join(" "),(c.rx||[]).map(function(r){return r[1]+r[3];}).join(" ")].join(" ");}
+function openCC(id){st.cid=id;st.recent=[id].concat(st.recent.filter(function(x){return x!==id;})).slice(0,6);save();renderCC();if(st.tab!=="cc")setTab("cc");window.scrollTo(0,0);}
 function renderCC(){
   var det=$("ccDetail"),lst=$("ccList");
-  if(st.cid){var c=C.filter(function(x){return x.id===st.cid;})[0];if(c){lst.hidden=true;det.hidden=false;det.innerHTML=detailHTML(c);bindDetail(c);return;}}
-  lst.hidden=false;det.hidden=true;
+  var c=st.cid&&cById(st.cid);
+  if(c){lst.hidden=true;det.hidden=false;det.innerHTML=detailHTML(c);bindDetail(c);return;}
+  st.cid=null;lst.hidden=false;det.hidden=true;det.innerHTML="";
   $("ccQ").value=st.q;
+  var rc=$("ccRecent");rc.innerHTML="";
+  st.recent.forEach(function(id){var x=cById(id);if(!x)return;var b=document.createElement("button");b.type="button";b.textContent="↺ "+x.t;b.addEventListener("click",function(){openCC(id);});rc.appendChild(b);});
+  rc.hidden=!rc.children.length;
   renderGroups($("ccG"),st.g,GROUPS,function(v){st.g=v;save();renderCC();});
   var box=$("ccItems");box.innerHTML="";var n=0;
   GROUPS.forEach(function(g){
@@ -711,95 +814,158 @@ function renderCC(){
     var h=document.createElement("div");h.className="ghead";h.textContent=g;box.appendChild(h);
     var grid=document.createElement("div");grid.className="clist";
     items.forEach(function(c){n++;var b=document.createElement("button");b.type="button";
-      b.innerHTML="<b>"+esc(c.t)+"</b><span>"+esc((c.red||[]).slice(0,3).map(function(r){return r.replace(/（.*$/,"").replace(/：.*$/,"");}).join("・"))+"</span>";
-      b.addEventListener("click",function(){st.cid=c.id;save();renderCC();window.scrollTo(0,0);});grid.appendChild(b);});
+      b.innerHTML="<b>"+esc(c.t)+"</b><span>"+esc((c.red||[]).slice(0,3).map(function(r){return r.replace(/[（〈：＝].*$/,"");}).join("・"))+"</span>";
+      b.addEventListener("click",function(){openCC(c.id);});grid.appendChild(b);});
     box.appendChild(grid);
   });
   if(!n)box.innerHTML='<p class="hint">該当なし。別の言葉で検索してください。</p>';
+  renderQK();
 }
 $("ccQ").addEventListener("input",function(e){st.q=e.target.value;save();renderCC();});
 function li(a,tag){return "<"+tag+' class="lst">'+a.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</"+tag+">";}
-function rxHTML(r,src){return '<div class="rx" data-c="'+esc(r[0])+'"><div class="nm"><span class="tag" data-c="'+esc(r[0])+'">'+esc(r[0])+"</span>"+(src?'<span class="tag src">'+esc(src)+"</span>":"")+esc(r[1])+'</div><div class="ds">'+esc(r[2])+"</div>"+(r[3]?'<div class="nt">'+esc(r[3])+"</div>":"")+"</div>";}
+function rxHTML(r,src){
+  var p=P(),w=p.weight,h='<div class="rx" data-c="'+esc(r[0])+'"><div class="nm"><span class="tag" data-c="'+esc(r[0])+'">'+esc(r[0])+"</span>"+(CHECKED.test(r[1])?'<span class="tag chk">照合済</span>':"")+(src?'<span class="tag src">'+esc(src)+"</span>":"")+esc(r[1])+'</div><div class="ds">'+esc(r[2])+"</div>";
+  if(r[3])h+='<div class="nt">'+esc(r[3])+"</div>";
+  var wc=wcalc(r[2],w,r[1]);if(wc)h+='<div class="wt">'+esc(wc)+"</div>";
+  flags(r,p).forEach(function(f){h+='<div class="fl'+(f[1]?" ng":"")+'">⚠ '+esc(f[0])+"</div>";});
+  return h+"</div>";
+}
+function sec(id,no,title,body,cls){return '<section class="card'+(cls?" "+cls:"")+'" id="'+id+'"><h2><span class="no">'+no+"</span>"+esc(title)+"</h2>"+body+"</section>";}
 function detailHTML(c){
-  var h='<button type="button" class="back" id="ccBack">← 主訴一覧</button>';
-  h+='<section class="card"><h2>'+esc(c.t)+'</h2><div class="red"><h3>見逃せない疾患・危険サイン</h3>'+li(c.red,"ul")+"</div>";
-  h+="<h3>初期対応</h3>"+li(c.first,"ol");
-  if(c.tests&&c.tests.length)h+="<h3>検査</h3>"+li(c.tests,"ul");
-  h+="</section>";
-  h+='<section class="card"><h2>薬剤・処置</h2>';
-  CAT.forEach(function(k){var rs=c.rx.filter(function(r){return r[0]===k;});if(!rs.length)return;h+="<h3>"+esc(k==="処置"?"処置":k)+"</h3>"+rs.map(function(r){return rxHTML(r);}).join("");});
-  h+='<p class="hint">成人標準量。腎機能・体重・妊娠で調整し添付文書で確認。</p></section>';
-  h+='<section class="card"><h2>入院・帰宅の目安</h2><div class="dispo"><div class="ad"><b>入院・専門科へ</b>'+li(c.dispo.admit,"ul")+'</div><div class="hm"><b>帰宅を考えてよい</b>'+(c.dispo.home.length?li(c.dispo.home,"ul"):'<p class="hint">原則として帰宅させない</p>')+"</div></div>";
-  h+='<h3>ピットフォール</h3><div class="pit">'+li(c.pit,"ul")+"</div>";
-  if((c.sc&&c.sc.length)||(c.link&&c.link.length)){h+='<h3>関連</h3><div class="btnrow">';
-    (c.sc||[]).forEach(function(s){h+='<button type="button" data-sc="'+s+'">'+esc(S[s].t.replace(/（.*?）/,""))+"</button>";});
-    (c.link||[]).forEach(function(l){h+='<a href="../'+l[0]+'">'+esc(l[1])+" ↗</a>";});
-    h+="</div>";}
-  h+="</section>";
+  var ini=c.rx.filter(function(r){return r[0]!=="内服"||INI_PO.test(r[1]);});
+  var home=c.rx.filter(function(r){return r[0]==="内服"&&!INI_PO.test(r[1]);});
+  var links=(c.link||[]).concat(LINKS[c.id]||[]);
+  var jump=[["d-red","危険"],["d-first","初期対応"],["d-rx","初療の薬"],["d-dec","判断"]];
+  if(home.length)jump.push(["d-home","帰宅時処方"]);jump.push(["d-pit","落とし穴"]);
+  var h='<div class="dhead"><button type="button" class="back" id="ccBack">← 主訴一覧</button><h2>'+esc(c.t)+'</h2></div>';
+  h+='<nav class="jump">'+jump.map(function(j){return '<a href="#'+j[0]+'">'+j[1]+"</a>";}).join("")+"</nav>";
+  h+=sec("d-red","1","見逃せない疾患・危険サイン",li(c.red,"ul"),"red");
+  var fb=li(c.first,"ol");if(c.tests&&c.tests.length)fb+='<details class="more"><summary>検査（'+c.tests.length+'）</summary>'+li(c.tests,"ul")+"</details>";
+  h+=sec("d-first","2","初期対応",fb);
+  var rb="";var order=["注射","外用・吸入","処置","内服"];
+  order.forEach(function(k){var rs=ini.filter(function(r){return r[0]===k;});rs.forEach(function(r){rb+=rxHTML(r);});});
+  rb+='<p class="hint">成人標準量。照合済以外は添付文書と未照合の目安です。</p>';
+  h+=sec("d-rx","3","初療の薬・処置",rb);
+  var db="";
+  (c.sc||[]).forEach(function(s,i){db+='<details class="sc" data-sck="'+s+'"'+(i===0?" open":"")+'><summary><span>'+esc(S[s].t)+'</span><span class="sv" id="sv-'+s+'"></span></summary><div class="scw" data-k="'+s+'"></div></details>';});
+  db+='<div class="dispo"><div class="ad"><b>入院・専門科へ</b>'+li(c.dispo.admit,"ul")+'</div><div class="hm"><b>帰宅を考えてよい</b>'+(c.dispo.home.length?li(c.dispo.home,"ul"):'<p class="hint">原則として帰宅させない</p>')+"</div></div>";
+  h+=sec("d-dec","4","判断（スコア・入院／帰宅）",db);
+  if(home.length)h+=sec("d-home","5","帰宅時処方",home.map(function(r){return rxHTML(r);}).join(""));
+  var pb=li(c.pit,"ul");
+  if(links.length)pb+='<h3>関連アプリ</h3><div class="btnrow">'+links.map(function(l){return '<a href="../'+l[0]+'">'+esc(l[1])+" ↗</a>";}).join("")+"</div>";
+  h+=sec("d-pit",home.length?"6":"5","落とし穴",pb,"pit");
   return h;
 }
 function bindDetail(c){
-  $("ccBack").addEventListener("click",function(){st.cid=null;save();renderCC();});
-  document.querySelectorAll("#ccDetail [data-sc]").forEach(function(b){b.addEventListener("click",function(){st.sc=b.dataset.sc;save();renderSC();setTab("sc");});});
+  $("ccBack").addEventListener("click",function(){st.cid=null;save();renderCC();window.scrollTo(0,0);});
+  document.querySelectorAll("#ccDetail .scw").forEach(function(el){renderScore(el.dataset.k,el);});
+  document.querySelectorAll("#ccDetail .jump a").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();var t=document.querySelector(a.getAttribute("href"));if(t)t.scrollIntoView({behavior:"smooth",block:"start"});});});
 }
 
-/* ---- 薬剤 ---- */
+/* ───── 緊急薬の早見 ───── */
+var QK=[
+ ["心停止","アドレナリン 1mg 静注 3〜5分ごと／VF・無脈性VT：アミオダロン（アンカロン）300mg→150mg","","cpa"],
+ ["アナフィラキシー","アドレナリン 0.01mg/kg 筋注（成人最大0.5mg）、5〜15分ごと","0.01mg/kg（最大0.5mg）","ana"],
+ ["低血糖","フルスルチアミン（アリナミンF100注）100mg → 50%ブドウ糖 40mL 静注","","glu"],
+ ["けいれん","ジアゼパム（セルシン）5〜10mg 静注、またはミダゾラム（ミダフレッサ）0.15mg/kg","0.15mg/kg","seizure"],
+ ["重積 第2段階","ホスフェニトイン（ホストイン）22.5mg/kg／レベチラセタム（イーケプラ）1000〜3000mg","22.5mg/kg","seizure"],
+ ["高K（心電図変化）","カルチコール 10〜30mL 静注 → インスリン10単位＋50%ブドウ糖50mL","","lyte"],
+ ["オピオイド","ナロキソン 0.2mg 静注、反復","","loc"],
+ ["徐脈","アトロピン 0.5〜1mg 静注（総量3mg）","","palp"],
+ ["PSVT","ATP（アデホス-L）10mg 急速静注 → 20mg","","palp"]
+];
+function renderQK(){var w=P().weight;$("qk").innerHTML=QK.map(function(q,i){var wc=q[2]?wcalc(q[2],w):"";
+  return '<tr data-i="'+i+'"><th>'+esc(q[0])+"</th><td>"+esc(q[1])+(wc?'<span class="w">'+esc(wc)+"</span>":"")+"</td></tr>";}).join("");
+  $("qk").querySelectorAll("tr").forEach(function(tr){tr.style.cursor="pointer";tr.addEventListener("click",function(){openCC(QK[+tr.dataset.i][3]);});});}
+
+/* ───── 薬剤 ───── */
 var ALL=[];C.forEach(function(c){c.rx.forEach(function(r){ALL.push({r:r,c:c});});});
 function renderRX(){
   $("rxQ").value=st.rq;
   renderGroups($("rxG"),st.rg,CAT,function(v){st.rg=v;save();renderRX();});
   var it=ALL.filter(function(x){return (!st.rg||x.r[0]===st.rg)&&hit(x.r.join(" ")+" "+x.c.t+" "+x.c.k,st.rq);});
-  $("rxN").textContent=it.length+" 件"+(st.rq?"":"（主訴ごとに掲載。同じ薬が複数の主訴に出ます）");
-  $("rxItems").innerHTML=it.map(function(x){return rxHTML(x.r,x.c.t);}).join("")||'<p class="hint">該当なし</p>';
+  $("rxN").textContent=it.length+" 件（主訴ごとに掲載。同じ薬が複数の主訴に出ます）";
+  $("rxItems").innerHTML=it.slice(0,st.rq||st.rg?400:60).map(function(x){return rxHTML(x.r,x.c.t);}).join("")+(!st.rq&&!st.rg&&it.length>60?'<p class="hint">先頭60件を表示。検索・区分で絞り込んでください。</p>':"")||'<p class="hint">該当なし</p>';
 }
 $("rxQ").addEventListener("input",function(e){st.rq=e.target.value;save();renderRX();});
 
-/* ---- スコア ---- */
+/* ───── スコア ───── */
+function short(t){return t.replace(/[（(].*$/,"").trim();}
+function renderScore(k,box){
+  var s=S[k];var v=st.scv[k]||(st.scv[k]={});
+  var h=(s.note?'<p class="hint">'+esc(s.note)+"</p>":"")+'<div class="res"></div>';
+  s.items.forEach(function(it,i){
+    if(it[0]==="chk")h+='<div class="item"><input type="checkbox" id="c_'+k+"_"+i+"_"+box.id+'" data-i="'+i+'"'+(v[i]?" checked":"")+'><label for="c_'+k+"_"+i+"_"+box.id+'">'+esc(it[1])+'</label><span class="pt">'+(it[2]>0?"+":"")+it[2]+"</span></div>";
+    else h+='<div class="selrow"><span>'+esc(it[1])+'</span><div class="seg">'+it[2].map(function(op,j){return '<button type="button" data-i="'+i+'" data-j="'+j+'" aria-pressed="'+(v[i]===j?"true":"false")+'">'+esc(op[0])+" <small>("+op[1]+")</small></button>";}).join("")+"</div></div>";
+  });
+  h+='<div class="btnrow" style="margin-top:8px"><button type="button" class="rs">このスコアをリセット</button></div>';
+  box.innerHTML=h;
+  box.querySelectorAll("input[type=checkbox]").forEach(function(cb){cb.addEventListener("change",function(){v[+cb.dataset.i]=cb.checked?1:0;v._t=1;save();calc();});});
+  box.querySelectorAll(".seg button").forEach(function(b){b.addEventListener("click",function(){var i=+b.dataset.i,j=+b.dataset.j;v[i]=(v[i]===j?undefined:j);v._t=1;save();
+    b.parentNode.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",(+x.dataset.j===v[i])?"true":"false");});calc();});});
+  box.querySelector(".rs").addEventListener("click",function(){st.scv[k]={};save();renderScore(k,box);});
+  calc();
+  function calc(){var t=0;s.items.forEach(function(it,i){if(it[0]==="chk"){if(v[i])t+=it[2];}else if(v[i]!=null)t+=it[2][v[i]][1];});
+    var out=box.querySelector(".res"),sv=document.getElementById("sv-"+k);
+    if(!v._t){out.innerHTML='<p class="hint">該当する項目を押すと判定します（既定はすべて「なし」）。</p>';if(sv)sv.textContent="";return;}
+    var r=s.rule(t),pa=r[0].split("："),sh=(pa[1]&&/点|^[\d〜]+(以下|以上|未満)?$/.test(pa[0]))?pa[1].split(/[（、。]/)[0]:pa[0];
+    out.innerHTML='<div class="result '+r[1]+'"><span class="big">'+esc(short(s.t))+" "+t+"点："+esc(sh)+"</span><p>"+esc(r[0])+"</p></div>";
+    if(sv)sv.textContent=t+"点";}
+}
 var sel=$("scSel");Object.keys(S).forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=S[k].t;sel.appendChild(o);});
 sel.addEventListener("change",function(){st.sc=sel.value;save();renderSC();});
-function renderSC(){
-  var k=S[st.sc]?st.sc:"heart";st.sc=k;sel.value=k;var s=S[k];var v=st.scv[k]||(st.scv[k]={});
-  $("scNote").textContent=s.note||"";
-  var box=$("scItems");box.innerHTML="";
-  s.items.forEach(function(it,i){
-    if(it[0]==="chk"){var d=document.createElement("div");d.className="item";var id="sc_"+k+"_"+i;
-      d.innerHTML='<input type="checkbox" id="'+id+'"'+(v[i]?" checked":"")+'><label for="'+id+'">'+esc(it[1])+'</label><span class="pt">'+(it[2]>0?"+":"")+it[2]+"</span>";
-      d.querySelector("input").addEventListener("change",function(e){v[i]=e.target.checked?1:0;save();calc();});box.appendChild(d);}
-    else{var d2=document.createElement("div");d2.className="selrow";var sl=document.createElement("select");
-      it[2].forEach(function(op,j){var o=document.createElement("option");o.value=j;o.textContent=op[0]+"（"+op[1]+"点）";sl.appendChild(o);});
-      sl.value=v[i]||0;sl.addEventListener("change",function(){v[i]=+sl.value;save();calc();});
-      d2.innerHTML="<span>"+esc(it[1])+"</span>";d2.appendChild(sl);box.appendChild(d2);}
-  });
-  calc();
-  function calc(){var t=0;s.items.forEach(function(it,i){if(it[0]==="chk"){if(v[i])t+=it[2];}else t+=it[2][v[i]||0][1];});
-    var r=s.rule(t);$("scRes").innerHTML='<div class="result '+r[1]+'"><span class="score">'+t+" 点</span><p>"+esc(r[0])+"</p></div>";}
-}
-$("scReset").addEventListener("click",function(){st.scv[st.sc]={};save();renderSC();});
+function renderSC(){var k=S[st.sc]?st.sc:"heart";st.sc=k;sel.value=k;var b=$("scBox");b.id="scBox";renderScore(k,b);}
 
-/* ---- 持続計算 ---- */
-var isel=$("infSel");INF.forEach(function(x,i){var o=document.createElement("option");o.value=i;o.textContent=x[0]+"（"+x[1]+"）";isel.appendChild(o);});
-function infSet(){var x=INF[st.inf.i]||INF[0];isel.value=st.inf.i;$("infPrep").textContent="調製例："+x[4];$("infCu").textContent=x[3];$("infDu").textContent=x[1];$("infRange").textContent=x[5]+" "+x[1];
-  $("infW").value=st.inf.w;$("infC").value=st.inf.c!==""?st.inf.c:x[2];$("infD").value=st.inf.d;$("infR").value=st.inf.r;infCalc();}
-function infCalc(){var x=INF[st.inf.i]||INF[0];var w=parseFloat($("infW").value),c=parseFloat($("infC").value),d=parseFloat($("infD").value),r=parseFloat($("infR").value);
-  var perMin=/分/.test(x[1]);var out=$("infOut");out.style.display="none";
-  if(!(w>0)||!(c>0))return;
-  // 量/時 = d*w*(perMin?60:1) ; mL/時 = 量/時 / c
-  if(st.inf.last==="d"&&d>=0&&!isNaN(d)){var rr=d*w*(perMin?60:1)/c;$("infR").value=rr?(+rr.toFixed(2)):"";st.inf.r=$("infR").value;
-    out.style.display="block";out.innerHTML='<span class="score">'+(+rr.toFixed(2))+' mL/時</span><p>'+esc(x[0])+" "+d+" "+esc(x[1])+"（体重"+w+"kg、"+c+" "+esc(x[3])+"）</p>";}
-  else if(st.inf.last==="r"&&r>=0&&!isNaN(r)){var dd=r*c/(w*(perMin?60:1));$("infD").value=+dd.toFixed(3);st.inf.d=$("infD").value;
-    out.style.display="block";out.innerHTML='<span class="score">'+(+dd.toFixed(3))+" "+esc(x[1])+'</span><p>'+r+" mL/時（体重"+w+"kg、"+c+" "+esc(x[3])+"）</p>";}
+/* ───── 持続計算 ───── */
+function infCur(){return INF[st.inf.i]||INF[0];}
+function infSet(){
+  renderGroupsInf();var x=infCur();
+  $("infPrep").textContent="調製例："+x[4];$("infCu").textContent=x[3];$("infDu").textContent=x[1];$("infRange").textContent=x[5]+" "+x[1];
+  $("infC").value=st.infc[x[0]]!=null?st.infc[x[0]]:x[2];$("infD").value=st.inf.d;$("infR").value=st.inf.r;
+  var nums=(x[5].match(/\d+(?:\.\d+)?/g)||[]).slice(0,2);var q=$("infQuick");q.innerHTML="";
+  nums.forEach(function(n){var b=document.createElement("button");b.type="button";b.textContent=n+" "+x[1];b.addEventListener("click",function(){$("infD").value=n;st.inf.d=n;st.inf.last="d";infCalc();});q.appendChild(b);});
+  infCalc();}
+function renderGroupsInf(){var el=$("infG");el.innerHTML="";INF.forEach(function(x,i){var b=document.createElement("button");b.type="button";b.textContent=x[0];b.setAttribute("aria-pressed",i===st.inf.i?"true":"false");
+  b.addEventListener("click",function(){st.inf={i:i,d:"",r:"",last:"d"};save();infSet();});el.appendChild(b);});}
+function infCalc(){var x=infCur();var w=parseFloat($("infW").value),c=parseFloat($("infC").value),d=parseFloat($("infD").value),r=parseFloat($("infR").value);
+  var f=/分/.test(x[1])?60:1;var out=$("infOut");out.hidden=true;
+  if(w>0&&c>0){
+    if(st.inf.last==="d"&&isFinite(d)){var rr=d*w*f/c;$("infR").value=+rr.toFixed(2);st.inf.r=$("infR").value;
+      out.hidden=false;out.innerHTML='<span class="big">'+esc(x[0])+" "+d+" "+esc(x[1])+" → "+(+rr.toFixed(2))+' mL/時</span><p>体重'+w+"kg、濃度"+c+" "+esc(x[3])+"</p>";}
+    else if(st.inf.last==="r"&&isFinite(r)){var dd=r*c/(w*f);$("infD").value=+dd.toFixed(3);st.inf.d=$("infD").value;
+      out.hidden=false;out.innerHTML='<span class="big">'+esc(x[0])+" "+r+" mL/時 → "+(+dd.toFixed(3))+" "+esc(x[1])+'</span><p>体重'+w+"kg、濃度"+c+" "+esc(x[3])+"</p>";}
+  }
   save();}
-isel.addEventListener("change",function(){st.inf.i=+isel.value;st.inf.c="";st.inf.d="";st.inf.r="";save();infSet();});
-[["infW","w"],["infC","c"],["infD","d"],["infR","r"]].forEach(function(p){$(p[0]).addEventListener("input",function(e){st.inf[p[1]]=e.target.value;if(p[1]==="d"||p[1]==="r")st.inf.last=p[1];infCalc();});});
+$("infW").addEventListener("input",infCalc);
+$("infC").addEventListener("input",function(e){var x=infCur();var n=parseFloat(e.target.value);if(isFinite(n)&&n!==x[2])st.infc[x[0]]=n;else delete st.infc[x[0]];infCalc();});
+$("infD").addEventListener("input",function(e){st.inf.d=e.target.value;st.inf.last="d";infCalc();});
+$("infR").addEventListener("input",function(e){st.inf.r=e.target.value;st.inf.last="r";infCalc();});
 
-/* ---- 出典 ---- */
-$("refList").innerHTML=REFS.map(function(r){return "<li>"+esc(r[0])+'<br><span class="hint">'+esc(r[1])+"</span></li>";}).join("");
+/* ───── 出典・版 ───── */
+$("refList").innerHTML=REFS.map(function(r){return "<li>"+(r[2]?'<a href="'+esc(r[2])+'" target="_blank" rel="noopener">'+esc(r[0])+"</a>":esc(r[0]))+'<br><span class="hint">'+esc(r[1])+"</span></li>";}).join("");
+$("appVer").textContent=APP_VER;
+$("forceUpdate").addEventListener("click",function(){toast("最新版を確認しています…");
+  (async function(){try{if("serviceWorker" in navigator){var r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}
+  try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}
+  setTimeout(function(){location.reload();},800);})();});
 
+/* ───── 起動 ───── */
 renderCC();renderRX();renderSC();infSet();setTab(st.tab||"cc");
+function refreshRx(){var c=st.cid&&cById(st.cid);
+  if(c){var ini=c.rx.filter(function(r){return r[0]!=="内服"||INI_PO.test(r[1]);}),home=c.rx.filter(function(r){return r[0]==="内服"&&!INI_PO.test(r[1]);});
+    var order=["注射","外用・吸入","処置","内服"],sr=document.getElementById("d-rx"),sh=document.getElementById("d-home");
+    if(sr){sr.querySelectorAll(".rx").forEach(function(e){e.remove();});var hint=sr.querySelector("p.hint"),tmp=document.createElement("div");
+      order.forEach(function(k){ini.filter(function(r){return r[0]===k;}).forEach(function(r){tmp.insertAdjacentHTML("beforeend",rxHTML(r));});});
+      while(tmp.firstChild)sr.insertBefore(tmp.firstChild,hint);}
+    if(sh){sh.querySelectorAll(".rx").forEach(function(e){e.remove();});home.forEach(function(r){sh.insertAdjacentHTML("beforeend",rxHTML(r));});}}
+  renderQK();renderRX();}
+function onProfile(){try{if(window.WardProfile)WardProfile.onChange(refreshRx);}catch(e){}refreshRx();}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",onProfile);else setTimeout(onProfile,0);
 })();
+
 </script>
 <script>
-function hh(){try{document.documentElement.style.setProperty('--hh',document.querySelector('header.top').offsetHeight+'px')}catch(e){}}hh();addEventListener('resize',hh);
+function hh(){try{document.documentElement.style.setProperty('--hh',document.querySelector('header.top').offsetHeight+'px')}catch(e){}}hh();addEventListener('resize',hh);try{new ResizeObserver(hh).observe(document.querySelector('header.top'));}catch(e){setInterval(hh,1000);}
 </script>
 <script>
 (function(){
@@ -819,6 +985,68 @@ function hh(){try{document.documentElement.style.setProperty('--hh',document.que
   }catch(e){}
 })();
 </script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=["#ccDetail .result","main>.view:not([hidden]) .result"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
 <!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
 <style>
 #wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -846,7 +1074,7 @@ function hh(){try{document.documentElement.style.setProperty('--hh',document.que
 <div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
 <script>
 (function(){
-  var KEYS=["er-nav-v1"];
+  var KEYS=[{"k":"er-nav-v1","keep":["recent","infc"]}];
   try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
   var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
   function close(){dlg.classList.remove("on");}
@@ -881,6 +1109,7 @@ function hh(){try{document.documentElement.style.setProperty('--hh',document.que
 })();
 </script>
 <!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
 <script src="../share.js" defer></script>
 </body>
 </html>
