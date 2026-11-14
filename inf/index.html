@@ -133,6 +133,16 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
 .summary .tile .k{font-size:10.5px;white-space:nowrap}
 .summary .tile .v{font-size:14.5px}
 .summary .tile.small .v{font-size:12.5px}
+.pdh{font-size:12px;color:var(--muted);margin:6px 0 2px;padding:4px 8px;background:var(--bg);border-radius:7px}
+.pdbox{margin:4px 0 6px;display:flex;flex-direction:column;gap:3px}
+.pdr{font-size:13px;line-height:1.45;border-left:4px solid var(--line);background:var(--bg);border-radius:6px;padding:4px 8px;font-weight:400}
+.pdr b{font-weight:700;margin-right:4px}
+.pdr .pdt{font-weight:700;font-size:14px;color:var(--ink)}
+.pdr .pdb{display:block;font-size:11.5px;color:var(--muted)}
+.pdr.ok{border-left-color:var(--ok);background:var(--ok-soft)}
+.pdr.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.pdr.crit{border-left-color:var(--crit);background:var(--crit-soft)}
+.pdw{font-size:12.5px;color:var(--accent-strong);font-weight:700}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -319,6 +329,7 @@ function calc(){
   }
   if(r.obese){r.use=r.crclAdj;r.basis="補正体重（IBW+0.4×超過分）";}
   else{r.use=r.crclAct;r.basis="実体重";}
+  if(r.use!=null)r.use=Math.round(r.use); /* 表17Aの区分は整数なので、表示と同じ整数で判定する */
   return r;
 }
 let K=calc();
@@ -333,7 +344,8 @@ function renderPt(){
   $$("#sex button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st.sex)));
   $$("#rrt button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st.rrt)));
   {const k0=calc();if(st.rrt==="hd"||st.rrt==="capd")st.rcat="lt15";else if(k0.use!=null)st.rcat=catOf(k0.use);
-   if(st.rcat&&window.WardProfile){try{const p=WardProfile.get();if(p.renal!==st.rcat)WardProfile.set({renal:st.rcat});}catch(e){}}}
+   if(st.rcat&&window.WardProfile){try{const p=WardProfile.get();if(p.renal!==st.rcat)WardProfile.set({renal:st.rcat});}catch(e){}}
+   const ag=num(st.age);if(ag!=null&&ag>=16&&window.WardProfile){try{const c=ag>=75?"ge75":ag>=65?"65-74":"lt65";if(WardProfile.get().age!==c)WardProfile.set({age:c});}catch(e){}}}
   $$("#rcat button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st.rcat)));
   ["age","wt","ht","cr","crclManual"].forEach(k=>{const el=$("#"+k);if(document.activeElement!==el)el.value=st[k]==null?"":st[k];});
   K=calc();
@@ -389,7 +401,7 @@ function rgroups(entry){
     const m=n.match(/^(.*?)[:：]\s*((?:CrCl|eGFR).*)$/);
     let label=null,rest=n;
     if(m&&!/CrCl|eGFR/.test(m[1])){label=m[1].trim();rest=m[2];}
-    if(label!==null||!cur){cur={label:label||"",rows:[]};gs.push(cur);}
+    if(!cur||(label!==null&&label!==cur.label)){const ex=label!==null&&gs.find(g=>g.label===label);if(ex)cur=ex;else{cur={label:label||"",rows:[]};gs.push(cur);}}
     const r=parseRange(rest);
     const tl=x=>String(x||"").replace(/~/g,"〜");
     cur.rows.push({raw:line,range:r,text:tl(r?rest.replace(/^(?:CrCl|eGFR)[^:：]*[:：]\s*/,""):rest),cond:tl(r?(rest.match(/^((?:CrCl|eGFR)[^:：]*)/)||[])[1]:"")});
@@ -449,7 +461,224 @@ document.addEventListener("click",e=>{
 });
 
 /* ---------- 共通 ---------- */
-function list(arr,cls){arr=(arr||[]).filter(x=>x&&String(x).trim());if(!arr.length)return "";const f=new Set();return {html:`<ul class="${cls||""}">${arr.map(x=>`<li>${linkify(x,f)}</li>`).join("")}</ul>`,f};}
+/* ---------- この患者での投与量（処方行ごと） ----------
+   方針：処方行の用量を読み取り、①体重あたりの量を mg に換算、②表17A の該当行で腎機能に合わせる。
+   ・処方の用量が表17Aの「通常量」の範囲内 → 表17Aの行をそのまま対応させる（原本どおり）
+   ・処方の用量が通常量より多い（髄膜炎など） → 表17Aと同じ割合で調整した参考値（原本に記載なし。黄色で表示）
+   ・読み取れない／原本に行がない → 赤で「要確認」 */
+const PD_INT=[4,6,8,12,24,48,72];
+function pdNum(s){return parseFloat(String(s).replace(/,/g,""));}
+function pdMid(r){return r?(r.lo+r.hi)/2:null;}
+function pdParse(t){
+  t=norm(String(t||"")).replace(/〜/g,"~").replace(/(\d+(?:\.\d+)?)万\s*~\s*(\d+(?:\.\d+)?)万単位/g,"$1~$2万単位");
+  const o={amt:null,unit:null,int:null,daily:false,txt:t};
+  const m=t.match(/(\d+(?:\.\d+)?)\s*(?:~\s*(\d+(?:\.\d+)?))?\s*(万単位|mg\/kg|μg\/kg|mg|g|錠|カプセル)(\/日)?/);
+  if(m){o.amt={lo:pdNum(m[1]),hi:pdNum(m[2]||m[1])};o.unit=m[3];o.daily=!!m[4];
+    if(o.unit==="g"){o.amt={lo:o.amt.lo*1000,hi:o.amt.hi*1000};o.unit="mg";o.g=true;} /* g は mg にそろえて比べる */}
+  const iv=t.match(/(\d+(?:\.\d+)?)\s*(?:~\s*(\d+(?:\.\d+)?))?\s*時間ごと/);
+  if(iv)o.int={lo:pdNum(iv[1]),hi:pdNum(iv[2]||iv[1])};
+  else{const d=t.match(/1日\s*(\d)\s*回/);if(d){const n=+d[1];o.int={lo:24/n,hi:24/n};}}
+  const sp=t.match(/(\d)\s*(?:~\s*(\d))?\s*回に分割/);
+  if(o.daily&&sp){o.split={lo:+sp[1],hi:+(sp[2]||sp[1])};}
+  return o;
+}
+function pdSame(a,b){return a&&b&&Math.abs(a.lo-b.lo)<1e-6&&Math.abs(a.hi-b.hi)<1e-6;}
+function pdWithin(v,r){return r&&v.lo>=r.lo-1e-6&&v.hi<=r.hi+1e-6;}
+function pdFmt(v,unit){
+  if(v==null||!isFinite(v))return "?";
+  if(unit==="g"){return String(Math.round(v*100)/100);}
+  if(unit==="mg"){return v>=100?(Math.round(v/5)*5).toLocaleString("ja-JP"):v>=10?String(Math.round(v)):String(Math.round(v*10)/10);}
+  return String(Math.round(v*100)/100);
+}
+function pdRange(r,unit){if(!r)return "";const a=pdFmt(r.lo,unit),b=pdFmt(r.hi,unit);return a===b?a:a+"〜"+b;}
+function pdSnap(h){let best=PD_INT[0];PD_INT.forEach(x=>{if(Math.abs(x-h)<Math.abs(best-h))best=x;});return best;}
+function pdIntTxt(r){if(!r)return "";const a=r.lo,b=r.hi;return (a===b?a:a+"〜"+b)+"時間ごと";}
+/* 体重：通常は実体重。AG は肥満なら補正体重（表10C） */
+function pdWeight(id){
+  const w=num(st.wt);if(w==null)return null;
+  if(["gm","tob","amk"].includes(id)&&K.obese&&K.abw)return {w:K.abw,lb:"補正体重 "+Math.round(K.abw)+"kg"};
+  return {w,lb:"体重 "+w+"kg"};
+}
+function pdMg(r,unit,wt,asG){ /* mg/kg → mg。asG なら g で表示 */
+  if(!r)return "";
+  if(asG&&unit==="mg")return pdRange({lo:r.lo/1000,hi:r.hi/1000},"g")+"g";
+  if(unit==="mg/kg"&&wt)return pdRange({lo:r.lo*wt.w,hi:r.hi*wt.w},"mg")+"mg";
+  if(unit==="μg/kg"&&wt)return pdRange({lo:r.lo*wt.w,hi:r.hi*wt.w},"mg")+"μg";
+  return pdRange(r,unit)+(unit||"");
+}
+/* 文中の「a〜b mg/kg」に体重換算を添える（表示用。薬剤以外のデキサメタゾン等も対象） */
+function pdInline(html){
+  const w=num(st.wt);if(w==null)return html;
+  return html.replace(/(\d+(?:\.\d+)?)(\s*[〜~]\s*(\d+(?:\.\d+)?))?\s*(mg|μg)\/kg(\/日)?/g,(m,a,_r,b,u,d)=>{
+    const lo=pdNum(a)*w,hi=pdNum(b||a)*w;
+    return m+`<span class="pdw">（${w}kgで${pdRange({lo,hi},"mg")}${u}${d||""}）</span>`;
+  });
+}
+/* 通常量の区切り（「ラベル：用量」が／；で並ぶ）と、腎機能別の群を対応させる */
+function pdBases(e){
+  const segs=String(e.usualDose||"").split(/[／;；]/).map(x=>x.trim()).filter(Boolean).map(x=>{
+    const k=x.lastIndexOf("：");return {lb:k>=0?x.slice(0,k):"",p:pdParse(k>=0?x.slice(k+1):x)};});
+  return segs;
+}
+function pdKey(s){return String(s||"").replace(/[\s・（）()、，,]/g,"");}
+function pdGroupBase(e,g,bases){
+  if(g.label&&/目標用量/.test(g.label)){const p=pdParse(g.label);if(p.amt)return p;}
+  if(bases.length===1)return bases[0].p;
+  const gk=pdKey(g.label);
+  const hit=bases.find(b=>b.lb&&(gk.includes(pdKey(b.lb))||pdKey(b.lb).includes(gk)))||(gk?bases.find(b=>pdKey(b.p.txt).includes(gk)):null);
+  return hit?hit.p:null;
+}
+/* 患者の腎機能に当たる行（数値・区分・透析） */
+function pdRows(e,g){
+  if(st.rrt!=="none"){const t=e[st.rrt];return t?[{text:t,cond:{hd:"血液透析",capd:"CAPD",crrt:"CRRT"}[st.rrt]}]:[];}
+  if(K.use!=null){const r=g.rows.find(r=>inRange(r.range,K.use));
+    if(r)return [r];if(g.rows.length===1&&!g.rows[0].range&&/不要/.test(g.rows[0].text))return [g.rows[0]];
+    /* 原本の区分のすき間（例 CrCl 10 が「11〜29」と「<10」のどちらにも入らない）→ 低い側の区分を使う */
+    for(let d=1;d<=2;d++){const r2=g.rows.find(r=>inRange(r.range,K.use-d));if(r2)return [Object.assign({},r2,{cond:r2.cond+"（CrCl "+K.use+" は原本の区分のすき間。低い側を適用）"})];}
+    return [];}
+  const C=useCat();if(!C)return null;
+  const hs=g.rows.filter(r=>rowInCat(r.range,C));
+  if(hs.length)return hs;
+  if(g.rows.length===1&&!g.rows[0].range&&/不要/.test(g.rows[0].text))return [g.rows[0]];
+  return [];
+}
+/* 1つの薬（処方中の該当部分 seg）について結果を作る */
+function pdDrug(id,seg){
+  const d=DR[id];if(!d)return null;
+  const reg=pdParse(seg),wt=pdWeight(id);
+  const out={name:d.abbr&&d.abbr!=="—"?d.abbr:d.name,lines:[],tone:"ok",note:""};
+  const regTxt=reg.amt?(reg.daily?pdMg(reg.amt,reg.unit,wt,reg.g)+"/日"+(reg.split?"（"+(reg.split.lo===reg.split.hi?reg.split.lo:reg.split.lo+"〜"+reg.split.hi)+"回に分割）":""):pdMg(reg.amt,reg.unit,wt,reg.g)+(reg.int?" "+pdIntTxt(reg.int):"")):"";
+  const rows=d.renalRows||[];
+  const hasR=hasRenal();
+  if(!rows.length){
+    if(regTxt)out.lines.push({t:regTxt,b:d.noAdjust?"腎機能による調整不要（表17A）":"表17Aに記載なし（腎調整の情報なし）"});
+    out.tone=d.noAdjust?"ok":"warn";return out;
+  }
+  if(!hasR){if(regTxt&&(reg.unit==="mg/kg"))out.lines.push({t:regTxt,b:"腎機能は未入力"});out.tone="";return out.lines.length?out:null;}
+  const bases=pdBases(rows[0]);
+  /* 対応する群を選ぶ：処方が通常量と一致する群 → 通常量の範囲内の群 → 先頭 */
+  let best=null;
+  rows.forEach(e=>rgroups(e).forEach(g=>{
+    const base=pdGroupBase(e,g,pdBases(e));
+    let sc=0;
+    if(base&&reg.amt&&base.unit===reg.unit){
+      if(pdSame(base.amt,reg.amt)&&(!reg.int||pdSame(base.int,reg.int)))sc=3;
+      else if(pdWithin(reg.amt,base.amt)&&(!reg.int||!base.int||pdWithin(reg.int,base.int)))sc=2;
+      else sc=1+(reg.int&&base.int&&pdSame(reg.int,base.int)?0.3:0);
+    }
+    if(g.label&&seg&&pdKey(seg).includes(pdKey(g.label).slice(0,4)))sc+=0.5;
+    if(g.label&&/静注|注射/.test(seg)&&/注射|静注/.test(g.label))sc+=1;
+    if(g.label&&/経口/.test(seg)&&!/静注/.test(seg)&&/錠|経口/.test(g.label)&&!/徐放/.test(g.label))sc+=1;
+    if(!best||sc>best.sc)best={e,g,base,sc};
+  }));
+  if(!best){out.lines.push({t:"要確認",b:"腎機能別の行を対応できません。薬剤タブで確認"});out.tone="crit";return out;}
+  const hit=pdRows(best.e,best.g);
+  if(!hit||!hit.length){out.lines.push({t:"要確認",b:"この腎機能に当たる行が表17Aにありません（薬剤タブで確認）"});out.tone="crit";return out;}
+  let base_=null;
+  hit.forEach(r=>{base_=null;
+    const cond=r.cond||"";
+    if(/不要/.test(r.text)&&!/推奨されない/.test(r.text)){
+      out.lines.push({t:regTxt||"処方どおり",b:"腎調整不要（"+(cond||"表17A")+"）"});return;
+    }
+    let rtext=r.text;
+    { /* 「IAI/UTI：750mg…；HAP/VAP：1.5g…」のように適応別に並ぶ行は、処方に合う適応を選ぶ */
+      const segs=String(r.text).split(/[；;]/).map(x=>{const k=x.indexOf("：");return k>0?{lb:pdKey(x.slice(0,k)),t:x.slice(k+1)}:null;}).filter(Boolean);
+      if(segs.length>=2){const bs=pdBases(best.e);
+        const bm=bs.find(b=>b.lb&&b.p.amt&&reg.amt&&b.p.unit===reg.unit&&pdSame(b.p.amt,reg.amt));
+        const sg=bm&&segs.find(x=>x.lb===pdKey(bm.lb));
+        if(sg){rtext=sg.t;base_=bm.p;}}
+    }
+    const adj=pdParse(rtext);const base=base_||best.base;
+    const pct=r.text.match(/(\d+)\s*%\s*減量/);
+    if(pct&&reg.amt){const f=1-(+pct[1])/100;
+      out.lines.push({t:pdMg({lo:reg.amt.lo*f,hi:reg.amt.hi*f},reg.unit,wt,reg.g)+(reg.int?" "+pdIntTxt(reg.int):""),b:"処方量を"+pct[1]+"%減量（表17A："+cond+"）"});out.tone=out.tone==="crit"?"crit":"ok";return;}
+    if(adj.amt&&(reg.daily||adj.daily)&&(!reg.unit||adj.unit===reg.unit)){
+      out.lines.push({t:pdMg(adj.amt,adj.unit,wt,reg.g||adj.g)+(adj.daily?"/日":"")+(adj.int?" "+pdIntTxt(adj.int).replace("時間ごと",adj.daily?"時間ごとに分割":"時間ごと"):""),b:"表17A（"+cond+"）の量"+(id==="vcm"?"。初回負荷量とTDM（AUC 400〜600）で調整":"")});
+      if(out.tone==="ok"||!out.tone)out.tone="ok";return;}
+    if(!adj.amt||!adj.int||!reg.amt||!base||!base.amt||adj.unit!==reg.unit||base.unit!==reg.unit){
+      if(adj.amt&&adj.int){out.lines.push({t:pdInlineText(rtext,wt),b:"表17A（"+cond+"）の量。処方の書き方と自動で対応できないため、剤形・適応を薬剤タブで確認"});if(out.tone!=="crit")out.tone="warn";return;}
+      out.lines.push({t:pdInlineText(rtext,wt),b:"表17A（"+cond+"）の記載。処方の用量と自動で対応できないため要確認"});out.tone="crit";return;}
+    const exact=pdSame(base.amt,reg.amt)&&(!reg.int||!base.int||pdSame(base.int,reg.int));
+    const within=pdWithin(reg.amt,base.amt)&&(!reg.int||!base.int||pdWithin(reg.int,base.int));
+    if(reg.daily){ /* 1日量で書かれた処方（VCM 30〜60mg/kg/日 など）→ 表17Aの行をそのまま出す */
+      out.lines.push({t:pdMg(adj.amt,adj.unit,wt,reg.g||adj.g)+" "+pdIntTxt(adj.int),b:"表17A（"+cond+"）の量"+(id==="vcm"?"。初回負荷量とTDM（AUC 400〜600）で調整":"")});
+      if(out.tone==="ok")out.tone="ok";return;}
+    if(exact||within){
+      /* 範囲の中での位置を対応させる（例 ABPC 2g〈上限〉4時間ごと〈最短〉→ 2g 6時間ごと） */
+      const pos=(v,r)=>r.hi>r.lo?(v-r.lo)/(r.hi-r.lo):0;
+      const map=(t,r)=>({lo:r.lo+t*(r.hi-r.lo),hi:r.lo+t*(r.hi-r.lo)});
+      const am=exact?adj.amt:{lo:map(pos(reg.amt.lo,base.amt),adj.amt).lo,hi:map(pos(reg.amt.hi,base.amt),adj.amt).lo};
+      const iv=!reg.int||!base.int||exact?adj.int:{lo:map(pos(reg.int.lo,base.int),adj.int).lo,hi:map(pos(reg.int.hi,base.int),adj.int).lo};
+      out.lines.push({t:pdMg(am,adj.unit,wt,reg.g||adj.g)+" "+pdIntTxt(iv),b:"表17A（"+cond+"）どおり"});return;
+    }
+    /* AG（1日1回投与など）と単位数の薬（PCG）は割合の換算をせず、表17Aの行を示す */
+    if(["gm","tob","amk"].includes(id)||reg.unit==="万単位"){
+      out.lines.push({t:pdMg(adj.amt,adj.unit,wt,reg.g||adj.g)+" "+pdIntTxt(adj.int),b:"表17A（"+cond+"）の量"+(["gm","tob","amk"].includes(id)?"（従来の分割投与）。処方が1日1回投与なら腎機能別の間隔は表10C（期間タブ）とTDMで決める":"。処方の用量とは自動で対応できないため確認")});
+      if(out.tone!=="crit")out.tone="warn";return;}
+    /* 通常量より多い処方：表17Aと同じ割合で調整（参考） */
+    const bAm=pdMid(base.amt),aAm=pdMid(adj.amt),bIv=pdMid(base.int)||pdMid(reg.int),aIv=pdMid(adj.int);
+    let t;
+    if(!reg.int||!base.int||(reg.int.lo<=base.int.hi+1e-6&&reg.int.hi>=base.int.lo-1e-6)){
+      t=pdMg({lo:adj.amt.lo*reg.amt.lo/bAm,hi:adj.amt.hi*reg.amt.hi/bAm},reg.unit,wt,reg.g)+" "+pdIntTxt(adj.int);
+    }else{
+      const f=(aAm/aIv)/(bAm/bIv);
+      const iv={lo:pdSnap(reg.int.lo/f),hi:pdSnap(reg.int.hi/f)};
+      t=pdMg(reg.amt,reg.unit,wt,reg.g)+" "+pdIntTxt(iv);
+    }
+    out.lines.push({t,b:"参考：処方は表17Aの通常量（"+pdMg(base.amt,base.unit,null,base.g)+(base.int?" "+pdIntTxt(base.int):"")+"）と用量・間隔が違うため、表17A（"+cond+"：通常量→"+pdMg(adj.amt,adj.unit,null,adj.g)+" "+pdIntTxt(adj.int)+"）と同じ割合で1日量を調整した値。この用量での腎調整は原本に記載なし。薬剤部と確認"});
+    if(out.tone!=="crit")out.tone="warn";
+  });
+  if(id==="vcm"){const w=wt;out.lines.push({t:"初回負荷 20〜30mg/kg"+(w?"（＝"+pdRange({lo:20*w.w,hi:Math.min(30*w.w,3000)},"mg")+"mg、最大3g）":""),b:"表10A。維持はTDM（AUC24 400〜600）で調整"});}
+  if(["gm","tob","amk"].includes(id))out.note=(out.note?out.note+"。":"")+"1日1回投与・目標ピーク/トラフは表10C（期間タブ）"+(wt&&K.obese?"。肥満のため補正体重で換算":"");
+  if(hit.length>1&&!st.crclManual&&K.use==null){out.note="腎機能の区分内で分かれます。CrClを入れると1つに絞れます";if(out.tone==="ok")out.tone="warn";}
+  return out;
+}
+function pdInlineText(t,wt){
+  if(!wt)return t;
+  return String(t).replace(/(\d+(?:\.\d+)?)(\s*[〜~]\s*(\d+(?:\.\d+)?))?\s*mg\/kg/g,(m,a,_r,b)=>m+"（＝"+pdRange({lo:pdNum(a)*wt.w,hi:pdNum(b||a)*wt.w},"mg")+"mg）");
+}
+/* 処方1行 → 薬ごとの区切り */
+function pdSplit(line){
+  if(!aliasRe)return [];
+  const t=String(line),ms=[];let m;const re=new RegExp(aliasRe.source,"g");
+  while((m=re.exec(t))){const id=aliasMap.get(m[0]);if(!id)continue;
+    const after=t.slice(m.index+m[0].length,m.index+m[0].length+2),before=t.slice(Math.max(0,m.index-2),m.index);
+    if(/^\/[A-Za-z]/.test(after)||/[A-Za-z]\/$/.test(before))continue; /* MEPM/Vaborbactam のような別の合剤は対象外 */
+    ms.push({id,i:m.index,end:m.index+m[0].length});}
+  return ms.map((x,k)=>{const nx=k+1<ms.length?ms[k+1].i:t.length;let seg=t.slice(x.end,nx);
+    seg=seg.split(/\s(?:または|or)\s|[+＋]|，|。/)[0];return {id:x.id,seg};});
+}
+function pdBox(line,ctx){
+  let parts=pdSplit(line);if(!parts.length)return "";
+  { /* 同じ薬が1行に2回出る（「VCM（VCM 30〜60mg/kg/日…）」など）ときは用量のある方だけ */
+    const hasD=x=>/\d+(?:\.\d+)?\s*(?:万単位|mg|g|μg|錠|カプセル)/.test(x.seg);
+    parts=parts.filter((x,i)=>{const same=parts.filter(y=>y.id===x.id);if(same.length<2)return true;const withD=same.filter(hasD);return withD.length?hasD(x):same[0]===x;});
+  }
+  const seen=new Set(),rows=[];
+  parts.forEach(p=>{const k=p.id+"|"+p.seg.trim();if(seen.has(k))return;seen.add(k);
+    let seg=p.seg,src="";
+    if(!/\d+(?:\.\d+)?\s*(?:万単位|mg|g|μg|錠|カプセル)/.test(seg)){ /* 処方に用量がない → 同じ項目の注記（脚注の用量）→ 表17Aの通常量 */
+      let found=null;(ctx||[]).some(n=>pdSplit(n).some(q=>{if(q.id===p.id&&/\d+(?:\.\d+)?\s*(?:万単位|mg|g|μg)/.test(q.seg)){found=q.seg;return true;}return false;}));
+      if(found){seg=found;src="用量は同じ項目の注記（脚注）から";}
+      else{const u=((DR[p.id]||{}).renalRows||[])[0];const up=u&&pdParse(u.usualDose);
+        if(up&&up.amt&&up.int&&!/さまざま|異なる|／|；/.test(u.usualDose)){seg=u.usualDose;src="処方に用量の記載なし→表17Aの通常量を使用";}
+        else{const dd=(DR[p.id]||{}).dose||[];const d1=dd.find(x=>pdParse(x).amt&&pdParse(x).int);if(d1){seg=d1;src="処方に用量の記載なし→表10A等の成人量を使用";}else return;}}
+    }
+    let r=null;try{r=pdDrug(p.id,seg);}catch(e){r={name:(DR[p.id]||{}).abbr||p.id,lines:[{t:"要確認",b:"用量を自動で読み取れませんでした。薬剤タブで確認"}],tone:"crit",note:""};}
+    if(r&&r.lines.length){if(src)r.note=(r.note?r.note+"。":"")+src;rows.push(r);}});
+  if(!rows.length)return "";
+  return `<div class="pdbox">${rows.map(r=>`<div class="pdr ${r.tone}"><b>${esc(r.name)}</b> ${r.lines.map(l=>`<span class="pdt">${esc(l.t)}</span><span class="pdb">${esc(l.b)}</span>`).join("<br>")}${r.note?`<span class="pdb">${esc(r.note)}</span>`:""}</div>`).join("")}</div>`;
+}
+window.__pdBox=(l,c)=>pdBox(l,c);
+function pdHeader(){
+  const w=num(st.wt);
+  const a=[];a.push(hasRenal()?"腎機能 "+crclText():"腎機能 未入力");a.push(w!=null?"体重 "+w+"kg":"体重 未入力");
+  if(num(st.age)!=null)a.push(st.age+"歳");
+  return `<div class="pdh">この患者での投与量：${esc(a.join("・"))}${!hasRenal()||w==null?`　<button type="button" class="dl" data-go-pt="1">患者タブで入力 →</button>`:""}</div>`;
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go-pt]");if(!b)return;e.preventDefault();show("v-pt");});
+
+function list(arr,cls,dose){arr=(arr||[]).filter(x=>x&&String(x).trim());if(!arr.length)return "";const f=new Set();return {html:`<ul class="${cls||""}">${arr.map(x=>`<li>${dose?pdInline(linkify(x,f)):linkify(x,f)}${dose?pdBox(x,dose===1?null:dose):""}</li>`).join("")}</ul>`,f};}
 function pages(p){p=(p||[]).filter(Boolean);return p.length?`<div class="pg">出典：サンフォード2026 p.${p.join(", ")}</div>`:"";}
 /* ---------- 系統名の代表薬（表示のみ。推奨内容は変えない） ---------- */
 const CEPH_REP={
@@ -501,8 +730,9 @@ function focusBody(f){
   const parts=[],ids=new Set();
   if(f.context)parts.push(`<h4>背景・条件</h4><p>${esc(f.context)}</p>`);
   if((f.organisms||[]).length)parts.push(`<h4>想定される起因菌</h4><div class="orgs">${f.organisms.map(o=>`<span>${esc(o)}</span>`).join("")}</div>`);
-  const p=list(f.primary,"pri");if(p){parts.push(`<h4>第一選択</h4>`+p.html);p.f.forEach(x=>ids.add(x));}
-  const a=list(f.alternative);if(a){parts.push(`<h4>代替</h4>`+a.html);a.f.forEach(x=>ids.add(x));}
+  parts.push(pdHeader());
+  const p=list(f.primary,"pri",f.notes||1);if(p){parts.push(`<h4>第一選択</h4>`+p.html);p.f.forEach(x=>ids.add(x));}
+  const a=list(f.alternative,"",f.notes||1);if(a){parts.push(`<h4>代替</h4>`+a.html);a.f.forEach(x=>ids.add(x));}
   const n=list(f.notes);if(n){parts.push(`<h4>注記</h4>`+n.html);n.f.forEach(x=>ids.add(x));}
   if(f.duration)parts.push(`<h4>治療期間</h4><p>${linkify(f.duration)}</p>`);
   parts.push(repHTML([f.primary,f.alternative,f.notes,f.duration]));
@@ -555,8 +785,9 @@ function specBody(o){
 function orgBody(o){
   const parts=[],ids=new Set();
   if(o.situation)parts.push(`<h4>状況</h4><p>${esc(o.situation)}</p>`);
-  const p=list(o.primary,"pri");if(p){parts.push(`<h4>第一選択</h4>`+p.html);p.f.forEach(x=>ids.add(x));}
-  const a=list(o.alternative);if(a){parts.push(`<h4>代替</h4>`+a.html);a.f.forEach(x=>ids.add(x));}
+  parts.push(pdHeader());
+  const p=list(o.primary,"pri",o.notes||1);if(p){parts.push(`<h4>第一選択</h4>`+p.html);p.f.forEach(x=>ids.add(x));}
+  const a=list(o.alternative,"",o.notes||1);if(a){parts.push(`<h4>代替</h4>`+a.html);a.f.forEach(x=>ids.add(x));}
   const n=list(o.notes);if(n){parts.push(`<h4>注記</h4>`+n.html);n.f.forEach(x=>ids.add(x));}
   parts.push(repHTML([o.situation,o.primary,o.alternative,o.notes]));
   parts.push(`<div data-rd="1">${rdoseBlock(ids)}</div>`);
@@ -645,7 +876,7 @@ function renderAllDrugDeps(){
   if(typeof renderFlow==='function'&&$('#v-flow').classList.contains('active'))renderFlow();
   if($("#v-drug").classList.contains("active"))renderDrugs();
   $$("[data-rd]").forEach(el=>{const det=el.closest("details.item");if(!det)return;
-    if(det.closest("#focusList")){const f=FOCUS.find(x=>x.id===det.dataset.id);if(f&&f.__ids)el.innerHTML=rdoseBlock(f.__ids);}
+    if(det.closest("#focusList")){const f=FOCUS.find(x=>x.id===det.dataset.id);if(f&&det.open)det.querySelector(".body").innerHTML=focusBody(f);}
   });
 }
 
@@ -664,7 +895,7 @@ simpleCard("#agCard","アミノグリコシドの投与法（表10C）",DATA.ag)
 simpleCard("#extCard","長時間・持続静注（表10D）",DATA.ext);
 simpleCard("#prefaceCard","腎障害時の用量の前提（表17A）",{rows:DATA.preface,notes:DATA.noAdjust&&DATA.noAdjust.length?["腎機能による用量調整が不要とされる薬剤："+DATA.noAdjust.join("、")]:[],pages:DATA.prefacePages});
 $("#dataVer").textContent=DATA.version;
-const APP_VER="inf-2026-11-14b";
+const APP_VER="inf-2026-11-14d";
 $("#appVer").textContent=APP_VER;
 $("#forceUpdate").addEventListener("click",async()=>{
   const b=$("#forceUpdate");b.textContent="確認しています…";
@@ -738,9 +969,9 @@ function sepsisNotes(){
   if(m.mdr)out.push(...pick("MEPM より劣る"));
   return [...new Set(out)];
 }
-function hlList(arr,keys,ids){
+function hlList(arr,keys,ids,dose,ctx){
   arr=(arr||[]).filter(Boolean);if(!arr.length)return "";
-  return `<ul>${arr.map(x=>{const h=keys.length&&keys.some(k=>x.includes(k));return `<li class="${h?"hl":""}">${linkify(x,ids)}</li>`;}).join("")}</ul>`;
+  return `<ul>${arr.map(x=>{const h=keys.length&&keys.some(k=>x.includes(k));return `<li class="${h?"hl":""}">${dose===false?linkify(x,ids):pdInline(linkify(x,ids))+pdBox(x,ctx)}</li>`;}).join("")}</ul>`;
 }
 function renderFlow(){
   const F=st.flow;
@@ -755,7 +986,7 @@ function renderFlow(){
   // 最初の1時間
   if(F.sev==="shock"||F.sev==="sepsis"){
     const ss=FX.septic_shock||{};const b=(ss.notes||[]).filter(x=>x.includes("治療バンドル")||x.includes("ヒドロコルチゾン"));
-    h+=`<div class="card"><h2>最初にやること</h2>${F.sev==="shock"?`<p style="font-size:14px;margin:0 0 4px">${esc(ss.context||"")}</p>`:""}${hlList(F.sev==="shock"?b:b.slice(0,1),[],ids)}${pages(ss.pages)}</div>`;
+    h+=`<div class="card"><h2>最初にやること</h2>${F.sev==="shock"?`<p style="font-size:14px;margin:0 0 4px">${esc(ss.context||"")}</p>`:""}${hlList(F.sev==="shock"?b:b.slice(0,1),[],ids,false)}${pages(ss.pages)}</div>`;
   }
   const R=routes();
   if(R.length&&FX[R[0].id])$("#sumFocus").textContent=FX[R[0].id].name;
@@ -764,16 +995,16 @@ function renderFlow(){
   R.forEach((r,ri)=>{const f=FX[r.id];
     h+=`<div class="route${ri===0?" verdict info":""}">${ri===0?`<span class="pill" hidden>経験的治療</span><span class="big" hidden>${esc(f.name)}${R.length>1?" ほか"+(R.length-1)+"項目":""}</span>`:""}<h3>${esc(f.name)}</h3><div class="why">根拠の分岐：${esc(r.why)}${f.context?"｜"+esc(f.context):""}</div>`+
       ((f.organisms||[]).length?`<div class="orgs" style="margin:4px 0">${f.organisms.map(o=>`<span>${esc(o)}</span>`).join("")}</div>`:"")+
-      `<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">第一選択</h4>${hlList(f.primary,r.hl,ids)}`+
-      ((f.alternative||[]).length?`<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">代替</h4>${hlList(f.alternative,r.hl,ids)}`:"")+
+      pdHeader()+`<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">第一選択</h4>${hlList(f.primary,r.hl,ids,true,f.notes)}`+
+      ((f.alternative||[]).length?`<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">代替</h4>${hlList(f.alternative,r.hl,ids,true,f.notes)}`:"")+
       (f.duration?`<p style="font-size:13.5px;margin:6px 0 0"><b>期間：</b>${esc(f.duration)}</p>`:"")+
       repHTML([f.primary,f.alternative])+
       `<div class="row-btn" style="margin-top:6px"><button type="button" class="dl" data-focus="${esc(f.id)}">注記を含めてFocusで見る →</button></div>${pages(f.pages)}</div>`;});
   const sn=sepsisNotes();
-  if(sn.length)h+=`<h4 style="font-size:12px;color:var(--muted);margin:8px 0 2px">条件に関係する注記（敗血症・感染源不明の項より）</h4>${hlList(sn,[],ids)}${pages((FX.sepsis_unknown||{}).pages)}`;
+  if(sn.length)h+=`<h4 style="font-size:12px;color:var(--muted);margin:8px 0 2px">条件に関係する注記（敗血症・感染源不明の項より）</h4>${hlList(sn,[],ids,false)}${pages((FX.sepsis_unknown||{}).pages)}`;
   if((F.mods||{}).mdr)h+=`<div class="alert info">耐性菌の検出率が高い・保菌歴あり：起因菌タブの「耐性菌（表5・6）」でESBL・CRE・DTR-PAの選択肢を確認してください。</div>`;
   h+=`<p class="hint">黄色の行は選んだ条件に該当する行です。分岐（どの項目を出すか）はアプリ側の整理で、処方内容は各項目の原本ページのとおりです。</p></div>`;
-  h+=`<div class="card"><h2>この患者の腎機能での用量</h2>${rdoseBlock(ids)}</div>`;
+  h+=`<div class="card"><details><summary>表17Aの通常量からの調整（薬ごとの一覧・参考）</summary>${rdoseBlock(ids)}</details></div>`;
   h+=`<div class="card"><h2>次の一手</h2><ul style="padding-left:18px;margin:0;font-size:14px"><li>培養・グラム染色が出たら：起因菌タブ（表4Aの活性・耐性菌）と、Focusの「起因菌判明後」「菌別」項目で狭域化を検討（アプリの整理）。</li><li>治療期間：期間タブ（表3）。</li></ul></div>`;
   box.innerHTML=h;
 }
