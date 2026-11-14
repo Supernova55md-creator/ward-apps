@@ -28,41 +28,38 @@
   color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
-header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 8px calc(14px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
 header.top .brand{max-width:760px;margin:0 auto}
-header.top h1{font-size:19px;margin:0;line-height:1.3}
-header.top small{font-size:12px;opacity:.9}
-nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-nav.tabs button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
-nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
-@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.2)}}
-main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+header.top h1{font-size:18px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.92}
+header.top #wpBandWrap,header.top #wcSum{max-width:760px;margin-left:auto;margin-right:auto}
+main{max-width:760px;margin:0 auto;padding:12px calc(12px + env(safe-area-inset-right)) 12px calc(12px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+[data-p]{display:flex;flex-direction:column;gap:12px}
 section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
 h2{font-size:16px;margin:0 0 10px;line-height:1.4}
 h3{font-size:14.5px;margin:14px 0 6px}
 h3:first-child{margin-top:0}
-.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
 .q{margin:0 0 14px}
 .q:last-child{margin-bottom:0}
 .q>.lb{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
-.opts{display:flex;flex-direction:column;gap:6px}
-.opt{position:relative;display:block}
-.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.opt span{display:block;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 11px;font-size:14px;line-height:1.45;cursor:pointer}
-.opt span b{font-family:var(--num);margin-right:6px}
-.opt input:checked + span{background:var(--accent-soft);border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
-.opt input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
-.opt.th span{border-style:dashed}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{position:relative}
-.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:14px;line-height:1.3;cursor:pointer;min-height:36px}
-.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:15px;font-weight:700;min-width:46px;min-height:42px;padding:6px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.seg button.th{border-style:dashed;border-color:var(--accent)}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.seg.wide button{flex:1 1 140px;font-size:14px;text-align:left}
+.desc{font-size:13.5px;margin-top:6px;padding:6px 10px;border-radius:8px;background:var(--accent-soft);min-height:1.6em}
+.desc:empty{display:none}
+details.more{border-top:1px dashed var(--line);margin-top:8px;padding-top:4px}
+details.more>summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
+details.more ol,details.more ul{margin:4px 0;padding-left:1.3em;font-size:13px}
+.dzq{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.dzq button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 11px;min-height:36px;cursor:pointer}
+.dzq button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+select,input[type=number],input[type=date]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
-input[type=number],input[type=date],select{font:inherit;font-size:17px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
-select{font-size:15px}
 .chk{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;padding:6px 0;cursor:pointer}
 .chk input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--accent)}
 .hidden{display:none!important}
@@ -74,14 +71,21 @@ select{font-size:15px}
 .pill{align-self:flex-start;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:#fff;background:var(--muted)}
 .verdict.ok .pill{background:var(--ok)}.verdict.warn .pill{background:var(--warn)}.verdict.crit .pill{background:var(--crit)}.verdict.info .pill{background:var(--info)}
 @media (prefers-color-scheme: dark){.pill{color:#111}}
-.big{font-size:17.5px;font-weight:700;line-height:1.45}
+.big{font-size:17px;font-weight:700;line-height:1.45}
 .verdict ul{margin:0;padding-left:1.2em;font-size:14px}
 .tags{display:flex;flex-wrap:wrap;gap:6px}
 .tg{font-size:12.5px;font-weight:700;border-radius:6px;padding:3px 8px;border:1px solid var(--line);background:var(--bg)}
 .tg.y{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
-.tg.n{background:var(--bg);color:var(--muted)}
+.tg.n{color:var(--muted)}
 .tg.c{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
-.score{font-family:var(--num);font-size:20px;font-weight:700}
+.qk{display:flex;flex-direction:column;gap:0}
+.qk button{font:inherit;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 2px;color:var(--ink);cursor:pointer;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:2px 8px;align-items:start}
+.qk button:last-child{border-bottom:0}
+.qk .no{font-family:var(--num);font-size:13px;color:var(--muted);padding-top:2px}
+.qk .nm{font-weight:700;font-size:15px}
+.qk .th{grid-column:2/4;font-size:13px;color:var(--muted)}
+.qk .mk{font-size:11.5px;white-space:nowrap;color:var(--muted)}
+.qk .mk b{color:var(--ok)}
 .bi .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dotted var(--line);font-size:14px}
 .bi .row:last-child{border-bottom:0}
 .bi select{width:auto;max-width:190px;font-size:14px;padding:6px}
@@ -89,439 +93,408 @@ table.tl{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numer
 table.tl th,table.tl td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
 table.tl th{font-size:12px;color:var(--muted);font-weight:700;background:var(--bg);white-space:nowrap}
 table.tl td.n{text-align:right;font-family:var(--num);white-space:nowrap}
-table.tl tr.hl td{background:var(--accent-soft)}
 .wrapx{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .list{margin:0;padding-left:1.2em;font-size:14px}
 .list li{margin:3px 0}
-.note{border-left:4px solid var(--info);background:var(--bg);border-radius:8px;padding:9px 11px;font-size:14px}
+.note{border-left:4px solid var(--info);background:var(--bg);border-radius:8px;padding:9px 11px;font-size:14px;margin:0}
 .note.w{border-left-color:var(--warn)}
 .note.k{border-left-color:var(--ok)}
-.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.links a{font-size:12.5px;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--info);background:var(--surface)}
+.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.links a{font-size:12.5px;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:var(--info);background:var(--surface)}
+a.app{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg);margin-top:8px;font-size:14px;font-weight:700}
+a.app img{width:32px;height:32px;border-radius:8px}
+a.app small{display:block;font-weight:400;color:var(--muted);font-size:12px}
 .mo{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 @media (max-width:420px){.mo{grid-template-columns:repeat(3,1fr)}}
 .mo label{font-size:11.5px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
 .mo input{font-size:15px;padding:6px}
 .mo input.hit{border-color:var(--ok);background:var(--ok-soft)}
 .mo input.hit2{border-color:var(--warn);background:var(--warn-soft)}
-.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;min-height:38px}
-.src{font-size:13px}
+.btn{font:inherit;font-size:14px;font-weight:700;border-radius:10px;padding:8px 12px;min-height:40px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);cursor:pointer}
+.src{font-size:13px;margin:0;padding-left:1.2em}
 .src li{margin:4px 0}
 .src a{color:var(--info);word-break:break-all}
-.dz{font-size:13px}
-#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 14px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:50;max-width:90vw}
+.dz{font-size:13px;margin:0}
+.disc{font-size:12px;color:var(--muted);margin:0}
+.vf{font-size:11px;font-weight:700;border-radius:4px;padding:0 5px;margin-left:4px;white-space:nowrap}
+.vf.ok{background:var(--ok-soft);color:var(--ok)}.vf.un{background:var(--warn-soft);color:var(--warn)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:4px calc(6px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left))}
+nav.tabs button{font:inherit;font-size:12px;font-weight:600;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:1px;min-height:54px;justify-content:center;cursor:pointer;border-radius:10px}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button[aria-selected=true]{color:var(--accent);background:var(--accent-soft)}
+#toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 14px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:50;max-width:90vw}
 #toast.on{opacity:.95}
-.foot{font-size:11.5px;color:var(--muted);text-align:center;margin:6px 0}
+@media print{nav.tabs{display:none}header.top{position:static}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="brand">
     <h1>指定難病・制度ナビ</h1>
-    <small>重症度チェック／臨個票・介護保険・身障手帳の要件</small>
+    <small>重症度の判定・軽症高額・介護保険・訪問看護・身障手帳</small>
   </div>
-  <nav class="tabs" role="tablist">
-    <button data-v="chk" role="tab">重症度</button>
-    <button data-v="kei" role="tab">軽症高額</button>
-    <button data-v="sys" role="tab">制度早見</button>
-    <button data-v="doc" role="tab">書類</button>
-    <button data-v="ref" role="tab">出典</button>
-  </nav>
 </header>
 <main>
 
-<!-- ========== 重症度チェック ========== -->
-<div data-p="chk">
+<!-- ========== 早見（入力なし） ========== -->
+<div data-p="qk">
   <section class="card">
-    <h2>疾患を選ぶ</h2>
+    <h2>神経の指定難病：重症度の対象と他制度</h2>
+    <p class="note k" style="margin-bottom:8px">重症度は<b>直近6か月で最も悪い状態</b>で判定（治療中は適切な医学的管理下で）。満たさなくても<b>軽症高額</b>（10割33,330円超の月が12か月で3回以上）で認定、診断基準を満たせば<b>登録者証</b>は発行。</p>
+    <div id="ageNote"></div>
+    <div class="qk" id="qkList"></div>
+    <p class="hint">介＝40〜64歳でも介護保険を使える特定疾病。訪＝訪問看護が医療保険（別表第7）。△は条件付き・要確認。行を押すと判定へ。</p>
+  </section>
+</div>
+
+<!-- ========== 判定 ========== -->
+<div data-p="chk" class="hidden">
+  <section class="card">
+    <div class="dzq" id="dzq"></div>
     <select id="dz" aria-label="疾患"></select>
-    <p class="hint">重症度は「適切な医学的管理の下で治療が行われている状態で、直近6か月間で最も悪い状態」で判定します（全疾患共通の留意事項）。</p>
   </section>
   <section class="card" id="panel"></section>
   <div id="verdict"></div>
+  <section class="card" id="keiQ"></section>
   <section class="card" id="dzinfo"></section>
 </div>
 
-<!-- ========== 軽症高額 ========== -->
-<div data-p="kei" class="hidden">
+<!-- ========== 費用 ========== -->
+<div data-p="cost" class="hidden">
   <section class="card">
-    <h2>軽症高額該当（軽症者特例）</h2>
-    <p class="note">診断基準は満たすが重症度を満たさない場合でも、指定難病に係る月ごとの<b>医療費総額（10割）が33,330円を超える月が、申請月から起算して12か月以内に3回以上</b>あれば認定されます（発症月が12か月以内なら発症月から申請月まで）。</p>
-    <p class="hint">目安：10割33,330円 ＝ 3割負担で約1万円、2割負担で約6,700円の窓口負担。薬剤費も含みます（指定難病に係る分のみ）。</p>
-    <h3>月ごとの医療費総額（10割・円）</h3>
-    <div class="mo" id="months"></div>
-    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-      <button class="btn" id="fill30">3割負担額で入力した→10割に換算</button>
-      <button class="btn" id="fill20">2割負担額で入力した→10割に換算</button>
-    </div>
-    <p class="hint">緑＝33,330円超、橙＝50,000円超（高額かつ長期の判定にも使える月）。</p>
-  </section>
-  <div id="keiv"></div>
-  <section class="card">
-    <h2>高額かつ長期（認定後の上限額の軽減）</h2>
-    <p class="note k">支給認定を受けた人で、指定難病の<b>月ごとの医療費総額（10割）が5万円を超える月が、直近12か月で6回以上</b>あれば、一般所得Ⅰ・Ⅱ・上位所得の上限額が下がります（申請が必要。変更は申請月の翌月からとする自治体あり）。</p>
-    <p class="hint">上の入力で橙の月の数をそのまま使えます（ただし対象は「支給認定後」の月）。</p>
-  </section>
-</div>
-
-<!-- ========== 制度早見 ========== -->
-<div data-p="sys" class="hidden">
-  <section class="card">
-    <h2>神経系の主な指定難病：基準と他制度の早見</h2>
-    <div class="wrapx"><table class="tl" id="matrix"></table></div>
-    <p class="hint">介護2号＝40〜64歳で介護保険を使える「特定疾病」に当たるか。訪看医療＝訪問看護を医療保険で行う「厚生労働大臣が定める疾病等」（別表第7）に当たるか。</p>
-  </section>
-
-  <section class="card">
-    <h2>難病医療費助成（特定医療費）</h2>
-    <ul class="list">
-      <li>要件：<b>診断基準を満たす</b>＋<b>重症度分類を満たす</b>（満たさなければ<b>軽症高額該当</b>）。疑い例・Probable の扱いは疾患ごと。</li>
-      <li>指定難病は<b>348疾病</b>（令和7年4月〜。令和8年4月時点の厚労省一覧も348）。</li>
-      <li>窓口負担は<b>2割</b>（既に1割の人はそのまま）＋所得に応じた<b>月額上限</b>。受診できるのは<b>指定医療機関</b>（病院・薬局・訪看）。</li>
-      <li>受給者証の有効期間は原則1年。更新は毎年、臨個票が必要。</li>
-      <li>助成開始日：<b>重症度分類を満たしていると診断した日</b>（臨個票の「診断年月日」）から。ただし遡りは<b>申請日から原則1か月</b>、やむを得ない理由があれば最長3か月（2023年10月〜）。</li>
-    </ul>
-    <h3>自己負担上限額（月額・円）</h3>
+    <h2>自己負担上限額（月額・円）</h2>
     <div class="wrapx"><table class="tl">
-      <tr><th>階層</th><th>基準（市町村民税）</th><th>一般</th><th>高額かつ長期</th><th>人工呼吸器等装着者</th></tr>
+      <tr><th>階層</th><th>市町村民税</th><th>一般</th><th>高額かつ長期</th><th>呼吸器等</th></tr>
       <tr><td>生活保護</td><td>—</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
-      <tr><td>低所得Ⅰ</td><td>非課税（世帯）・本人年収 約80万円以下※</td><td class="n">2,500</td><td class="n">2,500</td><td class="n" rowspan="5">1,000</td></tr>
-      <tr><td>低所得Ⅱ</td><td>非課税（世帯）・本人年収 上記超</td><td class="n">5,000</td><td class="n">5,000</td></tr>
-      <tr><td>一般所得Ⅰ</td><td>課税以上・所得割7.1万円未満</td><td class="n">10,000</td><td class="n">5,000</td></tr>
+      <tr><td>低所得Ⅰ</td><td>非課税・本人年収 約80万円以下※</td><td class="n">2,500</td><td class="n">2,500</td><td class="n" rowspan="5">1,000</td></tr>
+      <tr><td>低所得Ⅱ</td><td>非課税・上記超</td><td class="n">5,000</td><td class="n">5,000</td></tr>
+      <tr><td>一般所得Ⅰ</td><td>所得割7.1万円未満</td><td class="n">10,000</td><td class="n">5,000</td></tr>
       <tr><td>一般所得Ⅱ</td><td>所得割7.1万〜25.1万円未満</td><td class="n">20,000</td><td class="n">10,000</td></tr>
       <tr><td>上位所得</td><td>所得割25.1万円以上</td><td class="n">30,000</td><td class="n">20,000</td></tr>
     </table></div>
-    <p class="hint">※低所得Ⅰの本人年収の線は年度で改定（80万円→80.9万円→82.65万円と自治体資料で表記が異なる）。上限は病院・薬局・訪問看護の合算。同じ医療保険の世帯に難病・小慢の受給者が複数いると按分。人工呼吸器等装着者＝気管切開またはマスクを介した人工呼吸器・補助人工心臓を常時装着し、別途の認定基準を満たす人。入院時の食事は原則自己負担（東京都は負担者番号により1/2または全額を公費で負担する扱いあり）。</p>
-    <h3>登録者証（2024年4月〜）</h3>
-    <p class="note k">診断基準を満たせば、<b>重症度を満たさない軽症者にも</b>発行。障害福祉サービスの申請やハローワークで、難病患者であることの証明（診断書の代わり）に使える。医療費助成と同時に申請すれば併せて申請扱い（受給者証がある間は不要とする自治体もある）。</p>
+    <ul class="list" style="margin-top:8px">
+      <li>窓口負担は<b>2割</b>（既に1割の人はそのまま）。上限は病院・薬局・訪問看護の合算。受診できるのは<b>指定医療機関</b>。</li>
+      <li><b>高額かつ長期</b>：認定後、10割5万円超の月が直近12か月で6回以上 → 申請で上限が下がる。</li>
+      <li><b>人工呼吸器等装着者</b>：気管切開・マスクを介した人工呼吸器や補助人工心臓を常時装着し、別途の基準を満たす人は所得によらず1,000円。</li>
+    </ul>
+    <p class="hint">※低所得Ⅰの本人年収の線は年度で改定（自治体資料に80万円・80.9万円・82.65万円の表記あり）。同じ医療保険の世帯に難病・小慢の受給者が複数いると按分。入院時の食事は原則自己負担（東京都は負担者番号により1/2または全額を公費負担する扱いあり）。</p>
   </section>
+  <section class="card">
+    <h2>軽症高額該当・高額かつ長期の月数を数える</h2>
+    <p class="note">指定難病に係る医療費総額（10割）。<b>33,330円超が3回以上</b>（申請月から12か月以内、発症月より前は数えない）で軽症高額該当。東京都の案内では、医療費に一部の介護サービス費も合算して数える。</p>
+    <details class="more" id="moreMonths">
+      <summary>月ごとに入力して数える</summary>
+      <div class="mo" id="months"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn" id="fill30">3割負担額→10割に換算</button>
+        <button class="btn" id="fill20">2割負担額→10割に換算</button>
+      </div>
+      <p class="hint">緑＝33,330円超、橙＝5万円超。目安：10割33,330円 ≒ 3割で約1万円・2割で約6,700円。</p>
+    </details>
+  </section>
+  <div id="keiv"></div>
+</div>
 
+<!-- ========== 制度 ========== -->
+<div data-p="sys" class="hidden">
   <section class="card">
     <h2>介護保険</h2>
+    <div id="ageNote2"></div>
     <ul class="list">
-      <li><b>65歳以上</b>（第1号）：原因を問わず要介護・要支援認定で利用可。</li>
-      <li><b>40〜64歳</b>（第2号）：要介護状態の原因が<b>16の特定疾病</b>であることが必要。主治医意見書の診断名は<b>政令どおりの名称</b>で書き、診断の根拠となる所見も記載する（介護認定審査会が確認）。</li>
+      <li><b>65歳以上</b>（第1号）：原因を問わず要介護・要支援認定で利用できる。</li>
+      <li><b>40〜64歳</b>（第2号）：原因が<b>16の特定疾病</b>であることが必要。神経では ALS、初老期における認知症、PSP・CBD・PD（パーキンソン病関連疾患）、脊髄小脳変性症、多系統萎縮症、脳血管疾患。PDの Yahr・生活機能障害度は要件ではない。</li>
     </ul>
-    <h3>16の特定疾病（神経に関係するものを太字）</h3>
-    <ol class="list">
-      <li>がん（末期）</li><li>関節リウマチ</li><li><b>筋萎縮性側索硬化症</b></li><li>後縦靱帯骨化症</li><li>骨折を伴う骨粗鬆症</li>
-      <li><b>初老期における認知症</b>（アルツハイマー病、脳血管性認知症等）</li>
-      <li><b>進行性核上性麻痺、大脳皮質基底核変性症及びパーキンソン病</b>（パーキンソン病関連疾患）</li>
-      <li><b>脊髄小脳変性症</b></li><li>脊柱管狭窄症</li><li>早老症</li><li><b>多系統萎縮症</b></li>
-      <li>糖尿病性神経障害、糖尿病性腎症及び糖尿病性網膜症</li><li><b>脳血管疾患</b>（脳梗塞、脳出血等）</li>
-      <li>閉塞性動脈硬化症</li><li>慢性閉塞性肺疾患</li><li>両側の膝関節又は股関節に著しい変形を伴う変形性関節症</li>
-    </ol>
-    <p class="note w"><b>MG・MS/NMOSD・CIDP・ハンチントン病・筋ジストロフィー・SMA・SBMA などは特定疾病ではない</b>ので、40〜64歳は介護保険が使えない。→ 障害者総合支援法の障害福祉サービス（手帳不要）を検討。PDのYahr・生活機能障害度は特定疾病の要件ではない（PDと診断され要介護状態であればよい）。</p>
+    <p class="note w" style="margin-top:8px"><b>MG・MS/NMOSD・CIDP/MMN・ハンチントン病・筋ジストロフィー・SMA・SBMA などは特定疾病ではない</b>。40〜64歳は介護保険が使えない → 障害者総合支援法の障害福祉サービス（手帳不要）へ。</p>
+    <details class="more"><summary>16の特定疾病（全部）</summary>
+      <ol><li>がん（末期）</li><li>関節リウマチ</li><li>筋萎縮性側索硬化症</li><li>後縦靱帯骨化症</li><li>骨折を伴う骨粗鬆症</li><li>初老期における認知症</li><li>進行性核上性麻痺、大脳皮質基底核変性症及びパーキンソン病</li><li>脊髄小脳変性症</li><li>脊柱管狭窄症</li><li>早老症</li><li>多系統萎縮症</li><li>糖尿病性神経障害、糖尿病性腎症及び糖尿病性網膜症</li><li>脳血管疾患</li><li>閉塞性動脈硬化症</li><li>慢性閉塞性肺疾患</li><li>両側の膝関節又は股関節に著しい変形を伴う変形性関節症</li></ol>
+    </details>
+    <a class="app" href="../iken/"><img src="../iken/icon-192.png" alt=""><span>主治医意見書 自立度判定<small>寝たきり度・認知症自立度の判定はこちら</small></span></a>
   </section>
 
   <section class="card">
-    <h2>障害者総合支援法（障害福祉サービス）</h2>
+    <h2>訪問看護が医療保険になる疾病（別表第7）</h2>
+    <p class="note">要介護認定があっても<b>医療保険の訪問看護</b>になり、週4日以上・1日複数回・複数ステーションの利用ができる。</p>
+    <p class="dz" style="margin-top:8px"><b>多発性硬化症、重症筋無力症、筋萎縮性側索硬化症、脊髄小脳変性症、ハンチントン病、進行性筋ジストロフィー症、パーキンソン病関連疾患</b>（PSP、CBD、PD〈Yahr 3以上かつ生活機能障害度Ⅱ・Ⅲ度〉）、<b>多系統萎縮症、プリオン病</b>、亜急性硬化性全脳炎、ライソゾーム病、副腎白質ジストロフィー、<b>脊髄性筋萎縮症、球脊髄性筋萎縮症、慢性炎症性脱髄性多発神経炎</b>、末期の悪性腫瘍、スモン、後天性免疫不全症候群、頸髄損傷、人工呼吸器を使用している状態。</p>
+    <p class="hint">NMOSD・MMN は告示に名称が無い。算定の扱いは訪問看護ステーション・審査支払機関に確認。</p>
+  </section>
+
+  <section class="card">
+    <h2>障害者総合支援法・登録者証</h2>
     <ul class="list">
-      <li>対象の難病等は<b>376疾病</b>（令和7年4月〜）。指定難病より範囲が広く、名称が異なる疾病もある。</li>
-      <li><b>身体障害者手帳がなくても</b>、必要と認められれば居宅介護・補装具・日常生活用具などを利用できる。証明は診断書または受給者証・登録者証。</li>
-      <li>介護保険の対象者は介護保険が優先（介護保険にないサービスは併用可）。</li>
+      <li>障害福祉サービスの対象の難病等は<b>376疾病</b>（令和7年4月〜）。<b>手帳がなくても</b>居宅介護・補装具・日常生活用具などを利用できる。介護保険の対象者は介護保険が優先。</li>
+      <li><b>登録者証</b>（2024年〜）：診断基準を満たせば、重症度を満たさない軽症者にも発行。障害福祉サービスやハローワークで診断書の代わりに使える。</li>
     </ul>
   </section>
 
   <section class="card">
-    <h2>訪問看護：医療保険になる疾病（別表第7）</h2>
-    <p class="note">要介護認定を受けていても、下の疾病は<b>訪問看護が医療保険</b>になる（週4日以上・1日複数回・複数ステーションの利用が可能になる）。</p>
-    <p class="dz">末期の悪性腫瘍、<b>多発性硬化症、重症筋無力症</b>、スモン、<b>筋萎縮性側索硬化症、脊髄小脳変性症、ハンチントン病、進行性筋ジストロフィー症</b>、<b>パーキンソン病関連疾患</b>（進行性核上性麻痺、大脳皮質基底核変性症、パーキンソン病〈Hoehn-Yahr 3以上かつ生活機能障害度Ⅱ・Ⅲ度に限る〉）、<b>多系統萎縮症</b>、<b>プリオン病</b>、亜急性硬化性全脳炎、ライソゾーム病、副腎白質ジストロフィー、<b>脊髄性筋萎縮症、球脊髄性筋萎縮症、慢性炎症性脱髄性多発神経炎</b>、後天性免疫不全症候群、頸髄損傷、人工呼吸器を使用している状態。</p>
-    <p class="hint">NMOSD・MMN はこの告示に名称が無い。算定の扱いは訪問看護ステーション・審査支払機関に確認を。</p>
-  </section>
-
-  <section class="card">
-    <h2>身体障害者手帳（肢体不自由）</h2>
+    <h2>身体障害者手帳（肢体不自由）の要点</h2>
     <ul class="list">
-      <li>診断書は<b>身体障害者福祉法第15条の指定医</b>が作成。申請は市区町村の障害福祉窓口。</li>
-      <li>判定は<b>強制された一時的能力でしない</b>（無理をすれば1km歩けても翌日休むほどなら「1km歩行可能」ではない）。疼痛・筋力低下も客観的に示せれば機能障害として扱う。</li>
-      <li>PD・ALS・SCD などの進行性・成人発症の疾患は<b>上肢・下肢・体幹</b>の欄で評価する。「乳幼児期以前の非進行性の脳病変による運動機能障害」の欄は使わない。</li>
-      <li>複数の障害は指数で合算（1級18、2級11、3級7、4級4、5級2、6級1、7級0.5。合計18以上→1級、11〜17→2級、7〜10→3級、4〜6→4級、2〜3→5級、1→6級）。7級単独では交付されない。</li>
+      <li>15条指定医が診断書を作成。<b>強制された一時的能力でなく</b>日常的に安定してできる能力で判定。</li>
+      <li>PD・ALS・SCD など成人の進行性疾患は<b>上肢・下肢・体幹</b>の欄で評価（「乳幼児期以前の非進行性の脳病変」の欄は使わない）。</li>
+      <li>体幹：1級 坐位不能／2級 10分以上の坐位・起立位保持不能、又は自力のみで起立不能／3級 100m以上の歩行不能か片脚起立が全く不可能／5級 2km以上の歩行不能。</li>
     </ul>
-    <h3>体幹機能障害</h3>
-    <div class="wrapx"><table class="tl">
-      <tr><th>級</th><th>等級表</th><th>認定基準の目安</th></tr>
-      <tr><td>1級</td><td>坐っていることができない</td><td>—</td></tr>
-      <tr><td>2級</td><td>坐位又は起立位を保つことが困難／立ち上がることが困難</td><td>10分以上坐位・起立位を保てない／臥位・坐位から自力のみでは起立不能（人・柱・杖の介護で初めて可能）</td></tr>
-      <tr><td>3級</td><td>歩行が困難</td><td>100m以上の歩行不能、又は片脚での起立位保持が全く不可能</td></tr>
-      <tr><td>5級</td><td>著しい障害</td><td>2km以上の歩行不能</td></tr>
-    </table></div>
-    <h3>上肢・下肢（機能障害の基本）</h3>
-    <div class="wrapx"><table class="tl">
-      <tr><th></th><th>両上肢</th><th>一上肢</th><th>両下肢</th><th>一下肢</th></tr>
-      <tr><td>全廃</td><td>1級</td><td>2級</td><td>1級</td><td>3級</td></tr>
-      <tr><td>著しい障害</td><td>2級</td><td>3級</td><td>2級</td><td>4級</td></tr>
-      <tr><td>軽度の障害</td><td>—</td><td>7級</td><td>—</td><td>7級</td></tr>
-    </table></div>
-    <p class="hint">下肢全体の目安（自治体の手引き）：全廃＝患肢で立位を保持できない。著障＝1km以上の歩行不能・30分以上の起立位保持不能・手すりなしで階段昇降できない等。軽障＝2km以上の歩行不能・1時間以上の起立位保持不能・正座やあぐら不能。筋力では徒手筋力テストの平均で判断（著障は概ねMMT3相当）。</p>
-    <p class="note w">体幹と下肢を同一部位で重ねて認定しない、などの重複の扱いは自治体の手引き（指定医必携）で確認。嚥下・構音障害は「音声・言語・そしゃく機能障害」で別に評価できる（そしゃく機能は歯科医の診断が要る場合あり）。</p>
+    <a class="app" href="../shi/"><img src="../shi/icon-192.png" alt=""><span>肢体不自由 等級判定ナビ<small>等級の判定と診断書1枚目の下書きはこちら</small></span></a>
   </section>
 </div>
 
-<!-- ========== 書類 ========== -->
+<!-- ========== 書類・出典 ========== -->
 <div data-p="doc" class="hidden">
   <section class="card">
     <h2>助成開始日の計算（遡り）</h2>
     <div class="grid">
       <label class="f">臨個票の「診断年月日」<input type="date" id="dDiag"></label>
-      <label class="f">申請日（保健所等で受理）<input type="date" id="dAppl"></label>
+      <label class="f">申請日（窓口で受理）<input type="date" id="dAppl"></label>
     </div>
-    <label class="chk"><input type="checkbox" id="dUnav"><span>1か月以内に申請できなかった<b>やむを得ない理由</b>あり（入院・緊急治療など）→最長3か月</span></label>
+    <label class="chk"><input type="checkbox" id="dUnav"><span>1か月以内に申請できなかった<b>やむを得ない理由</b>あり（入院など）→最長3か月</span></label>
     <div id="dOut"></div>
-    <p class="hint">診断年月日＝「診察や検査結果等から、当該指定難病の診断基準を満たし、かつ当該指定難病が原因で重症度分類を満たしていると総合的に診断した日」。軽症高額の場合は「軽症高額該当基準を満たした日の翌日」（領収書等で確認）。</p>
+    <p class="hint">診断年月日＝診断基準を満たし、その難病が原因で重症度分類を満たしていると総合的に診断した日。軽症高額の場合は基準を満たした日の翌日（領収書等で確認）。</p>
   </section>
 
   <section class="card">
     <h2>臨個票（臨床調査個人票）チェック</h2>
     <ul class="list">
-      <li><b>新規</b>は難病指定医、<b>更新</b>は難病指定医または協力難病指定医が記載。基本情報欄も含め医師が記入する（患者記入は不可）。</li>
-      <li>右上の<b>新規／更新</b>のチェックを忘れない（受給者証の有効期限切れは「新規」扱い）。</li>
-      <li><b>診断年月日</b>欄を必ず記入（旧様式は使用不可）。</li>
-      <li>重症度は<b>直近6か月で最も悪い状態</b>を記載（PDなら off 時、MGなら増悪時）。更新時は改めて病状を確認する。</li>
-      <li>重症度と他の記載の<b>整合</b>：MGは MGFA 分類と MG-ADL、PDは Yahr と生活機能障害度と ADL 欄など、矛盾があると照会になる。</li>
-      <li><b>保険情報</b>の記載漏れが多いと厚労省が注意喚起している。</li>
-      <li>病名診断に使う症状・検査は、診断基準に特段の定めがなければ<b>過去のものでもよい</b>（経過として確認できるものに限る）。</li>
-      <li>新規で<b>検査レポートの写し</b>の添付を求める疾患がある（例：CIDP/MMN の神経伝導検査。自治体ごとに確認）。</li>
-      <li>重症度を満たさないときは、患者に<b>軽症高額該当</b>（領収書等）と<b>登録者証</b>を案内。</li>
-      <li>令和7年4月以降の更新で、一部疾患（ミトコンドリア病など）は過去に認定済なら診断基準を満たすものとし、「症状の概要、経過、特記すべき事項など」欄に「認定済」と書く特別の扱いがある。</li>
+      <li><b>新規</b>は難病指定医、<b>更新</b>は難病指定医または協力難病指定医。基本情報も含め医師が記入。</li>
+      <li><b>新規／更新</b>のチェック（有効期限切れは「新規」）、<b>診断年月日</b>、<b>保険情報</b>の記載漏れに注意。</li>
+      <li>重症度は<b>直近6か月で最も悪い状態</b>（PDは off 時、MGは増悪時）。他欄と矛盾させない（MGは MGFA と MG-ADL、PDは Yahr と ADL 欄）。</li>
+      <li>病名診断の症状・検査は過去のものでもよい（経過として確認できるもの）。</li>
+      <li>CIDP/MMN の新規で神経伝導検査レポートの写しを求める自治体がある。</li>
+      <li><b>東京都</b>：申請窓口は<b>区市町村</b>。国制度の臨個票は申請日前<b>6か月以内</b>に作成したものに限る。</li>
+      <li>重症度を満たさなければ、患者に<b>軽症高額</b>（領収書を集める）と<b>登録者証</b>を案内。</li>
     </ul>
   </section>
 
   <section class="card">
-    <h2>主治医意見書（介護保険）</h2>
-    <ul class="list">
-      <li>40〜64歳は「1.(1) 診断名」に<b>特定疾病名を政令どおり</b>書く（PDなら「パーキンソン病」、MSAなら「多系統萎縮症」）。特定疾病が確認できないとサービスを受けられない。</li>
-      <li>「生活機能低下の直接の原因となっている傷病または特定疾病の経過」に、<b>診断の根拠となる所見</b>も書く。</li>
-      <li>オン・オフや日内変動のある疾患は、悪い時間帯の介護の手間を具体的に（転倒、すくみ、嚥下、夜間介助など）。</li>
-    </ul>
-  </section>
-
-  <section class="card">
-    <h2>身障手帳の診断書・意見書</h2>
-    <ul class="list">
-      <li>15条指定医（肢体不自由の科目）が作成。</li>
-      <li>進行性疾患では、将来の再認定（要否・時期）の欄を病状に合わせて記載する。</li>
-      <li>MMT・関節可動域・歩行距離・起立位保持時間を数値で。強制された一時的能力ではなく、<b>日常的に安定してできる能力</b>で書く。</li>
-    </ul>
+    <h2>出典（2026年11月14日に確認）</h2>
+    <ol class="src" id="srcList"></ol>
+    <p class="disc" style="margin-top:8px">重症度の基準・尺度の文言は厚労省の告示個票（令和8年4月時点の一覧）と照合済。EDSS の各段階の説明は要約<span class="vf un">未照合</span>で、判定には個票の EDSS 表を使う。診療判断・書類作成の補助であり、認定は都道府県・指定都市の審査で決まる。最終判断は診察と原典で行う。</p>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px"><span class="hint" style="margin:0">アプリの版：<b id="appVer"></b></span><button type="button" class="btn" id="forceUpdate">最新版に更新</button></div>
   </section>
 </div>
-
-<!-- ========== 出典 ========== -->
-<div data-p="ref" class="hidden">
-  <section class="card">
-    <h2>出典（2026年11月12日に確認）</h2>
-    <ul class="src" id="srcList"></ul>
-    <p class="hint">基準は改正されます。申請前に最新の個票・自治体の案内で確認してください。このアプリは判定の補助であり、認定は都道府県・指定都市の審査で決まります。</p>
-  </section>
-</div>
-
-<p class="foot">自分用の補助ツール。患者個人情報は入力しない。入力はこの端末内にのみ保存。</p>
 </main>
+
+<nav class="tabs" role="tablist" aria-label="画面">
+  <button type="button" role="tab" data-v="qk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>早見</button>
+  <button type="button" role="tab" data-v="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>判定</button>
+  <button type="button" role="tab" data-v="cost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 8l4 5 4-5M8 13h8M8 16h8M12 13v5"/></svg>費用</button>
+  <button type="button" role="tab" data-v="sys"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg>制度</button>
+  <button type="button" role="tab" data-v="doc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>書類・出典</button>
+</nav>
 <div id="toast" role="status"></div>
 
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
 const MH="https://www.mhlw.go.jp/content/10905000/";
-const KEY="nan-nav-v1";
+const KEY="nan-nav-v2";
+const APP_VERSION="nan-2026-11-14a";
+const WP=()=>window.WardProfile||null;
 
-/* ---------- 尺度 ---------- */
-const HY=[["0","パーキンソニズムなし"],["1","一側性パーキンソニズム"],["2","両側性パーキンソニズム"],["3","軽〜中等度パーキンソニズム。姿勢反射障害（姿勢保持障害）あり。日常生活に介助不要"],["4","高度障害を示すが、歩行は介助なしにどうにか可能"],["5","介助なしにはベッド又は車椅子生活"]];
-const LF=[["1","日常生活、通院にほとんど介助を要しない"],["2","日常生活、通院に部分的介助を要する"],["3","日常生活に全面的介助を要し、独立では歩行起立不能"]];
-const MGFA=[["I","眼筋型。眼輪筋を含む眼筋の筋力低下のみ。他の筋力は正常"],["IIa","眼筋以外の軽度の筋力低下（四肢・体軸が主）"],["IIb","眼筋以外の軽度の筋力低下（口咽頭・呼吸筋が主）"],["IIIa","中等度の筋力低下（四肢・体軸が主）"],["IIIb","中等度の筋力低下（口咽頭・呼吸筋が主）"],["IVa","高度の筋力低下（四肢・体軸が主）"],["IVb","高度の筋力低下（口咽頭・呼吸筋が主）。経管栄養で挿管なしを含む"],["V","気管挿管（術後管理を除く）"]];
-const ALSS=[["1","家事・就労はおおむね可能"],["2","家事・就労は困難だが、日常生活（身の回りのこと）はおおむね自立"],["3","自力で食事、排泄、移動のいずれか1つ以上ができず、日常生活に介助を要する"],["4","呼吸困難・痰の喀出困難あるいは嚥下障害がある"],["5","気管切開、非経口的栄養摂取（経管栄養、中心静脈栄養など）、人工呼吸器使用"]];
-const SMAL=[["1","学校生活・家事・就労はおおむね可能"],["2","学校生活・家事・就労は困難だが、日常生活（身の回りのこと）はおおむね自立"],["3","自力で食事、排泄、移動のいずれか一つ以上ができず、日常生活に介助を要する"],["4","呼吸困難・痰の喀出困難、あるいは嚥下障害がある"],["5","非経口的栄養摂取（経管栄養、胃瘻など）、人工呼吸器使用、気管切開を受けている"]];
-const MRS=[["0","まったく症候がない"],["1","症候はあっても明らかな障害はない：日常の勤めや活動は行える"],["2","軽度の障害：発症以前の活動がすべて行えるわけではないが、身の回りのことは介助なしに行える"],["3","中等度の障害：何らかの介助を必要とするが、歩行は介助なしに行える（買い物・公共交通機関での外出などに介助）"],["4","中等度から重度の障害：歩行や身体的要求には介助が必要（持続的な介護は不要）"],["5","重度の障害：寝たきり、失禁状態、常に介護と見守りを必要とする"]];
-const NUT=[["0","症候なし"],["1","時にむせる、食事動作がぎこちないなどの症候があるが、社会生活・日常生活に支障ない"],["2","食物形態の工夫や、食事時の道具の工夫を必要とする"],["3","食事・栄養摂取に何らかの介助を要する"],["4","補助的な非経口的栄養摂取（経管栄養、中心静脈栄養など）を必要とする"],["5","全面的に非経口的栄養摂取に依存している"]];
-const RES=[["0","症候なし"],["1","肺活量の低下などの所見はあるが、社会生活・日常生活に支障ない"],["2","呼吸障害のために軽度の息切れなどの症状がある"],["3","呼吸症状が睡眠の妨げになる、あるいは着替えなどの日常生活動作で息切れが生じる"],["4","喀痰の吸引あるいは間欠的な換気補助装置使用が必要"],["5","気管切開あるいは継続的な換気補助装置使用が必要"]];
-const EDSS=[["0","正常"],["1.0","障害なし。1つのFSで最小の徴候"],["1.5","障害なし。2つ以上のFSで最小の徴候"],["2.0","1つのFSで軽度の障害"],["2.5","1つのFSで軽度、または2つのFSで最小の障害"],["3.0","歩行は可能。1つのFSで中等度、または3〜4つのFSで軽度の障害"],["3.5","歩行は可能。中等度の障害が複数"],["4.0","補助なしで約500m歩行可。1日12時間程度は活動可能"],["4.5","補助なしで約300m歩行可。終日活動できるが一部制限、または最小限の補助が必要"],["5.0","補助なしで約200m歩行可。終日の通常活動に支障"],["5.5","補助なしで約100m歩行可。終日の通常活動はできない"],["6.0","片側の補助（杖など）で約100m歩行可"],["6.5","両側の補助で約20m歩行可"],["7.0","補助があっても5m以上歩けない。車椅子を自分で操作・移乗"],["7.5","数歩以上歩けない。車椅子の移乗・操作に介助"],["8.0","ほぼ車椅子・ベッド生活。身の回りのことは多くできる。上肢は使える"],["8.5","1日の大半をベッドで過ごす。上肢はある程度使える"],["9.0","寝たきり。意思伝達・飲食はできる"],["9.5","寝たきり。意思伝達・飲食・嚥下が十分にできない"]];
-const BI=[["meal","食事",[[10,"自立"],[5,"部分介助"],[0,"全介助"]]],["trans","車椅子からベッドへの移動",[[15,"自立"],[10,"軽度の介助・監視"],[5,"座ることは可能だがほぼ全介助"],[0,"全介助・不可能"]]],["groom","整容",[[5,"自立"],[0,"部分介助・不可能"]]],["toilet","トイレ動作",[[10,"自立"],[5,"部分介助"],[0,"全介助・不可能"]]],["bath","入浴",[[5,"自立"],[0,"部分介助・不可能"]]],["walk","歩行",[[15,"45m以上自立（補装具可）"],[10,"45m以上の介助歩行（歩行器含む）"],[5,"歩行不能だが車椅子で45m以上操作可"],[0,"上記以外"]]],["stair","階段昇降",[[10,"自立（手すり可）"],[5,"介助・監視"],[0,"不能"]]],["dress","着替え",[[10,"自立"],[5,"部分介助（半分以上は自分で）"],[0,"上記以外"]]],["bowel","排便コントロール",[[10,"失禁なし"],[5,"ときに失禁・坐薬等に介助"],[0,"上記以外"]]],["bladder","排尿コントロール",[[10,"失禁なし"],[5,"ときに失禁・収尿器に介助"],[0,"上記以外"]]]];
-const FTLDS=[["0","変化なし"],["1","軽微"],["2","軽度"],["3","中等度（bvFTD：対人関係・相互のやり取りに相当な影響を及ぼす中等度の行動変化／SD：コミュニケーションを阻害する中等度の喚語障害・通常会話での中等度の理解障害）"],["4","重度"]];
+/* ---------- 尺度（厚労省個票の文言。[値, 短い名前, 定義]） ---------- */
+const HY=[["1","一側性","一側性パーキンソニズム"],["2","両側性","両側性パーキンソニズム"],["3","姿勢反射障害","軽〜中等度パーキンソニズム。姿勢反射障害（姿勢保持障害）あり。日常生活に介助不要"],["4","高度障害","高度障害を示すが、歩行は介助なしにどうにか可能"],["5","車椅子・臥床","介助なしにはベッド又は車椅子生活"]];
+const LF=[["1","ほぼ介助不要","日常生活、通院にほとんど介助を要しない"],["2","部分介助","日常生活、通院に部分的介助を要する"],["3","全面介助","日常生活に全面的介助を要し、独立では歩行起立不能"]];
+const MGFA=[["I","眼筋型","眼輪筋を含む眼筋の筋力低下のみ。他の筋力は正常"],["IIa","軽度・四肢","眼筋以外の軽度の筋力低下（四肢・体軸が主）"],["IIb","軽度・球","眼筋以外の軽度の筋力低下（口咽頭・呼吸筋が主）"],["IIIa","中等度・四肢","中等度の筋力低下（四肢・体軸が主）"],["IIIb","中等度・球","中等度の筋力低下（口咽頭・呼吸筋が主）"],["IVa","高度・四肢","高度の筋力低下（四肢・体軸が主）"],["IVb","高度・球","高度の筋力低下（口咽頭・呼吸筋が主）。挿管なしの経管栄養を含む"],["V","挿管","気管挿管（術後管理を除く）"]];
+const ALSS=[["1","就労可","家事・就労はおおむね可能"],["2","身の回り自立","家事・就労は困難だが、日常生活（身の回りのこと）はおおむね自立"],["3","介助要","自力で食事、排泄、移動のいずれか1つ以上ができず、日常生活に介助を要する"],["4","呼吸・嚥下","呼吸困難・痰の喀出困難あるいは嚥下障害がある"],["5","気切・経管・呼吸器","気管切開、非経口的栄養摂取（経管栄養、中心静脈栄養など）、人工呼吸器使用"]];
+const SMAL=[["1","就学・就労可","学校生活・家事・就労はおおむね可能"],["2","身の回り自立","学校生活・家事・就労は困難だが、日常生活（身の回りのこと）はおおむね自立"],["3","介助要","自力で食事、排泄、移動のいずれか一つ以上ができず、日常生活に介助を要する"],["4","呼吸・嚥下","呼吸困難・痰の喀出困難、あるいは嚥下障害がある"],["5","経管・呼吸器・気切","非経口的栄養摂取（経管栄養、胃瘻など）、人工呼吸器使用、気管切開を受けている"]];
+const MRS=[["0","症候なし","まったく症候がない"],["1","障害なし","症候はあっても明らかな障害はない：日常の勤めや活動は行える"],["2","軽度","軽度の障害：発症以前の活動がすべて行えるわけではないが、自分の身の回りのことは介助なしに行える"],["3","中等度","中等度の障害：何らかの介助を必要とするが、歩行は介助なしに行える（買い物・公共交通機関の外出などに介助）"],["4","中〜重度","中等度から重度の障害：歩行や身体的要求には介助が必要（持続的な介護は不要）"],["5","重度","重度の障害：寝たきり、失禁状態、常に介護と見守りを必要とする"]];
+const NUT=[["0","症候なし","症候なし"],["1","時にむせる","時にむせる、食事動作がぎこちないなどの症候があるが、社会生活・日常生活に支障ない"],["2","形態・道具の工夫","食物形態の工夫や、食事時の道具の工夫を必要とする"],["3","介助","食事・栄養摂取に何らかの介助を要する"],["4","補助的経管等","補助的な非経口的栄養摂取（経管栄養、中心静脈栄養など）を必要とする"],["5","全面的経管等","全面的に非経口的栄養摂取に依存している"]];
+const RES=[["0","症候なし","症候なし"],["1","所見のみ","肺活量の低下などの所見はあるが、社会生活・日常生活に支障ない"],["2","軽い息切れ","呼吸障害のために軽度の息切れなどの症状がある"],["3","睡眠・着替えで","呼吸症状が睡眠の妨げになる、あるいは着替えなどの日常生活動作で息切れが生じる"],["4","吸引・間欠換気","喀痰の吸引あるいは間欠的な換気補助装置使用が必要"],["5","気切・継続換気","気管切開あるいは継続的な換気補助装置使用が必要"]];
+const VIS=[["1","Ⅰ度","矯正視力0.7以上、かつ視野狭窄なし"],["2","Ⅱ度","矯正視力0.7以上、視野狭窄あり（ゴールドマン I-4 で中心の残存視野20度以内）"],["3","Ⅲ度","矯正視力0.7未満、0.2以上"],["4","Ⅳ度","矯正視力0.2未満"]];
+const EDSSQ=[["lt","4.0以下","補助なしで約500m以上歩ける（目安）"],["ge","4.5以上","補助なしの歩行が約300m以下、または終日の活動に制限・最小限の補助（目安）"]];
+const EDSSREF=["4.0：補助なしで約500m。1日12時間程度は活動可能","4.5：補助なしで約300m。終日活動できるが一部制限、または最小限の補助","5.0：補助なしで約200m","5.5：補助なしで約100m","6.0：片側の補助（杖など）で約100m","6.5：両側の補助で約20m","7.0：補助があっても5m未満。車椅子を自分で操作・移乗"];
+const BIQ=[["le","85点以下","Barthel Index 85点以下"],["gt","86点以上","Barthel Index 86点以上"]];
+const BI=[["meal","食事",[[10,"自立"],[5,"部分介助"],[0,"全介助"]]],["trans","車椅子⇄ベッド移乗",[[15,"自立"],[10,"軽度介助・監視"],[5,"座れるがほぼ全介助"],[0,"全介助・不可"]]],["groom","整容",[[5,"自立"],[0,"部分介助・不可"]]],["toilet","トイレ動作",[[10,"自立"],[5,"部分介助"],[0,"全介助・不可"]]],["bath","入浴",[[5,"自立"],[0,"部分介助・不可"]]],["walk","歩行",[[15,"45m以上自立（補装具可）"],[10,"45m以上の介助歩行"],[5,"車椅子で45m以上"],[0,"上記以外"]]],["stair","階段昇降",[[10,"自立（手すり可）"],[5,"介助・監視"],[0,"不能"]]],["dress","着替え",[[10,"自立"],[5,"部分介助"],[0,"上記以外"]]],["bowel","排便",[[10,"失禁なし"],[5,"ときに失禁"],[0,"上記以外"]]],["bladder","排尿",[[10,"失禁なし"],[5,"ときに失禁"],[0,"上記以外"]]]];
+const FTLDS=[["0","変化なし","変化なし"],["1","軽微","軽微"],["2","軽度","軽度"],["3","中等度","bvFTD：対人関係・相互のやり取りに相当な影響を及ぼす中等度の行動変化／SD：コミュニケーションを阻害する中等度の喚語障害・通常会話での中等度の理解障害"],["4","重度","重度"]];
+const MITO=[["mild","軽症","採点の平均2未満"],["mod","中等症","2以上"],["sev","重症","3以上"]];
+const KEIQ=[["0","0回"],["1","1回"],["2","2回"],["3","3回以上"]];
 
 /* ---------- 疾患 ---------- */
-/* s:判定方式 k:介護2号(Y/N/C) b:別表7(Y/N/C) g:概要PDF p:個票PDF */
 const DZ=[
- {no:6,nm:"パーキンソン病",s:"pd",k:"Y",b:"C",bn:"Yahr3以上かつ生活機能障害度Ⅱ・Ⅲ度に限る",g:"001173440.pdf",p:"001209820.pdf",th:"Hoehn-Yahr 3度以上 かつ 生活機能障害度 2度以上",
-  nt:["Yahr と生活機能障害度は<b>直近6か月で最も悪い状態</b>（off 時・wearing-off の谷）で評価してよい。","診断基準：パーキンソニズム／CT・MRIに特異的異常なし／原因となる薬物・毒物曝露なし／抗PD薬で改善。薬物反応未検討は「疑い」で対象外。","重症度を満たさなくても、デバイス補助療法や高額薬剤で軽症高額に当たることが多い。"]},
- {no:11,nm:"重症筋無力症",s:"mg",k:"N",b:"Y",g:"001173447.pdf",p:"001209825.pdf",th:"MGFA clinical classification で Class I 以上",
-  nt:["<b>Class I（眼筋型）から対象</b>。診断基準を満たせば重症度はほぼ自動的に満たす。","MGFA 分類と MG-ADL の記載が矛盾しないように（さいたま市の留意事項）。","40〜64歳は介護保険の特定疾病ではない。訪問看護は医療保険（別表第7）。"]},
- {no:13,nm:"多発性硬化症／視神経脊髄炎",s:"ms",k:"N",b:"C",bn:"MSは該当。NMOSDは告示に名称なし→確認",g:"001173449.pdf",p:"001209827.pdf",th:"EDSS 4.5 以上、又は 視覚の重症度 Ⅱ・Ⅲ・Ⅳ度",
-  nt:["視覚は<b>良い方の眼</b>の矯正視力と視野で判定。視野狭窄＝ゴールドマン I-4 で中心の残存視野20度以内。","EDSS 4.5 未満・視覚Ⅰ度でも、疾患修飾薬（高額）で<b>軽症高額</b>に当たる例が多い。","MOG抗体関連疾患は令和8年4月時点の指定難病一覧に独立した疾病としては無い。"]},
- {no:2,nm:"筋萎縮性側索硬化症",s:"als",k:"Y",b:"Y",g:"001443728.pdf",p:"001209816.pdf",th:"ALS 重症度分類 2 以上",
-  nt:["重症度1（家事・就労はおおむね可能）は対象外。軽症高額は可。","人工呼吸器を常時装着していれば<b>人工呼吸器等装着者</b>（上限1,000円）の申請を。","SOD1変異のトフェルセンは遺伝子検査での変異確認が必須（概要の記載）。"]},
+ {no:6,nm:"パーキンソン病",ab:"PD",s:"pd",k:"Y",b:"C",bn:"Yahr3以上かつ生活機能障害度Ⅱ・Ⅲ度",g:"001173440.pdf",p:"001209820.pdf",th:"Hoehn-Yahr 3度以上 かつ 生活機能障害度 2度以上",
+  nt:["off 時・wearing-off の谷など、直近6か月で最も悪い状態で評価してよい。","診断基準：パーキンソニズム／CT・MRIに特異的異常なし／原因となる薬物・毒物曝露なし／抗PD薬で改善。薬物反応未検討は「疑い」で対象外。","重症度を満たさなくても、デバイス補助療法〈レボドパ・カルビドパ配合経腸用液（デュオドーパ）、ホスレボドパ・ホスカルビドパ（ヴィアレブ）〉などで軽症高額に当たりうる。"]},
+ {no:11,nm:"重症筋無力症",ab:"MG",s:"mg",k:"N",b:"Y",g:"001173447.pdf",p:"001209825.pdf",th:"MGFA Class I 以上（眼筋型から対象）",
+  nt:["診断基準を満たせば重症度はほぼ満たす。","MGFA 分類と MG-ADL の記載を矛盾させない。","40〜64歳は介護保険の特定疾病ではない。訪問看護は医療保険（別表第7）。"]},
+ {no:13,nm:"多発性硬化症／視神経脊髄炎",ab:"MS/NMOSD",s:"ms",k:"N",b:"C",bn:"MSは該当、NMOSDは告示に名称なし",g:"001173449.pdf",p:"001209827.pdf",th:"EDSS 4.5以上、又は 視覚の重症度 Ⅱ度以上",
+  nt:["視覚は<b>良い方の眼</b>の矯正視力と視野で判定。","EDSS 4.5 未満・視覚Ⅰ度でも、高額な再発予防薬〈MS：オファツムマブ（ケシンプタ）、ナタリズマブ（タイサブリ）／NMOSD：サトラリズマブ（エンスプリング）、イネビリズマブ（ユプリズナ）、エクリズマブ（ソリリス）、ラブリズマブ（ユルトミリス）〉で<b>軽症高額</b>に当たる例が多い。","MOG抗体関連疾患は令和8年4月時点の一覧に独立した指定難病としては無い。"]},
+ {no:2,nm:"筋萎縮性側索硬化症",ab:"ALS",s:"als",k:"Y",b:"Y",g:"001443728.pdf",p:"001209816.pdf",th:"ALS 重症度分類 2 以上",
+  nt:["重症度1（家事・就労はおおむね可能）は対象外。軽症高額は可。","人工呼吸器を常時装着していれば<b>人工呼吸器等装着者</b>（上限1,000円）の申請を。","SOD1変異 ALS のトフェルセン（クアルソディ髄注100mg）は、遺伝子検査で変異を確認した患者に投与する。"]},
+ {no:14,nm:"CIDP／多巣性運動ニューロパチー",ab:"CIDP/MMN",s:"bi",k:"N",b:"C",bn:"CIDPは該当、MMNは告示に名称なし",g:"001173450.pdf",p:"001209828.pdf",th:"Barthel Index 85点以下（mRSではない）",
+  nt:["<b>mRS ではなく Barthel Index</b> で判定する。","免疫グロブリンの維持療法〈献血ヴェノグロブリンIH、献血グロベニン-I（静注）、ハイゼントラ（皮下注）〉は高額なので、BI 86点以上でも<b>軽症高額</b>に当たることが多い。","新規で神経伝導検査レポートの写しを求める自治体がある。"]},
+ {no:17,nm:"多系統萎縮症",ab:"MSA",s:"mnr",k:"Y",b:"Y",g:"001173453.pdf",p:"001209831.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:["睡眠時喘鳴・夜間の呼吸症状も「呼吸」に反映できる。"]},
+ {no:18,nm:"脊髄小脳変性症（MSAを除く）",ab:"SCD",s:"mnr",k:"Y",b:"Y",g:"001173454.pdf",p:"001527292.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:["痙性対麻痺（HSP）も含まれる。"]},
+ {no:5,nm:"進行性核上性麻痺",ab:"PSP",s:"mnr",k:"Y",b:"Y",g:"001173438.pdf",p:"001209819.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:[]},
+ {no:7,nm:"大脳皮質基底核変性症",ab:"CBD",s:"mnr",k:"Y",b:"Y",g:"001173441.pdf",p:"001209821.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:[]},
  {no:4,nm:"原発性側索硬化症",s:"als",k:"N",b:"N",g:"001173437.pdf",p:"001209818.pdf",th:"ALS 重症度分類 2 以上",nt:["介護保険の特定疾病・別表第7には名称が無い。"]},
  {no:1,nm:"球脊髄性筋萎縮症",s:"mnr",k:"N",b:"Y",g:"001173431.pdf",p:"001437282.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:[]},
- {no:3,nm:"脊髄性筋萎縮症",s:"sma",k:"N",b:"Y",g:"001173434.pdf",p:"001527290.pdf",th:"生活における重症度 2 以上、又は mRS・食事栄養・呼吸のいずれかが 3 以上",nt:[]},
- {no:5,nm:"進行性核上性麻痺",s:"mnr",k:"Y",b:"Y",g:"001173438.pdf",p:"001209819.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:[]},
- {no:7,nm:"大脳皮質基底核変性症",s:"mnr",k:"Y",b:"Y",g:"001173441.pdf",p:"001209821.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:[]},
- {no:17,nm:"多系統萎縮症",s:"mnr",k:"Y",b:"Y",g:"001173453.pdf",p:"001209831.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:["睡眠時喘鳴・夜間の呼吸症状も「呼吸」の評価に反映できる。"]},
- {no:18,nm:"脊髄小脳変性症（MSAを除く）",s:"mnr",k:"Y",b:"Y",g:"001173454.pdf",p:"001527292.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:["痙性対麻痺（HSP）も脊髄小脳変性症に含まれる。"]},
- {no:8,nm:"ハンチントン病",s:"hd",k:"N",b:"Y",g:"001173442.pdf",p:"001437283.pdf",th:"Barthel Index 85点以下、又は 精神症状・能力障害二軸評価で精神症状2以上か能力障害2以上",nt:["二軸評価は障害支援区分の「精神症状・能力障害二軸評価」の定義で評価。"]},
+ {no:3,nm:"脊髄性筋萎縮症",s:"sma",k:"N",b:"Y",g:"001173434.pdf",p:"001527290.pdf",th:"生活の重症度 2以上、又は mRS・食事栄養・呼吸のいずれかが 3以上",nt:[]},
  {no:10,nm:"シャルコー・マリー・トゥース病",s:"mrs3",k:"N",b:"N",g:"001173446.pdf",p:"001209824.pdf",th:"mRS 3 以上",nt:[]},
- {no:14,nm:"CIDP／多巣性運動ニューロパチー",s:"bi",k:"N",b:"C",bn:"CIDPは該当。MMNは告示に名称なし→確認",g:"001173450.pdf",p:"001209828.pdf",th:"Barthel Index 85点以下",
-  nt:["<b>mRSではなくBarthel Index</b>で判定する点に注意。","IVIg・SCIg の維持療法は高額なので、BI 86点以上でも<b>軽症高額</b>に当たることが多い。","新規申請で神経伝導検査レポートの写しの添付を求める自治体がある。"]},
  {no:15,nm:"封入体筋炎",s:"bi",k:"N",b:"N",g:"001173451.pdf",p:"001209829.pdf",th:"Barthel Index 85点以下",nt:[]},
- {no:16,nm:"クロウ・深瀬症候群（POEMS）",s:"bi",k:"N",b:"N",g:"001173452.pdf",p:"001437286.pdf",th:"Barthel Index 85点以下",nt:[]},
- {no:113,nm:"筋ジストロフィー",s:"mnrc",k:"N",b:"Y",g:"001174033.pdf",p:"001210133.pdf",th:"mRS・食事栄養・呼吸・循環のいずれかが 3 以上",nt:["循環（C）は活動度制限・不整脈・BNP・LVEF のうち最も高い点数を採用（定義は個票）。"]},
- {no:22,nm:"もやもや病（成人）",s:"moya",k:"Y",b:"N",kn:"「脳血管疾患」として",g:"001173459.pdf",p:"001437296.pdf",th:"BI 85点以下／高次脳機能低下／手術適応・術後5年以内／再発 のいずれか",nt:["18歳未満は小児慢性特定疾病の基準に準じる。"]},
+ {no:16,nm:"クロウ・深瀬症候群",s:"bi",k:"N",b:"N",g:"001173452.pdf",p:"001437286.pdf",th:"Barthel Index 85点以下",nt:[]},
+ {no:113,nm:"筋ジストロフィー",s:"mnrc",k:"N",b:"Y",g:"001174033.pdf",p:"001210133.pdf",th:"mRS・食事栄養・呼吸・循環のいずれかが 3 以上",nt:["循環（C）は活動度制限・不整脈・BNP・LVEF のうち最も高い点（定義は個票）。"]},
+ {no:119,nm:"アイザックス症候群",s:"bi",k:"N",b:"N",g:"001174043.pdf",p:"001437442.pdf",th:"Barthel Index 85点以下",nt:[]},
+ {no:8,nm:"ハンチントン病",s:"hd",k:"N",b:"Y",g:"001173442.pdf",p:"001437283.pdf",th:"BI 85点以下、又は 精神症状・能力障害二軸評価のどちらかが 2 以上",nt:["二軸評価は障害支援区分の「精神症状・能力障害二軸評価」の定義で評価。"]},
+ {no:21,nm:"ミトコンドリア病",s:"mito",k:"N",b:"N",g:"001173458.pdf",p:"001209910.pdf",th:"疾患独自の重症度で 中等症以上",nt:["セクション1〜3の平均とセクション4〜9の判定のうち重い方（2以上で中等症）。採点は個票で。","令和7年4月以降の更新は、認定済なら診断基準を満たすものとして「認定済」と書く特別の扱い。"]},
+ {no:22,nm:"もやもや病（成人）",s:"moya",k:"Y",kn:"脳血管疾患として",b:"N",g:"001173459.pdf",p:"001437296.pdf",th:"BI 85点以下／高次脳機能低下／手術適応・術後5年以内／再発 のいずれか",nt:["18歳未満は小児慢性特定疾病の基準に準じる。"]},
  {no:23,nm:"プリオン病",s:"bi",k:"C",kn:"初老期における認知症として認められる可能性",b:"Y",g:"001173460.pdf",p:"001209912.pdf",th:"Barthel Index 85点以下",nt:[]},
  {no:25,nm:"進行性多巣性白質脳症",s:"bi",k:"N",b:"N",g:"001173462.pdf",p:"001209914.pdf",th:"Barthel Index 85点以下",nt:[]},
- {no:26,nm:"HTLV-1関連脊髄症",s:"ham",k:"N",b:"N",g:"001173463.pdf",p:"001209915.pdf",th:"Barthel Index 85点以下、又は Osame の運動機能障害重症度 Grade 5 以上",nt:[]},
- {no:21,nm:"ミトコンドリア病",s:"mito",k:"N",b:"N",g:"001173458.pdf",p:"001209910.pdf",th:"疾患独自の重症度分類で 中等症以上",nt:["セクション1〜3の平均と、セクション4〜9の判定のうち重い方を採用（2以上で中等症）。詳細は個票。","令和7年4月以降の更新は、過去に認定済なら診断基準を満たすものとして「認定済」と記載する特別の扱い。"]},
- {no:119,nm:"アイザックス症候群",s:"bi",k:"N",b:"N",g:"001174043.pdf",p:"001437442.pdf",th:"Barthel Index 85点以下",nt:[]},
- {no:127,nm:"前頭側頭葉変性症",s:"ftld",k:"C",kn:"65歳未満発症なら初老期における認知症",b:"N",g:"001174064.pdf",p:"001210155.pdf",th:"疾患独自の重症度分類で 3 以上",nt:["個票は bvFTD（127-01）と意味性認知症（127-02）で別。"]},
+ {no:26,nm:"HTLV-1関連脊髄症",s:"ham",k:"N",b:"N",g:"001173463.pdf",p:"001209915.pdf",th:"BI 85点以下、又は Osame 運動機能障害重症度 Grade 5 以上",nt:[]},
+ {no:127,nm:"前頭側頭葉変性症",s:"ftld",k:"C",kn:"65歳未満発症なら初老期における認知症",b:"N",g:"001174064.pdf",p:"001210155.pdf",th:"疾患独自の重症度で 3 以上",nt:["個票は bvFTD（127-01）と意味性認知症（127-02）で別。"]},
  {no:128,nm:"ビッカースタッフ脳幹脳炎",s:"mnr",k:"N",b:"N",g:"001174065.pdf",p:"001210159.pdf",th:"mRS・食事栄養・呼吸のいずれかが 3 以上",nt:[]}
 ];
+const QUICK=[6,11,13,2,14,17,18,5];
 
 /* ---------- 状態 ---------- */
-let S={tab:"chk",dz:6,v:{},cost:Array(12).fill(""),dDiag:"",dAppl:"",dUnav:false};
+let S={tab:"qk",dz:6,v:{},cost:Array(12).fill(""),dDiag:"",dAppl:"",dUnav:false};
 function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)S=Object.assign(S,o);if(!Array.isArray(S.cost)||S.cost.length!==12)S.cost=Array(12).fill("")}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const V=k=>S.v[S.dz+":"+k];
-const num=k=>{const x=V(k);return x===undefined||x===""?null:+x};
+const num=k=>{const x=V(k);return x===undefined||x===""||x===null?null:+x};
+function curDz(){return DZ.find(d=>d.no===+S.dz)||DZ[0]}
 
 /* ---------- 部品 ---------- */
-function radios(key,arr,lab,thr){
-  const cur=V(key);
-  return `<div class="q"><span class="lb">${lab}</span><div class="opts">`+arr.map(([v,t])=>{
-    const th=thr&&thr(v);
-    return `<label class="opt${th?" th":""}"><input type="radio" name="${key}" data-k="${key}" value="${v}"${cur===v?" checked":""}><span><b>${v}</b>${t}</span></label>`}).join("")+`</div></div>`;
+function seg(key,arr,lab,thr,wide){
+  const cur=V(key),sel=arr.find(a=>a[0]===cur);
+  return `<div class="q"><span class="lb">${lab}</span><div class="seg${wide?" wide":""}">`+arr.map(a=>`<button type="button" data-k="${key}" data-val="${a[0]}" aria-pressed="${cur===a[0]}"${thr&&thr(a[0])?' class="th"':""} title="${a[2]||a[1]}">${wide?a[1]:a[0]}</button>`).join("")+
+    `</div><div class="desc">${sel?(wide?"":"<b>"+sel[0]+"</b> ")+(sel[2]||sel[1]):""}</div>`+
+    `<details class="more"><summary>定義を見る</summary><ul>${arr.map(a=>`<li><b>${a[0]}</b>：${a[2]||a[1]}</li>`).join("")}</ul></details></div>`;
 }
 function check(key,lab){return `<label class="chk"><input type="checkbox" data-k="${key}"${V(key)?" checked":""}><span>${lab}</span></label>`}
+function biCalc(){let t=0,n=0;BI.forEach(([k])=>{const c=V("bi_"+k);if(c!==undefined&&c!==""){t+=+c;n++}});return {t,n}}
+function biState(){const c=biCalc();if(c.n===10)return c.t<=85?"le":"gt";return V("bi")||null}
 function biBlock(){
-  let tot=0,done=0;
-  const rows=BI.map(([k,n,o])=>{const cur=V("bi_"+k);if(cur!==undefined&&cur!==""){tot+=+cur;done++}
-    return `<div class="row"><span>${n}</span><select data-k="bi_${k}"><option value="">—</option>${o.map(([p,t])=>`<option value="${p}"${cur!==undefined&&cur!==""&&+cur===p?" selected":""}>${p}：${t}</option>`).join("")}</select></div>`}).join("");
-  return {html:`<div class="q"><span class="lb">Barthel Index（85点以下で対象）</span><div class="bi">${rows}</div><p style="margin:8px 0 0">合計 <span class="score">${done?tot:"—"}</span> 点 <small class="hint">（${done}/10項目入力）</small></p></div>`,tot,done};
-}
-function visGrade(){
-  const a=num("va"),f=!!V("vf");if(a===null)return null;
-  if(a<0.2)return 4;if(a<0.7)return 3;return f?2:1;
+  const c=biCalc(),st=biState();
+  const rows=BI.map(([k,n,o])=>{const cur=V("bi_"+k);return `<div class="row"><span>${n}</span><select data-k="bi_${k}"><option value="">—</option>${o.map(([p,t])=>`<option value="${p}"${cur!==undefined&&cur!==""&&+cur===p?" selected":""}>${p}：${t}</option>`).join("")}</select></div>`}).join("");
+  const segH=`<div class="seg wide">${BIQ.map(a=>`<button type="button" data-k="bi" data-val="${a[0]}" aria-pressed="${st===a[0]}"${a[0]==="le"?' class="th"':""}>${a[1]}</button>`).join("")}</div>`;
+  return `<div class="q"><span class="lb">Barthel Index（85点以下で対象）</span>${segH}
+    <details class="more"${c.n&&c.n<10?" open":""}><summary>点数を計算する（${c.n?c.t+"点・"+c.n+"/10項目":"未入力"}）</summary><div class="bi">${rows}</div><p class="hint">10項目そろうと上のボタンに自動で反映。</p></details></div>`;
 }
 
 /* ---------- 判定 ---------- */
 function evaluate(d){
   const R=[];let ok=null,inc=false;
-  const mnr=(withC)=>{const m=num("mrs"),n=num("nut"),r=num("res");
-    const parts=[["mRS",m],["食事・栄養",n],["呼吸",r]];
-    const hits=parts.filter(p=>p[1]!==null&&p[1]>=3);
-    if(withC&&V("circ")) hits.push(["循環",3]);
-    if(hits.length){R.push("3以上："+hits.map(h=>h[0]+(h[0]==="循環"?"":" "+h[1])).join("、"));return true}
+  const mnr=withC=>{const parts=[["mRS",num("mrs")],["食事・栄養",num("nut")],["呼吸",num("res")]];
+    const hits=parts.filter(p=>p[1]!==null&&p[1]>=3).map(p=>p[0]+" "+p[1]);
+    if(withC&&V("circ"))hits.push("循環 3以上");
+    if(hits.length){R.push(hits.join("、")+"（3以上）");return true}
     if(parts.some(p=>p[1]===null)){inc=true;return null}
-    R.push(`mRS ${m}・食事栄養 ${n}・呼吸 ${r}${withC?"・循環 3未満":""}（いずれも3未満）`);return false};
+    R.push(parts.map(p=>p[0]+" "+p[1]).join("・")+"（いずれも3未満）");return false};
   switch(d.s){
-    case "pd":{const h=num("hy"),l=num("lf");
-      if(h===null||l===null){inc=true;break}
-      ok=h>=3&&l>=2;R.push(`Hoehn-Yahr ${h}度（${h>=3?"3以上":"3未満"}）／生活機能障害度 ${l}度（${l>=2?"2以上":"2未満"}）`);break}
-    case "mg":{const c=V("mgfa");if(!c){inc=true;break}ok=true;R.push(`MGFA Class ${c}（Class I 以上）`);break}
-    case "ms":{const e=V("edss"),g=visGrade();
-      if(e!==undefined&&e!==""&&+e>=4.5){ok=true;R.push(`EDSS ${e}（4.5以上）`)}
-      if(g!==null&&g>=2){ok=true;R.push(`視覚の重症度 ${["","Ⅰ","Ⅱ","Ⅲ","Ⅳ"][g]}度`)}
-      if(ok)break;
-      if(e===undefined||e===""||g===null){inc=true;if(e!==undefined&&e!=="")R.push(`EDSS ${e}（4.5未満）`);if(g!==null)R.push(`視覚Ⅰ度`);break}
-      ok=false;R.push(`EDSS ${e}（4.5未満）・視覚Ⅰ度`);break}
-    case "als":{const a=num("als");if(a===null){inc=true;break}ok=a>=2;R.push(`ALS重症度 ${a}（${a>=2?"2以上":"2未満"}）`);break}
-    case "sma":{const a=num("sma");if(a!==null&&a>=2){ok=true;R.push(`生活における重症度 ${a}（2以上）`);break}
-      const x=mnr(false);if(x===true)ok=true;else if(x===false&&a!==null){ok=false;R.unshift(`生活における重症度 ${a}（2未満）`)}else inc=true;break}
-    case "mnr":{const x=mnr(false);ok=x;break}
-    case "mnrc":{const x=mnr(true);ok=x;break}
-    case "mrs3":{const m=num("mrs");if(m===null){inc=true;break}ok=m>=3;R.push(`mRS ${m}（${m>=3?"3以上":"3未満"}）`);break}
+    case "pd":{const h=num("hy"),l=num("lf");if(h!==null&&h<3){ok=false;R.push(`Yahr ${h}度（3未満）`);break}
+      if(l!==null&&l<2){ok=false;R.push(`生活機能障害度 ${l}度（2未満）`);break}
+      if(h===null||l===null){inc=true;break}ok=true;R.push(`Yahr ${h}度・生活機能障害度 ${l}度`);break}
+    case "mg":{const c=V("mgfa");if(!c){inc=true;break}ok=true;R.push(`MGFA Class ${c}`);break}
+    case "ms":{const e=V("edss"),g=num("vis");
+      if(e==="ge"){ok=true;R.push("EDSS 4.5以上")}
+      if(g!==null&&g>=2){ok=true;R.push(`視覚 ${["","Ⅰ","Ⅱ","Ⅲ","Ⅳ"][g]}度`)}
+      if(ok)break;if(!e||g===null){inc=true;break}ok=false;R.push("EDSS 4.0以下・視覚Ⅰ度");break}
+    case "als":{const a=num("als");if(a===null){inc=true;break}ok=a>=2;R.push(`ALS重症度 ${a}`);break}
+    case "sma":{const a=num("sma");if(a!==null&&a>=2){ok=true;R.push(`生活の重症度 ${a}`);break}
+      const x=mnr(false);if(x===true)ok=true;else if(x===false&&a!==null){ok=false;R.unshift(`生活の重症度 ${a}（2未満）`)}else inc=true;break}
+    case "mnr":ok=mnr(false);break;
+    case "mnrc":ok=mnr(true);break;
+    case "mrs3":{const m=num("mrs");if(m===null){inc=true;break}ok=m>=3;R.push(`mRS ${m}`);break}
     case "bi":case "hd":case "ham":case "moya":{
-      const b=biBlock();
-      if(b.done===10&&b.tot<=85){ok=true;R.push(`Barthel Index ${b.tot}点（85点以下）`)}
-      else if(b.done<10&&b.tot+maxRest()<=85){ok=true;R.push(`Barthel Index 未入力項目を満点としても ${b.tot+maxRest()}点以下`)}
+      const st=biState(),c=biCalc();
+      if(st==="le"){ok=true;R.push("Barthel Index 85点以下"+(c.n===10?`（${c.t}点）`:""))}
       if(d.s==="hd"){if(V("hd_m")){ok=true;R.push("精神症状評価 2以上")}if(V("hd_a")){ok=true;R.push("能力障害評価 2以上")}}
-      if(d.s==="ham"&&V("omds")){ok=true;R.push("Osame 運動機能障害重症度 Grade 5 以上")}
-      if(d.s==="moya"){if(V("my_h")){ok=true;R.push("高次脳機能低下（画像上の器質的変化あり）")}if(V("my_s")){ok=true;R.push("手術適応／術後5年以内")}if(V("my_r")){ok=true;R.push("再発（新たな梗塞・出血・出血リスク所見）")}}
-      if(ok)break;
-      if(b.done===10){ok=false;R.push(`Barthel Index ${b.tot}点（86点以上）`)}else inc=true;break}
-    case "ftld":{const a=num("ftld");if(a===null){inc=true;break}ok=a>=3;R.push(`重症度 ${a}（${a>=3?"3以上":"3未満"}）`);break}
+      if(d.s==="ham"&&V("omds")){ok=true;R.push("Osame Grade 5以上")}
+      if(d.s==="moya"){if(V("my_h")){ok=true;R.push("高次脳機能低下")}if(V("my_s")){ok=true;R.push("手術適応／術後5年以内")}if(V("my_r")){ok=true;R.push("再発")}}
+      if(ok)break;if(st==="gt"){ok=false;R.push("Barthel Index 86点以上"+(c.n===10?`（${c.t}点）`:""))}else inc=true;break}
+    case "ftld":{const a=num("ftld");if(a===null){inc=true;break}ok=a>=3;R.push(`重症度 ${a}`);break}
     case "mito":{const a=V("mito");if(!a){inc=true;break}ok=a!=="mild";R.push(a==="mild"?"軽症":"中等症以上");break}
   }
-  return {ok:inc&&ok!==true?null:ok,R};
+  if(ok===null||(inc&&ok!==true))ok=null;
+  return {ok,R};
 }
-function maxRest(){let s=0;BI.forEach(([k,n,o])=>{const c=V("bi_"+k);if(c===undefined||c==="")s+=o[0][0]});return s}
+
+/* ---------- 描画：早見 ---------- */
+function ageInfo(){
+  const p=WP()&&WP().get?WP().get():null;const a=p&&p.age;
+  if(!a)return "";
+  return a==="lt65"?`<p class="note w" style="margin-bottom:8px">プロファイル：<b>65歳未満</b> → 介護保険は40歳以上で<b>特定疾病</b>（介）の場合だけ。それ以外は障害福祉サービス。</p>`
+                   :`<p class="note k" style="margin-bottom:8px">プロファイル：<b>65歳以上</b> → 介護保険は原因を問わず使える（第1号）。</p>`;
+}
+const yn=x=>x==="Y"?"<b>○</b>":x==="C"?"△":"—";
+function renderQk(){
+  $("ageNote").innerHTML=ageInfo();$("ageNote2").innerHTML=ageInfo();
+  $("qkList").innerHTML=DZ.map(d=>`<button type="button" data-dz="${d.no}"><span class="no">${d.no}</span><span class="nm">${d.nm}</span><span class="mk">介${yn(d.k)} 訪${yn(d.b)}</span><span class="th">${d.th}</span></button>`).join("");
+}
 
 /* ---------- 描画：判定 ---------- */
-function curDz(){return DZ.find(d=>d.no===+S.dz)||DZ[0]}
 function renderPanel(){
   const d=curDz();let h=`<h2>${d.no} ${d.nm}</h2><p class="note k" style="margin:0 0 12px"><b>対象：</b>${d.th}</p>`;
   const ge=x=>v=>+v>=x;
   switch(d.s){
-    case "pd":h+=radios("hy",HY,"Hoehn-Yahr 重症度分類",ge(3))+radios("lf",LF,"生活機能障害度",ge(2));break;
-    case "mg":h+=radios("mgfa",MGFA,"MGFA clinical classification",()=>true);break;
-    case "ms":{
-      h+=`<div class="q"><span class="lb">EDSS</span><select data-k="edss"><option value="">—</option>${EDSS.map(([v,t])=>`<option value="${v}"${V("edss")===v?" selected":""}>${v}：${t}</option>`).join("")}</select><p class="hint">歩行距離が決め手になる 4.0〜5.5 付近は FS の組み合わせも確認（個票の EDSS 表）。</p></div>`;
-      const g=visGrade();
-      h+=`<div class="q"><span class="lb">視覚の重症度（良い方の眼）</span><div class="grid"><label class="f">矯正視力<input type="number" step="0.01" min="0" max="2" inputmode="decimal" data-k="va" value="${V("va")??""}"></label></div>${check("vf","視野狭窄あり（ゴールドマン I-4 で中心の残存視野20度以内）")}<p class="hint">Ⅰ度：0.7以上かつ視野狭窄なし／Ⅱ度：0.7以上で視野狭窄あり／Ⅲ度：0.2以上0.7未満／Ⅳ度：0.2未満。判定：<b>${g?["","Ⅰ","Ⅱ","Ⅲ","Ⅳ"][g]+"度":"—"}</b></p></div>`;break}
-    case "als":h+=radios("als",ALSS,"ALS 重症度分類",ge(2));break;
-    case "sma":h+=radios("sma",SMAL,"生活における重症度分類（2以上で対象）",ge(2))+`<p class="hint">2未満なら下の mRS・食事栄養・呼吸で判定。</p>`+radios("mrs",MRS,"modified Rankin Scale",ge(3))+radios("nut",NUT,"食事・栄養",ge(3))+radios("res",RES,"呼吸",ge(3));break;
-    case "mnr":case "mnrc":h+=radios("mrs",MRS,"modified Rankin Scale（日本版）",ge(3))+radios("nut",NUT,"食事・栄養",ge(3))+radios("res",RES,"呼吸",ge(3));if(d.s==="mnrc")h+=check("circ","循環（C）が3以上（活動度制限・不整脈・BNP・LVEFで最も高い点）");break;
-    case "mrs3":h+=radios("mrs",MRS,"modified Rankin Scale（日本版）",ge(3));break;
-    case "bi":h+=biBlock().html;break;
-    case "hd":h+=biBlock().html+`<div class="q"><span class="lb">精神症状・能力障害二軸評価（どちらかで対象）</span>${check("hd_m","精神症状評価が 2 以上")}${check("hd_a","能力障害評価が 2 以上")}</div>`;break;
-    case "ham":h+=biBlock().html+check("omds","Osame の運動機能障害重症度（OMDS）Grade 5 以上");break;
-    case "moya":h+=`<div class="q"><span class="lb">BI 以外の該当（いずれか1つで対象）</span>${check("my_h","画像上の器質的変化（脳梗塞など）があり、高次脳機能検査を参考に高次脳機能低下と判断")}${check("my_s","手術適応者、又は術後5年以内（症状の有無を問わない）")}${check("my_r","再発例（画像上の新たな梗塞・出血、出血リスクを示す所見の出現）")}</div>`+biBlock().html;break;
-    case "ftld":h+=radios("ftld",FTLDS,"重症度（bvFTD は社会的適切さ・態度・共感・行動、SD は喚語・理解で評価）",ge(3));break;
-    case "mito":h+=`<div class="q"><span class="lb">ミトコンドリア病の重症度（個票の採点表で算出）</span><div class="chips">${[["mild","軽症（平均2未満）"],["mod","中等症（2以上）"],["sev","重症（3以上）"]].map(([v,t])=>`<label class="chip"><input type="radio" name="mito" data-k="mito" value="${v}"${V("mito")===v?" checked":""}><span>${t}</span></label>`).join("")}</div></div>`;break;
+    case "pd":h+=seg("hy",HY,"Hoehn-Yahr 重症度",ge(3))+seg("lf",LF,"生活機能障害度",ge(2));break;
+    case "mg":h+=seg("mgfa",MGFA,"MGFA clinical classification",()=>true);break;
+    case "ms":h+=seg("edss",EDSSQ,"EDSS",v=>v==="ge",true)+`<details class="more"><summary>EDSS の目安（要約・未照合）</summary><ul>${EDSSREF.map(x=>`<li>${x}</li>`).join("")}</ul><p class="hint">4.0〜5.5 付近は FS の組み合わせも個票の EDSS 表で確認。</p></details>`+seg("vis",VIS,"視覚の重症度（良い方の眼）",ge(2));break;
+    case "als":h+=seg("als",ALSS,"ALS 重症度分類",ge(2));break;
+    case "sma":h+=seg("sma",SMAL,"生活における重症度",ge(2))+`<p class="hint" style="margin:-6px 0 10px">2未満なら下の3つのどれかが3以上で対象。</p>`+seg("mrs",MRS,"mRS",ge(3))+seg("nut",NUT,"食事・栄養",ge(3))+seg("res",RES,"呼吸",ge(3));break;
+    case "mnr":case "mnrc":h+=seg("mrs",MRS,"mRS（日本版）",ge(3))+seg("nut",NUT,"食事・栄養",ge(3))+seg("res",RES,"呼吸",ge(3));if(d.s==="mnrc")h+=check("circ","循環（C）が3以上（活動度制限・不整脈・BNP・LVEFで最も高い点）");break;
+    case "mrs3":h+=seg("mrs",MRS,"mRS（日本版）",ge(3));break;
+    case "bi":h+=biBlock();break;
+    case "hd":h+=biBlock()+`<div class="q"><span class="lb">精神症状・能力障害二軸評価（どちらかで対象）</span>${check("hd_m","精神症状評価が 2 以上")}${check("hd_a","能力障害評価が 2 以上")}</div>`;break;
+    case "ham":h+=biBlock()+check("omds","Osame の運動機能障害重症度 Grade 5 以上");break;
+    case "moya":h+=`<div class="q"><span class="lb">BI 以外（いずれか1つで対象）</span>${check("my_s","手術適応者、又は術後5年以内")}${check("my_r","再発例（新たな梗塞・出血、出血リスク所見）")}${check("my_h","画像上の器質的変化があり、高次脳機能低下と判断")}</div>`+biBlock();break;
+    case "ftld":h+=seg("ftld",FTLDS,"重症度（bvFTD は行動、SD は喚語・理解）",ge(3));break;
+    case "mito":h+=seg("mito",MITO,"重症度（個票の採点表で算出）",v=>v!=="mild",true);break;
   }
   $("panel").innerHTML=h;
 }
 function tag(cls,t){return `<span class="tg ${cls}">${t}</span>`}
 function renderVerdict(){
-  const d=curDz(),e=evaluate(d);let cls,pill,big;
-  if(e.ok===true){cls="ok";pill="重症度を満たす";big="重症度分類の対象に該当"}
-  else if(e.ok===false){cls="warn";pill="重症度を満たさない";big="重症度は対象外 → 軽症高額該当を確認"}
-  else{cls="info";pill="入力途中";big="評価を入力してください"}
+  const d=curDz(),e=evaluate(d),kei=V("kei");let cls,pill,big;
+  if(e.ok===true){cls="ok";pill="重症度を満たす";big=`${d.ab||d.nm}：重症度分類の対象`}
+  else if(e.ok===false&&kei==="3"){cls="ok";pill="軽症高額で認定";big=`${d.ab||d.nm}：重症度は対象外だが軽症高額に該当`}
+  else if(e.ok===false){cls="warn";pill="重症度を満たさない";big=`${d.ab||d.nm}：重症度は対象外 → 軽症高額を確認`}
+  else{cls="info";pill="入力途中";big=`${d.ab||d.nm}：評価を選んでください`}
   let h=`<div class="verdict ${cls}"><span class="pill">${pill}</span><div class="big">${big}</div>`;
   if(e.R.length)h+=`<ul>${e.R.map(r=>`<li>${r}</li>`).join("")}</ul>`;
-  if(e.ok===false)h+=`<p style="margin:0;font-size:14px">医療費総額（10割）33,330円超の月が12か月で3回以上あれば認定（<a href="#" data-go="kei">軽症高額タブ</a>）。満たさなくても<b>登録者証</b>は発行対象。</p>`;
-  if(e.ok===true&&d.s==="pd")h+=`<p style="margin:0;font-size:14px">同じ基準で訪問看護も医療保険（別表第7）になる。</p>`;
-  h+=`</div>`;
-  $("verdict").innerHTML=h;
+  if(e.ok===false&&kei!=="3")h+=`<p style="margin:0;font-size:14px">満たさなくても診断基準を満たせば<b>登録者証</b>は発行。</p>`;
+  if(e.ok===true&&d.s==="pd")h+=`<p style="margin:0;font-size:14px">同じ基準で訪問看護も医療保険（別表第7）。</p>`;
+  $("verdict").innerHTML=h+`</div>`;
+  const kq=$("keiQ");
+  if(e.ok===false){kq.classList.remove("hidden");kq.innerHTML=`<div class="q"><span class="lb">10割で33,330円を超えた月（申請月から12か月以内）</span><div class="seg">${KEIQ.map(a=>`<button type="button" data-k="kei" data-val="${a[0]}" aria-pressed="${kei===a[0]}"${a[0]==="3"?' class="th"':""}>${a[1]}</button>`).join("")}</div><p class="hint">3割負担で約1万円・2割で約6,700円を超えた月。月ごとに数えるなら「費用」タブ。</p></div>`}
+  else{kq.classList.add("hidden");kq.innerHTML=""}
 }
-function kTag(d){return d.k==="Y"?tag("y","介護2号 ○"+(d.kn?"（"+d.kn+"）":"")):d.k==="C"?tag("c","介護2号 △ "+(d.kn||"")):tag("n","介護2号 ×（40〜64歳は総合支援法）")}
-function bTag(d){return d.b==="Y"?tag("y","訪看 医療保険 ○"):d.b==="C"?tag("c","訪看 医療保険 △ "+(d.bn||"")):tag("n","訪看 医療保険 ×")}
 function renderInfo(){
   const d=curDz();
-  let h=`<h2>この疾患の制度メモ</h2><div class="tags">${kTag(d)}${bTag(d)}${tag("y","障害福祉サービス ○（手帳不要）")}</div>`;
+  const kT=d.k==="Y"?tag("y","介護2号 ○"+(d.kn?"（"+d.kn+"）":"")):d.k==="C"?tag("c","介護2号 △ "+(d.kn||"")):tag("n","介護2号 ×（40〜64歳は障害福祉）");
+  const bT=d.b==="Y"?tag("y","訪看 医療保険 ○"):d.b==="C"?tag("c","訪看 医療保険 △ "+(d.bn||"")):tag("n","訪看 医療保険 ×");
+  let h=`<h2>この疾患の制度メモ</h2><div class="tags">${kT}${bT}${tag("y","障害福祉サービス ○")}</div>`;
   if(d.nt.length)h+=`<ul class="list" style="margin-top:10px">${d.nt.map(x=>`<li>${x}</li>`).join("")}</ul>`;
-  h+=`<div class="links"><a href="${MH+d.g}" target="_blank" rel="noopener">概要・診断基準（厚労省PDF）</a><a href="${MH+d.p}" target="_blank" rel="noopener">臨床調査個人票（厚労省PDF）</a></div>`;
+  h+=`<div class="links"><a href="${MH+d.g}" target="_blank" rel="noopener">概要・診断基準（厚労省）</a><a href="${MH+d.p}" target="_blank" rel="noopener">臨床調査個人票（厚労省）</a></div>`;
   $("dzinfo").innerHTML=h;
 }
+function renderDzSel(){
+  $("dzq").innerHTML=QUICK.map(n=>{const d=DZ.find(x=>x.no===n);return `<button type="button" data-dz2="${n}" aria-pressed="${n===+S.dz}">${d.ab}</button>`}).join("");
+  $("dz").value=S.dz;
+}
+function renderChk(){renderDzSel();renderPanel();renderVerdict();renderInfo()}
 
-/* ---------- 描画：軽症高額 ---------- */
+/* ---------- 描画：費用 ---------- */
 function renderKei(){
   const box=$("months");
-  if(!box.children.length){box.innerHTML=S.cost.map((c,i)=>`<label>${i+1}か月目<input type="number" inputmode="numeric" min="0" step="1" data-m="${i}" value="${c}"></label>`).join("")}
+  if(!box.children.length)box.innerHTML=S.cost.map((c,i)=>`<label>${i+1}か月目<input type="number" inputmode="numeric" min="0" step="1" data-m="${i}" value="${c}"></label>`).join("");
   let a=0,b=0,n=0;
   box.querySelectorAll("input").forEach((el,i)=>{const v=S.cost[i]===""?null:+S.cost[i];el.classList.remove("hit","hit2");
     if(v!==null){n++;if(v>50000){b++;el.classList.add("hit2")}if(v>33330){a++;if(v<=50000)el.classList.add("hit")}}});
+  if(!n){$("keiv").innerHTML="";return}
   let cls="info",pill="入力途中",big=`33,330円超：${a}か月`;
-  if(a>=3){cls="ok";pill="軽症高額に該当";big=`33,330円超の月が ${a} 回 → 該当（3回以上）`}
+  if(a>=3){cls="ok";pill="軽症高額に該当";big=`33,330円超の月が ${a} 回（3回以上）`}
   else if(n>=12){cls="warn";pill="該当しない";big=`33,330円超の月が ${a} 回（3回未満）`}
-  $("keiv").innerHTML=`<div class="verdict ${cls}"><span class="pill">${pill}</span><div class="big">${big}</div><ul><li>5万円超の月：${b} 回（認定後なら6回以上で「高額かつ長期」）</li><li>入力した月：${n}/12</li></ul></div>`;
-}
-
-/* ---------- 描画：制度早見 ---------- */
-function renderMatrix(){
-  const yn=x=>x==="Y"?"○":x==="C"?"△":"—";
-  $("matrix").innerHTML=`<tr><th>No</th><th>疾患</th><th>重症度の対象</th><th>介護2号</th><th>訪看医療</th></tr>`+
-    DZ.slice().sort((a,b)=>a.no-b.no).map(d=>`<tr${d.no===+S.dz?' class="hl"':""}><td class="n">${d.no}</td><td>${d.nm}</td><td>${d.th}</td><td>${yn(d.k)}</td><td>${yn(d.b)}</td></tr>`).join("");
+  $("keiv").innerHTML=`<div class="verdict ${cls}"><span class="pill">${pill}</span><div class="big">${big}</div><ul><li>5万円超の月：${b} 回（認定後なら6回以上で高額かつ長期）</li><li>入力した月：${n}/12</li></ul></div>`;
 }
 
 /* ---------- 描画：遡り ---------- */
 function renderDoc(){
   $("dDiag").value=S.dDiag||"";$("dAppl").value=S.dAppl||"";$("dUnav").checked=!!S.dUnav;
-  const out=$("dOut");
-  if(!S.dDiag||!S.dAppl){out.innerHTML="";return}
+  const out=$("dOut");if(!S.dDiag||!S.dAppl){out.innerHTML="";return}
   const dg=new Date(S.dDiag+"T00:00:00"),ap=new Date(S.dAppl+"T00:00:00");
-  if(dg>ap){out.innerHTML=`<div class="verdict warn"><span class="pill">確認</span><div class="big">診断年月日が申請日より後になっています</div></div>`;return}
+  if(dg>ap){out.innerHTML=`<div class="verdict warn"><span class="pill">確認</span><div class="big">診断年月日が申請日より後です</div></div>`;return}
   const lim=new Date(ap);lim.setMonth(lim.getMonth()-(S.dUnav?3:1));
-  const st=dg>lim?dg:lim;
+  const st=dg>lim?dg:lim,lost=dg<lim;
   const f=x=>`${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`;
-  const lost=dg<lim;
-  out.innerHTML=`<div class="verdict ${lost?"warn":"ok"}"><span class="pill">${lost?"遡り上限で打ち切り":"診断年月日から助成"}</span><div class="big">助成開始日：${f(st)}</div><ul><li>遡りの上限（申請日の${S.dUnav?3:1}か月前）：${f(lim)}</li>${lost?`<li>診断年月日（${f(dg)}）〜${f(st)}の前日までは助成の対象外</li>`:""}</ul></div>`;
+  out.innerHTML=`<div class="verdict ${lost?"warn":"ok"}"><span class="pill">${lost?"遡り上限で打ち切り":"診断年月日から助成"}</span><div class="big">助成開始日：${f(st)}</div><ul><li>遡りの上限（申請日の${S.dUnav?3:1}か月前）：${f(lim)}</li>${lost?`<li>${f(dg)}〜${f(st)}の前日は助成の対象外</li>`:""}</ul></div>`;
 }
 
 /* ---------- 出典 ---------- */
@@ -529,62 +502,64 @@ const SRC=[
  ["厚生労働省：指定難病の概要、診断基準等、臨床調査個人票（告示番号1〜348）令和8年4月時点","https://www.mhlw.go.jp/stf/newpage_53881.html"],
  ["厚労省：6 パーキンソン病 概要・診断基準等",MH+"001173440.pdf"],
  ["難病情報センター：重症筋無力症（指定難病11）","https://www.nanbyou.or.jp/entry/272"],
- ["厚労省：13 多発性硬化症／視神経脊髄炎 概要・診断基準等（視覚の重症度分類）",MH+"001173449.pdf"],
+ ["厚労省：13 多発性硬化症／視神経脊髄炎 概要・診断基準等",MH+"001173449.pdf"],
  ["厚労省：2 筋萎縮性側索硬化症 概要・診断基準等",MH+"001443728.pdf"],
- ["厚労省：18 脊髄小脳変性症 概要・診断基準等（日本版mRS・食事栄養・呼吸の尺度）",MH+"001173454.pdf"],
- ["厚労省：14 CIDP/MMN 概要・診断基準等（Barthel Index 85点以下、留意事項）",MH+"001173450.pdf"],
+ ["厚労省：18 脊髄小脳変性症 概要・診断基準等（mRS・食事栄養・呼吸の尺度）",MH+"001173454.pdf"],
+ ["厚労省：14 CIDP/MMN 概要・診断基準等（Barthel Index、留意事項）",MH+"001173450.pdf"],
  ["厚労省：3 脊髄性筋萎縮症 概要・診断基準等",MH+"001173434.pdf"],
  ["厚労省：8 ハンチントン病 概要・診断基準等",MH+"001173442.pdf"],
  ["厚労省：22 もやもや病 概要・診断基準等",MH+"001173459.pdf"],
  ["厚労省：113 筋ジストロフィー 概要・診断基準等",MH+"001174033.pdf"],
  ["厚労省：127 前頭側頭葉変性症 概要・診断基準等",MH+"001174064.pdf"],
+ ["東京都：難病医療費助成の支給認定申請手続等（区市町村で受付、臨個票は申請日前6か月以内）","https://www.hokeniryo.metro.tokyo.lg.jp/kenkou/nanbyo/portal/seido/shinsei"],
+ ["東京都：難病医療費助成のご案内（軽症高額に一部の介護サービス費を合算）","https://www.hokeniryo.metro.tokyo.lg.jp/documents/d/hokeniryo/2026-09-03-114524-830"],
  ["埼玉県：指定難病医療給付制度の対象となる方（軽症高額該当基準）","https://www.pref.saitama.lg.jp/documents/52722/taisyou.pdf"],
  ["香川県：指定難病医療費助成制度について（348疾病・自己負担上限額）","https://www.pref.kagawa.lg.jp/kenkosomu/nanbyou_seido.html"],
- ["静岡県：医療費助成における自己負担上限額（高額かつ長期の定義）","https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/024/318/070401hutanzyogen.pdf"],
- ["東京都：人工呼吸器等装着者・入院時食事療養費の扱い（PDF）","https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/2026-09-16-112449-961"],
+ ["静岡県：自己負担上限額（高額かつ長期の定義）","https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/024/318/070401hutanzyogen.pdf"],
+ ["東京都：人工呼吸器等装着者・入院時食事療養費の扱い","https://www.fukushi.metro.tokyo.lg.jp/documents/d/fukushi/2026-09-16-112449-961"],
  ["静岡県：医療費助成開始時期の前倒し（診断年月日の考え方）","https://www.pref.shizuoka.jp/kenkofukushi/shippeikansensho/nanbyo/1003078/1056834.html"],
  ["千葉県：指定難病医療費助成申請の手続（遡り1か月・最長3か月）","https://www.pref.chiba.lg.jp/shippei/alle-nan/nanbyouiryouhou/appli.html"],
  ["神奈川県：登録者証の発行について","https://www.pref.kanagawa.jp/docs/nf5/cnt/f531594/p333851.html"],
  ["さいたま市：臨床調査個人票記入にあたっての留意事項","https://www.city.saitama.lg.jp/002/001/017/012/p056897_d/fil/ryuuijikou.pdf"],
  ["登米市：介護保険の特定疾病一覧（16種類）","https://www.city.tome.miyagi.jp/koho/shisejoho/gyose/shinsei/documents/tokuteishipei_1.pdf"],
- ["北九州市：第2号被保険者の主治医意見書の記載上の留意点","https://www.city.kitakyushu.lg.jp/files/001162018.pdf"],
  ["岡山県：訪問看護（厚生労働大臣が定める疾病等）","https://www.pref.okayama.jp/uploaded/life/976109_9402303_misc.pdf"],
  ["新潟県：障害者総合支援法の対象となる難病等の拡大（376疾病）","https://www.pref.niigata.lg.jp/sec/shougaifukushi/1356764716254.html"],
  ["青森県：体幹不自由の認定基準","https://www.pref.aomori.lg.jp:443/soshiki/kenko/syofuku/files/9_taikanhujiyu.pdf"],
- ["岡山市：肢体不自由（全廃・著障・軽障の目安）","https://www.city.okayama.jp/cmsfiles/contents/0000027/27739/sitaifujiyuu.pdf"],
- ["静岡市：肢体不自由（障害の重複・指数合算）","https://www.city.shizuoka.lg.jp/documents/2896/5shitaihuziyuu.pdf"],
- ["厚労省：15条指定医向け 医師の診断書作成マニュアル","https://www.mhlw.go.jp/stf/newpage_56429.html"]
+ ["PMDA：クアルソディ髄注100mg 電子添文","https://www.pmda.go.jp/PmdaSearch/iyakuDetail/ResultDataSetPDF/630499_1190411A1027_1_01"]
 ];
 
 /* ---------- タブ・イベント ---------- */
-function setTab(v){S.tab=v;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v));document.querySelectorAll("[data-p]").forEach(p=>p.classList.toggle("hidden",p.dataset.p!==v))}
-function renderChk(){renderPanel();renderVerdict();renderInfo()}
-function renderAll(){renderChk();renderKei();renderMatrix();renderDoc()}
-function initSelect(){
-  const groups=[["よく使う",[6,11,13,2,14,17,18,5,7]],["運動ニューロン・神経筋",[4,1,3,10,15,16,113,119]],["その他",[8,21,22,23,25,26,127,128]]];
-  $("dz").innerHTML=groups.map(([g,ns])=>`<optgroup label="${g}">${ns.map(n=>{const d=DZ.find(x=>x.no===n);return `<option value="${n}">${n} ${d.nm}</option>`}).join("")}</optgroup>`).join("");
-  $("dz").value=S.dz;
+function setTab(v){S.tab=v;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v?"true":"false"));document.querySelectorAll("[data-p]").forEach(p=>p.classList.toggle("hidden",p.dataset.p!==v))}
+function renderAll(){renderQk();renderChk();renderKei();renderDoc()}
+function initStatic(){
+  $("dz").innerHTML=DZ.slice().sort((a,b)=>a.no-b.no).map(d=>`<option value="${d.no}">${d.no} ${d.nm}</option>`).join("");
   $("srcList").innerHTML=SRC.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join("");
+  $("appVer").textContent=APP_VERSION;
 }
+function setV(k,val){S.v[S.dz+":"+k]=val;save();renderChk()}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("nav.tabs button");if(t){setTab(t.dataset.v);save();window.scrollTo({top:0});return}
+  const q=e.target.closest("[data-dz]");if(q){S.dz=+q.dataset.dz;setTab("chk");save();renderChk();window.scrollTo({top:0});return}
+  const q2=e.target.closest("[data-dz2]");if(q2){S.dz=+q2.dataset.dz2;save();renderChk();return}
+  const b=e.target.closest("button[data-k]");if(b){const k=b.dataset.k,cur=V(k);
+    if(k==="bi"){BI.forEach(([x])=>delete S.v[S.dz+":bi_"+x])}
+    setV(k,cur===b.dataset.val?"":b.dataset.val);return}
+  if(e.target.id==="fill30"||e.target.id==="fill20"){const r=e.target.id==="fill30"?0.3:0.2;
+    S.cost=S.cost.map(c=>c===""?"":String(Math.round(+c/r)));$("months").innerHTML="";renderKei();save();toast("10割の金額に換算しました");return}
+});
 document.addEventListener("change",e=>{
   const t=e.target;
-  if(t.id==="dz"){S.dz=+t.value;renderChk();renderMatrix();save();return}
-  if(t.dataset.k){const key=S.dz+":"+t.dataset.k;S.v[key]=t.type==="checkbox"?t.checked:t.value;renderChk();save();return}
+  if(t.id==="dz"){S.dz=+t.value;save();renderChk();return}
+  if(t.dataset.k){setV(t.dataset.k,t.type==="checkbox"?t.checked:t.value);return}
   if(t.dataset.m!==undefined){S.cost[+t.dataset.m]=t.value;renderKei();save();return}
   if(t.id==="dDiag"||t.id==="dAppl"){S[t.id]=t.value;renderDoc();save();return}
   if(t.id==="dUnav"){S.dUnav=t.checked;renderDoc();save();return}
 });
-document.addEventListener("input",e=>{const t=e.target;
-  if(t.dataset.m!==undefined){S.cost[+t.dataset.m]=t.value;renderKei();save()}
-  else if(t.dataset.k==="va"){S.v[S.dz+":va"]=t.value;renderVerdict();save()}});
-document.addEventListener("click",e=>{
-  const b=e.target.closest("nav.tabs button");if(b){setTab(b.dataset.v);save();window.scrollTo({top:0});return}
-  const g=e.target.closest("[data-go]");if(g){e.preventDefault();setTab(g.dataset.go);save();window.scrollTo({top:0});return}
-  if(e.target.id==="fill30"||e.target.id==="fill20"){const r=e.target.id==="fill30"?0.3:0.2;
-    S.cost=S.cost.map(c=>c===""?"":String(Math.round(+c/r)));$("months").innerHTML="";renderKei();save();toast("10割の金額に換算しました");}
-});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.m!==undefined){S.cost[+t.dataset.m]=t.value;renderKei();save()}});
+$("forceUpdate").addEventListener("click",async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(()=>location.reload(),800);});
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),3500)}
-load();initSelect();setTab(S.tab);renderAll();
+load();initStatic();setTab(S.tab);renderAll();
+document.addEventListener("DOMContentLoaded",()=>{if(WP()&&WP().onChange)WP().onChange(()=>setTimeout(renderQk,0));renderQk();});
 </script>
 <script>
 (function(){
@@ -604,6 +579,68 @@ load();initSelect();setTab(S.tab);renderAll();
   }catch(e){}
 })();
 </script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
 <!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
 <style>
 #wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -631,8 +668,8 @@ load();initSelect();setTab(S.tab);renderAll();
 <div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
 <script>
 (function(){
-  var KEYS=["nan-nav-v1"];
-  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var KEYS=["nan-nav-v2","nan-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
   var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
   function close(){dlg.classList.remove("on");}
   btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
@@ -666,6 +703,7 @@ load();initSelect();setTab(S.tab);renderAll();
 })();
 </script>
 <!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
 <script src="../share.js" defer></script>
 </body>
 </html>
