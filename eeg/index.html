@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>脳波パターン判読トレーニング</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0F766E">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="脳波トレーニング">
+<style>
+:root{
+  --bg:#F3F6F5; --surface:#FFFFFF; --ink:#1A2422; --muted:#5A6865; --line:#D9E2DF;
+  --accent:#0F766E; --accent-strong:#0B5650; --accent-soft:#E1F2EF; --on-accent:#FFFFFF;
+  --ok:#2E7D4F; --ok-soft:#E3F3E9; --ng:#B42318; --ng-soft:#FDE8E6; --warn-soft:#FFF4DB;
+  --font:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#121716; --surface:#1B2220; --ink:#E7EEEC; --muted:#9FB0AC; --line:#2D3835;
+    --accent:#2DBFAF; --accent-strong:#6FDCCF; --accent-soft:#16332F; --on-accent:#06201D;
+    --ok:#5CC48A; --ok-soft:#163323; --ng:#F27A6E; --ng-soft:#3B1C1A; --warn-soft:#3A3017; color-scheme:dark}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+.app{max-width:680px;margin:0 auto;padding:0 calc(14px + env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;border:5px solid var(--accent);flex:none}
+.brand h1{font-size:19px;font-weight:900}
+.brand small{color:var(--muted);font-size:11px;margin-left:auto;text-align:right;line-height:1.3}
+.summary{margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px 9px}
+.tile .k{font-size:11px;color:var(--muted);display:block}
+.tile .v{font-size:17px;font-weight:700;display:block}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:6px}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sm{min-height:36px;padding:5px 11px;font-size:14px}
+.btn:disabled{opacity:.55;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.set>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details.set>summary::-webkit-details-marker{display:none}
+details.set>summary::after{content:"＋";margin-left:auto;color:var(--muted);font-weight:400}
+details.set[open]>summary::after{content:"－"}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input{margin:0;accent-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px}
+input[type=search]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;min-height:44px}
+.sw{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--accent)}
+/* 出題 */
+.qhead{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.lv{letter-spacing:1px;color:var(--accent)}
+.regtag{margin-left:auto;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:1px 10px;font-weight:700}
+.pt{font-size:15.5px;margin:0 0 8px}
+ul.fd{margin:0;padding:0;list-style:none}
+ul.fd li{position:relative;padding:7px 0 7px 18px;border-top:1px dashed var(--line);font-size:15.5px;line-height:1.5}
+ul.fd li:first-child{border-top:0}
+ul.fd li::before{content:"";position:absolute;left:3px;top:15px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.ask{font-weight:700;margin:12px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;font-size:15.5px;line-height:1.45;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:11px;padding:11px 12px;min-height:48px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ng{border-color:var(--ng);background:var(--ng-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.result{border-radius:10px;padding:9px 12px;font-weight:700;margin-bottom:10px}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.ng{background:var(--ng-soft);color:var(--ng)}
+.result .ans{display:block;color:var(--ink);font-size:17px;margin-top:2px}
+.result .syn{display:block;color:var(--muted);font-weight:400;font-size:13.5px}
+.ex h3{font-size:14.5px;margin:12px 0 4px;color:var(--accent-strong)}
+.why{margin:0;padding:0;list-style:none}
+.why li{padding:7px 0;border-top:1px dashed var(--line);font-size:15px;line-height:1.5}
+.why li:first-child{border-top:0}
+.why .f{display:block}
+.why .w{display:block;color:var(--muted);font-size:13.5px;padding-left:1.2em;text-indent:-1.2em}
+.why .w::before{content:"→ ";color:var(--accent)}
+.why .dn{font-weight:700;display:block}
+.pearl{background:var(--warn-soft);border-radius:10px;padding:9px 12px;font-size:14.5px;margin-top:12px}
+.pearl b{display:block;font-size:13px;color:var(--muted)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.nav .btn{flex:1 1 140px}
+/* 一覧 */
+details.site{border-top:1px solid var(--line)}
+details.site:first-of-type{border-top:0}
+details.site>summary{cursor:pointer;padding:9px 0;list-style:none}
+details.site>summary::-webkit-details-marker{display:none}
+details.site>summary b{display:block;font-size:15px}
+details.site>summary span{display:block;font-size:13px;color:var(--muted)}
+.lvb{font-size:11px;color:var(--accent);margin-left:6px;font-weight:400}
+.sub{font-size:12.5px;color:var(--muted);margin:8px 0 2px;font-weight:700}
+/* 成績 */
+table.st{width:100%;border-collapse:collapse;font-size:14.5px}
+table.st td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+table.st td.num{text-align:right;white-space:nowrap;width:1%}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{color:var(--muted);font-size:14px}
+/* タブ */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+nav.tabs .in{display:flex;max-width:680px;width:100%}
+nav.tabs button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:9px 0 10px;min-height:56px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;display:none;max-width:90%}
+.toast.on{display:block}
+.foot{font-size:11.5px;color:var(--muted);margin:16px 2px 0}
+.trwrap{margin:6px -8px 2px}
+.trwrap[hidden]{display:none}
+.par{font-size:11.5px;color:var(--muted);margin:0 8px 4px;line-height:1.45}
+.trace{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px;background:var(--surface);overscroll-behavior-x:contain}
+.trace .in{display:flex;width:max-content}
+.trace canvas{display:block}
+.trace canvas.lab{position:sticky;left:0;z-index:2;border-right:1px solid var(--line)}
+.ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 8px 0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{font:inherit;font-size:13px;border:0;border-left:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 9px;min-height:36px;cursor:pointer}
+.seg button:first-child{border-left:0}
+.seg button.on{background:var(--accent);color:var(--on-accent);font-weight:700}
+.ss{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--muted)}
+.ss select{font-size:13px;min-height:36px;padding:4px 6px}
+.ss input{width:18px;height:18px;accent-color:var(--accent)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt small{display:block;color:var(--muted);font-size:12.5px;font-weight:400}
+.opt b{font-weight:700}
+.hintbox{background:var(--warn-soft);border-radius:10px;padding:7px 11px;font-size:14px;margin:0 0 8px}
+.result .mn{display:block;color:var(--ink);font-size:14px;font-weight:700;margin-top:3px}
+.tx{margin:4px 0;font-size:15px;line-height:1.6}
+.chk{font-size:12px;color:var(--muted);margin:10px 0 0;border-top:1px dashed var(--line);padding-top:6px}
+.pearl .lnk{display:block;margin-top:6px;color:var(--accent-strong);font-weight:700;text-decoration:none}
+ul.ref{margin:0;padding-left:18px;font-size:14px}
+ul.ref li{margin:0 0 8px}
+ul.ref a{color:var(--accent-strong)}
+.why .dn{color:var(--ink)}
+.fsv{position:fixed;inset:0;z-index:2147483100;background:var(--bg);display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.fsv[hidden]{display:none}
+.fsbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 8px;border-bottom:1px solid var(--line)}
+.fsbar>b{font-size:14px}
+.fsctl{width:100%}
+.fsctl .ctl{margin:4px 0 0}
+.fsbody{flex:1;min-height:0;padding:6px 8px;display:flex;flex-direction:column}
+#fsTr{flex:1;min-height:0;overflow:auto}
+body.fsopen{overflow:hidden}
+.fsv .seg button{min-height:30px;padding:3px 7px;font-size:12px}
+.fsv .ss select{min-height:30px;padding:2px 4px;font-size:12px}
+.fsv .btn.sm{min-height:30px;padding:3px 10px;font-size:13px}
+.fsv .ctl{gap:4px}
+@media (orientation:landscape){.fsbar{flex-wrap:nowrap}.fsctl{width:auto;flex:1;display:flex;flex-wrap:wrap;gap:4px}.fsctl .ctl{margin:0}.fsv .par{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><h1>脳波パターン判読トレーニング</h1><small>模式波形で所見名と意味を答える<br>病棟アプリ</small></div>
+  <div class="summary">
+    <div class="tile"><span class="k">回答数</span><span class="v" id="sN">0</span></div>
+    <div class="tile"><span class="k">正答率（両方）</span><span class="v" id="sR">—</span></div>
+    <div class="tile"><span class="k">連続正解</span><span class="v" id="sS">0</span></div>
+  </div>
+</header>
+<section class="view active" id="v-q" aria-label="出題">
+  <details class="card set" id="setBox">
+    <summary>出題範囲・設定 <span class="hint" id="setSum" style="margin:0 0 0 4px"></span></summary>
+    <div class="chips" id="modeChips"></div>
+    <div class="row" style="margin-top:6px">
+      <label for="lvSel" style="font-size:14px">難易度</label>
+      <select id="lvSel"><option value="1">基本のみ</option><option value="2">標準まで</option><option value="3" selected>応用まで（すべて・アーチファクトの混入あり）</option></select>
+    </div>
+    <label class="sw"><input type="checkbox" id="hideOpt">選択肢を隠して、先に自分で考える</label>
+    <label class="sw"><input type="checkbox" id="weakOpt">間違えた・まだ解いていないパターンを優先</label>
+    <p class="hint">波形は毎回プログラムで作る模式波形です（部位・左右・周波数・振幅・出る時刻が変わります）。実際の脳波や成書の図は使っていません。</p>
+  </details>
+  <div id="qArea"></div>
+</section>
+<section class="view" id="v-a" aria-label="パターン一覧">
+  <div class="card">
+    <h2>パターン一覧（見分け方の要点）</h2>
+    <input type="search" id="aQ" placeholder="所見名・特徴で絞り込み（例：wicket、+F、三相）" aria-label="絞り込み">
+    <p class="hint">各パターンで「見本の波形」と「この所見で出題」ができます。</p>
+  </div>
+  <details class="card set">
+    <summary>ICU脳波の用語の要点（ACNS 2021）</summary>
+    <ul class="why acns">
+      <li><span class="dn">主用語1（分布）</span><span class="w">G 全般性（両側同期・対称。両側前頭部だけでもG）／L 一側性（一側、または両側でも一側優位・一側が先行）／BI 両側独立／UI 一側の中で独立／Mf 多焦点（3つ以上、両半球に）</span></li>
+      <li><span class="dn">主用語2（形）</span><span class="w">PD 周期性放電（放電の間に間隔があり、周期の変動は多くの組で50%未満）／RDA 律動性δ（0.5〜4 Hz、間隔なし）／SW 棘徐波・鋭徐波（間隔なく反復。間隔があればPD）。いずれも6周期以上続くこと</span></li>
+      <li><span class="dn">plus修飾語</span><span class="w">+F 重なる速波（θ以上）：PD・RDA／+R 重なる律動性δ：PDだけ／+S 重なる鋭波・棘波（10秒に1回以上）：RDAだけ。組み合わせは +FR（PD）、+FS（RDA）。SWには付けない</span></li>
+      <li><span class="dn">三相性の形態</span><span class="w">PD・SWの修飾語。陰-陽-陰の3相で後の相ほど長く、陽性相が最も高い（「三相波」は独立したパターン名にしない）</span></li>
+      <li><span class="dn">電気的発作（ESz）</span><span class="w">てんかん性放電が平均2.5 Hz超（10秒に25個超）で10秒以上、または明確なevolutionのあるパターンが10秒以上</span></li>
+      <li><span class="dn">電気的てんかん重積（ESE）</span><span class="w">ESzが10分以上続く、または60分のうち20%以上を占める</span></li>
+      <li><span class="dn">IIC（発作間欠期-発作期連続体）</span><span class="w">ESzに当たらず、①PD・SWが10秒平均で1.0 Hz超〜2.5 Hz、②0.5〜1 HzのPD・SWにplusか変動、③1 Hz超のLRDA（GRDAは含まない）にplusか変動、のいずれか</span></li>
+      <li><span class="dn">evolution</span><span class="w">同じ向きの変化が2回以上続く（各状態3周期以上）。周波数は0.5 Hz以上ずつ、部位は2つ以上の電極へ広がる・離れる。振幅の変化だけではevolutionとしない</span></li>
+      <li><span class="dn">BIRDs</span><span class="w">4 Hz超の律動（6波以上）が0.5秒以上10秒未満。正常亜型・burst suppressionの群発・明らかな臨床症状を伴うものは除く。evolutionあり／同じ患者の放電・発作と同じ形と部位＝確実、鋭いだけ＝可能性</span></li>
+      <li><span class="dn">連続性</span><span class="w">抑制（10 µV未満）または減衰（10 µV以上で背景の50%未満）が記録の50〜99%＝burst suppression／burst attenuation、99%超＝抑制・減衰。群発は平均0.5秒以上・4相以上</span></li>
+      <li><span class="dn">鋭さ</span><span class="w">spiky 70 ms未満／sharp 70〜200 ms／sharply contoured（尖るが鋭波より長い）／blunt（鈍い）</span></li>
+    </ul>
+  </details>
+  <div id="aList"></div>
+</section>
+<section class="view" id="v-s" aria-label="成績">
+  <div id="sArea"></div>
+</section>
+<section class="view" id="v-r" aria-label="出典">
+  <div class="card">
+    <h2>読み方の約束</h2>
+    <ul class="why">
+      <li><span class="dn">極性</span><span class="w">上向きが陰性、下向きが陽性（入力1が入力2より陰性なら上向き）。</span></li>
+      <li><span class="dn">縦の双極導出</span><span class="w">ACNSの縦双極（LB-18.1）：左側頭→右側頭→左傍矢状→右傍矢状→正中。隣り合う2チャンネルが逆向きに振れる電極（位相逆転）に電位の最大がある。</span></li>
+      <li><span class="dn">基準導出</span><span class="w">同側の耳朶（A1・A2）を基準にし、正中は両耳朶の平均（表示は「-A」）。側頭部の電位は耳朶にも乗る（耳朶の活性化）ので、側頭部の所見は双極導出とあわせて見る。</span></li>
+      <li><span class="dn">感度・時定数</span><span class="w">感度は画面上の1 mmあたりの電位。時定数0.3秒は約0.53 Hz、0.1秒は約1.6 Hzの低域遮断に相当する。電極名は旧称（T3＝T7、T4＝T8、T5＝P7、T6＝P8）。</span></li>
+      <li><span class="dn">スマホで見る</span><span class="w">横スクロールで10秒を送る。「横：画面幅」で全体、「×2」で棘波の幅まで見える。「大きく表示」で全画面にし、スマホを横向きにすると広く見える。「側頭」「傍矢状」「左」「右」でチャンネルを減らせる。</span></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>出典</h2>
+    <ul class="ref">
+      <li>Hirsch LJ, et al. American Clinical Neurophysiology Society's Standardized Critical Care EEG Terminology: 2021 Version. J Clin Neurophysiol. 2021;38(1):1-29. <a href="https://pubmed.ncbi.nlm.nih.gov/33475321/" target="_blank" rel="noopener">PubMed 33475321</a>・<a href="https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf" target="_blank" rel="noopener">ACNS公式PDF</a><span class="hint" style="display:block;margin:0">ICU脳波の用語・判定基準（ESz・ESE・IIC・evolution・BIRDs・plus・三相性の形態・burst suppression）の照合に使用</span></li>
+      <li>Kane N, et al. A revised glossary of terms most commonly used by clinical electroencephalographers and updated proposal for the report format of the EEG findings. Revision 2017. Clin Neurophysiol Pract. 2017;2:170-185. <a href="https://pubmed.ncbi.nlm.nih.gov/30214992/" target="_blank" rel="noopener">PubMed 30214992</a><span class="hint" style="display:block;margin:0">棘波・鋭波・α律動などの一般用語</span></li>
+      <li>Rodriguez Ruiz A, et al. Association of periodic and rhythmic electroencephalographic patterns with seizures in critically ill patients. JAMA Neurol. 2017;74(2):181-188. <a href="https://doi.org/10.1001/jamaneurol.2016.4990" target="_blank" rel="noopener">doi:10.1001/jamaneurol.2016.4990</a><span class="hint" style="display:block;margin:0">LPD・LRDA・GPDは発作と関連、GRDAは関連しない。周波数とplusの影響</span></li>
+      <li>Yoo JY, et al. Brief potentially ictal rhythmic discharges in critically ill adults. JAMA Neurol. 2014;71(4):454-462. <a href="https://pubmed.ncbi.nlm.nih.gov/24535702/" target="_blank" rel="noopener">PubMed 24535702</a></li>
+      <li>Struck AF, et al. Association of an electroencephalography-based risk score with seizure probability in hospitalized patients（2HELPS2B）. JAMA Neurol. 2017;74(12):1419-1424. <a href="https://pubmed.ncbi.nlm.nih.gov/29052706/" target="_blank" rel="noopener">PubMed 29052706</a></li>
+      <li>Kang JY, Krauss GL. Normal variants are commonly overread as interictal epileptiform abnormalities. J Clin Neurophysiol. 2019;36(4):257-263. <a href="https://doi.org/10.1097/WNP.0000000000000613" target="_blank" rel="noopener">doi:10.1097/WNP.0000000000000613</a><span class="hint" style="display:block;margin:0">wicket棘波・small sharp spikesなど正常亜型の読み過ぎ</span></li>
+    </ul>
+    <p class="hint">照合の表示：各パターンの解説の末尾に「ACNS 2021で照合」「IFCN用語集で照合」「成書・総説の一般的な記載（未照合）」を示しています。治療の判断はすべて一般的な目安（未照合）で、薬の用量・適応は添付文書で確認してください。</p>
+  </div>
+  <div class="card">
+    <h2>このアプリについて</h2>
+    <p class="tx">波形はすべてプログラムで作った模式波形（電極ごとの電位を合成し、導出は電極間の差で計算）で、実際の患者の脳波や成書の図は使っていません。実際の脳波はもっと多様で、ここで覚えた特徴は判読の入口として使ってください。</p>
+    <div class="row" style="margin-top:8px"><span>アプリの版：<b id="appVer"></b></span><button type="button" class="btn sm" id="forceUpdate">最新版に更新</button></div>
+  </div>
+</section>
+<p class="foot">自分用の学習ツールです。模式波形と要点は典型例の要約で、実際の判断は記録全体・臨床経過・原典で行ってください。成績はこの端末内にのみ保存されます。</p>
+</div>
+<div id="fsv" class="fsv" hidden role="dialog" aria-label="波形の全画面表示">
+  <div class="fsbar"><b>波形（全画面）</b><button type="button" class="btn sm" id="fsClose">閉じる</button><div id="fsCtl" class="fsctl"></div></div>
+  <div class="fsbody"><p class="par" id="fsPar"></p><div class="trace" id="fsTr"></div></div>
+</div>
+<nav class="tabs" role="tablist" aria-label="画面切替"><div class="in">
+  <button role="tab" aria-selected="true" data-v="v-q" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12h3l2-6 3 12 3-9 2 5 2-2h5"/></svg>出題</button>
+  <button role="tab" aria-selected="false" data-v="v-a" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg>一覧</button>
+  <button role="tab" aria-selected="false" data-v="v-s" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>成績</button>
+  <button role="tab" aria-selected="false" data-v="v-r" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7"/></svg>出典</button>
+</div></nav>
+<div class="toast" id="toast" role="status"></div>
+<script>
+/* ===== 模式波形エンジン =====
+   10-20法の電極ごとに頭皮上の電位（µV、陰性＝負の値）を作り、導出は電極間の差で計算する。
+   実際の脳波・成書の図は使わない。すべて乱数（seed）から毎回作る。 */
+var FS=200,PRE=3,DUR=10,NT=(PRE+DUR)*FS;
+var EL=["Fp1","Fp2","F7","F3","Fz","F4","F8","T3","C3","Cz","C4","T4","T5","P3","Pz","P4","T6","O1","O2","A1","A2"];
+var POS={Fp1:[-.3,.95],Fp2:[.3,.95],F7:[-.8,.6],F3:[-.4,.55],Fz:[0,.5],F4:[.4,.55],F8:[.8,.6],T3:[-1,0],C3:[-.5,0],Cz:[0,0],C4:[.5,0],T4:[1,0],T5:[-.8,-.6],P3:[-.4,-.55],Pz:[0,-.5],P4:[.4,-.55],T6:[.8,-.6],O1:[-.3,-.95],O2:[.3,-.95],A1:[-1.15,-.2],A2:[1.15,-.2]};
+var EI={};EL.forEach(function(e,i){EI[e]=i;});
+var NE=EL.length;
+var MIR={Fp1:"Fp2",Fp2:"Fp1",F7:"F8",F8:"F7",F3:"F4",F4:"F3",T3:"T4",T4:"T3",C3:"C4",C4:"C3",T5:"T6",T6:"T5",P3:"P4",P4:"P3",O1:"O2",O2:"O1",A1:"A2",A2:"A1",Fz:"Fz",Cz:"Cz",Pz:"Pz"};
+function mirror(n){return MIR[n]||n;}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function Gen(seed){
+  var r=mulberry(seed),g={r:r,P:[],ecg:new Float32Array(NT)};
+  for(var i=0;i<NE;i++)g.P.push(new Float32Array(NT));
+  g.U=function(a,b){return a+(b-a)*r();};
+  g.I=function(a,b){return Math.floor(a+(b-a+1)*r());};
+  g.pick=function(a){return a[Math.floor(r()*a.length)];};
+  g.side=function(){return r()<.5?"L":"R";};
+  return g;
+}
+function W0(){return new Float32Array(NT);}
+function tI(t){return Math.round((PRE+t)*FS);}
+function gauss(g){var u=g.r()||1e-9,v=g.r();return Math.sqrt(-2*Math.log(u))*Math.cos(6.2832*v);}
+function center(names){var x=0,y=0;names.forEach(function(n){x+=POS[n][0];y+=POS[n][1];});return [x/names.length,y/names.length];}
+/* 電場：中心からの距離のガウス分布。耳朶は頭皮より遠いので弱める */
+function wF(c,sig,earK){var w=new Float32Array(NE);earK=earK==null?.3:earK;
+  for(var i=0;i<NE;i++){var p=POS[EL[i]],dx=p[0]-c[0],dy=p[1]-c[1],v=Math.exp(-(dx*dx+dy*dy)/(2*sig*sig));if(EL[i][0]==="A")v*=earK;w[i]=v;}return w;}
+function wAt(names,sig,earK){return wF(center(names),sig,earK);}
+/* 全般性：前頭部優位の度合い front（0〜1） */
+function wGen(g,cy,sig,base){var w=new Float32Array(NE);
+  for(var i=0;i<NE;i++){var p=POS[EL[i]],v=base+(1-base)*Math.exp(-(p[0]*p[0]*.5+Math.pow(p[1]-cy,2))/(2*sig*sig));if(EL[i][0]==="A")v*=.3;w[i]=v*(1+g.U(-.05,.05));}return w;}
+function wDict(d){var w=new Float32Array(NE);for(var k in d)w[EI[k]]=d[k];return w;}
+function one(n){var d={};d[n]=1;return wDict(d);}
+function addW(g,wave,w,gain){gain=gain==null?1:gain;for(var e=0;e<NE;e++){var k=w[e]*gain;if(Math.abs(k)<.003)continue;var P=g.P[e];for(var i=0;i<NT;i++)P[i]+=wave[i]*k;}}
+function maxEl(w){var m=-1,b="";for(var i=0;i<NE;i++){if(EL[i][0]==="A")continue;if(w[i]>m){m=w[i];b=EL[i];}}return b;}
+/* 帯域ノイズ（正弦波の和）。beta=1で1/f型 */
+function noise(g,f1,f2,rms,beta,K){K=K||18;beta=beta==null?1:beta;var w=W0(),cs=[],s=0,k,i;
+  for(k=0;k<K;k++){var f=f1*Math.pow(f2/f1,g.r()),a=Math.pow(f,-beta*.5);cs.push([f,a,g.r()*6.2832]);s+=a*a/2;}
+  var nrm=rms/Math.sqrt(s);
+  for(k=0;k<K;k++){var c=cs[k],om=6.2832*c[0]/FS,a2=c[1]*nrm,ph=c[2];for(i=0;i<NT;i++)w[i]+=a2*Math.sin(om*i+ph);}
+  return w;}
+function osc(g,t0,t1,fr,am,shape,ph0){var w=W0(),ph=ph0==null?g.r()*6.2832:ph0,i0=Math.max(0,tI(t0)),i1=Math.min(NT,tI(t1));
+  for(var i=i0;i<i1;i++){var t=i/FS-PRE;ph+=6.2832*fr(t)/FS;w[i]=am(t)*shape(ph);}return w;}
+function hann(t,a,b){return t<a||t>b?0:.5-.5*Math.cos(6.2832*(t-a)/(b-a));}
+function tuk(t,a,b,r){if(t<a||t>b)return 0;r=r||.15;var d=b-a,e=Math.min(r,d/2);if(t<a+e)return .5-.5*Math.cos(Math.PI*(t-a)/e);if(t>b-e)return .5-.5*Math.cos(Math.PI*(b-t)/e);return 1;}
+function smooth(a,sec){var n=Math.max(1,Math.round(sec*FS)),o=new Float32Array(a.length),s=0,q=[],i;
+  for(i=0;i<a.length;i++){s+=a[i];q.push(a[i]);if(q.length>n)s-=q.shift();o[i]=s/q.length;}return o;}
+/* 波形の部品 */
+var SHP={
+  sin:Math.sin,
+  arc:function(p){var s=Math.sin(p);return s>0?-1.25*Math.pow(s,2.2):.55*Math.pow(-s,.8);},        /* 陰性が尖るアーチ状（wicket・ミュー様） */
+  pos:function(p){var s=Math.sin(p);return Math.pow((1+s)/2,6)*1.9-.2;},                          /* 陽性に尖る櫛状（14&6 Hz陽性棘波） */
+  notch:function(p){return Math.sin(p)+.3*Math.sin(3*p)+.12*Math.sin(2*p);},                     /* ノッチのあるθ（RMTD） */
+  sharp:function(p){return Math.sin(p)+.32*Math.sin(2*p+1.2);}                                   /* やや鋭い律動 */
+};
+function bump(w,t0,dur,amp){var i0=tI(t0-dur/2),n=Math.max(2,Math.round(dur*FS));for(var k=0;k<=n;k++){var i=i0+k;if(i<0||i>=NT)continue;w[i]+=amp*(.5-.5*Math.cos(6.2832*k/n));}}
+function spk(w,t0,dur,amp){var r=dur*.4,f=dur*.6,i0=tI(t0-r),i1=tI(t0+f);
+  for(var i=i0;i<=i1;i++){if(i<0||i>=NT)continue;var t=i/FS-PRE-t0,v=t<0?.5-.5*Math.cos(Math.PI*(t+r)/r):.5+.5*Math.cos(Math.PI*t/f);w[i]+=amp*v;}}
+/* てんかん性放電：棘（amp<0で陰性）→小さな逆極性→同極性の後続徐波 */
+function ied(w,t,o){spk(w,t,o.dur,o.amp);bump(w,t+o.dur*.7,o.dur*.9,-o.amp*.2);if(o.aft)bump(w,t+o.dur*.6+o.aftDur/2+.02,o.aftDur,o.amp*o.aft);}
+function times(g,n,t0,t1,gap){var out=[],k=0;while(out.length<n&&k<600){k++;var t=g.U(t0,t1);if(out.every(function(x){return Math.abs(x-t)>=gap;}))out.push(t);}return out.sort(function(a,b){return a-b;});}
+/* 眼球運動：網膜側が陰性・角膜側が陽性。角膜が近づく電極が陽性 */
+var EYEV={Fp1:1,Fp2:1,F3:.22,F4:.22,Fz:.2,F7:.3,F8:.3,C3:.04,C4:.04,Cz:.03,T3:.05,T4:.05};
+var EYEH={F7:1,F8:-1,Fp1:.4,Fp2:-.4,T3:.35,T4:-.35,F3:.12,F4:-.12,A1:.15,A2:-.15,T5:.1,T6:-.1};
+function blink(g,t,amp){var w=W0();bump(w,t,g.U(.26,.4),amp);addW(g,w,wDict(EYEV));}
+function saccade(g,t,dur,amp){var w=W0(),e=.03;for(var i=tI(t-e);i<=tI(t+dur+e);i++){if(i<0||i>=NT)continue;var tt=i/FS-PRE;w[i]=amp*tuk(tt,t-e,t+dur+e,e);}addW(g,w,wDict(EYEH));}
+/* 心電図（ECGチャンネル）と脳波への混入 */
+function ecgSet(g,hr,artK){var w=W0(),rr=60/hr,t=-PRE+g.U(0,rr);
+  while(t<DUR+1){bump(w,t-.17,.09,100);spk(w,t-.025,.02,-120);spk(w,t,.04,1000);spk(w,t+.03,.035,-260);bump(w,t+.27,.18,220);t+=rr*(1+g.U(-.04,.04));}
+  for(var i=0;i<NT;i++)g.ecg[i]+=w[i];
+  if(artK)addW(g,w,wDict({A1:.02,A2:.008,T5:.014,T3:.01,O1:.004,P3:.004,F7:.006,T6:.004,T4:.003,C3:.003,O2:.002}),artK);
+  g.hr=hr;}
+/* ── 背景活動 ── */
+function srcNoise(g,n,f1,f2,rms,sig,beta){for(var k=0;k<n;k++){var c=[g.U(-.95,.95),g.U(-.95,.95)];addW(g,noise(g,f1,f2,rms*g.U(.7,1.2),beta==null?1:beta,16),wF(c,sig,.4));}}
+function localNoise(g,rms){for(var e=0;e<NE;e++){var w=noise(g,1,45,rms*(EL[e][0]==="A"?.6:1),.6,12),P=g.P[e];for(var i=0;i<NT;i++)P[i]+=w[i];}}
+function betaAct(g,rms){addW(g,noise(g,14,26,rms,0,10),wF([0,.35],.75,.3));}
+function alphaAct(g,o){var f=o.f,amp=o.amp,gate=o.gate,pm=g.U(1.4,3),pp=g.r()*6.28,fm=g.U(2.5,5),fp=g.r()*6.28,asym=o.asym||g.U(.85,1.1);
+  var fr=function(t){return f+.18*Math.sin(6.283*t/fm+fp);};
+  var am=function(t){var gv=1;if(gate){var i=tI(t);gv=gate[Math.max(0,Math.min(NT-1,i))];}return amp*(.62+.38*Math.sin(6.283*t/pm+pp))*gv;};
+  var ph=g.r()*6.28,wl=osc(g,-PRE,DUR,fr,am,Math.sin,ph),wr=osc(g,-PRE,DUR,fr,function(t){return am(t)*asym;},Math.sin,ph+g.U(.1,.4));
+  addW(g,wl,wF([-.3,-.95],.28,.3));addW(g,wr,wF([.3,-.95],.28,.3));}
+function bgAwake(g,o){o=o||{};srcNoise(g,7,1,25,o.child?6:3.2,.5);localNoise(g,1.5);betaAct(g,2.2);
+  if(!o.noAlpha)alphaAct(g,{f:o.af||g.U(9,10.8),amp:o.aa||g.U(15,26),gate:o.gate});
+  ecgSet(g,o.hr||g.U(58,86),o.ecgK==null?g.U(.06,.15):o.ecgK);}
+function bgDrowsy(g,o){o=o||{};srcNoise(g,7,2.5,7.5,o.th||7,.55,0);srcNoise(g,5,1,25,2.5,.5);localNoise(g,1.5);betaAct(g,2);
+  var gate=W0(),t=-PRE;while(t<DUR+1){var d=g.U(.5,2),on=g.r()<.3;for(var i=Math.max(0,tI(t));i<Math.min(NT,tI(t+d));i++)gate[i]=on?1:.12;t+=d;}
+  alphaAct(g,{f:g.U(8,9.2),amp:g.U(12,22),gate:smooth(gate,.2)});
+  if(o.roving!==false&&g.r()<.7){var a=g.U(20,40),f=g.U(.18,.32);addW(g,osc(g,-PRE,DUR,function(){return f;},function(){return a;},Math.sin),wDict(EYEH));}
+  ecgSet(g,o.hr||g.U(56,80),o.ecgK==null?g.U(.06,.15):o.ecgK);}
+function bgN2(g){srcNoise(g,8,.8,6,6.5,.6);srcNoise(g,4,1,25,2,.5);localNoise(g,1.4);ecgSet(g,g.U(52,72),g.U(.06,.14));}
+function bgICU(g,o){o=o||{};srcNoise(g,8,.5,3.5,o.d||g.U(10,16),.55);srcNoise(g,6,3.5,8,o.t||g.U(3,6),.5,0);localNoise(g,1.6);betaAct(g,1.2);
+  ecgSet(g,o.hr||g.U(70,105),o.ecgK==null?g.U(.08,.18):o.ecgK);}
+/* 筋電図：差分した白色雑音（高い周波数を強調） */
+function emgAt(g,names,t0,t1,rms,env){names.forEach(function(n){var w=W0(),prev=0,i0=Math.max(0,tI(t0)),i1=Math.min(NT,tI(t1));
+  for(var i=i0;i<i1;i++){var x=gauss(g);w[i]=(x-prev)*rms*.7*(env?env(i/FS-PRE):1);prev=x;}addW(g,w,one(n));});}
+/* 周期性放電の1個 */
+function pdDis(w,t,A,D){spk(w,t,D,-A);bump(w,t+D*.5+.07,.15,A*.42);bump(w,t+D+.2,.22,-A*.18);}
+
+/* ── フィルタと導出 ── */
+function filt(src,tc,hff){var o=new Float32Array(NT),i,m=0;for(i=0;i<NT;i++)m+=src[i];m/=NT;
+  var a=tc/(tc+1/FS),y=0,xp=src[0]-m;for(i=0;i<NT;i++){var x=src[i]-m;y=a*(y+x-xp);xp=x;o[i]=y;}
+  if(hff){var al=(1/FS)/(1/(6.2832*hff)+1/FS);y=o[0];for(i=0;i<NT;i++){y+=al*(o[i]-y);o[i]=y;}}
+  return o;}
+function Rec(g){this.raw=g.P;this.ecgRaw=g.ecg;this.cache={};}
+Rec.prototype.get=function(tc,hff){var k=tc+"|"+hff;if(this.cache[k])return this.cache[k];
+  var o={P:this.raw.map(function(a){return filt(a,tc,hff);}),ecg:filt(this.ecgRaw,tc,hff)};this.cache[k]=o;return o;};
+var MONT={
+  bip:{name:"縦の双極導出（ACNS LB-18.1）",ch:[["Fp1","F7"],["F7","T3"],["T3","T5"],["T5","O1"],["Fp2","F8"],["F8","T4"],["T4","T6"],["T6","O2"],["Fp1","F3"],["F3","C3"],["C3","P3"],["P3","O1"],["Fp2","F4"],["F4","C4"],["C4","P4"],["P4","O2"],["Fz","Cz"],["Cz","Pz"]],grp:[0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4]},
+  ref:{name:"基準導出（同側耳朶）",ch:[["Fp1","A1"],["Fp2","A2"],["F3","A1"],["F4","A2"],["C3","A1"],["C4","A2"],["P3","A1"],["P4","A2"],["O1","A1"],["O2","A2"],["F7","A1"],["F8","A2"],["T3","A1"],["T4","A2"],["T5","A1"],["T6","A2"],["Fz","Ae"],["Cz","Ae"],["Pz","Ae"]],grp:[0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2]}
+};
+var VIEWN={all:"全チャンネル",tmp:"側頭部のみ",par:"傍矢状部のみ",L:"左半球",R:"右半球"};
+var TEMPB={Fp1:1,F7:1,T3:1,T5:1,O1:1,Fp2:1,F8:1,T4:1,T6:1,O2:1};
+var PARB={Fp1:1,F3:1,C3:1,P3:1,O1:1,Fp2:1,F4:1,C4:1,P4:1,O2:1,Fz:1,Cz:1,Pz:1};
+var LATT={F7:1,T3:1,T5:1,F8:1,T4:1,T6:1};
+function sideOf(n){var c=n.charAt(n.length-1);if(c==="z")return "z";return (+c)%2?"L":"R";}
+function inView(m,v,c){if(v==="all")return true;
+  if(v==="tmp")return m==="bip"?(TEMPB[c[0]]&&TEMPB[c[1]]):!!LATT[c[0]];
+  if(v==="par")return m==="bip"?(PARB[c[0]]&&PARB[c[1]]):!LATT[c[0]];
+  var s=sideOf(c[0]);return s==="z"||s===v;}
+function chans(m,v){var M=MONT[m],out=[];M.ch.forEach(function(c,i){if(inView(m,v,c))out.push({lab:c[0]+"-"+(c[1]==="Ae"?"A":c[1]),a:c[0],b:c[1],grp:M.grp[i]});});return out;}
+
+/* ===== 出題パターン =====
+   grp：norm 正常・正常亜型／art アーチファクト／ep てんかん性／icu ICU脳波
+   mean：臨床的な意味（MEANのキー。複数あればどれも正解）
+   chk：acns＝ACNS 2021で照合、ifcn＝IFCN用語集2017で照合、gen＝成書・総説の一般的記載（数値は未照合）
+   gen(g)：模式波形を作り、今回の特徴（detail）・注目部位（focus）・状態（state）を返す。{S}は病巣側 */
+var MEAN={
+  norm:{s:"正",t:"正常・正常亜型",d:"病的意義はない（てんかんの根拠にしない）"},
+  art:{s:"ア",t:"アーチファクト",d:"脳由来ではない"},
+  epi:{s:"危",t:"発作の危険が高い所見",d:"てんかん性放電、または発作の起こりやすさを示す"},
+  sz:{s:"発",t:"発作そのもの",d:"電気的発作（ESz）。治療の対象"},
+  path:{s:"態",t:"病態を示す所見",d:"脳症・脳機能低下・鎮静などを示す。単独では発作の危険を大きく上げない"}
+};
+var MKEYS=["norm","art","epi","sz","path"];
+var GRPN={norm:"正常・正常亜型",art:"アーチファクト",ep:"てんかん性の所見",icu:"ICU脳波（ACNS 2021）"};
+var MODES={nv:{n:"正常亜型・アーチファクト",g:["norm","art"]},ep:{n:"てんかん性の所見",g:["ep"]},icu:{n:"ICU脳波",g:["icu"]}};
+var SIDEJ={L:"左",R:"右"};
+var CHK={
+  acns:"用語と判定基準：ACNS Standardized Critical Care EEG Terminology 2021 で照合（周波数・振幅などの例示値は模式）",
+  ifcn:"用語の定義：IFCN用語集（2017年改訂）で照合。その他の数値は成書・総説の一般的な目安（未照合）",
+  gen:"特徴は成書・総説の一般的な記載による（数値は未照合の目安）"
+};
+var FOCI=[
+  {e:["F7","T3"],l:"前〜中側頭部（F7・T3）"},{e:["T3"],l:"中側頭部（T3）"},{e:["C3","T3"],l:"中心側頭部（C3・T3）",child:1},
+  {e:["F3"],l:"前頭部（F3）"},{e:["T5"],l:"後側頭部（T5）"},{e:["C3"],l:"中心部（C3）"}];
+function focalIED(g,kind){
+  var f=g.pick(FOCI),s=g.side(),child=!!f.child,dr=g.r()<.4;
+  var es=s==="L"?f.e:f.e.map(mirror);
+  if(dr)bgDrowsy(g,{});else bgAwake(g,{child:child,af:child?g.U(8,9.5):null,aa:child?g.U(25,40):null});
+  var w=wAt(es,g.U(.3,.38),.3),n=g.I(3,6),A=g.U(70,140)*(child?1.5:1);
+  var D=kind==="sharp"?g.U(.09,.15):kind==="sw"?g.U(.045,.065):g.U(.035,.06);
+  var aft=kind==="spike"?g.U(0,.22):kind==="sharp"?g.U(.2,.45):g.U(.9,1.25);
+  var wave=W0();
+  times(g,n,.4,9.4,kind==="sw"?1.2:.9).forEach(function(t){ied(wave,t,{dur:D*g.U(.9,1.1),amp:-A*g.U(.8,1.15),aft:aft,aftDur:kind==="sw"?g.U(.22,.32):g.U(.15,.22)});});
+  addW(g,wave,w);
+  var mx=maxEl(w),lab=SIDEJ[s]+f.l.replace(/（.*）/,"")+"（"+es.join("・")+"）";
+  return {side:s,child:child,state:dr?"眠気":"覚醒",awake:!dr,focus:lab,mx:mx,n:n,D:D,aft:aft,A:A,lab:lab,
+    vig:child?["9歳。睡眠中に顔の片側がぴくつく発作があった。","8歳。寝入りばなに口がゆがみ、話せなくなる発作を2回起こした。"]:["38歳。意識が遠のき、口をもぐもぐさせる発作を繰り返す。","52歳。半年前から短い意識減損発作がある。","27歳。初めての全身けいれんの後。"]};
+}
+var PATS=[
+/* ───── 正常・正常亜型 ───── */
+{id:"n_pdr",grp:"norm",lvl:1,name:"後頭部優位律動（α律動）",en:"posterior dominant rhythm（PDR）／alpha rhythm",mean:["norm"],chk:"ifcn",
+ sig:"後頭部優位の8〜13 Hzの律動。閉眼で現れ、開眼で抑制される",
+ key:{dist:"O1・O2を中心に、頭頂部（P3・P4）・後側頭部（T5・T6）まで。左右の振幅差は50%未満",freq:"8〜13 Hz（成人は多くが9〜11 Hz）。8 Hz未満なら背景の徐波化",morph:"正弦波様で、漸増・漸減（waxing and waning）する",occur:"安静閉眼の覚醒時に連続する。開眼・注意で抑制され、眠気で断片化して消える"},
+ conf:[["ミュー律動","中心部（C3・C4）のアーチ状の7〜11 Hz。開眼では抑制されず、対側の手を動かすと抑制される"],["α昏睡","昏睡で、びまん性（前頭部優位のことも）にα帯域の律動が出て、刺激に反応しない。反応性の有無で区別する"],["wicket棘波","眠気時の中側頭部のアーチ状波。後頭部ではなく、開眼とは関係しない"]],
+ clin:"正常。周波数（8 Hz未満は徐波化）、左右差（振幅で50%以上は異常）、反応性（一側だけ開眼で抑制されない場合は同側の機能低下）を見る。",
+ near:["n_wicket","a_eye","n_rmtd","n_spindle","n_tslow"],
+ vig:["34歳。頭痛の精査。安静閉眼で記録。","28歳。失神の精査。安静閉眼で記録し、途中で開眼を指示した。","45歳。めまいの精査。安静閉眼。"],
+ gen:function(g){var f=g.U(9,10.8),a=g.U(20,32),open=g.r()<.75,to=g.U(3,5),tc=to+g.U(2,3.4),env=W0(),i;
+  for(i=0;i<NT;i++){var t=i/FS-PRE;env[i]=(open&&t>to&&t<tc)?.06:1;}
+  bgAwake(g,{af:f,aa:a,gate:smooth(env,.15)});
+  if(open){blink(g,to+.02,g.U(120,170));blink(g,tc-.05,g.U(110,160));}
+  return {focus:"後頭部（O1・O2）",state:"覚醒（安静閉眼）",awake:false,detail:[f.toFixed(1)+" Hz、振幅 約"+Math.round(a*2)+" µV（頂点間）。O1・O2に最大で、P3・P4・T5・T6まで広がる",open?("開眼（"+to.toFixed(1)+"秒）で抑制され、閉眼（"+tc.toFixed(1)+"秒）で再び出る＝反応性あり。開閉眼の瞬間の前頭極の振れは眼球運動"):"閉眼のまま連続し、漸増・漸減している"]};}},
+{id:"n_vertex",grp:"norm",lvl:1,name:"頭蓋頂鋭波（瘤波）",en:"vertex sharp transient（V wave）",mean:["norm"],chk:"gen",
+ sig:"眠気〜睡眠1・2期に、Cz中心で左右対称に出る陰性の鋭い一過波",
+ key:{dist:"Cz最大で左右対称（Fz・C3・C4へ広がる）。双極導出ではFz-CzとCz-Pzで向きが逆になる（Czで位相逆転）",freq:"単発、または数秒おきに反復（周期性はない）",morph:"陰性主体の二相性で、持続は150〜250 ms前後。小児ほど高く鋭い",occur:"入眠期〜睡眠2期。覚醒で消える。背景はα律動が消えてθが増えている"},
+ conf:[["正中部の棘波・鋭波","左右差がある、覚醒時にも出る、後続徐波を伴う、背景から浮き立つ。瘤波は眠気に一致し左右対称"],["K複合","より大きく長い（0.5秒以上）。陰性に続く陽性の徐波があり、紡錘波を伴いやすい"],["GPD","ICUで周期的に反復し、睡眠段階と関係しない"]],
+ clin:"正常の睡眠波で、入眠期〜睡眠2期の目印になる。",
+ near:["e_sharp","n_kc","e_spike","i_gpd"],
+ vig:["41歳。頭痛の精査。記録中にうとうとし始めた。","33歳。失神の精査。睡眠賦活のために部屋を暗くした。"],
+ gen:function(g){bgDrowsy(g,{th:8});var n=g.I(3,6),A=g.U(70,140),D=g.U(.12,.18);
+  times(g,n,.4,9.5,1.1).forEach(function(t){var w=W0(),a=A*g.U(.8,1.15);bump(w,t-D*.75,.07,a*.2);spk(w,t,D,-a);bump(w,t+D*.9,.22,a*.32);addW(g,w,wF([0,.03],.42,.25));});
+  return {focus:"頭頂部の正中（Cz）",state:"眠気〜睡眠1期",detail:[n+"個。Cz最大で左右対称（振幅 約"+Math.round(A)+" µV）","後頭部のα律動が消え、θが増えている（眠気）","双極導出ではFz-CzとCz-Pzで向きが逆になる（Czで位相逆転）"]};}},
+{id:"n_spindle",grp:"norm",lvl:1,name:"睡眠紡錘波",en:"sleep spindle",mean:["norm"],chk:"gen",
+ sig:"睡眠2期の12〜14 Hz前後、0.5〜2秒の紡錘形の律動（中心部優位）",
+ key:{dist:"中心部（C3・Cz・C4）〜前頭部優位で、左右同期",freq:"11〜15 Hz（多くは12〜14 Hz）",morph:"漸増・漸減する紡錘形。振幅は20〜50 µV程度",occur:"睡眠2期に数秒〜十数秒おき。K複合に続くことがある。覚醒で消える"},
+ conf:[["BIRDs","ICUで、4 Hzを超える律動が0.5秒以上10秒未満。限局性で鋭く、evolutionを伴うことがある。睡眠段階に一致し左右対称の紡錘形なら紡錘波"],["筋電図","20 Hz以上で不規則。側頭・前頭の局所の電極だけに出て、紡錘形にならない"],["薬物性速波","ベンゾジアゼピンなどで前頭部優位のβが持続する。紡錘形の群発ではない"]],
+ clin:"正常の睡眠波で、睡眠2期の目印になる。昏睡で紡錘波が出る場合（spindle coma）は別の解釈が要る。",
+ near:["i_birds","a_emg","n_vertex","n_kc"],
+ vig:["46歳。睡眠時の異常行動の精査。眠っている。","39歳。睡眠賦活。静かに眠っている。"],
+ gen:function(g){bgN2(g);var n=g.I(2,4),f=g.U(12,14);
+  times(g,n,.6,9,2).forEach(function(t){var d=g.U(.6,1.4),a=g.U(22,45),ff=f+g.U(-.4,.4);addW(g,osc(g,t,t+d,function(){return ff;},function(tt){return a*hann(tt,t,t+d);},Math.sin),wF([0,.12],.55,.3));});
+  return {focus:"中心部（C3・Cz・C4）",state:"睡眠2期",detail:[n+"回、"+f.toFixed(1)+" Hz前後、0.6〜1.4秒の紡錘形","中心部優位で左右同期","背景はθ〜δが主体（睡眠）"]};}},
+{id:"n_kc",grp:"norm",lvl:2,name:"K複合",en:"K complex",mean:["norm"],chk:"gen",
+ sig:"睡眠2期の大きな二相性波（鋭い陰性成分→陽性の徐波）。0.5秒以上、前頭中心部優位",
+ key:{dist:"前頭〜中心部（Fz・Cz）優位で、左右対称の広い分布",freq:"単発。自然に、または音などの刺激で出る",morph:"鋭い陰性波に大きな陽性の徐波が続く。全体で0.5秒以上、振幅は100 µVを超えることが多い",occur:"睡眠2期。紡錘波が後に続くことが多い"},
+ conf:[["頭蓋頂鋭波","小さく短い（0.5秒未満）。入眠期から出る"],["全般性の鋭徐波・GPD","覚醒時にも出る、周期的に反復する、鋭い成分がより短く尖る"],["刺激による覚醒反応","覚醒すると後頭部のα律動が戻る"]],
+ clin:"正常の睡眠波。",
+ near:["n_vertex","i_gpd","e_sw","e_3hz"],
+ vig:["52歳。睡眠時無呼吸の疑い。眠っている。","44歳。睡眠賦活。廊下の物音がした。"],
+ gen:function(g){bgN2(g);var n=g.I(1,3),A=g.U(100,170),sp=0;
+  times(g,n,.6,8,2.8).forEach(function(t){var w=W0(),a=A*g.U(.85,1.1);bump(w,t-.08,.08,a*.15);spk(w,t,g.U(.18,.25),-a);bump(w,t+.32,g.U(.45,.6),a*.75);addW(g,w,wF([0,.3],.62,.3));
+   if(g.r()<.6){sp++;var t2=t+.75,d=g.U(.6,1);addW(g,osc(g,t2,t2+d,function(){return 13;},function(tt){return 28*hann(tt,t2,t2+d);},Math.sin),wF([0,.12],.55,.3));}});
+  return {focus:"前頭〜中心部（Fz・Cz）",state:"睡眠2期",detail:[n+"個。鋭い陰性→大きな陽性の徐波で、全体で0.5秒以上（振幅 約"+Math.round(A)+" µV）","前頭中心部優位で左右対称",sp?"後に紡錘波が続いている（"+sp+"回）":"背景はθ〜δが主体（睡眠）"]};}},
+{id:"n_wicket",grp:"norm",lvl:3,name:"wicket棘波（wicket律動）",en:"wicket spikes／wicket rhythm",mean:["norm"],chk:"gen",
+ sig:"中高年の眠気時に、中側頭部に出るアーチ状の6〜11 Hzの律動・単発波。後続徐波を伴わない",
+ key:{dist:"中側頭部（T3・T4、F7・F8）。一側、または両側に独立して出る",freq:"6〜11 Hzの連発（群発）、またはその中の単発",morph:"ミュー律動に似たアーチ状（陰性側が尖り、陽性側が丸い）。後続徐波を伴わず、背景を乱さない",occur:"眠気〜浅い睡眠。50歳以上に多い"},
+ conf:[["側頭部の棘波・鋭波","後続徐波を伴う、背景から浮き立つ、周囲の背景を乱す。同じ形の律動の一部として出るならwicket"],["RMTD","5〜7 Hzのノッチのあるθ律動が数秒以上続く"],["small sharp spikes","低振幅の単発で、律動（連発）にならない"]],
+ clin:"正常亜型。側頭部の棘波と読み過ぎないことが大切で、てんかんの誤診の原因として多い。",
+ near:["e_spike","n_rmtd","n_sss","e_sharp"],
+ vig:["63歳。一過性の健忘の精査。記録の後半はうとうとしている。","71歳。失神の精査。眠気がある。","58歳。めまいの精査。うとうとしている。"],
+ gen:function(g){bgDrowsy(g,{});var s=g.side(),bi=g.r()<.3,f=g.U(7,10),A=g.U(30,55),nt=g.I(1,3),ns=g.I(1,2);
+  function c(sd){return [sd==="L"?-.93:.93,.22];}
+  times(g,nt,.3,8.3,1.8).forEach(function(t,k){var sd=bi&&k%2?(s==="L"?"R":"L"):s,d=g.U(.5,1.5),ff=f+g.U(-.5,.5);
+   addW(g,osc(g,t,t+d,function(){return ff;},function(tt){return A*(.5+.5*hann(tt,t,t+d));},SHP.arc,0),wF(c(sd),.3,.3));});
+  times(g,ns,.5,9.3,1).forEach(function(t){addW(g,osc(g,t,t+1/f,function(){return f;},function(){return A*.9;},SHP.arc,0),wF(c(s),.3,.3));});
+  var lab=SIDEJ[s]+"中側頭部（"+(s==="L"?"T3・F7":"T4・F8")+"）";
+  return {side:s,focus:lab+(bi?"と反対側":""),state:"眠気",detail:[lab+(bi?"に出て、反対側にも独立して出る":"に出る"),f.toFixed(1)+" Hz前後のアーチ状の連発（"+nt+"回）と単発（"+ns+"回）","後続徐波がなく、周囲の背景を乱さない"]};}},
+{id:"n_146",grp:"norm",lvl:3,name:"14 & 6 Hz陽性棘波",en:"14 and 6 Hz positive spikes（ctenoids）",mean:["norm"],chk:"gen",
+ sig:"思春期〜若年者の眠気・浅睡眠で、後側頭部に陽性の櫛状の群発（14 Hzまたは6 Hz）",
+ key:{dist:"後側頭部（T5・T6）とその周囲。広い分布で、左右独立または両側。電極間距離の長い基準導出で目立つ",freq:"14 Hz前後、または6 Hz前後の0.5〜1秒の群発",morph:"陽性に尖り、陰性側は丸い櫛（くし）状。基準導出で下向きに尖る",occur:"眠気〜浅い睡眠。思春期〜若年成人に多い"},
+ conf:[["後側頭部の棘波","陰性（上向き）に尖り、後続徐波を伴う。陽性の棘は病的意義が乏しい"],["睡眠紡錘波","中心部優位で、上下対称の紡錘形"],["wicket棘波","陰性側が尖るアーチ状で、中側頭部、中高年"]],
+ clin:"正常亜型。過去に自律神経症状などとの関連が言われたが、病的意義はないとされる。",
+ near:["e_spike","n_spindle","n_wicket","n_sss"],
+ vig:["16歳。起立時のふらつきの精査。眠気がある。","19歳。失神の精査。浅く眠っている。"],
+ gen:function(g){bgDrowsy(g,{});var f=g.r()<.7?g.U(13.5,14.5):g.U(6,7),A=g.U(30,55),nb=g.I(2,3),s=g.side();
+  times(g,nb,.4,8.8,1.8).forEach(function(t,k){var d=g.U(.5,1),sd=k%2&&g.r()<.6?(s==="L"?"R":"L"):s;addW(g,osc(g,t,t+d,function(){return f;},function(tt){return A*hann(tt,t,t+d);},SHP.pos),wF(POS[sd==="L"?"T5":"T6"],.42,.35));});
+  return {side:s,focus:"後側頭部（T5・T6）",state:"眠気〜浅い睡眠",detail:[f.toFixed(1)+" Hzの陽性（下向き）に尖る櫛状の群発、"+nb+"回","後側頭部（T5・T6）に最大で、分布が広い（基準導出で見やすい）"]};}},
+{id:"n_sss",grp:"norm",lvl:3,name:"small sharp spikes（良性睡眠時一過性てんかん様波形）",label:"small sharp spikes（BETS）",en:"small sharp spikes／benign epileptiform transients of sleep",mean:["norm"],chk:"gen",
+ sig:"成人の眠気・浅睡眠に出る、低振幅（50 µV未満）で短い（50 ms未満）単発の小棘波。徐波はほぼない",
+ key:{dist:"側頭〜前頭部に広く、左右で出る側が入れ替わる（両側独立）",freq:"単発。群発・反復しない",morph:"単相〜二相性の小さく短い棘。後続徐波はないか小さく、背景を乱さない",occur:"眠気〜浅い睡眠だけ。深睡眠で消える（てんかん性放電は深睡眠で増える）"},
+ conf:[["棘波（てんかん性）","振幅が高く背景から浮き立つ、後続徐波を伴う、同じ焦点に繰り返す、覚醒時にも出る"],["wicket棘波","6〜11 Hzの律動の一部として出る"],["電極ポップ","1つの電極だけで、電場（周囲への広がり）がない"]],
+ clin:"正常亜型。てんかんの根拠にしない。",
+ near:["e_spike","n_wicket","a_pop","n_146"],
+ vig:["35歳。1回だけの全身けいれんの後。うとうとしている。","48歳。失神の精査。眠気がある。"],
+ gen:function(g){bgDrowsy(g,{});var n=g.I(3,6),sides=[];
+  times(g,n,.4,9.5,1).forEach(function(t){var s=g.side(),w=W0(),a=g.U(25,42),d=g.U(.035,.05);sides.push(s);spk(w,t,d,-a);spk(w,t+d*.8,d*1.1,a*.55);addW(g,w,wF([s==="L"?-.9:.9,.2],.6,.35));});
+  var nl=sides.filter(function(x){return x==="L";}).length;
+  return {focus:"側頭部（左右）",state:"眠気",detail:[n+"個の低振幅（50 µV未満）・短い（50 ms未満）単発の小棘","左"+nl+"個・右"+(n-nl)+"個と、出る側が入れ替わる。分布は広い","後続徐波はほとんどなく、背景を乱さない"]};}},
+{id:"n_rmtd",grp:"norm",lvl:3,name:"RMTD（眠気時の律動性中側頭部θ）",label:"RMTD（律動性中側頭部θ）",en:"rhythmic mid-temporal theta of drowsiness（psychomotor variant）",mean:["norm"],chk:"gen",
+ sig:"眠気時に中側頭部に出る5〜7 Hzのノッチのあるθ律動。周波数が一定で、evolutionがない",
+ key:{dist:"中側頭部（T3・T4）。一側、または両側（左右が入れ替わる）",freq:"5〜7 Hzで一定。数秒〜10秒程度の群発",morph:"平らな頂点やノッチのある、単調なθ波",occur:"眠気。青年〜成人。臨床症状を伴わない"},
+ conf:[["側頭葉発作の発作時脳波","周波数・振幅・分布が変化（evolution）し、発作後に抑制や徐波が出る。臨床症状を伴うことが多い"],["BIRDs","ICUで10秒未満の4 Hzを超える鋭い律動。evolutionや同じ部位のてんかん性放電を伴う"],["眠気時の側頭部徐波","不規則で散発し、律動にならない"]],
+ clin:"正常亜型。発作と読み過ぎない。",
+ near:["i_esz_ev","i_birds","n_tslow","n_wicket"],
+ vig:["31歳。浮動感の精査。うとうとしている。","24歳。失神の精査。眠気がある。"],
+ gen:function(g){bgDrowsy(g,{});var s=g.side(),bi=g.r()<.25,t0=g.U(1,3),d=g.U(3,6.5),f=g.U(5,6.5),A=g.U(20,36);
+  var am=function(tt){return A*tuk(tt,t0,t0+d,.4);},ph=g.r()*6.28;
+  addW(g,osc(g,t0,t0+d,function(){return f;},am,SHP.notch,ph),wF([s==="L"?-.95:.95,.05],.3,.3));
+  if(bi)addW(g,osc(g,t0+.3,t0+d,function(){return f;},function(tt){return am(tt)*.7;},SHP.notch,ph+1),wF([s==="L"?.95:-.95,.05],.33,.3));
+  var lab=SIDEJ[s]+"中側頭部（"+(s==="L"?"T3":"T4")+"）";
+  return {side:s,focus:lab,state:"眠気",detail:[lab+(bi?"と反対側":"")+"に"+d.toFixed(1)+"秒","周波数 "+f.toFixed(1)+" Hzで始めから終わりまで一定（evolutionなし）","ノッチのある単調なθ。終了後に抑制や徐波はない"]};}},
+{id:"n_tslow",grp:"norm",lvl:2,name:"眠気時の側頭部の徐波（高齢者）",label:"眠気時の側頭部徐波（加齢性）",en:"temporal slowing of drowsiness／of the elderly",mean:["norm"],chk:"gen",
+ sig:"高齢者の眠気時に側頭部（左優位）に出る散発性のθ〜δ波。覚醒時に少なければ年齢相応",
+ key:{dist:"前〜中側頭部（F7・T3）、左優位が多い",freq:"2〜6 Hz前後の不規則な波が散発する",morph:"多形性で律動にならない。棘波を伴わない",occur:"眠気で増え、覚醒・開眼で減る。記録のごく一部"},
+ conf:[["LRDA","ICUで1〜4 Hzの規則的な律動が6周期以上続く。発作の危険が高い"],["持続性多形性δ活動（PPDA）","覚醒時も持続し、刺激で抑制されない局在性のδ。局在性の器質病変を示す"],["RMTD","5〜7 Hzの規則的な律動"]],
+ clin:"加齢・眠気に伴う所見として許容されることが多い。覚醒時に持続する、量が多い、高振幅、δ優位なら局在性の機能障害（器質病変）を考える。",
+ near:["i_lrda","n_rmtd","n_wicket","a_sweat"],
+ vig:["76歳。物忘れの精査。記録の途中からうとうとしている。","81歳。一過性の意識消失の精査。眠気がある。"],
+ gen:function(g){bgDrowsy(g,{});var s=g.r()<.8?"L":"R",nb=g.I(2,4),A=g.U(30,55),wv=W0();
+  times(g,nb,.3,9,1.5).forEach(function(t){var d=g.U(.6,1.3),nz=noise(g,2,5.5,A,0,8);for(var i=Math.max(0,tI(t));i<Math.min(NT,tI(t+d));i++)wv[i]+=nz[i]*tuk(i/FS-PRE,t,t+d,.2);});
+  addW(g,wv,wF([s==="L"?-.92:.92,.3],.36,.3));
+  var lab=SIDEJ[s]+"前〜中側頭部（"+(s==="L"?"F7・T3":"F8・T4")+"）";
+  return {side:s,focus:lab,state:"眠気",detail:[lab+"に不規則なθ〜δが"+nb+"回、散発","律動にならず、棘波を伴わない"]};}},
+/* ───── アーチファクト ───── */
+{id:"a_eye",grp:"art",lvl:1,name:"眼球運動（瞬目・側方視）",en:"eye movement artifact（blink／lateral eye movement）",mean:["art"],chk:"gen",
+ sig:"前頭極（Fp1・Fp2）の陽性の振れ（瞬目・上転）、F7とF8で逆位相の振れ（側方視）",
+ key:{dist:"瞬目：Fp1・Fp2に最大で、後方へ急に小さくなる。側方視：F7とF8が逆位相（見た側の電極が陽性）",freq:"不規則（瞬目は0.2〜0.4秒の単発）",morph:"滑らかな単発の振れ。陽性なので、双極導出のFp1-F3・Fp1-F7では下向き",occur:"覚醒・開眼時。眠気では緩徐な側方の眼球運動（roving eye movement）"},
+ conf:[["前頭部優位の律動性δ（GRDA）","律動的に反復し、F3・F4・C3・C4まで広がる。迷えば眼の周りに電極を付けて逆位相かを見る"],["前頭部の鋭波","持続が短く尖り、電場がF3・F7にも広がる"],["発汗","さらに遅い（0.5 Hz未満）不規則な基線の揺れ"]],
+ clin:"アーチファクト。眼球は網膜側が陰性・角膜側が陽性の双極子で、角膜が近づいた電極が陽性になる。",
+ near:["i_grda","a_sweat","e_sharp","n_tslow"],
+ vig:["29歳。頭痛の精査。開眼で記録。","55歳。めまいの精査。落ち着かず、目を動かしている。"],
+ gen:function(g){var v=g.pick(["blink","blink","lat","mix"]),det=[];bgAwake(g,{aa:g.U(5,10)});
+  if(v!=="lat"){var nb=g.I(3,6);times(g,nb,.4,9.5,.9).forEach(function(t){blink(g,t,g.U(110,210));});det.push("瞬目 "+nb+"回：Fp1・Fp2に最大の陽性の振れ（双極導出のFp1-F3などで下向き）。F3・C3へ急に小さくなる");}
+  if(v!=="blink"){var ns=g.I(2,3);times(g,ns,.5,8,2.2).forEach(function(t){saccade(g,t,g.U(.6,1.5),g.U(60,110)*(g.r()<.5?1:-1));});det.push("側方視 "+ns+"回：F7とF8が逆向きに振れる（見た側の電極が陽性）。振れが続く間、時定数で減衰する");}
+  det.push("後頭部のα律動は開眼で抑制されている");
+  return {focus:"前頭極（Fp1・Fp2）と前側頭部（F7・F8）",state:"覚醒（開眼）",detail:det};}},
+{id:"a_emg",grp:"art",lvl:1,name:"筋電図（筋活動）",en:"muscle（EMG）artifact",mean:["art"],chk:"gen",
+ sig:"側頭部・前頭部の電極に限局する、20 Hz以上の不規則で尖った速い活動",
+ key:{dist:"側頭筋（F7・F8・T3・T4）や前頭筋（Fp1・Fp2）の上。正中部・頭頂部には少ない",freq:"20 Hz以上（脳波では尖った速い波の集まりに見える）",morph:"不規則で、1つ1つが極めて短い棘。高域フィルタで小さくなる",occur:"噛みしめ・咀嚼（律動的な群発）・会話・緊張。睡眠で消える"},
+ conf:[["多棘波・多棘徐波","電場があり、徐波を伴い、全般性で左右同期"],["BIRDs・発作の速波（+F）","律動的で周波数がそろい、evolutionを示すことがある"],["棘波","単発で、周囲の電極に広がる電場がある"]],
+ clin:"アーチファクト。高域フィルタを強くかけると棘波のように見えることがあるので注意する。",
+ near:["e_psw","i_birds","e_spike","i_plus"],
+ vig:["42歳。頭痛の精査。緊張している様子。","67歳。記録中に何度も口を動かしている。"],
+ gen:function(g){var v=g.pick(["burst","chew","front"]),det=[];bgAwake(g,{});
+  if(v==="burst"){var s=g.r()<.4?"B":g.side(),els=s==="L"?["F7","T3","T5"]:s==="R"?["F8","T4","T6"]:["F7","T3","F8","T4"],nb=g.I(1,3);
+   times(g,nb,.3,8,2.6).forEach(function(t){var d=g.U(.8,2.3),r=g.U(15,35);emgAt(g,els,t,t+d,r,function(tt){return tuk(tt,t,t+d,.2);});});
+   det.push((s==="B"?"両側":SIDEJ[s])+"の側頭部の電極（"+els.join("・")+"）に"+nb+"回の群発。電極ごとにばらばらで電場がない");}
+  else if(v==="chew"){var t0=g.U(1,4),d=g.U(3,5),iv=g.U(.65,.9),r=g.U(18,32),n=0;for(var t=t0;t<t0+d;t+=iv){(function(tt){emgAt(g,["F7","T3","F8","T4"],tt,tt+.28,r,function(x){return tuk(x,tt,tt+.28,.06);});})(t);n++;}
+   det.push("両側の側頭部に、約"+(1/iv).toFixed(1)+"回/秒の律動的な群発が"+n+"回（咀嚼）");}
+  else{var r2=g.U(7,14);emgAt(g,["Fp1","Fp2","F7","F8"],-PRE,DUR,r2,function(tt){return .6+.4*Math.sin(tt*1.3);});det.push("前頭極・前側頭部（Fp1・Fp2・F7・F8）に持続する低振幅の速い活動（前頭筋）");}
+  det.push("高域フィルタを30 Hzにすると小さくなる（表示の設定で試せる）");
+  return {focus:"側頭部・前頭部",state:"覚醒",detail:det};}},
+{id:"a_pop",grp:"art",lvl:2,name:"電極ポップ",en:"electrode pop artifact",mean:["art"],chk:"gen",
+ sig:"1つの電極だけに出る、急峻な立ち上がりと緩やかな減衰の振れ。電場がない",
+ key:{dist:"1電極に限局。双極導出ではその電極を含む2チャンネルだけが逆向きに振れ、基準導出では1チャンネルだけ",freq:"不規則に単発",morph:"垂直に近い立ち上がりと、指数関数的な減衰",occur:"電極の接触不良（ペーストの乾燥など）"},
+ conf:[["棘波・鋭波","隣の電極にも広がる電場があり、立ち上がりも脳波としてありうる速さ"],["心電図","心拍に一致して規則的"],["small sharp spikes","広い分布をもつ小棘"]],
+ clin:"アーチファクト。技師に電極の付け直しを依頼する。",
+ near:["e_spike","e_sharp","a_ecg","n_sss"],
+ vig:["60歳。長時間記録の後半。","48歳。発汗が多い。記録開始から40分。"],
+ gen:function(g){bgAwake(g,{});var e=g.pick(["T3","T4","F8","O1","C4","P3","T5","F3"]),n=g.I(2,4),sg=g.r()<.5?1:-1,tau=g.U(.15,.45),w=W0();
+  times(g,n,.5,9,1.5).forEach(function(t){var a=g.U(100,220)*sg,i0=tI(t);for(var i=i0;i<NT;i++){var dt=(i-i0)/FS;w[i]+=a*Math.exp(-dt/tau);if(dt>4*tau+.3)break;}});
+  addW(g,w,one(e));
+  return {focus:e+"（1電極）",state:"覚醒",detail:[e+"の1電極だけに"+n+"回（周囲の電極には広がらない）","双極導出では"+e+"を含む2つのチャンネルが互いに逆向きに振れる。基準導出では"+e+"の1チャンネルだけ","垂直に近い立ち上がりと、指数関数的な減衰"]};}},
+{id:"a_ecg",grp:"art",lvl:1,name:"心電図アーチファクト",en:"ECG artifact",mean:["art"],chk:"gen",
+ sig:"心電図のQRSに一致して規則的に出る鋭い振れ。耳朶基準・左側で目立つ",
+ key:{dist:"左側（T3・T5）や耳朶（A1）を含む導出で目立つ。基準導出では耳朶への混入で多くのチャンネルに出る",freq:"心拍に一致（0.6〜1.2秒ごと）",morph:"QRSに一致した短い鋭い振れで、形がそろう",occur:"記録全体を通じて。肥満・短頸の人で目立つ"},
+ conf:[["周期性放電（LPD・GPD）","ECGと時刻が一致しない。形や間隔がわずかに変動し、電場が脳の領域に沿う"],["棘波","不規則に出て、ECGと一致しない"],["脈波","QRSから200 ms前後遅れる緩やかな振れで、血管の上の1電極に出る"]],
+ clin:"アーチファクト。ECGチャンネルと時刻が一致するかで確かめる。",
+ near:["i_lpd","i_gpd","e_spike","a_pop"],
+ vig:["70歳。意識消失の精査。体格が大きい。","63歳。頭部外傷後。仰臥位で記録。"],
+ gen:function(g){var hr=g.U(58,92);bgAwake(g,{ecgK:g.U(2.4,3.4),hr:hr});
+  return {focus:"ECGチャンネルと左側頭部",state:"覚醒",detail:["心拍 約"+Math.round(hr)+"/分。ECGチャンネルのQRSと同じ時刻に出る","左側頭部（T3・T5）で目立ち、基準導出では-A1の多くのチャンネルに出る（耳朶への混入）"]};}},
+{id:"a_sweat",grp:"art",lvl:2,name:"発汗（皮膚電位）アーチファクト",label:"発汗アーチファクト",en:"sweat artifact",mean:["art"],chk:"gen",
+ sig:"0.5 Hz未満の非常にゆっくりした大きな基線の揺れ。前頭部・側頭部に多い",
+ key:{dist:"発汗しやすい前頭部・側頭部の複数の電極。隣同士でも位相がそろわない",freq:"0.1〜0.5 Hz（2〜10秒周期）",morph:"大きくゆっくりうねる基線。時定数を短くすると小さくなる",occur:"暑い部屋・発熱・長時間の記録"},
+ conf:[["δ活動（GRDA・LRDA）","1 Hz以上で、隣接電極に連続した電場をもつ"],["眼球運動","Fp・F7・F8に限局し、眼の動きに一致する"],["呼吸・体動","呼吸の周期に一致し、全体的"]],
+ clin:"アーチファクト。室温を下げる・汗を拭く・時定数を短くして読む。",
+ near:["i_grda","a_eye","i_lrda","n_tslow"],
+ vig:["38歳。発熱で入院中。室温が高い。","50歳。長時間記録の後半。"],
+ gen:function(g){bgAwake(g,{});var front=g.r()<.5,els=front?["Fp1","Fp2","F7","F8","F3","F4"]:["F7","T3","T5","F8","T4","T6"],cf=g.U(.15,.35),A=g.U(40,85);
+  els.forEach(function(e){var fe=cf*g.U(.75,1.25),ae=A*g.U(.6,1.2),w=osc(g,-PRE,DUR,function(){return fe;},function(){return ae;},Math.sin),nz=noise(g,.08,.5,ae*.35,0,4);for(var i=0;i<NT;i++)w[i]+=nz[i];addW(g,w,one(e));});
+  return {focus:front?"前頭部":"側頭部",state:"覚醒",detail:[(front?"前頭部":"側頭部")+"の電極（"+els.join("・")+"）に、約"+(1/cf).toFixed(0)+"秒周期のゆっくりした揺れ","隣り合う電極でも位相がそろわない","時定数を0.1秒にすると小さくなる（表示の設定で試せる）"]};}},
+/* ───── てんかん性の所見 ───── */
+{id:"e_spike",grp:"ep",lvl:1,name:"棘波",en:"spike",mean:["epi"],chk:"ifcn",aed:1,
+ sig:"持続20〜70 msの尖った陰性の波。背景から浮き立ち、周囲へ広がる電場をもつ",
+ key:{dist:"焦点の電極を中心に周囲へ広がる電場（双極導出で位相逆転、基準導出で最大振幅）",freq:"単発、または散発に反復",morph:"持続20〜70 ms。立ち上がりが立ち下がりより急峻なことが多い。陰性。後続徐波は小さい（目立てば棘徐波複合）",occur:"覚醒・睡眠（眠気〜浅睡眠で増える）。同じ焦点に繰り返す"},
+ conf:[["wicket棘波","眠気時の中側頭部で、6〜11 Hzの律動の一部として出る。後続徐波がなく、背景を乱さない"],["small sharp spikes","50 µV未満・50 ms未満の小棘で、左右に入れ替わる。深睡眠で消える"],["電極ポップ","1電極だけで電場がない"],["鋭波","持続70〜200 ms。臨床的な意味は同じ"]],
+ clin:"てんかん性放電（発作間欠期）。部位が症候群の手がかりになる（前〜中側頭部＝側頭葉てんかん、小児の中心側頭部の高振幅棘波＝中心側頭部棘波を示す自然終息性てんかん〈SeLECTS〉など）。",
+ tx:"てんかんの診断は臨床（発作の病歴）で行い、脳波は裏づけに使う。焦点てんかんならレベチラセタム（イーケプラ）、ラモトリギン（ラミクタール）、ラコサミド（ビムパット）などから、年齢・併存症・妊娠の可能性に合わせて選ぶ。",
+ near:["e_sharp","e_sw","n_wicket","n_sss","a_pop"],
+ gen:function(g){var o=focalIED(g,"spike");return {side:o.side,focus:o.focus,state:o.state,awake:o.awake,vig:o.vig,detail:[o.lab+"（最大："+o.mx+"）に"+o.n+"回","持続 約"+Math.round(o.D*1000)+" ms（20〜70 ms＝棘波）",o.aft<.12?"後続徐波はほとんどない":"小さな後続徐波を伴う","双極導出では"+o.mx+"を挟む2チャンネルが逆向き（位相逆転）"]};}},
+{id:"e_sharp",grp:"ep",lvl:2,name:"鋭波",en:"sharp wave",mean:["epi"],chk:"ifcn",aed:1,
+ sig:"持続70〜200 msの尖った陰性の波。意味は棘波と同じ",
+ key:{dist:"焦点の電極を中心に周囲へ広がる電場",freq:"単発、または散発に反復",morph:"持続70〜200 ms。尖った頂点をもち、後続徐波を伴うことがある",occur:"覚醒・睡眠。同じ焦点に繰り返す"},
+ conf:[["棘波","持続20〜70 ms。臨床的な意味は同じ"],["頭蓋頂鋭波","眠気時に、Czに左右対称"],["wicket棘波","律動の一部として出て、後続徐波がない"],["眼球運動（側方視）","F7とF8が逆位相で、滑らかな振れ"]],
+ clin:"てんかん性放電。棘波と区別する臨床的意味は小さく、焦点の部位と出現量が大切。",
+ tx:"棘波と同じ。焦点てんかんならレベチラセタム（イーケプラ）、ラモトリギン（ラミクタール）、ラコサミド（ビムパット）などから選ぶ。",
+ near:["e_spike","n_vertex","n_wicket","a_eye","e_sw"],
+ gen:function(g){var o=focalIED(g,"sharp");return {side:o.side,focus:o.focus,state:o.state,awake:o.awake,vig:o.vig,detail:[o.lab+"（最大："+o.mx+"）に"+o.n+"回","持続 約"+Math.round(o.D*1000)+" ms（70〜200 ms＝鋭波）","後続徐波を伴う（棘波の約"+Math.round(o.aft*100)+"%の振幅）","双極導出では"+o.mx+"を挟む2チャンネルが逆向き（位相逆転）"]};}},
+{id:"e_sw",grp:"ep",lvl:2,name:"棘徐波複合（焦点性）",en:"spike-and-slow-wave complex（focal）",mean:["epi"],chk:"ifcn",aed:1,
+ sig:"棘波の直後に、同じ部位で大きな徐波（200〜500 ms）が続く複合",
+ key:{dist:"焦点性（一側の限局した電場）。全般性なら3 Hz棘徐波・多棘徐波を考える",freq:"散発",morph:"棘波（20〜70 ms）に陰性の徐波が続く。徐波は棘波と同程度以上の振幅",occur:"覚醒・睡眠"},
+ conf:[["棘波","後続徐波が目立たない"],["3 Hz棘徐波","両側同期・前頭部優位で、3 Hz前後で連続して反復する"],["頭蓋頂鋭波・K複合","睡眠中にCz・Fzに左右対称"]],
+ clin:"てんかん性放電。後続徐波はてんかん性を支持する所見。",
+ tx:"焦点てんかんならレベチラセタム（イーケプラ）、ラモトリギン（ラミクタール）、ラコサミド（ビムパット）などから選ぶ。",
+ near:["e_spike","e_sharp","e_3hz","n_kc"],
+ gen:function(g){var o=focalIED(g,"sw");return {side:o.side,focus:o.focus,state:o.state,awake:o.awake,vig:o.vig,detail:[o.lab+"（最大："+o.mx+"）に"+o.n+"回","棘波（約"+Math.round(o.D*1000)+" ms）の直後に、同じ部位で棘波と同程度以上の徐波（200〜300 ms）が続く","双極導出では"+o.mx+"を挟む2チャンネルが逆向き（位相逆転）"]};}},
+{id:"e_3hz",grp:"ep",lvl:1,name:"3 Hz棘徐波（全般性）",en:"3 Hz spike-and-wave",mean:["epi"],chk:"gen",aed:1,sens:20,
+ sig:"両側同期・前頭部優位の3 Hz前後の棘徐波の連続。欠神発作の脳波",
+ key:{dist:"全般性で両側同期・対称、前頭〜正中部（Fz）優位",freq:"開始時は3〜4 Hz、終わりに2.5 Hz前後へ遅くなる",morph:"小さな棘波と大きな徐波の規則的な反復。振幅は200 µVを超えることが多い",occur:"数秒の群発。過呼吸で誘発されやすい。数秒以上続くと意識減損（欠神）を伴いやすい"},
+ conf:[["多棘徐波","3.5〜6 Hz前後で不規則で、1つの複合に複数の棘がある"],["GPD","ICUで、放電の間に間隔があり周期的"],["GRDA","棘を伴わない律動性δ"],["遅棘徐波（2.5 Hz未満）","Lennox-Gastaut症候群などで、不規則"]],
+ clin:"全般てんかん（小児欠神てんかんなど）を示す。群発中に呼びかけへの反応を確かめる（欠神発作そのものか）。",
+ tx:"エトスクシミド（ザロンチン）、バルプロ酸（デパケン・セレニカR）、ラモトリギン（ラミクタール）。カルバマゼピン（テグレトール）・フェニトイン（アレビアチン）は欠神を悪化させうる。妊娠可能年齢の女性ではバルプロ酸を避ける。",
+ near:["e_psw","i_gpd","i_grda","e_sw"],
+ vig:["8歳。授業中にぼんやりして返事をしないことがある。過呼吸の途中。","7歳。1日に何度も動作が止まる。過呼吸を始めて90秒。"],
+ gen:function(g){bgAwake(g,{child:true,af:g.U(8,9.5),aa:g.U(25,40)});var t0=g.U(1.5,4),dur=g.U(2.6,4.5),A=g.U(180,300),f0=g.U(3.3,3.8),f1=g.U(2.6,3),wv=W0(),t=t0,k=0;
+  while(t<t0+dur){var fr=f0+(f1-f0)*(t-t0)/dur,cyc=1/fr,a=A*Math.min(1,(t-t0)/.4+.5)*g.U(.92,1.05);spk(wv,t,.06,-a*.38);bump(wv,t+.045,.06,a*.12);bump(wv,t+cyc*.5,cyc*.62,-a);t+=cyc;k++;}
+  addW(g,wv,wGen(g,.42,.45,.12));
+  return {focus:"全般性（前頭部優位）",state:"覚醒（過呼吸中）",awake:true,detail:["約"+dur.toFixed(1)+"秒の群発（"+k+"個）","開始時 約"+f0.toFixed(1)+" Hz → 終わりに約"+f1.toFixed(1)+" Hzへ遅くなる","両側同期・対称で、Fz・F3・F4に最大（振幅 約"+Math.round(A)+" µV）"]};}},
+{id:"e_psw",grp:"ep",lvl:2,name:"多棘徐波（全般性）",en:"polyspike-and-wave",mean:["epi"],chk:"gen",aed:1,sens:15,
+ sig:"複数の棘波に徐波が続く複合が、3.5〜6 Hz前後で不規則に群発する（全般性）",
+ key:{dist:"全般性・両側同期で、前頭中心部優位",freq:"3.5〜6 Hz前後で不規則。1〜数秒の群発",morph:"2〜数個の棘波（多棘）に徐波が続く",occur:"覚醒直後・睡眠不足・光刺激で誘発されやすい"},
+ conf:[["3 Hz棘徐波","3 Hz前後で規則的で、棘は1つ"],["筋電図","電場がなく局所の電極だけで、徐波を伴わない"],["GPD","周期的で、放電の間に間隔がある"]],
+ clin:"全般てんかん（若年ミオクロニーてんかんなど）を示す。ミオクロニー発作に一致することがある。",
+ tx:"バルプロ酸（デパケン・セレニカR）、レベチラセタム（イーケプラ）。ラモトリギン（ラミクタール）はミオクロニーを悪化させることがある。カルバマゼピン（テグレトール）は悪化させうる。妊娠可能年齢の女性ではバルプロ酸を避ける。",
+ near:["e_3hz","a_emg","i_gpd","e_hyps"],
+ vig:["17歳。朝に手がぴくっとして物を落とす。睡眠不足の翌朝に記録。","20歳。徹夜明けに全身けいれんを起こした。"],
+ gen:function(g){bgAwake(g,{});var nb=g.I(1,2),A=g.U(130,230),wv=W0(),tot=0,sd=0;
+  times(g,nb,1,7.5,2.5).forEach(function(t0){var dur=g.U(.8,2),t=t0;sd+=dur;while(t<t0+dur){var ns=g.I(2,4),a=A*g.U(.8,1.1),sp=g.U(.04,.05);for(var s=0;s<ns;s++)spk(wv,t+s*sp,.032,-a*g.U(.55,1));var te=t+ns*sp;bump(wv,te+.08,g.U(.13,.17),-a*.8);t=te+g.U(.1,.16);tot++;}});
+  addW(g,wv,wGen(g,.3,.5,.12));
+  return {focus:"全般性（前頭中心部優位）",state:"覚醒",awake:true,detail:[nb+"回の群発、計"+tot+"個の複合（平均 約"+(tot/sd).toFixed(1)+" Hz、不規則）","1つの複合に2〜4個の棘波があり、徐波が続く","両側同期・対称で前頭中心部に最大"]};}},
+{id:"e_hyps",grp:"ep",lvl:2,name:"ヒプスアリスミア",en:"hypsarrhythmia",mean:["epi"],chk:"gen",aed:1,sens:30,
+ sig:"乳児で、高振幅（200 µV超）の不規則な徐波と多焦点の棘波が混在し、背景の組織化がない",
+ key:{dist:"びまん性だが、左右・前後で非同期（多焦点）",freq:"不規則なδ・θ。律動はない",morph:"高振幅の徐波に、多焦点の棘波・鋭波が混じる混沌とした波形",occur:"乳児。睡眠で断片化（群発状）しやすい。てんかん性スパズムの時は電位が減衰する"},
+ conf:[["burst suppression","群発の間に平坦（抑制）期がある"],["多棘徐波・3 Hz棘徐波","全般性に同期した規則的な反復"],["正常乳児の高振幅徐波","棘波を伴わず、組織化された背景がある"]],
+ clin:"てんかん性脳症（West症候群・乳児てんかん性スパズム症候群）を示す。早く治療を始めることが発達の予後に関わる。",
+ tx:"ACTH（テトラコサクチド：コートロシンZ）、ビガバトリン（サブリル：結節性硬化症で特に）。小児神経の専門医と連携する。",
+ near:["i_bs","e_psw","e_3hz","a_emg"],
+ vig:["7か月。発達が止まり、目覚めに短い発作を繰り返す。","5か月。数日前から、まとまって出る短い発作がある。"],
+ gen:function(g){var i;for(i=0;i<7;i++){addW(g,noise(g,.5,3.5,g.U(70,110),1,14),wF([g.U(-.9,.9),g.U(-.9,.9)],.45,.3));}
+  srcNoise(g,5,3,7,25,.45,0);localNoise(g,4);var ns=g.I(14,24),ELS=["Fp1","Fp2","F3","F4","F7","F8","C3","C4","T3","T4","T5","T6","P3","P4","O1","O2"],seen={};
+  for(i=0;i<ns;i++){var e=g.pick(ELS),w=W0();seen[e]=1;ied(w,g.U(.2,9.8),{dur:g.U(.04,.09),amp:-g.U(100,250),aft:g.U(0,.5),aftDur:.2});addW(g,w,wF(POS[e],.3,.3));}
+  ecgSet(g,g.U(110,140),.1);
+  return {focus:"全体（多焦点）",state:"乳児・覚醒〜睡眠",detail:["高振幅（200〜400 µV前後）の不規則なδ・θが左右・前後で非同期","多焦点の棘波・鋭波（"+Object.keys(seen).length+"か所から計"+ns+"個）","後頭部優位律動などの組織化された背景がない（感度30 µV/mmで表示）"]};}},
+/* ───── ICU脳波 ───── */
+{id:"i_lpd",grp:"icu",lvl:1,name:"LPD（一側性周期性放電）",label:"LPD",en:"lateralized periodic discharges",mean:["epi"],chk:"acns",aed:1,
+ sig:"一側の半球に、ほぼ一定の間隔で反復する鋭い放電（放電の間に間隔がある）",
+ key:{dist:"一側（または両側だが一側優位・一側が先行）。限局〜半球性",freq:"0.5〜2 Hz前後が多い。間隔の変動は50%未満",morph:"二相〜三相の鋭い放電（持続0.5秒未満）。放電の間に背景活動がある",occur:"6周期以上反復し、持続する。急性の大脳病変（脳卒中・脳炎・腫瘍）や、陳旧病変に全身状態の悪化が加わった時に出る"},
+ conf:[["心電図アーチファクト","ECGと時刻が一致する"],["GPD","両側同期・対称"],["LRDA","放電の間に間隔がなく、律動的な徐波が連続する"],["電気的発作","2.5 Hzを超える、またはevolutionがある"]],
+ clin:"ICU脳波で発作の危険が最も高いパターン（周波数によらず発作と関連し、plusがあるとさらに高い：Rodriguez Ruiz 2017）。1 Hzを超えればIIC（発作間欠期-発作期連続体）に当たる。",
+ tx:"持続脳波（24〜48時間以上）で臨床発作・電気的発作を探す。LPDだけなら必ずしも治療しないが、IIC（1 Hz超・plus・変動）や臨床症状の疑いがあれば、鎮静しにくい抗発作薬（レベチラセタム〈イーケプラ〉、ラコサミド〈ビムパット〉）を試すことを検討する。",
+ near:["i_gpd","i_lrda","a_ecg","i_esz_ne","i_plus"],
+ vig:["74歳。{S}中大脳動脈領域の脳梗塞3日目に意識レベルが低下した。","58歳。発熱と意識障害で入院（脳炎の疑い）。","81歳。{S}慢性硬膜下血腫の術後、反応が乏しい。"],
+ gen:function(g){var s=g.side(),reg=g.pick([["F3","C3","T3"],["C3","P3","T3"],["F7","T3","C3"],["T3","T5","P3"]]);if(s==="R")reg=reg.map(mirror);
+  bgICU(g,{});var f=g.U(.6,2),A=g.U(80,180),D=g.U(.07,.13),w=wAt(reg,g.U(.5,.62),.3),wv=W0(),t=-PRE+g.U(0,1/f),n=0;
+  while(t<DUR){pdDis(wv,t,A*g.U(.85,1.1),D*g.U(.9,1.1));if(t>=0)n++;t+=1/f*(1+g.U(-.1,.1));}
+  addW(g,wv,w);var fr=n/DUR;
+  return {side:s,focus:SIDEJ[s]+"半球（"+reg.join("・")+"）",state:"ICU・意識障害",detail:[SIDEJ[s]+"半球（"+reg.join("・")+"、最大："+maxEl(w)+"）","約"+fr.toFixed(1)+" Hz（10秒に"+n+"個）で、間隔はほぼ一定","持続 約"+Math.round(D*1000)+" msの鋭い二相〜三相の放電。放電の間に背景活動がある",fr>1?"1 Hzを超えるので、IICの基準（1.0 Hz超〜2.5 Hz）にも当たる":"1 Hz以下で、plusや変動がないのでIICには当たらない"]};}},
+{id:"i_gpd",grp:"icu",lvl:1,name:"GPD（全般性周期性放電）",label:"GPD",en:"generalized periodic discharges",mean:["epi"],chk:"acns",aed:1,
+ sig:"両側同期・対称の放電が、ほぼ一定の間隔で反復する（放電の間に間隔がある）",
+ key:{dist:"全般性（両側同期・対称）。前頭部優位が多い",freq:"0.5〜2.5 Hz（この問題では1.5 Hz以上）",morph:"鋭い二相性〜多相性の放電。三相性の形なら「三相性の形態」と付記する",occur:"持続する。低酸素脳症・代謝性脳症・敗血症・薬剤（セフェピムなど）・非けいれん性てんかん重積（NCSE）"},
+ conf:[["GPD（三相波様の形態）","鈍い三相性（陰-陽-陰で陽性相が最大）で、前から後ろへ遅れる"],["LPD","一側優位"],["3 Hz棘徐波","覚醒した小児の数秒の群発で、間隔なく連続する"],["心電図","ECGに一致する"]],
+ clin:"発作と関連し、1.5 Hz以上やplusで危険が上がる（Rodriguez Ruiz 2017）。1 Hzを超えるのでIICにも当たる。",
+ tx:"持続脳波で発作を探す。NCSEとの区別に迷う時はベンゾジアゼピンの試験投与（脳波と臨床の両方が改善すればNCSE）。原因（低酸素・代謝・薬剤）を確認する。",
+ near:["i_tw","i_lpd","e_3hz","a_ecg","i_esz_ne"],
+ vig:["69歳。敗血症で人工呼吸管理中。鎮静を切っても覚醒しない。","55歳。心停止から蘇生して2日目。","77歳。腎機能低下があり、抗菌薬の投与中に意識が低下した。"],
+ gen:function(g){bgICU(g,{});var f=g.U(1.5,2.4),A=g.U(100,180),D=g.U(.06,.1),wv=W0(),t=-PRE+g.U(0,1/f),n=0;
+  while(t<DUR){spk(wv,t,D,-A*g.U(.85,1.1));bump(wv,t+D*.5+.06,.12,A*.5);if(t>=0)n++;t+=1/f*(1+g.U(-.08,.08));}
+  addW(g,wv,wGen(g,.4,.55,.2));
+  return {focus:"全般性（前頭部優位）",state:"ICU・意識障害",detail:["両側同期・対称で前頭部優位","約"+(n/DUR).toFixed(1)+" Hz（10秒に"+n+"個）で、放電の間に間隔がある","持続 約"+Math.round(D*1000)+" msの鋭い二相性の放電で、前後の時間差はない","1.0 Hz超〜2.5 HzなのでIICに当たる"]};}},
+{id:"i_tw",grp:"icu",lvl:2,name:"GPD（三相波様の形態）",label:"GPD（三相波様の形態）",en:"GPDs with triphasic morphology（いわゆる三相波）",mean:["path","epi"],chk:"acns",aed:1,
+ sig:"前頭部優位の鈍い三相性（陰-陽-陰、陽性相が最大）の全般性周期性放電。前から後ろへ遅れる",
+ key:{dist:"全般性で前頭部優位。前頭から後頭へ少し遅れて出る（前後の時間差）",freq:"1.5〜2.5 Hz前後",morph:"鈍い。小さな陰性→最大の陽性→ゆるやかな陰性の3相で、後の相ほど長い（ACNS 2021の三相性の形態）",occur:"代謝性脳症（肝・腎・敗血症）、薬剤（セフェピム、リチウムなど）で多い"},
+ conf:[["GPD（鋭い形）","鋭く尖り（70 ms未満の棘を含む）、前後の時間差がない"],["GRDA","放電の間に間隔のない、正弦波様の律動性δ"],["3 Hz棘徐波","覚醒した小児の短い群発"]],
+ clin:"代謝性・中毒性の脳症を示すことが多い（病態を示す所見）。ただし形だけではNCSEと区別できず、1 Hzを超えるのでIICにも当たる（発作の危険も否定できない）。ACNS 2021では「三相波」は独立した用語ではなく、PD・SWの修飾語「三相性の形態」として扱う。",
+ tx:"原因（アンモニア・腎機能・Na・Ca・薬剤）を確認する。NCSEと区別できない時はベンゾジアゼピンの試験投与を考える（脳波と臨床の両方が改善すればNCSEを支持。脳波だけ改善して意識が戻らなければNCSEとは言えない）。",
+ near:["i_gpd","i_grda","e_3hz","i_lpd"],
+ vig:["72歳。肝硬変があり、2日前から傾眠。","80歳。腎不全があり、抗菌薬の投与中に意識が低下した。","66歳。敗血症の治療中にせん妄から傾眠になった。"],
+ gen:function(g){bgICU(g,{d:g.U(8,13)});var f=g.U(1.5,2.2),A=g.U(60,120),lag=g.U(.04,.1),ts=[],t=-PRE+g.U(0,1/f),n=0;
+  while(t<DUR){ts.push([t,A*g.U(.85,1.1)]);if(t>=0)n++;t+=1/f*(1+g.U(-.08,.08));}
+  var w=wGen(g,.5,.55,.2);for(var e=0;e<NE;e++){var P=g.P[e],dl=lag*(.95-POS[EL[e]][1])/1.9,wv=W0();ts.forEach(function(x){var tt=x[0]+dl,a=x[1];bump(wv,tt,.07,-a*.3);bump(wv,tt+.085,.13,a);bump(wv,tt+.23,.24,-a*.55);});for(var i=0;i<NT;i++)P[i]+=wv[i]*w[e];}
+  return {focus:"全般性（前頭部優位）",state:"ICU・意識障害",detail:["約"+(n/DUR).toFixed(1)+" Hzの全般性周期性放電","鈍い三相性（小さな陰性→最大の陽性→ゆるやかな陰性）","前頭部（Fp）から後頭部（O）へ約"+Math.round(lag*1000)+" ms遅れて出る（前後の時間差）"]};}},
+{id:"i_lrda",grp:"icu",lvl:2,name:"LRDA（一側性律動性δ活動）",label:"LRDA",en:"lateralized rhythmic delta activity",mean:["epi"],chk:"acns",aed:1,
+ sig:"一側に、間隔なく連続する規則的なδ（0.5〜4 Hz）の律動",
+ key:{dist:"一側（側頭部・前頭部が多い）",freq:"1〜2.5 Hz前後で規則的（周期の変動は50%未満）",morph:"単調な正弦波様のδ。鋭い波が重なれば+S",occur:"6周期以上。数秒〜持続"},
+ conf:[["LPD","放電の間に間隔がある"],["持続性多形性δ活動（PPDA）","不規則で多形性。RDAには含めない"],["眠気時の側頭部徐波","散発的で律動にならない"],["GRDA","両側同期・対称で、発作の危険は増えない"]],
+ clin:"発作と強く関連し、LPDに近い意味をもつ（1.5 Hz以上やplusで危険が上がる：Rodriguez Ruiz 2017）。1 Hzを超えてplusか変動があればIIC。",
+ tx:"持続脳波で発作を探す。臨床症状が疑わしい、またはIICに当たれば、抗発作薬（レベチラセタム〈イーケプラ〉、ラコサミド〈ビムパット〉）の試験投与を検討する。",
+ near:["i_grda","i_lpd","n_tslow","a_sweat","i_plus"],
+ vig:["64歳。{S}側頭葉の皮質下出血。発症翌日から意識が変動する。","52歳。{S}側頭葉の腫瘍の術後、反応が鈍い。"],
+ gen:function(g){var s=g.side();bgICU(g,{});var c=g.pick([["T3"],["F7","T3"],["F3","F7"]]);if(s==="R")c=c.map(mirror);
+  var f=g.U(1,2.3),A=g.U(35,65),ph=g.r()*6.28,fm=g.U(3,6);
+  addW(g,osc(g,-PRE,DUR,function(t){return f*(1+.03*Math.sin(t/fm*6.28));},function(t){return A*(.85+.15*Math.sin(t*.9));},SHP.sharp,ph),wAt(c,.45,.3));
+  return {side:s,focus:SIDEJ[s]+"（"+c.join("・")+"）",state:"ICU・意識障害",detail:[SIDEJ[s]+"側（"+c.join("・")+"）に限局","約"+f.toFixed(1)+" Hzの規則的なδが、間隔なく10秒間続く","形は単調（鋭い波・速波の重なりはない＝plusなし）"]};}},
+{id:"i_grda",grp:"icu",lvl:1,name:"GRDA（全般性律動性δ活動）",label:"GRDA",en:"generalized rhythmic delta activity（前頭部優位＝いわゆるFIRDA）",mean:["path"],chk:"acns",
+ sig:"両側同期・対称の律動性δ（多くは前頭部優位）。間欠的に群発する",
+ key:{dist:"全般性で前頭部優位（いわゆるFIRDA）。小児では後頭部優位のことがある",freq:"1.5〜2.5 Hz前後で規則的",morph:"正弦波様で鈍い。棘を伴わない",occur:"間欠的な群発。開眼・刺激で抑制されることが多い"},
+ conf:[["眼球運動（瞬目）","Fp1・Fp2に限局し、後方へ急に小さくなる"],["LRDA","一側性で、発作の危険が高い"],["3 Hz棘徐波","棘を伴い、覚醒した小児の数秒の群発"],["GPD（三相波様）","間隔のある周期性の放電"]],
+ clin:"発作の危険は増えない（Rodriguez Ruiz 2017）。代謝性・中毒性脳症、びまん性の脳機能障害、深部病変などで出る非特異的な所見。",
+ tx:"抗発作薬の適応にはならない。脳症の原因を探す。",
+ near:["i_lrda","a_eye","e_3hz","i_tw"],
+ vig:["78歳。尿路感染症で入院後、せん妄が続く。","66歳。高度の低ナトリウム血症で傾眠。","59歳。水頭症で傾眠。"],
+ gen:function(g){bgICU(g,{d:g.U(7,11)});var cont=g.r()<.3,f=g.U(1.6,2.5),A=g.U(60,130),wv=W0(),segs=[];
+  if(cont)segs=[[-PRE,DUR]];else times(g,g.I(2,3),0,6.5,3.6).forEach(function(t){segs.push([t,t+g.U(2.5,3.4)]);});
+  segs.forEach(function(sg){var w=osc(g,sg[0],sg[1],function(){return f;},function(t){return A*tuk(t,sg[0],sg[1],.35);},Math.sin);for(var i=0;i<NT;i++)wv[i]+=w[i];});
+  addW(g,wv,wGen(g,.55,.5,.15));
+  return {focus:"全般性（前頭部優位）",state:"ICU・意識障害",detail:[cont?"10秒間連続":"2.5〜3.4秒の群発が"+segs.length+"回（間欠的）","約"+f.toFixed(1)+" Hzの正弦波様の律動性δ。棘を伴わない","両側同期・対称で前頭部に最大"]};}},
+{id:"i_birds",grp:"icu",lvl:3,name:"BIRDs（短時間の潜在的発作性律動放電）",label:"BIRDs",en:"brief potentially ictal rhythmic discharges",mean:["epi"],chk:"acns",aed:1,
+ sig:"4 Hzを超える律動（6波以上）が0.5秒以上10秒未満だけ出る。限局性・鋭い形・evolution",
+ key:{dist:"限局性（病変部位に一致することが多い）、または全般性",freq:"4 Hz超（θ〜α帯域が多い）で、6波以上",morph:"鋭い律動。evolutionあり＝確実（definite）、同じ患者のてんかん性放電・発作と同じ形・部位＝確実、鋭いだけ＝可能性（possible）",occur:"0.5秒以上10秒未満。正常亜型、burst suppressionの群発、明らかな臨床症状を伴うものは除く"},
+ conf:[["睡眠紡錘波","中心部に左右対称、紡錘形、睡眠2期"],["電気的発作","10秒以上続く"],["筋電図","20 Hz超で不規則、局所の電極だけ"],["RMTD","眠気時の健常者で、5〜7 Hzの単調な律動。鋭くない"]],
+ clin:"発作の危険が高い（ICUでBIRDsのある患者の75%に電気的発作：Yoo 2014）。発作の前ぶれになりうる。",
+ tx:"持続脳波を続けて発作を探す。抗発作薬（レベチラセタム〈イーケプラ〉など）の開始を検討する（2HELPS2BでもBIRDsは高い点数）。",
+ near:["n_spindle","i_esz_ev","a_emg","n_rmtd","i_lrda"],
+ vig:["61歳。{S}前頭葉の脳挫傷。鎮静を浅くして持続脳波。","73歳。{S}頭頂葉の脳出血の2日後。"],
+ gen:function(g){var s=g.side();bgICU(g,{});var c=g.pick([["T3"],["F7"],["C3"],["F3"],["P3"]]);if(s==="R")c=c.map(mirror);
+  var v=g.pick(["ev","loc","pos"]),w=wAt(c,.35,.3),nr=g.I(1,2),f=g.U(5,7.5),A=g.U(25,45),runs=[];
+  times(g,nr,.5,6.5,3.2).forEach(function(t){var d=v==="ev"?g.U(2.2,3):g.U(6/f+.2,2.4),fr=v==="ev"?function(tt){return f+.75*Math.min(2,Math.floor((tt-t)/(d/3)));}:function(){return f;};
+   runs.push(d);addW(g,osc(g,t,t+d,fr,function(tt){return A*tuk(tt,t,t+d,.15)*(v==="ev"?.7+.3*(tt-t)/d:1);},SHP.sharp),w);});
+  if(v==="loc"){var wv=W0();times(g,g.I(2,3),.3,9.7,1).forEach(function(t){ied(wv,t,{dur:.09,amp:-A*1.3,aft:.3,aftDur:.18});});addW(g,wv,w);}
+  var vt=v==="ev"?"evolutionあり（約"+f.toFixed(1)+"→"+(f+1.5).toFixed(1)+" Hz、0.5 Hz以上ずつ2回速くなる）＝確実なBIRDs":v==="loc"?"同じ部位に鋭波もある（同じ形・部位）＝確実なBIRDs":"鋭い形だがevolution・同部位のてんかん性放電はない＝可能性のあるBIRDs（possible）";
+  return {side:s,focus:SIDEJ[s]+"（"+c.join("・")+"）",state:"ICU・意識障害",detail:[SIDEJ[s]+"側（"+c.join("・")+"）に限局","約"+f.toFixed(1)+" Hzの鋭い律動が"+runs.map(function(d){return d.toFixed(1)+"秒";}).join("・")+"（0.5秒以上10秒未満、6波以上）",vt]};}},
+{id:"i_bs",grp:"icu",lvl:1,name:"burst suppression（群発・抑制交代）",label:"burst suppression",en:"burst-suppression",mean:["path"],chk:"acns",
+ sig:"高振幅の群発（0.5秒以上・4相以上）と、10 µV未満の抑制期が交互に出る。抑制が記録の50〜99%",
+ key:{dist:"全般性（左右ほぼ同期）",freq:"群発の間隔は数秒で不規則",morph:"群発は徐波・鋭波の混在。抑制期は10 µV未満（10 µV以上で背景の50%未満なら burst attenuation）",occur:"深い鎮静（プロポフォール・ミダゾラム・バルビツレートなど）、低体温、重い脳障害（心停止後など）"},
+ conf:[["ヒプスアリスミア","乳児で、抑制期がなく連続する高振幅の不規則波"],["GPD","放電は短く（0.5秒未満）、間に背景活動がある"],["電極ポップ","1電極に限局する"]],
+ clin:"病態を示す所見：鎮静薬の効果か、重い脳障害。鎮静がないのに心停止後に出れば予後不良の所見の一つ（群発が毎回同じ形〈identical bursts〉なら特に）。",
+ tx:"鎮静薬・体温・時期（心停止後の早い時期か）を確認して解釈する。難治性てんかん重積でburst suppressionを治療目標にしている場合は、目標の抑制の程度を確認する。",
+ near:["e_hyps","i_gpd","a_pop","i_esz_ne"],
+ vig:["57歳。心停止から蘇生し、体温管理療法の後。鎮静薬は終了している。","45歳。難治性てんかん重積でミダゾラム（ミダフレッサ）持続静注中。","62歳。プロポフォールで深く鎮静中。"],
+ gen:function(g){localNoise(g,1.1);srcNoise(g,3,1,20,1.2,.5);ecgSet(g,g.U(60,95),g.U(.15,.3));
+  var idn=g.r()<.3,tmpl=null,t=-PRE+g.U(0,2),supp=0,nb=0,wv=W0(),A=g.U(80,170);
+  function mk(len){var seg=new Float32Array(len),k,j,fs=[[g.U(.8,2),g.U(.5,1)],[g.U(2,4),g.U(.3,.6)],[g.U(5,8),g.U(.15,.3)]],ph=[g.r()*6.3,g.r()*6.3,g.r()*6.3];
+   for(k=0;k<len;k++){var tt=k/FS,v=0;for(j=0;j<3;j++)v+=fs[j][1]*Math.sin(6.283*fs[j][0]*tt+ph[j]);seg[k]=A*v*tuk(tt,0,len/FS,.12);}
+   for(j=0;j<g.I(1,3);j++){var c=Math.floor(g.U(.1,.8)*len);for(k=-8;k<9;k++)if(c+k>=0&&c+k<len)seg[c+k]-=A*.8*(.5+.5*Math.cos(Math.PI*k/8));}return seg;}
+  while(t<DUR){var bd=idn&&tmpl?tmpl.length/FS:g.U(.6,2.2),seg=idn?(tmpl||(tmpl=mk(Math.round(bd*FS)))):mk(Math.round(bd*FS)),i0=tI(t);
+   for(var k=0;k<seg.length;k++){var i=i0+k;if(i>=0&&i<NT)wv[i]+=seg[k];}if(t<DUR&&t+bd>0)nb++;var sd=g.U(1.8,4.2);
+   var a0=Math.max(0,t+bd),a1=Math.min(DUR,t+bd+sd);if(a1>a0)supp+=a1-a0;t+=bd+sd;}
+  addW(g,wv,wGen(g,.1,.8,.3));var pc=Math.round(supp/DUR*100);
+  return {focus:"全体",state:"ICU（昏睡または深い鎮静）",detail:["群発（0.6〜2.2秒）が"+nb+"回、その間は10 µV未満の抑制期","抑制期が記録の約"+pc+"%（50〜99%＝burst suppression）",idn?"群発の形が毎回ほぼ同じ（identical bursts）":"群発の形は毎回異なる","抑制期に見える小さな規則的な振れは心電図の混入"]};}},
+{id:"i_esz_ev",grp:"icu",lvl:2,name:"電気的発作（evolutionあり）",label:"電気的発作（evolutionあり）",en:"electrographic seizure with evolution",mean:["sz"],chk:"acns",aed:1,
+ sig:"律動的な放電が、周波数・部位・形を変えながら（evolution）10秒以上続く",
+ key:{dist:"限局して始まり、隣の電極へ広がる（2つ以上の電極へ）",freq:"0.5 Hz以上ずつ同じ向きに2回以上変化する（この問題では速くなる）。各段階は3周期以上",morph:"律動波の形や振幅が変わる",occur:"10秒以上。発作後に抑制や徐波が出ることが多い"},
+ conf:[["LRDA","周波数・部位が変わらない"],["BIRDs","10秒未満で終わる"],["RMTD","眠気時の健常者で、単調な5〜7 Hz。意識障害はない"],["筋電図・体動","電場がなく、周波数がばらばら"]],
+ clin:"電気的発作（ESz）。10分以上続く、または60分の20%以上を占めれば電気的てんかん重積（ESE）。臨床症状が時間的に一致すれば電気臨床発作。",
+ tx:"治療の対象。ベンゾジアゼピン（ロラゼパム〈ロラピタ〉、ジアゼパム〈ホリゾン・セルシン〉、ミダゾラム〈ミダフレッサ〉）→第二段階（ホスフェニトイン〈ホストイン〉、レベチラセタム〈イーケプラ〉、フェノバルビタール〈ノーベルバール〉など）。詳しくは抗てんかん薬ナビで。",
+ near:["i_lrda","i_birds","n_rmtd","i_lpd","i_esz_ne"],
+ vig:["70歳。{S}慢性硬膜下血腫の術後、急に反応が乏しくなった。このパターンは約70秒続いた。","66歳。{S}側頭葉の脳梗塞の後。このパターンは約1分続き、終了後に抑制された。"],
+ gen:function(g){bgICU(g,{});var s=g.side(),seq=[["T3"],["T3","F7"],["F7","T3","C3","T5"]];if(s==="R")seq=seq.map(function(a){return a.map(mirror);});
+  var t0=g.U(1.5,3),sd=(DUR-t0)/3,f0=g.U(2.5,3.2),st=[f0,f0+g.U(.8,1.2)];st.push(st[1]+g.U(.9,1.3));
+  var base=osc(g,t0,DUR+.01,function(t){return t<t0+sd?st[0]:t<t0+2*sd?st[1]:st[2];},function(){return 1;},SHP.sharp);
+  var envs=[[t0,30,70,.28],[t0+sd,0,60,.38],[t0+2*sd,0,95,.55]];
+  envs.forEach(function(e,k){var wv=W0();for(var i=Math.max(0,tI(e[0]));i<NT;i++){var tt=i/FS-PRE,p=Math.min(1,(tt-e[0])/(DUR-e[0]));wv[i]=base[i]*(e[1]+(e[2]-e[1])*p)*Math.min(1,(tt-e[0])/.4+.3);}addW(g,wv,wAt(seq[k],e[3],.3));});
+  return {side:s,focus:SIDEJ[s]+"側頭部（"+seq[0][0]+"）",state:"ICU・意識障害",detail:[t0.toFixed(1)+"秒に"+SIDEJ[s]+"側頭部（"+seq[0][0]+"）で約"+st[0].toFixed(1)+" Hzの律動として始まる","約"+st[1].toFixed(1)+" Hz → 約"+st[2].toFixed(1)+" Hzへ速くなり（0.5 Hz以上ずつ2回）、"+seq[2].join("・")+"へ広がって振幅も増す（周波数と部位のevolution）","このページの後も続き、計約70秒（10秒以上）"]};}},
+{id:"i_esz_ne",grp:"icu",lvl:3,name:"電気的発作（evolutionなし：2.5 Hz超が10秒以上）",label:"電気的発作（evolutionなし）",en:"electrographic seizure without evolution（>2.5 Hz for ≥10 s）",mean:["sz"],chk:"acns",aed:1,
+ sig:"てんかん性放電が平均2.5 Hzを超える頻度（10秒に25個超）で10秒以上続く。evolutionは要らない",
+ key:{dist:"一側性・全般性のどちらでもよい",freq:"平均2.5 Hz超（10秒間に25個を超える）",morph:"棘波・鋭波（200 msを超える鋭い放電も含む）",occur:"10秒以上続く。周波数・部位の変化がなくても発作と判定する"},
+ conf:[["LPD（2.5 Hz以下）","1.0超〜2.5 HzならIIC、1 Hz以下ならplusや変動があればIIC"],["電気的発作（evolutionあり）","周波数・部位・形が変化する"],["GPD","全般性で2.5 Hz以下"]],
+ clin:"電気的発作（ESz）。10分以上続けば電気的てんかん重積（ESE）。",
+ tx:"治療の対象。ベンゾジアゼピン（ロラゼパム〈ロラピタ〉、ジアゼパム〈ホリゾン・セルシン〉、ミダゾラム〈ミダフレッサ〉）→第二段階（ホスフェニトイン〈ホストイン〉、レベチラセタム〈イーケプラ〉、フェノバルビタール〈ノーベルバール〉など）。詳しくは抗てんかん薬ナビで。",
+ near:["i_lpd","i_esz_ev","i_gpd","i_plus","i_lrda"],
+ vig:["76歳。{S}側の脳腫瘍。呼びかけへの反応が乏しく、同じパターンが記録の最初から20分以上続いている。","68歳。{S}側の脳梗塞の後、意識障害。このパターンが15分以上続いている。"],
+ gen:function(g){var s=g.side();bgICU(g,{});var reg=["F3","C3","T3"];if(s==="R")reg=reg.map(mirror);
+  var f=g.U(2.8,3.6),A=g.U(60,120),wv=W0(),t=-PRE+g.U(0,1/f),n=0;
+  while(t<DUR){ied(wv,t,{dur:g.U(.07,.09),amp:-A*g.U(.9,1.1),aft:.45,aftDur:.12});if(t>=0)n++;t+=1/f*(1+g.U(-.05,.05));}
+  addW(g,wv,wAt(reg,.55,.3));
+  return {side:s,focus:SIDEJ[s]+"半球（"+reg.join("・")+"）",state:"ICU・意識障害",detail:[SIDEJ[s]+"半球（"+reg.join("・")+"）の鋭い放電が、10秒に"+n+"個（約"+(n/DUR).toFixed(1)+" Hz＝2.5 Hz超）","周波数・部位・形はほぼ一定（evolutionなし）","20分以上続いている（10秒以上）＝ESz。10分以上なのでESEにも当たる"]};}},
+{id:"i_plus",grp:"icu",lvl:3,name:"plus修飾語（+F・+R・+S）",label:"LPD+F",en:"Plus modifiers（+F, +R, +S）",mean:["epi"],chk:"acns",aed:1,
+ sig:"PD・RDAに、より発作らしく見える要素が重なる。+F（速波：PD・RDA）、+R（律動性δ：PDのみ）、+S（鋭波：RDAのみ）",
+ key:{dist:"主パターンと同じ部位",freq:"+F：θ以上の速い活動。+R：律動性・準律動性のδ",morph:"+S：RDAに、10秒に1回以上の鋭波・棘波（SWパターンでないもの）",occur:"主パターンに伴う（+FRはPD、+FSはRDAで使う。PDとRDAが同程度ならPD+Rとする）"},
+ conf:[["LPD・LRDA（plusなし）","重なる要素がない"],["筋電図","重なる速波に電場がなく、不規則"],["電気的発作","2.5 Hz超、またはevolutionがある"]],
+ clin:"plusがあると発作の危険が上がる（LPDにplusがあると58%に発作：Rodriguez Ruiz 2017）。0.5〜1 HzのPDや、1 Hzを超えるLRDAでも、plusがあればIICに当たる。",
+ tx:"持続脳波で発作を探す。IICに当たり臨床症状が疑わしければ、抗発作薬（レベチラセタム〈イーケプラ〉、ラコサミド〈ビムパット〉）の試験投与を検討する。",
+ near:["i_lpd","i_lrda","i_esz_ne","a_emg"],
+ vig:["79歳。{S}中大脳動脈領域の脳梗塞。意識が変動する。","63歳。{S}側の脳膿瘍の治療中に反応が鈍くなった。"],
+ gen:function(g){var v=g.pick(["LPD+F","LPD+R","LRDA+S","LRDA+F"]),s=g.side();bgICU(g,{});var reg=g.pick([["F3","C3","T3"],["F7","T3"],["C3","T3","P3"]]);if(s==="R")reg=reg.map(mirror);
+  var w=wAt(reg,.5,.3),det=[],f,A=g.U(60,110),t,n=0,wv=W0();
+  if(v.indexOf("LPD")===0){f=g.U(.6,1.4);t=-PRE+g.U(0,1/f);var fts=[];while(t<DUR){pdDis(wv,t,A*g.U(.85,1.1),g.U(.08,.12));fts.push(t);if(t>=0)n++;t+=1/f*(1+g.U(-.1,.1));}
+   addW(g,wv,w);
+   if(v==="LPD+F"){var ff=g.U(12,18),fa=g.U(15,28);fts.forEach(function(x){var a=x+.12,b=a+g.U(.25,.4);addW(g,osc(g,a,b,function(){return ff;},function(tt){return fa*hann(tt,a,b);},Math.sin),w);});det.push("各放電の直後に約"+ff.toFixed(0)+" Hzの速波（θ以上）が重なる＝+F");}
+   else{var rf=g.U(1,1.6);addW(g,osc(g,-PRE,DUR,function(){return rf;},function(){return A*.35;},Math.sin),wAt(reg,.55,.3));det.push("放電の間を約"+rf.toFixed(1)+" Hzの律動性δが埋める＝+R（PDだけに使う）");}
+   det.unshift(SIDEJ[s]+"半球（"+reg.join("・")+"）のLPD、約"+(n/DUR).toFixed(1)+" Hz");
+   det.push((n/DUR)>1?"1 Hzを超えるのでIIC（plusがなくても当たる）":"1 Hz以下でもplusがあるのでIICに当たる");}
+  else{f=g.U(1,1.8);addW(g,osc(g,-PRE,DUR,function(){return f;},function(){return A*.75;},SHP.sharp),w);
+   if(v==="LRDA+S"){t=g.U(.3,1);while(t<DUR-.2){ied(wv,t,{dur:g.U(.08,.12),amp:-A*g.U(.9,1.2),aft:0,aftDur:.1});n++;t+=g.U(1,3);}addW(g,wv,w);det.push("律動性δに鋭波が10秒に"+n+"回重なる（SWパターンではない）＝+S（RDAだけに使う）");}
+   else{var ff2=g.U(10,15);addW(g,osc(g,-PRE,DUR,function(){return ff2;},function(tt){return 14+8*Math.sin(tt*1.7);},Math.sin),w);det.push("律動性δに約"+ff2.toFixed(0)+" Hzの低振幅の速波が重なる＝+F");}
+   det.unshift(SIDEJ[s]+"側（"+reg.join("・")+"）のLRDA、約"+f.toFixed(1)+" Hz");det.push("1 Hzを超えるLRDAにplusがあるのでIICに当たる");}
+  var ex=[{l:"LPD",n:"plusなし（重なる要素がない）"},{l:"LRDA",n:"plusなし（重なる要素がない）"},{l:"LPD+F",n:"PDに速波（θ以上）が重なる"},{l:"LPD+R",n:"PDに律動性δが重なる（+RはPDだけ）"},{l:"LRDA+S",n:"RDAに鋭波・棘波が重なる（+SはRDAだけ）"},{l:"LRDA+F",n:"RDAに速波が重なる"},{l:"LPD+S",n:"+SはRDAだけに使う修飾語で、PDには付けない"}];
+  var base=v.indexOf("LPD")===0?"LPD":"LRDA",pool=ex.filter(function(x){return x.l!==v;}),first=pool.filter(function(x){return x.l===base||(base==="LPD"&&x.l==="LPD+S")||(base==="LRDA"&&x.l==="LPD+R");}),rest=pool.filter(function(x){return first.indexOf(x)<0;});
+  return {side:s,ans:v,extra:first.concat(rest),focus:SIDEJ[s]+"半球（"+reg.join("・")+"）",state:"ICU・意識障害",detail:det};}}
+];
+
+</script>
+<script>
+(function(){
+"use strict";
+var APP_VERSION="2026-11-14a";
+var KEY="eeg-v1",DSKEY="eeg-disp";
+var byId={};PATS.forEach(function(p){byId[p.id]=p;});
+function rnd(n){return Math.floor(Math.random()*n);}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=rnd(i+1),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function lab(p){return p.label||p.name;}
+function lvDots(n){return "●●●".slice(0,n)+"○○○".slice(0,3-n);}
+
+/* ── 保存 ── */
+var st;
+function defaults(){return {set:{modes:["nv","ep","icu"],lvl:3,hide:false,weak:false},cur:null,st:{},hist:[],cnt:0,streak:0};}
+try{st=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){st=null;}
+if(!st||typeof st!=="object")st=defaults();
+var d0=defaults();Object.keys(d0).forEach(function(k){if(st[k]===undefined)st[k]=d0[k];});Object.keys(d0.set).forEach(function(k){if(st.set[k]===undefined)st.set[k]=d0.set[k];});
+if(st.cur&&!byId[st.cur.pid])st.cur=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+var DS={mont:"bip",view:"all",tc:.3,hff:60,xz:"1",vz:1,ecg:true};
+try{var dd=JSON.parse(localStorage.getItem(DSKEY)||"null");if(dd)Object.keys(DS).forEach(function(k){if(dd[k]!==undefined)DS[k]=dd[k];});}catch(e){}
+function saveDS(){try{localStorage.setItem(DSKEY,JSON.stringify(DS));}catch(e){}}
+
+/* ── 波形を作る（seedから毎回同じ波形を再現） ── */
+var cache={};
+function build(pid,seed,x){var k=pid+"|"+seed+"|"+(x?1:0);if(cache[k])return cache[k];
+  var P=byId[pid],g=Gen(seed),info=P.gen(g)||{};
+  if(x){if(info.awake){times(g,2,.5,9.5,2).forEach(function(t){blink(g,t,g.U(80,120));});info.xnote="応用：瞬目のアーチファクトも混じっている";}
+    else if(/ICU/.test(info.state||"")){var t=g.U(1,8);emgAt(g,g.r()<.5?["F7","T3"]:["F8","T4"],t,t+g.U(.6,1.2),g.U(12,22),function(tt){return tuk(tt,t,t+1.2,.2);});info.xnote="応用：短い筋電図の混入もある";}}
+  var vs=info.vig||P.vig||[""],v=vs[Math.floor(g.r()*vs.length)]||"";
+  info.vigT=v.replace(/\{S\}/g,info.side?SIDEJ[info.side]:"");
+  info.mean=info.mean||P.mean;
+  var o={rec:new Rec(g),info:info,P:P};
+  var keys=Object.keys(cache);if(keys.length>12)delete cache[keys[0]];
+  cache[k]=o;return o;}
+
+/* ── 描画 ── */
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||"#000";}
+function drawTrace(host,B,o){
+  var prevL=host.firstChild?host.scrollLeft:0;
+  host.innerHTML="";
+  var d=B.rec.get(o.tc,o.hff),ch=chans(o.mont,o.view),rows=ch.length+(o.ecg?1:0);
+  var labW=52,top=18,bot=26,ngap=0,pg=null;ch.forEach(function(c){if(pg!==null&&c.grp!==pg)ngap++;pg=c.grp;});if(o.ecg)ngap++;
+  var chH=o.fitH?Math.max(9,(o.fitH-top-bot)/(rows+ngap*.35)):Math.max(16,6.5*3.78*o.vz);
+  var gap=chH*.35,ys=[],yc=top+chH/2;pg=null;
+  ch.forEach(function(c){if(pg!==null&&c.grp!==pg)yc+=gap;ys.push(yc);yc+=chH;pg=c.grp;});
+  var ecgY=0;if(o.ecg){yc+=gap;ecgY=yc;yc+=chH;}
+  var H=Math.round(yc-chH/2+bot);
+  var avail=host.clientWidth||340;
+  var pps=o.xz==="fit"?Math.max(24,(avail-labW-10)/DUR):113.4*parseFloat(o.xz);
+  var Wd=Math.round(pps*DUR)+10,kuv=(chH/6.5)/o.sens,dpr=Math.min(2,window.devicePixelRatio||1);
+  var inn=document.createElement("div");inn.className="in";
+  var cl=document.createElement("canvas"),cs=document.createElement("canvas");cl.className="lab";
+  [[cl,labW],[cs,Wd]].forEach(function(a){a[0].width=Math.round(a[1]*dpr);a[0].height=Math.round(H*dpr);a[0].style.width=a[1]+"px";a[0].style.height=H+"px";});
+  inn.appendChild(cl);inn.appendChild(cs);host.appendChild(inn);
+  var ink=css("--ink"),mut=css("--muted"),line=css("--line"),sur=css("--surface"),ngc=css("--ng"),acc=css("--accent");
+  var x=cl.getContext("2d");x.scale(dpr,dpr);x.fillStyle=sur;x.fillRect(0,0,labW,H);x.fillStyle=ink;x.font="600 10.5px system-ui,sans-serif";x.textAlign="right";x.textBaseline="middle";
+  ch.forEach(function(c,i){x.fillText(c.lab,labW-5,ys[i]);});if(o.ecg){x.fillStyle=ngc;x.fillText("ECG",labW-5,ecgY);}
+  var c2=cs.getContext("2d");c2.scale(dpr,dpr);c2.fillStyle=sur;c2.fillRect(0,0,Wd,H);
+  var x0=5,s;
+  for(s=0;s<=DUR*5;s++){var xx=x0+s*pps/5;if(s%5){if(pps<55)continue;c2.strokeStyle=line;c2.globalAlpha=.45;}else{c2.strokeStyle=line;c2.globalAlpha=1;}c2.beginPath();c2.moveTo(xx+.5,top-4);c2.lineTo(xx+.5,H-bot+4);c2.stroke();}
+  c2.globalAlpha=1;c2.fillStyle=mut;c2.font="10px system-ui,sans-serif";c2.textBaseline="top";c2.textAlign="left";
+  for(s=0;s<DUR;s++)c2.fillText(s+" s",x0+s*pps+3,2);
+  var i0=tI(0),i1=tI(DUR),step=Math.max(1,Math.floor(FS/Math.max(60,pps*1.5)));
+  c2.lineWidth=1;c2.lineJoin="round";c2.strokeStyle=ink;
+  ch.forEach(function(c,k){var a=d.P[EI[c.a]],b=c.b==="Ae"?null:d.P[EI[c.b]],A1=d.P[EI.A1],A2=d.P[EI.A2],y0=ys[k];
+    c2.beginPath();for(var i=i0;i<=i1;i++){var v=a[i]-(b?b[i]:(A1[i]+A2[i])/2),px=x0+(i-i0)/FS*pps,py=y0+v*kuv;if(i===i0)c2.moveTo(px,py);else c2.lineTo(px,py);}c2.stroke();});
+  if(o.ecg){var kE=chH*.85/1000;c2.strokeStyle=ngc;c2.beginPath();for(var i=i0;i<=i1;i++){var px=x0+(i-i0)/FS*pps,py=ecgY-d.ecg[i]*kE;if(i===i0)c2.moveTo(px,py);else c2.lineTo(px,py);}c2.stroke();}
+  var cu=o.sens<=10?50:o.sens<=20?100:200,hw=Math.min(pps,140),bx=Wd-hw-10,by=H-8;
+  c2.strokeStyle=acc;c2.lineWidth=1.6;c2.beginPath();c2.moveTo(bx,by-cu*kuv);c2.lineTo(bx,by);c2.lineTo(bx+hw,by);c2.stroke();
+  c2.fillStyle=acc;c2.textAlign="right";c2.textBaseline="middle";c2.fillText(cu+" µV",bx-3,by-cu*kuv/2);
+  c2.textAlign="center";c2.textBaseline="bottom";c2.fillText(hw<pps?(hw/pps).toFixed(1)+" s":"1 s",bx+hw/2,by-2);
+  host.scrollLeft=prevL;
+}
+function parText(o){return MONT[o.mont].name+"・"+VIEWN[o.view]+"　感度 "+o.sens+" µV/mm　時定数 "+o.tc+" s　高域 "+(o.hff?o.hff+" Hz":"切")+"　1ページ10秒（"+(o.xz==="fit"?"画面幅に合わせて表示":"30 mm/s×"+o.xz)+"）";}
+function seg(name,opts,val){return '<div class="seg" role="group">'+opts.map(function(o){return '<button type="button" class="'+(String(val)===String(o[0])?'on':'')+'" data-ds="'+name+'" data-v="'+o[0]+'" aria-pressed="'+(String(val)===String(o[0]))+'">'+o[1]+'</button>';}).join("")+'</div>';}
+function sel(name,lb,opts,val,unit){return '<label class="ss">'+lb+'<select data-ds="'+name+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(val)===String(o[0])?' selected':'')+'>'+o[1]+'</option>';}).join("")+'</select>'+(unit||"")+'</label>';}
+function ctlHTML(sens,src,full){
+  var h='<div class="ctl">'+seg("mont",[["bip","縦双極"],["ref","基準"]],DS.mont)+seg("view",[["all","全"],["tmp","側頭"],["par","傍矢状"],["L","左"],["R","右"]],DS.view)+'</div>';
+  h+='<div class="ctl">'+sel("sens","感度",[[5,"5"],[7,"7"],[10,"10"],[15,"15"],[20,"20"],[30,"30"],[50,"50"]],sens,"µV/mm")+sel("tc","時定数",[[.1,"0.1"],[.3,"0.3"],[1,"1.0"]],DS.tc,"s")+sel("hff","高域",[[30,"30 Hz"],[60,"60 Hz"],[0,"切"]],DS.hff,"")+sel("xz","横",[["fit","画面幅"],["1","×1"],["1.5","×1.5"],["2","×2"]],DS.xz,"")+(full?"":sel("vz","縦",[[.75,"小"],[1,"中"],[1.3,"大"]],DS.vz,""))+
+    '<label class="ss"><input type="checkbox" data-ds="ecg"'+(DS.ecg?' checked':'')+'>ECG</label>'+(full?'':'<button type="button" class="btn sm" data-full="'+src+'">大きく表示</button>')+'</div>';
+  return h;}
+function opts(sens,extra){var o={mont:DS.mont,view:DS.view,sens:sens,tc:+DS.tc,hff:+DS.hff,xz:DS.xz,vz:+DS.vz,ecg:!!DS.ecg};if(extra)for(var k in extra)o[k]=extra[k];return o;}
+
+/* 表示中の波形（出題・一覧の見本・全画面） */
+var VIEWS={};
+function view(src){if(src==="q"){var q=st.cur;if(!q)return null;return {B:build(q.pid,q.seed,q.x),sens:q.sens,host:document.getElementById("trQ"),par:document.getElementById("parQ"),ctl:document.getElementById("ctlQ")};}
+  var v=VIEWS[src];if(!v||!document.body.contains(v.host))return null;return v;}
+function redraw(src){var v=view(src);if(!v||!v.host)return;var o=opts(v.sens);drawTrace(v.host,v.B,o);if(v.par)v.par.textContent=parText(o);if(v.ctl)v.ctl.innerHTML=ctlHTML(v.sens,src,false);}
+function redrawAll(){redraw("q");Object.keys(VIEWS).forEach(redraw);if(fs.src)drawFull();}
+function setSens(src,n){if(src==="q"&&st.cur){st.cur.sens=n;save();}else if(VIEWS[src])VIEWS[src].sens=n;}
+document.addEventListener("click",function(e){var b=e.target.closest?e.target.closest("button[data-ds]"):null;
+  if(b){DS[b.getAttribute("data-ds")]=b.getAttribute("data-v");saveDS();redrawAll();return;}
+  var f=e.target.closest?e.target.closest("button[data-full]"):null;if(f){openFull(f.getAttribute("data-full"));}});
+document.addEventListener("change",function(e){var s=e.target;if(!s.getAttribute||!s.getAttribute("data-ds"))return;var k=s.getAttribute("data-ds");
+  if(k==="sens"){var host=s.closest("[data-src]"),src=host?host.getAttribute("data-src"):(fs.src||"q");setSens(src,+s.value);}
+  else if(k==="ecg")DS.ecg=s.checked;else if(k==="xz")DS.xz=s.value;else DS[k]=+s.value;
+  saveDS();redrawAll();});
+var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(redrawAll,150);});
+
+/* 全画面表示（横向きにすると広く見える） */
+var fs={src:null},fsv=document.getElementById("fsv");
+function openFull(src){if(!view(src))return;fs.src=src;fsv.hidden=false;document.body.classList.add("fsopen");
+  ["wcClrBtn","wcQrBtn"].forEach(function(id){var b=document.getElementById(id);if(b)b.style.visibility="hidden";});drawFull();}
+function closeFull(){fs.src=null;fsv.hidden=true;document.body.classList.remove("fsopen");["wcClrBtn","wcQrBtn"].forEach(function(id){var b=document.getElementById(id);if(b)b.style.visibility="";});redrawAll();}
+function drawFull(){var v=view(fs.src);if(!v){closeFull();return;}var host=document.getElementById("fsTr");
+  document.getElementById("fsCtl").setAttribute("data-src",fs.src);document.getElementById("fsCtl").innerHTML=ctlHTML(v.sens,fs.src,true);
+  var o=opts(v.sens,{fitH:host.clientHeight-4});drawTrace(host,v.B,o);document.getElementById("fsPar").textContent=parText(o);}
+document.getElementById("fsClose").onclick=closeFull;
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&fs.src)closeFull();});
+
+/* ── 出題 ── */
+function inSet(p){var gs=[];st.set.modes.forEach(function(m){gs=gs.concat(MODES[m].g);});return gs.indexOf(p.grp)>=0&&p.lvl<=st.set.lvl;}
+function pick(){var c=PATS.filter(inSet);if(!c.length)return null;var last=st.cur&&st.cur.pid;if(c.length>1)c=c.filter(function(p){return p.id!==last;});
+  var w=c.map(function(p){if(!st.set.weak)return 1;var r=st.st[p.id];if(!r||!r.n)return 3;return 1+4*(1-r.b/r.n);});
+  var sum=w.reduce(function(a,b){return a+b;},0),x=Math.random()*sum;for(var i=0;i<c.length;i++){x-=w[i];if(x<=0)return c[i].id;}return c[c.length-1].id;}
+function makeOpts(P,info){var corr={l:info.ans||lab(P),id:P.id},pool=[];
+  if(info.extra)pool=info.extra.map(function(x){return {l:x.l,n:x.n};});
+  else{pool=shuffle(P.near).map(function(id){return {l:lab(byId[id]),id:id};});shuffle(PATS.filter(function(q){return q.grp===P.grp&&q.id!==P.id&&P.near.indexOf(q.id)<0;})).forEach(function(q){pool.push({l:lab(q),id:q.id});});}
+  var o=[corr];for(var i=0;i<pool.length&&o.length<5;i++){if(o.every(function(y){return y.l!==pool[i].l;}))o.push(pool[i]);}
+  return {o:shuffle(o),cl:corr.l};}
+function newQ(pid,seed,x){var id=pid||pick();if(!id){st.cur=null;save();renderQ();return;}
+  var P=byId[id];seed=seed||(Math.floor(Math.random()*2147483646)+1);if(x===undefined)x=st.set.lvl>=3&&Math.random()<.35;
+  var B=build(id,seed,x),m=makeOpts(P,B.info);
+  st.cur={pid:id,seed:seed,x:!!x,o:m.o,cl:m.cl,sens:P.sens||10,a1:null,a2:null,done:false,hint:false,reveal:!st.set.hide,no:st.cnt+1};
+  save();renderQ();try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}}
+var qArea=document.getElementById("qArea");
+function renderQ(){var q=st.cur;
+  if(!q){var c=PATS.filter(inSet).length;
+    qArea.innerHTML='<div class="card"><h2>はじめる</h2><p class="hint" style="font-size:14px">出題範囲：'+c+'パターン。模式波形（毎回プログラムで作る10秒の脳波）を見て、①所見名と②臨床的な意味を選びます。答えると、見分ける決め手と紛らわしいものを解説します。</p><div class="nav"><button class="btn primary" type="button" id="goQ"'+(c?'':' disabled')+'>問題を出す</button></div>'+(c?'':'<p class="hint">出題範囲が空です。設定でモードを選んでください。</p>')+'</div>';
+    var gq=document.getElementById("goQ");if(gq)gq.onclick=function(){newQ();};return;}
+  var P=byId[q.pid],B=build(q.pid,q.seed,q.x),info=B.info;
+  var h='<div class="card"><div class="qhead"><span>第'+q.no+'問</span><span class="lv" title="難易度">'+lvDots(P.lvl)+'</span>'+((q.hint||q.done)?'<span class="regtag">'+esc(GRPN[P.grp])+'</span>':'')+'</div>';
+  if(info.vigT)h+='<p class="pt">'+esc(info.vigT)+'</p>';
+  if(q.hint&&!q.done)h+='<p class="hintbox">注目：'+esc(info.focus||"")+'　／　状態：'+esc(info.state||"")+'</p>';
+  h+='<div class="trwrap" data-src="q"><p class="par" id="parQ"></p><div class="trace" id="trQ"></div><div id="ctlQ"></div></div>';
+  h+='<p class="ask">① 所見名は？</p>';
+  if(!q.reveal&&!q.done)h+='<div class="nav"><button class="btn primary" type="button" id="revBtn">考えたら選択肢を表示</button></div>';
+  else{
+    h+='<div class="opts">'+q.o.map(function(o,k){var cls="";if(q.done){if(o.l===q.cl)cls=" ok";else if(k===q.a1)cls=" ng";}else if(k===q.a1)cls=" sel";
+      return '<button type="button" class="opt'+cls+'" data-a1="'+k+'"'+(q.done?' disabled':'')+'><span class="n">'+(k+1)+'</span><span>'+esc(o.l)+'</span></button>';}).join("")+'</div>';
+    h+='<p class="ask">② 臨床的な意味は？</p><div class="opts">'+MKEYS.map(function(m){var cls="";if(q.done){if(info.mean.indexOf(m)>=0)cls=" ok";else if(m===q.a2)cls=" ng";}else if(m===q.a2)cls=" sel";
+      return '<button type="button" class="opt'+cls+'" data-a2="'+m+'"'+(q.done?' disabled':'')+'><span class="n">'+MEAN[m].s+'</span><span><b>'+esc(MEAN[m].t)+'</b><small>'+esc(MEAN[m].d)+'</small></span></button>';}).join("")+'</div>';}
+  if(!q.done)h+='<div class="nav"><button class="btn sm" type="button" id="hintBtn"'+(q.hint?' disabled':'')+'>ヒント（注目部位）</button><button class="btn sm" type="button" id="giveBtn">わからない（解説へ）</button><button class="btn sm" type="button" id="skipBtn">別の問題</button></div>';
+  h+='</div>';
+  if(q.done)h+=explain(q,P,info);
+  var old=document.getElementById("trQ"),sl=old?old.scrollLeft:0;
+  qArea.innerHTML=h;
+  var b;
+  if((b=document.getElementById("revBtn")))b.onclick=function(){q.reveal=true;save();renderQ();};
+  if((b=document.getElementById("hintBtn")))b.onclick=function(){q.hint=true;save();renderQ();};
+  if((b=document.getElementById("giveBtn")))b.onclick=function(){q.a1=-1;q.a2=null;finish();};
+  if((b=document.getElementById("skipBtn")))b.onclick=function(){newQ();};
+  if((b=document.getElementById("nextBtn")))b.onclick=function(){newQ();};
+  if((b=document.getElementById("sameBtn")))b.onclick=function(){newQ(q.pid);};
+  Array.prototype.forEach.call(qArea.querySelectorAll("[data-a1]"),function(el){el.onclick=function(){q.a1=+el.getAttribute("data-a1");if(q.a2)finish();else{save();renderQ();}};});
+  Array.prototype.forEach.call(qArea.querySelectorAll("[data-a2]"),function(el){el.onclick=function(){q.a2=el.getAttribute("data-a2");if(q.a1!=null)finish();else{save();renderQ();}};});
+  redraw("q");var tr=document.getElementById("trQ");if(tr)tr.scrollLeft=sl;
+}
+function finish(){var q=st.cur;if(!q||q.done)return;var B=build(q.pid,q.seed,q.x);
+  q.ok1=q.a1>=0&&q.o[q.a1].l===q.cl;q.ok2=!!q.a2&&B.info.mean.indexOf(q.a2)>=0;q.done=true;q.reveal=true;
+  var r=st.st[q.pid]||(st.st[q.pid]={n:0,c:0,m:0,b:0});r.n++;if(q.ok1)r.c++;if(q.ok2)r.m++;if(q.ok1&&q.ok2)r.b++;
+  st.cnt++;st.streak=q.ok1&&q.ok2?st.streak+1:0;
+  st.hist.unshift({pid:q.pid,seed:q.seed,x:q.x,ok:q.ok1&&q.ok2,ok1:q.ok1,ok2:q.ok2,l:q.cl,t:Date.now()});if(st.hist.length>60)st.hist.length=60;
+  save();renderQ();renderTop();
+  setTimeout(function(){var e=document.getElementById("exCard");if(e)try{e.scrollIntoView({behavior:"smooth",block:"start"});}catch(x){}},60);}
+function keyList(P){return [["分布",P.key.dist],["周波数",P.key.freq],["形",P.key.morph],["出現の仕方",P.key.occur]].map(function(k){return '<li><span class="dn">'+k[0]+'</span><span class="w">'+esc(k[1])+'</span></li>';}).join("");}
+function confList(P){return P.conf.map(function(c){return '<li><span class="dn">'+esc(c[0])+'</span><span class="w">'+esc(c[1])+'</span></li>';}).join("");}
+function txBox(P){return P.tx?'<div class="pearl"><b>治療の判断（一般的な目安・未照合）</b>'+esc(P.tx)+(P.aed?'<a class="lnk" href="../aed/">抗てんかん薬ナビで重積・薬の選択を見る →</a>':'')+'</div>':'';}
+function explain(q,P,info){var ok=q.ok1&&q.ok2,head=ok?"正解":q.a1<0?"解説":q.ok1?"所見名は正解・意味は不正解":q.ok2?"意味は正解・所見名は不正解":"不正解";
+  var h='<div class="card ex" id="exCard"><div class="result '+(ok?'ok':'ng')+'">'+head+'<span class="ans">'+esc(q.cl)+'</span><span class="syn">'+esc(P.en)+'</span><span class="mn">意味：'+info.mean.map(function(m){return esc(MEAN[m].t);}).join(" ／ ")+'</span></div>';
+  h+='<h3>今回の波形</h3><ul class="why">'+info.detail.map(function(d){return '<li>'+esc(d)+'</li>';}).join("")+(info.xnote?'<li>'+esc(info.xnote)+'</li>':'')+'</ul>';
+  h+='<h3>見分ける決め手</h3><ul class="why">'+keyList(P)+'</ul>';
+  h+='<h3>紛らわしいもの</h3><ul class="why">'+confList(P)+'</ul>';
+  if(q.a1>=0&&!q.ok1){var o=q.o[q.a1],t=o.id&&byId[o.id]?byId[o.id].sig:(o.n||"");h+='<h3>選んだ「'+esc(o.l)+'」との違い</h3><ul class="why"><li><span class="w">この所見なら：'+esc(t)+'</span></li></ul>';}
+  h+='<h3>臨床的な意味</h3><p class="tx">'+esc(P.clin)+'</p>';
+  if(info.mean.length>1)h+='<p class="hint">意味は「'+info.mean.map(function(m){return MEAN[m].t;}).join("」「")+'」のどちらを選んでも正解にしています。</p>';
+  if(q.a2&&!q.ok2)h+='<p class="hint">選んだ意味：「'+esc(MEAN[q.a2].t)+'」</p>';
+  h+=txBox(P)+'<p class="chk">'+esc(CHK[P.chk])+'</p>';
+  h+='<div class="nav"><button class="btn primary" type="button" id="nextBtn">次の問題</button><button class="btn" type="button" id="sameBtn">同じ所見を別の波形で</button></div></div>';
+  return h;}
+
+/* ── 設定 ── */
+var modeChips=document.getElementById("modeChips");
+function renderSet(){
+  modeChips.innerHTML=Object.keys(MODES).map(function(k){var on=st.set.modes.indexOf(k)>=0,n=PATS.filter(function(p){return MODES[k].g.indexOf(p.grp)>=0;}).length;
+    return '<label class="chip'+(on?' on':'')+'"><input type="checkbox" data-m="'+k+'"'+(on?' checked':'')+'>'+esc(MODES[k].n)+'<span class="hint" style="margin:0">'+n+'</span></label>';}).join("");
+  Array.prototype.forEach.call(modeChips.querySelectorAll("input"),function(el){el.onchange=function(){var k=el.getAttribute("data-m"),i=st.set.modes.indexOf(k);if(el.checked&&i<0)st.set.modes.push(k);if(!el.checked&&i>=0)st.set.modes.splice(i,1);save();renderSet();if(!st.cur)renderQ();};});
+  document.getElementById("lvSel").value=String(st.set.lvl);document.getElementById("hideOpt").checked=!!st.set.hide;document.getElementById("weakOpt").checked=!!st.set.weak;
+  document.getElementById("setSum").textContent="（"+PATS.filter(inSet).length+"パターン）";}
+document.getElementById("lvSel").onchange=function(){st.set.lvl=+this.value;save();renderSet();if(!st.cur)renderQ();};
+document.getElementById("hideOpt").onchange=function(){st.set.hide=this.checked;save();};
+document.getElementById("weakOpt").onchange=function(){st.set.weak=this.checked;save();};
+
+/* ── 一覧 ── */
+var aList=document.getElementById("aList"),aQ=document.getElementById("aQ");
+function pText(p){return [p.name,p.label||"",p.en,p.sig,p.clin,p.key.dist,p.key.freq,p.key.morph,p.key.occur].concat(p.conf.map(function(c){return c.join(" ");})).join(" ");}
+function renderAtlas(){var q=aQ.value.trim().toLowerCase(),h="";VIEWS={};
+  ["norm","art","ep","icu"].forEach(function(g){var list=PATS.filter(function(p){return p.grp===g&&(!q||pText(p).toLowerCase().indexOf(q)>=0);});if(!list.length)return;
+    h+='<div class="card"><h2>'+esc(GRPN[g])+'</h2>'+list.map(function(p){var r=st.st[p.id];
+      return '<details class="site" data-p="'+p.id+'"><summary><b>'+esc(p.name)+'<span class="lvb">'+lvDots(p.lvl)+(r&&r.n?'　'+r.b+'/'+r.n:'')+'</span></b><span>'+esc(p.sig)+'</span></summary>'+
+        '<p class="hint" style="margin-top:0">'+esc(p.en)+'　意味：'+p.mean.map(function(m){return MEAN[m].t;}).join("／")+'</p>'+
+        '<div class="sub">見分ける決め手</div><ul class="why">'+keyList(p)+'</ul><div class="sub">紛らわしいもの</div><ul class="why">'+confList(p)+'</ul>'+
+        '<div class="sub">臨床的な意味</div><p class="tx">'+esc(p.clin)+'</p>'+txBox(p)+'<p class="chk">'+esc(CHK[p.chk])+'</p>'+
+        '<div class="trwrap" data-src="a_'+p.id+'" hidden><p class="par"></p><div class="trace"></div><div class="ctlA"></div></div>'+
+        '<div class="nav"><button class="btn sm" type="button" data-ex="'+p.id+'">見本の波形</button><button class="btn sm" type="button" data-q="'+p.id+'">この所見で出題</button></div></details>';}).join("")+'</div>';});
+  aList.innerHTML=h||'<div class="card empty">該当する所見がありません。</div>';
+  Array.prototype.forEach.call(aList.querySelectorAll("[data-q]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-q"));show("v-q");};});
+  Array.prototype.forEach.call(aList.querySelectorAll("[data-ex]"),function(b){b.onclick=function(){var id=b.getAttribute("data-ex"),w=aList.querySelector('[data-src="a_'+id+'"]'),src="a_"+id;
+    var seed=(VIEWS[src]&&VIEWS[src].seed?VIEWS[src].seed+1:7001+PATS.indexOf(byId[id])*13);w.hidden=false;
+    VIEWS[src]={B:build(id,seed,false),seed:seed,sens:byId[id].sens||10,host:w.querySelector(".trace"),par:w.querySelector(".par"),ctl:w.querySelector(".ctlA")};redraw(src);b.textContent="別の見本";};});}
+aQ.addEventListener("input",renderAtlas);
+
+/* ── 成績 ── */
+var sArea=document.getElementById("sArea"),resetArm=false;
+function renderStats(){var tot=0;Object.keys(st.st).forEach(function(k){if(byId[k])tot+=st.st[k].n;});
+  var h='<div class="card"><h2>系統別の正答率</h2>';
+  if(!tot)h+='<p class="empty">まだ回答がありません。</p>';
+  else{h+='<table class="st"><tr><td></td><td class="num hint">所見名</td><td class="num hint">意味</td><td class="num hint">両方</td></tr>'+["norm","art","ep","icu"].map(function(g){var n=0,c=0,m=0,b=0;PATS.forEach(function(p){var r=st.st[p.id];if(p.grp===g&&r){n+=r.n;c+=r.c;m+=r.m;b+=r.b;}});
+      function pc(x){return n?Math.round(x/n*100)+"%":"—";}
+      return '<tr><td>'+esc(GRPN[g])+'<div class="bar"><i style="width:'+(n?Math.round(b/n*100):0)+'%"></i></div></td><td class="num">'+pc(c)+'</td><td class="num">'+pc(m)+'</td><td class="num">'+pc(b)+'<span class="hint" style="display:block;margin:0">'+b+'/'+n+'</span></td></tr>';}).join("")+'</table>';}
+  h+='</div>';
+  var weak=Object.keys(st.st).filter(function(k){return byId[k]&&st.st[k].n&&st.st[k].b<st.st[k].n;}).sort(function(a,b){return st.st[a].b/st.st[a].n-st.st[b].b/st.st[b].n||st.st[b].n-st.st[a].n;}).slice(0,10);
+  h+='<div class="card"><h2>苦手なパターン</h2>'+(weak.length?'<table class="st">'+weak.map(function(k){var r=st.st[k];return '<tr><td>'+esc(byId[k].name)+'<span class="hint" style="display:block;margin:0">所見名 '+r.c+'/'+r.n+'・意味 '+r.m+'/'+r.n+'</span></td><td class="num"><button class="btn sm" type="button" data-w="'+k+'">出題</button></td></tr>';}).join("")+'</table>':'<p class="empty">間違えたパターンはまだありません。</p>')+'</div>';
+  var wr=st.hist.filter(function(x){return !x.ok&&byId[x.pid];}).slice(0,15);
+  h+='<div class="card"><h2>最近間違えた問題</h2>'+(wr.length?'<table class="st">'+wr.map(function(x,i){var d=new Date(x.t);return '<tr><td>'+esc(x.l||byId[x.pid].name)+'<span class="hint" style="display:block;margin:0">'+(d.getMonth()+1)+'/'+d.getDate()+'　'+(x.ok1?'所見名○':'所見名×')+'・'+(x.ok2?'意味○':'意味×')+'</span></td><td class="num"><button class="btn sm" type="button" data-h="'+i+'">同じ波形</button></td></tr>';}).join("")+'</table><p class="hint">「同じ波形」は前回と同じ波形で出題します（選択肢の順は変わります）。</p>':'<p class="empty">まだありません。</p>')+'</div>';
+  h+='<div class="card"><button class="btn sm" type="button" id="resetBtn">'+(resetArm?'もう一度押すと成績を消去':'成績を消去')+'</button><p class="hint">成績と履歴だけを消します。右上の「入力クリア」は設定と出題中の問題を消し、成績は残します。</p></div>';
+  sArea.innerHTML=h;
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-w]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-w"));show("v-q");};});
+  Array.prototype.forEach.call(sArea.querySelectorAll("[data-h]"),function(b){b.onclick=function(){var x=wr[+b.getAttribute("data-h")];newQ(x.pid,x.seed,x.x);show("v-q");};});
+  document.getElementById("resetBtn").onclick=function(){if(!resetArm){resetArm=true;renderStats();setTimeout(function(){resetArm=false;if(document.getElementById("v-s").classList.contains("active"))renderStats();},4000);return;}
+    resetArm=false;st.st={};st.hist=[];st.cnt=0;st.streak=0;save();renderStats();renderTop();toast("成績を消去しました");};}
+function renderTop(){var tot=0,b=0;Object.keys(st.st).forEach(function(k){tot+=st.st[k].n;b+=st.st[k].b||0;});
+  document.getElementById("sN").textContent=tot;document.getElementById("sR").textContent=tot?Math.round(b/tot*100)+"%":"—";document.getElementById("sS").textContent=st.streak||0;}
+
+/* ── タブ ── */
+var tabs=document.querySelectorAll("nav.tabs button");
+function show(v){Array.prototype.forEach.call(document.querySelectorAll("section.view"),function(s){s.classList.toggle("active",s.id===v);});
+  Array.prototype.forEach.call(tabs,function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===v?"true":"false");});
+  if(v==="v-a")renderAtlas();if(v==="v-s")renderStats();if(v==="v-q")redraw("q");window.scrollTo(0,0);}
+Array.prototype.forEach.call(tabs,function(b){b.onclick=function(){show(b.getAttribute("data-v"));};});
+var tt;function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on");},2600);}
+window.__eegToast=toast;
+document.getElementById("appVer").textContent=APP_VERSION;
+document.getElementById("forceUpdate").onclick=function(){(async function(){toast("最新版を確認しています…");try{if("serviceWorker" in navigator){var r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(_){}try{await fetch(location.href,{cache:"reload"});}catch(_){toast("通信できないため更新を確認できません");return;}setTimeout(function(){location.reload();},800);})();};
+window.__eeg={st:function(){return st;},newQ:newQ,build:build,PATS:PATS,show:show};
+renderSet();renderTop();renderQ();
+})();
+
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    var onClaude=/claude\.ai$|claudeusercontent|claude\.site/.test(h);
+    if(!("serviceWorker" in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller&&window.__eegToast)window.__eegToast("新しい版を取り込みました。次に開いたときに反映されます");
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[{"k":"eeg-v1","keep":["st","hist","cnt"]}];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>

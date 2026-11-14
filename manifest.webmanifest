@@ -161,6 +161,18 @@
       ]
     },
     {
+      "name": "脳波パターン判読トレーニング",
+      "short_name": "脳波トレーニング",
+      "url": "eeg/",
+      "icons": [
+        {
+          "src": "eeg/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "抗てんかん薬ナビ",
       "short_name": "抗てんかん薬",
       "url": "aed/",
