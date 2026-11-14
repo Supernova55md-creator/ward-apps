@@ -186,6 +186,23 @@ body.fsopen{overflow:hidden}
 .fsv .fsbar .ss select,.fsv .fsbar .btn.sm{background:#FFFFFF;color:#1F2A33;border:1px solid #9FAAB4;border-radius:4px}
 .fsv{background:#FFFFFF}
 .viewer .vstat .hint2{color:#5B6870;width:100%}
+.seg.nav button{min-width:34px;font-weight:700}
+.vmap{display:flex;gap:10px;align-items:center;padding:8px;background:#F4F6F8;border-top:1px solid #D5DBE0;color:#33404A}
+.vmap canvas{flex:none;border:1px solid #C3CBD2;border-radius:6px;background:#fff}
+.vmap p{margin:0;font-size:12px;line-height:1.5}
+.ss select:disabled{opacity:.45}
+.vmap[hidden]{display:none}
+.ss select[data-ds="mont"]{max-width:11em}
+.ss select[data-ds="ref"]{max-width:9em}
+@media (orientation:landscape){
+ .fsbar{padding:3px 6px}.fsbar>b{display:none}
+ .fsctl{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .fsctl .ctl{flex-wrap:nowrap;flex:none}
+ .fsv .seg button,.fsv .ss select,.fsv .btn.sm{min-height:28px}
+ .fsbody{padding:2px 6px}
+ #fsPar{font-size:11px;max-height:1.9em;overflow:hidden;padding:2px 6px}
+ #fsPar .hint2{display:none}
+}
 </style>
 </head>
 <body>
@@ -247,8 +264,10 @@ body.fsopen{overflow:hidden}
       <li><span class="dn">縦の双極導出</span><span class="w">ACNSの縦双極（LB-18.1）：左側頭→右側頭→左傍矢状→右傍矢状→正中。隣り合う2チャンネルが逆向きに振れる電極（位相逆転）に電位の最大がある。</span></li>
       <li><span class="dn">基準導出</span><span class="w">同側の耳朶（A1・A2）を基準にし、正中は両耳朶の平均（表示は「-A」）。側頭部の電位は耳朶にも乗る（耳朶の活性化）ので、側頭部の所見は双極導出とあわせて見る。</span></li>
       <li><span class="dn">感度・時定数</span><span class="w">感度は画面上の1 mmあたりの電位。時定数0.3秒は約0.53 Hz、0.1秒は約1.6 Hzの低域遮断に相当する。電極名は旧称（T3＝T7、T4＝T8、T5＝P7、T6＝P8）。</span></li>
-      <li><span class="dn">画面</span><span class="w">病院のデジタル脳波の判読画面に寄せて、白地・黒線、上に時刻、1秒ごとの縦線（0.2秒の補助線）、左にチャンネル番号、技師の記録（開眼・閉眼・呼名など）を表示する。「左青・右赤」で左右を色分けできる。波形をタップすると計測カーソルが出て、2点の時間差と周波数を表示する（棘波の幅は「横：×2」で測る）。</span></li>
-      <li><span class="dn">スマホで見る</span><span class="w">横スクロールで10秒を送る。「横：画面幅」で全体、「×2」で棘波の幅まで見える。「大きく表示」で全画面にし、スマホを横向きにすると広く見える。「側頭」「傍矢状」「左」「右」でチャンネルを減らせる。</span></li>
+      <li><span class="dn">画面</span><span class="w">病院のデジタル脳波の判読画面（Sens・TC・HF・Pat・Refの切り替え）に寄せた。白地・黒線、上に時刻、1秒ごとの縦線（0.2秒の補助線）、左にチャンネル番号、下にイベントバー（開眼・閉眼・呼名など技師の記録）を表示する。「左青右赤」で左右を色分けできる。</span></li>
+      <li><span class="dn">導出の変更</span><span class="w">記録は電極ごとの電位で持っているので、同じ10秒を別の導出に組み替えて見られる。Pat：IA 同側耳朶基準、IIIA 縦の双極（左右交互）、IVA 横の双極、LB 縦の双極（ACNS LB-18.1）、SD 発生源導出。基準電極導出ではRefをA1+A2・A2・Cz・AV（Fp1・Fp2・耳朶を除いた平均）に替えられる。耳朶の活性化（側頭部の焦点が同側耳朶に及ぶ）は双極やAVで確かめる。双極導出では位相逆転、鎖の端の電極では逆転が出ない（鎖の端の現象）。</span></li>
+      <li><span class="dn">頁送りと計測</span><span class="w">「1頁」で表示時間（10・5・3・2・1秒）を選び、◀◀▶▶で1頁、◀▶で1秒ずつ送る。「実寸30mm/s」は紙送り30 mm/sに相当し横スクロールで見る。波形を2点タップすると時間差・周波数・振幅差（脳波スケール）、1点目の時点の電位マップ（平均電位基準）を表示する。棘波の幅は1頁2秒か1秒で測る。</span></li>
+      <li><span class="dn">スマホで見る</span><span class="w">「全画面」でスマホを横向きにすると広く見える。「側頭」「傍矢状」「左」「右」でチャンネルを減らせる。</span></li>
     </ul>
   </div>
   <div class="card">
@@ -390,20 +409,43 @@ function filt(src,tc,hff){var o=new Float32Array(NT),i,m=0;for(i=0;i<NT;i++)m+=s
 function Rec(g){this.raw=g.P;this.ecgRaw=g.ecg;this.cache={};}
 Rec.prototype.get=function(tc,hff){var k=tc+"|"+hff;if(this.cache[k])return this.cache[k];
   var o={P:this.raw.map(function(a){return filt(a,tc,hff);}),ecg:filt(this.ecgRaw,tc,hff)};this.cache[k]=o;return o;};
+/* 導出（デジタル脳波のパターン）。九州大学の例（IA・IIIA・IVA）に、ACNSの縦双極と発生源導出を加えた */
+function P2(list){return list.map(function(x){var p=x.split("-");return [p[0],p[1]];});}
 var MONT={
-  bip:{name:"縦の双極導出（ACNS LB-18.1）",ch:[["Fp1","F7"],["F7","T3"],["T3","T5"],["T5","O1"],["Fp2","F8"],["F8","T4"],["T4","T6"],["T6","O2"],["Fp1","F3"],["F3","C3"],["C3","P3"],["P3","O1"],["Fp2","F4"],["F4","C4"],["C4","P4"],["P4","O2"],["Fz","Cz"],["Cz","Pz"]],grp:[0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4]},
-  ref:{name:"基準導出（同側耳朶）",ch:[["Fp1","A1"],["Fp2","A2"],["F3","A1"],["F4","A2"],["C3","A1"],["C4","A2"],["P3","A1"],["P4","A2"],["O1","A1"],["O2","A2"],["F7","A1"],["F8","A2"],["T3","A1"],["T4","A2"],["T5","A1"],["T6","A2"],["Fz","Ae"],["Cz","Ae"],["Pz","Ae"]],grp:[0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2]}
+  IA:{name:"IA 基準電極導出（同側耳朶）",short:"IA",ref:1,ch:P2(["Fp1-A1","Fp2-A2","F3-A1","F4-A2","C3-A1","C4-A2","P3-A1","P4-A2","O1-A1","O2-A2","F7-A1","F8-A2","T3-A1","T4-A2","T5-A1","T6-A2","Fz-A2","Cz-A2","Pz-A2"]),grp:[0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2]},
+  IIIA:{name:"IIIA 縦の双極導出（左右交互）",short:"IIIA",ch:P2(["Fp1-F3","Fp2-F4","F3-C3","F4-C4","C3-P3","C4-P4","P3-O1","P4-O2","Fp1-F7","Fp2-F8","F7-T3","F8-T4","T3-T5","T4-T6","T5-O1","T6-O2","Fz-Cz","Cz-Pz"]),grp:[0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,2,2]},
+  IVA:{name:"IVA 横の双極導出",short:"IVA",ch:P2(["F7-Fp1","Fp1-Fp2","Fp2-F8","F7-F3","F3-Fz","Fz-F4","F4-F8","A1-T3","T3-C3","C3-Cz","Cz-C4","C4-T4","T4-A2","T5-P3","P3-Pz","Pz-P4","P4-T6","T5-O1","O1-O2","O2-T6"]),grp:[0,0,0,1,1,1,1,2,2,2,2,2,2,3,3,3,3,4,4,4]},
+  LB:{name:"縦の双極導出（ACNS LB-18.1）",short:"LB",ch:P2(["Fp1-F7","F7-T3","T3-T5","T5-O1","Fp2-F8","F8-T4","T4-T6","T6-O2","Fp1-F3","F3-C3","C3-P3","P3-O1","Fp2-F4","F4-C4","C4-P4","P4-O2","Fz-Cz","Cz-Pz"]),grp:[0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4]},
+  SD:{name:"SD 発生源導出（近傍電極の平均を基準）",short:"SD",ch:P2(["Fp1-SD","Fp2-SD","F3-SD","F4-SD","C3-SD","C4-SD","P3-SD","P4-SD","O1-SD","O2-SD","F7-SD","F8-SD","T3-SD","T4-SD","T5-SD","T6-SD","Fz-SD","Cz-SD","Pz-SD"]),grp:[0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2]}
 };
+var REFN={OFF:"OFF（パターンどおり）",A1A2:"A1+A2（両耳朶）",A2:"A2",Cz:"Cz",AV:"AV（平均電位）"};
+var NB={Fp1:["F7","F3","Fp2"],Fp2:["F8","F4","Fp1"],F7:["Fp1","F3","T3"],F3:["Fp1","F7","Fz","C3"],Fz:["F3","F4","Cz"],F4:["Fp2","F8","Fz","C4"],F8:["Fp2","F4","T4"],T3:["F7","C3","T5"],C3:["F3","T3","Cz","P3"],Cz:["Fz","C3","C4","Pz"],C4:["F4","T4","Cz","P4"],T4:["F8","C4","T6"],T5:["T3","P3","O1"],P3:["C3","T5","Pz","O1"],Pz:["Cz","P3","P4"],P4:["C4","T6","Pz","O2"],T6:["T4","P4","O2"],O1:["P3","T5","O2"],O2:["P4","T6","O1"]};
+var AVEX={Fp1:1,Fp2:1,A1:1,A2:1};  /* AVでは開閉眼の影響が大きいFp1・Fp2と耳朶を除く */
 var VIEWN={all:"全チャンネル",tmp:"側頭部のみ",par:"傍矢状部のみ",L:"左半球",R:"右半球"};
-var TEMPB={Fp1:1,F7:1,T3:1,T5:1,O1:1,Fp2:1,F8:1,T4:1,T6:1,O2:1};
-var PARB={Fp1:1,F3:1,C3:1,P3:1,O1:1,Fp2:1,F4:1,C4:1,P4:1,O2:1,Fz:1,Cz:1,Pz:1};
-var LATT={F7:1,T3:1,T5:1,F8:1,T4:1,T6:1};
-function sideOf(n){var c=n.charAt(n.length-1);if(c==="z")return "z";return (+c)%2?"L":"R";}
+var TEMPE={F7:1,T3:1,T5:1,F8:1,T4:1,T6:1};
+function sideOf(n){var c=n.charAt(n.length-1);if(c==="z")return "z";if(n==="A1")return "L";if(n==="A2")return "R";return (+c)%2?"L":"R";}
 function inView(m,v,c){if(v==="all")return true;
-  if(v==="tmp")return m==="bip"?(TEMPB[c[0]]&&TEMPB[c[1]]):!!LATT[c[0]];
-  if(v==="par")return m==="bip"?(PARB[c[0]]&&PARB[c[1]]):!LATT[c[0]];
+  var t=!!(TEMPE[c[0]]||TEMPE[c[1]]);
+  if(v==="tmp")return t;if(v==="par")return !t;
   var s=sideOf(c[0]);return s==="z"||s===v;}
-function chans(m,v){var M=MONT[m],out=[];M.ch.forEach(function(c,i){if(inView(m,v,c))out.push({lab:c[0]+"-"+(c[1]==="Ae"?"A":c[1]),a:c[0],b:c[1],grp:M.grp[i]});});return out;}
+/* パターンとRefから実際のチャンネル（入力1・入力2）を決める */
+function chans(m,v,ref){var M=MONT[m]||MONT.IA,out=[];
+  M.ch.forEach(function(c,i){var a=c[0],b=c[1];
+    if(M.ref&&ref&&ref!=="OFF")b=ref;
+    if(!inView(m,v,[a,b]))return;
+    var lb=b==="A1A2"?"A1A2":b;
+    out.push({lab:a+"-"+lb,a:a,b:b,grp:M.grp[i]});});
+  return out;}
+/* 導出した信号を返す（入力1−入力2）。上向き＝入力1が陰性 */
+function derive(d,c,cache){var A=d.P[EI[c.a]],b=c.b;
+  var key=c.a+"|"+b;if(cache[key])return cache[key];
+  var R;
+  if(EI[b]!==undefined)R=d.P[EI[b]];
+  else if(b==="A1A2"||b==="Ae"){R=cache._ae||(cache._ae=(function(){var o=new Float32Array(NT),x=d.P[EI.A1],y=d.P[EI.A2];for(var i=0;i<NT;i++)o[i]=(x[i]+y[i])/2;return o;})());}
+  else if(b==="AV"){R=cache._av||(cache._av=(function(){var o=new Float32Array(NT),n=0;EL.forEach(function(e){if(AVEX[e])return;n++;var P=d.P[EI[e]];for(var i=0;i<NT;i++)o[i]+=P[i];});for(var i=0;i<NT;i++)o[i]/=n;return o;})());}
+  else if(b==="SD"){var nb=NB[c.a]||[];R=new Float32Array(NT);nb.forEach(function(e){var P=d.P[EI[e]];for(var i=0;i<NT;i++)R[i]+=P[i]/nb.length;});}
+  else R=new Float32Array(NT);
+  var o=new Float32Array(NT);for(var i=0;i<NT;i++)o[i]=A[i]-R[i];cache[key]=o;return o;}
 
 /* ===== 出題パターン =====
    grp：norm 正常・正常亜型／art アーチファクト／ep てんかん性／icu ICU脳波
@@ -821,7 +863,7 @@ var PATS=[
 <script>
 (function(){
 "use strict";
-var APP_VERSION="2026-11-14c";
+var APP_VERSION="2026-11-14d";
 var KEY="eeg-v1",DSKEY="eeg-disp";
 var byId={};PATS.forEach(function(p){byId[p.id]=p;});
 function rnd(n){return Math.floor(Math.random()*n);}
@@ -838,8 +880,10 @@ if(!st||typeof st!=="object")st=defaults();
 var d0=defaults();Object.keys(d0).forEach(function(k){if(st[k]===undefined)st[k]=d0[k];});Object.keys(d0.set).forEach(function(k){if(st.set[k]===undefined)st.set[k]=d0.set[k];});
 if(st.cur&&!byId[st.cur.pid])st.cur=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
-var DS={mont:"bip",view:"all",tc:.3,hff:60,xz:"1",vz:1,ecg:true,color:"mono"};
-try{var dd=JSON.parse(localStorage.getItem(DSKEY)||"null");if(dd)Object.keys(DS).forEach(function(k){if(dd[k]!==undefined)DS[k]=dd[k];});}catch(e){}
+var DS={mont:"IA",ref:"OFF",view:"all",tc:.3,hff:60,page:"10",vz:1,ecg:true,color:"mono"};
+try{var dd=JSON.parse(localStorage.getItem(DSKEY)||"null");if(dd){Object.keys(DS).forEach(function(k){if(dd[k]!==undefined)DS[k]=dd[k];});
+  if(DS.mont==="bip")DS.mont="LB";if(DS.mont==="ref")DS.mont="IA";if(!MONT[DS.mont])DS.mont="IA";if(!REFN[DS.ref])DS.ref="OFF";
+  if(dd.xz&&!dd.page)DS.page=dd.xz==="fit"?"10":"real";}}catch(e){}
 function saveDS(){try{localStorage.setItem(DSKEY,JSON.stringify(DS));}catch(e){}}
 
 /* ── 波形を作る（seedから毎回同じ波形を再現） ── */
@@ -858,95 +902,123 @@ function build(pid,seed,x){var k=pid+"|"+seed+"|"+(x?1:0);if(cache[k])return cac
 
 /* ── 描画 ── */
 function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||"#000";}
-var CUR={};
-function hms(sec){sec=Math.floor(sec)%86400;var h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return (h<10?"0":"")+h+":"+(m<10?"0":"")+m+":"+(x<10?"0":"")+x;}
-/* 病院のデジタル脳波の判読画面に寄せた描画：白地・黒線・1秒の縦線と0.2秒の補助線・上に時刻・技師の記録（開眼など）・チャンネル番号 */
+var CUR={},OFFS={};
+function hms(sec,dec){var f=sec%1;sec=Math.floor(sec)%86400;var h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return (h<10?"0":"")+h+":"+(m<10?"0":"")+m+":"+(x<10?"0":"")+x+(dec?"."+String(Math.floor(f*100)).padStart(2,"0"):"");}
+function pageLen(){return DS.page==="real"?DUR:+DS.page;}
+/* 病院のデジタル脳波（判読ビューア）に寄せた描画。白地・黒線、1秒の縦線と0.2秒の補助線、上に時刻、下にイベントバー、左にチャンネル番号 */
 function drawTrace(host,B,o){
   var prevL=host.firstChild?host.scrollLeft:0;
   host.innerHTML="";
-  var d=B.rec.get(o.tc,o.hff),ch=chans(o.mont,o.view),rows=ch.length+(o.ecg?1:0),info=B.info||{};
-  var labW=62,top=30,bot=24,ngap=0,pg=null;ch.forEach(function(c){if(pg!==null&&c.grp!==pg)ngap++;pg=c.grp;});if(o.ecg)ngap++;
-  var chH=o.fitH?Math.max(9,(o.fitH-top-bot)/(rows+ngap*.15)):Math.max(16,6.5*3.78*o.vz);
+  var d=B.rec.get(o.tc,o.hff),ch=chans(o.mont,o.view,o.ref),rows=ch.length+(o.ecg?1:0),info=B.info||{},dc={};
+  var labW=70,top=22,evH=18,bot=evH+4,ngap=0,pg=null;ch.forEach(function(c){if(pg!==null&&c.grp!==pg)ngap++;pg=c.grp;});if(o.ecg)ngap++;
+  var chH=o.fitH?Math.max(6,(o.fitH-top-bot)/(rows+ngap*.15)):Math.max(16,6.5*3.78*o.vz);
   var gap=chH*.15,ys=[],yc=top+chH/2;pg=null;
   ch.forEach(function(c){if(pg!==null&&c.grp!==pg)yc+=gap;ys.push(yc);yc+=chH;pg=c.grp;});
   var ecgY=0;if(o.ecg){yc+=gap;ecgY=yc;yc+=chH;}
   var H=Math.round(yc-chH/2+bot);
-  var avail=host.clientWidth||340;
-  var pps=o.xz==="fit"?Math.max(24,(avail-labW-10)/DUR):113.4*parseFloat(o.xz);
-  var Wd=Math.round(pps*DUR)+12,kuv=(chH/6.5)/o.sens,dpr=Math.min(2,window.devicePixelRatio||1);
+  var avail=host.clientWidth||340,real=o.page==="real",PL=real?DUR:+o.page;
+  var off=real?0:Math.max(0,Math.min(DUR-PL,OFFS[o.src]||0));
+  var pps=real?113.4:Math.max(20,(avail-labW-12)/PL);
+  var Wd=Math.round(pps*PL)+12,kuv=(chH/6.5)/o.sens,dpr=Math.min(2,window.devicePixelRatio||1);
   var inn=document.createElement("div");inn.className="in";
   var cl=document.createElement("canvas"),cs=document.createElement("canvas");cl.className="lab";cs.className="sig";
   [[cl,labW],[cs,Wd]].forEach(function(a){a[0].width=Math.round(a[1]*dpr);a[0].height=Math.round(H*dpr);a[0].style.width=a[1]+"px";a[0].style.height=H+"px";});
   inn.appendChild(cl);inn.appendChild(cs);host.appendChild(inn);
-  /* 判読ソフトと同じく、配色はダークモードでも白地に固定 */
-  var BG="#FFFFFF",INK="#111111",G1="#9AA6B0",G2="#DCE2E7",TXT="#33404A",ECGC="#2E7D32",MK="#1565C0",CURC="#D32F2F";
-  var colL="#1F4E9E",colR="#B71C1C";
+  var BG="#FFFFFF",INK="#111111",G1="#9AA6B0",G2="#DCE2E7",TXT="#33404A",ECGC="#2E7D32",MK="#1565C0",CURC="#D32F2F",colL="#1F4E9E",colR="#B71C1C";
   function colOf(c){if(o.color!=="lr")return INK;var sd=sideOf(c.a);return sd==="L"?colL:sd==="R"?colR:INK;}
-  var x=cl.getContext("2d");x.scale(dpr,dpr);x.fillStyle="#F4F6F8";x.fillRect(0,0,labW,H);
-  x.textBaseline="middle";
+  var x=cl.getContext("2d");x.scale(dpr,dpr);x.fillStyle="#F4F6F8";x.fillRect(0,0,labW,H);x.textBaseline="middle";
   ch.forEach(function(c,i){x.fillStyle="#8A96A0";x.font="9px system-ui,sans-serif";x.textAlign="left";x.fillText(String(i+1),3,ys[i]);
-    x.fillStyle=colOf(c)===INK?TXT:colOf(c);x.font="600 10.5px system-ui,sans-serif";x.textAlign="right";x.fillText(c.lab,labW-5,ys[i]);});
-  if(o.ecg){x.fillStyle="#8A96A0";x.font="9px system-ui,sans-serif";x.textAlign="left";x.fillText(String(ch.length+1),3,ecgY);x.fillStyle=ECGC;x.font="600 10.5px system-ui,sans-serif";x.textAlign="right";x.fillText("ECG",labW-5,ecgY);}
-  x.fillStyle=TXT;x.font="600 9.5px system-ui,sans-serif";x.textAlign="left";x.textBaseline="middle";x.fillText(o.mont==="bip"?"縦双極":"基準",4,10);
+    x.fillStyle=colOf(c)===INK?TXT:colOf(c);x.font="600 10px system-ui,sans-serif";x.textAlign="right";x.fillText(c.lab,labW-4,ys[i]);});
+  if(o.ecg){x.fillStyle="#8A96A0";x.font="9px system-ui,sans-serif";x.textAlign="left";x.fillText(String(ch.length+1),3,ecgY);x.fillStyle=ECGC;x.font="600 10px system-ui,sans-serif";x.textAlign="right";x.fillText("X1-X2",labW-4,ecgY);}
+  x.fillStyle=TXT;x.font="700 9.5px system-ui,sans-serif";x.textAlign="left";x.fillText("Pat "+MONT[o.mont].short+(MONT[o.mont].ref&&o.ref!=="OFF"?"/"+o.ref:""),4,11);
+  x.fillStyle="#E1E6EA";x.fillRect(0,H-evH,labW,evH);x.fillStyle=TXT;x.font="600 9.5px system-ui,sans-serif";x.fillText("イベント",4,H-evH/2);
   x.strokeStyle="#C3CBD2";x.beginPath();x.moveTo(labW-.5,0);x.lineTo(labW-.5,H);x.stroke();
   var c2=cs.getContext("2d");c2.scale(dpr,dpr);c2.fillStyle=BG;c2.fillRect(0,0,Wd,H);
-  c2.fillStyle="#F4F6F8";c2.fillRect(0,0,Wd,top-8);
-  var x0=6,s,t0=info.t0||36000;
-  /* 縦線：0.2秒は細い補助線、1秒は濃い線 */
-  for(s=0;s<=DUR*5;s++){var xx=Math.round(x0+s*pps/5)+.5;if(s%5){if(pps<45)continue;c2.strokeStyle=G2;}else c2.strokeStyle=G1;c2.lineWidth=1;c2.beginPath();c2.moveTo(xx,top-8);c2.lineTo(xx,H-bot+2);c2.stroke();}
+  c2.fillStyle="#F4F6F8";c2.fillRect(0,0,Wd,top-6);c2.fillStyle="#E1E6EA";c2.fillRect(0,H-evH,Wd,evH);
+  var x0=6,t0=info.t0||36000,s;
+  function X(t){return x0+(t-off)*pps;}
+  var s0=Math.ceil(off*5-1e-6),s1=Math.floor((off+PL)*5+1e-6);
+  for(s=s0;s<=s1;s++){var xx=Math.round(X(s/5))+.5;if(s%5){if(pps<45)continue;c2.strokeStyle=G2;}else c2.strokeStyle=G1;c2.lineWidth=1;c2.beginPath();c2.moveTo(xx,top-6);c2.lineTo(xx,H-evH);c2.stroke();}
   c2.fillStyle=TXT;c2.font="10px system-ui,sans-serif";c2.textBaseline="middle";c2.textAlign="left";
-  for(s=0;s<DUR;s++){var lab=pps>=70?hms(t0+s):(s%2?"":hms(t0+s));if(lab)c2.fillText(lab,x0+s*pps+3,11);}
-  /* チャンネル間の基線（ごく薄く） */
+  var step=pps>=70?1:pps>=36?2:5;
+  for(s=Math.ceil(off);s<off+PL;s++){if(s%step)continue;c2.fillText(hms(t0+s),X(s)+3,8);}
   c2.strokeStyle="#F0F2F4";ys.forEach(function(y){c2.beginPath();c2.moveTo(0,Math.round(y)+.5);c2.lineTo(Wd,Math.round(y)+.5);c2.stroke();});
-  /* 技師の記録（開眼・閉眼・HVなど） */
-  (info.marks||[]).forEach(function(m){if(m.t<0||m.t>DUR)return;var xx=Math.round(x0+m.t*pps)+.5;c2.strokeStyle=MK;c2.setLineDash([4,3]);c2.beginPath();c2.moveTo(xx,top-8);c2.lineTo(xx,H-bot);c2.stroke();c2.setLineDash([]);
-    c2.font="600 10.5px system-ui,sans-serif";var w=c2.measureText(m.l).width+8;c2.fillStyle="#E3F0FC";c2.fillRect(xx+2,top-7,w,15);c2.fillStyle=MK;c2.textAlign="left";c2.fillText(m.l,xx+6,top+1);});
-  var i0=tI(0),i1=tI(DUR);
+  /* イベント（技師が入れた記録）：トレースに点線、下のイベントバーに名前 */
+  (info.marks||[]).forEach(function(m){if(m.t<off||m.t>off+PL)return;var xx=Math.round(X(m.t))+.5;
+    c2.strokeStyle=MK;c2.setLineDash([4,3]);c2.beginPath();c2.moveTo(xx,top-6);c2.lineTo(xx,H-evH);c2.stroke();c2.setLineDash([]);
+    c2.fillStyle=MK;c2.beginPath();c2.moveTo(xx,H-evH+2);c2.lineTo(xx-4,H-evH+8);c2.lineTo(xx+4,H-evH+8);c2.fill();
+    c2.font="600 10.5px system-ui,sans-serif";c2.textAlign="left";c2.fillText(m.l,xx+6,H-evH/2+1);});
+  var i0=tI(off),i1=tI(off+PL);
   c2.lineWidth=dpr>1?.9:1;c2.lineJoin="round";
-  ch.forEach(function(c,k){var a=d.P[EI[c.a]],b=c.b==="Ae"?null:d.P[EI[c.b]],A1=d.P[EI.A1],A2=d.P[EI.A2],y0=ys[k];c2.strokeStyle=colOf(c);
-    c2.beginPath();for(var i=i0;i<=i1;i++){var v=a[i]-(b?b[i]:(A1[i]+A2[i])/2),px=x0+(i-i0)/FS*pps,py=y0+v*kuv;if(i===i0)c2.moveTo(px,py);else c2.lineTo(px,py);}c2.stroke();});
+  ch.forEach(function(c,k){var v=derive(d,c,dc),y0=ys[k];c2.strokeStyle=colOf(c);
+    c2.beginPath();for(var i=i0;i<=i1;i++){var px=x0+(i-i0)/FS*pps,py=y0+v[i]*kuv;if(i===i0)c2.moveTo(px,py);else c2.lineTo(px,py);}c2.stroke();});
   if(o.ecg){var kE=chH*.85/1000;c2.strokeStyle=ECGC;c2.beginPath();for(var i=i0;i<=i1;i++){var px=x0+(i-i0)/FS*pps,py=ecgY-d.ecg[i]*kE;if(i===i0)c2.moveTo(px,py);else c2.lineTo(px,py);}c2.stroke();}
-  /* 較正（右下）：縦＝電位、横＝1秒 */
-  var cu=o.sens<=10?50:o.sens<=20?100:200,hw=Math.min(pps,140),bx=Wd-hw-10,by=H-6;
+  var cu=o.sens<=10?50:o.sens<=20?100:200,hw=Math.min(pps,140),bx=Wd-hw-10,by=H-evH-5;
   c2.strokeStyle=INK;c2.lineWidth=1.4;c2.beginPath();c2.moveTo(bx,by-cu*kuv);c2.lineTo(bx,by);c2.lineTo(bx+hw,by);c2.stroke();
   c2.fillStyle=INK;c2.font="10px system-ui,sans-serif";c2.textAlign="right";c2.textBaseline="middle";c2.fillText(cu+" µV",bx-3,by-cu*kuv/2);
   c2.textAlign="center";c2.textBaseline="bottom";c2.fillText(hw<pps?(hw/pps).toFixed(1)+" s":"1 s",bx+hw/2,by-2);
-  /* 計測カーソル（タップ2点で時間差と周波数） */
+  /* 脳波スケール（2点で時間差・周波数・振幅差） */
   var cur=CUR[o.src]||[];
-  cur.forEach(function(t,k){var xx=Math.round(x0+t*pps)+.5;c2.strokeStyle=CURC;c2.lineWidth=1;c2.beginPath();c2.moveTo(xx,top-8);c2.lineTo(xx,H-bot);c2.stroke();
-    c2.fillStyle=CURC;c2.font="700 10px system-ui,sans-serif";c2.textAlign="left";c2.textBaseline="middle";c2.fillText(k?"B":"A",xx+3,top+10);});
-  cs.addEventListener("click",function(e){var r=cs.getBoundingClientRect(),t=(e.clientX-r.left-x0)/pps;if(t<0||t>DUR)return;var c=CUR[o.src]||[];if(c.length>=2)c=[];c.push(t);CUR[o.src]=c;if(o.onCur)o.onCur();});
-  host.scrollLeft=prevL;
+  cur.forEach(function(p,k){if(p.t<off||p.t>off+PL)return;var xx=Math.round(X(p.t))+.5;c2.strokeStyle=CURC;c2.lineWidth=1;c2.beginPath();c2.moveTo(xx,top-6);c2.lineTo(xx,H-evH);c2.stroke();
+    c2.beginPath();c2.moveTo(xx-6,p.y+.5);c2.lineTo(xx+6,p.y+.5);c2.stroke();
+    c2.fillStyle=CURC;c2.font="700 10px system-ui,sans-serif";c2.textAlign="left";c2.textBaseline="middle";c2.fillText(k?"B":"A",xx+3,top+4);});
+  if(cur.length===2){var a=cur[0],b=cur[1];if(a.t>=off&&b.t<=off+PL){c2.strokeStyle=CURC;c2.setLineDash([2,2]);c2.beginPath();c2.moveTo(X(a.t),a.y);c2.lineTo(X(b.t),b.y);c2.stroke();c2.setLineDash([]);}}
+  o._kuv=kuv;
+  cs.addEventListener("click",function(e){var r=cs.getBoundingClientRect(),t=off+(e.clientX-r.left-x0)/pps,y=e.clientY-r.top;if(t<0||t>DUR||y>H-evH)return;
+    var c=CUR[o.src]||[];if(c.length>=2)c=[];c.push({t:t,y:y,kuv:kuv});CUR[o.src]=c;if(o.onCur)o.onCur();});
+  host.scrollLeft=real?prevL:0;
+  return {off:off,PL:PL,pps:pps};
 }
-function parText(o,B){var info=(B&&B.info)||{},t0=info.t0||36000,c=CUR[o.src]||[],r;
-  var h='<span>'+esc(MONT[o.mont].name)+'・'+esc(VIEWN[o.view])+'</span><span>'+o.sens+' µV/mm</span><span>TC '+o.tc+' s</span><span>HF '+(o.hff?o.hff+' Hz':'切')+'</span><span>'+(o.xz==="fit"?'画面幅':'30 mm/s×'+o.xz)+'</span><span>'+hms(t0)+'〜'+hms(t0+DUR)+'（1/1ページ・10秒）</span>';
-  if(c.length===1)r='カーソルA '+c[0].toFixed(2)+' s（もう1点タップで時間差）';
-  else if(c.length===2){var dt=Math.abs(c[1]-c[0]);r='A–B '+Math.round(dt*1000)+' ms（'+(dt>0?(1/dt).toFixed(1):'—')+' Hz）・タップでやり直し';}
-  else return h+'<span class="hint2">波形をタップすると時間を測れます（2点で時間差と周波数）</span>';
+function parText(o,B,g){var info=(B&&B.info)||{},t0=info.t0||36000,c=CUR[o.src]||[],r,PL=g?g.PL:DUR,off=g?g.off:0,np=Math.ceil(DUR/PL-1e-6),pn=Math.min(np,Math.floor(off/PL+1e-6)+1);
+  var h='<span>'+esc(MONT[o.mont].name)+(MONT[o.mont].ref&&o.ref!=="OFF"?'（Ref '+esc(o.ref)+'）':'')+'・'+esc(VIEWN[o.view])+'</span><span>Sens '+o.sens+' µV/mm</span><span>TC '+o.tc+' s</span><span>HF '+(o.hff?o.hff+' Hz':'OFF')+'</span><span>'+(o.page==="real"?'30 mm/s（実寸）':'1頁 '+PL+' 秒（約'+Math.round((g?g.pps:30)/3.78)+' mm/s）')+'</span><span>'+hms(t0+off,1)+'〜'+hms(t0+off+PL,1)+'　頁 '+pn+'/'+np+'（記録10秒）</span>';
+  if(c.length===1)r='A '+hms(t0+c[0].t,1)+'（もう1点タップで時間差・振幅差）';
+  else if(c.length===2){var dt=Math.abs(c[1].t-c[0].t),da=Math.abs(c[1].y-c[0].y)/(c[1].kuv||1);r='A–B '+Math.round(dt*1000)+' ms（'+(dt>0?(1/dt).toFixed(1):'—')+' Hz）・振幅差 '+Math.round(da)+' µV・タップでやり直し';}
+  else return h+'<span class="hint2">脳波スケール：波形を2点タップすると時間差・周波数・振幅差を表示</span>';
   return h+'<span class="cur">'+r+'</span>';}
+/* 電位マップ（カーソルAの時点、平均電位基準）。陰性＝青、陽性＝赤 */
+function drawMap(cv,B,o){var c=CUR[o.src];if(!c||!c.length){cv.parentNode.hidden=true;return;}cv.parentNode.hidden=false;
+  var d=B.rec.get(o.tc,o.hff),i=tI(c[0].t),es=EL.filter(function(e){return e[0]!=="A";}),vals={},m=0;
+  es.forEach(function(e){vals[e]=d.P[EI[e]][i];m+=vals[e];});m/=es.length;es.forEach(function(e){vals[e]-=m;});
+  var mx=1;es.forEach(function(e){mx=Math.max(mx,Math.abs(vals[e]));});
+  var S=150,dpr=Math.min(2,window.devicePixelRatio||1);cv.width=S*dpr;cv.height=S*dpr;cv.style.width=S+"px";cv.style.height=S+"px";
+  var g=cv.getContext("2d");g.scale(dpr,dpr);g.fillStyle="#FFFFFF";g.fillRect(0,0,S,S);var R=S*.42,cx=S/2,cy=S/2+4,img=g.createImageData(Math.round(S*dpr),Math.round(S*dpr));
+  for(var py=0;py<img.height;py++)for(var px=0;px<img.width;px++){var X=(px/dpr-cx)/R,Y=-(py/dpr-cy)/R;if(X*X+Y*Y>1)continue;var sw=0,sv=0;
+    for(var k=0;k<es.length;k++){var p=POS[es[k]],dx=X-p[0],dy=Y-p[1],w=1/(dx*dx+dy*dy+1e-3);sw+=w;sv+=w*vals[es[k]];}
+    var v=sv/sw/mx,j=(py*img.width+px)*4,r,gg,b;if(v<0){r=255*(1+v);gg=255*(1+v*.7);b=255;}else{r=255;gg=255*(1-v*.7);b=255*(1-v);}img.data[j]=r;img.data[j+1]=gg;img.data[j+2]=b;img.data[j+3]=255;}
+  g.putImageData(img,0,0);g.setTransform(dpr,0,0,dpr,0,0);
+  g.strokeStyle="#333";g.lineWidth=1.2;g.beginPath();g.arc(cx,cy,R,0,6.283);g.stroke();g.beginPath();g.moveTo(cx-7,cy-R+1);g.lineTo(cx,cy-R-8);g.lineTo(cx+7,cy-R+1);g.stroke();
+  g.font="8px system-ui,sans-serif";g.textAlign="center";g.textBaseline="middle";es.forEach(function(e){var p=POS[e];g.fillStyle="#222";g.fillText(e,cx+p[0]*R,cy-p[1]*R);});
+}
 function seg(name,opts,val){return '<div class="seg" role="group">'+opts.map(function(o){return '<button type="button" class="'+(String(val)===String(o[0])?'on':'')+'" data-ds="'+name+'" data-v="'+o[0]+'" aria-pressed="'+(String(val)===String(o[0]))+'">'+o[1]+'</button>';}).join("")+'</div>';}
-function sel(name,lb,opts,val,unit){return '<label class="ss">'+lb+'<select data-ds="'+name+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(val)===String(o[0])?' selected':'')+'>'+o[1]+'</option>';}).join("")+'</select>'+(unit||"")+'</label>';}
+function sel(name,lb,opts,val,unit,dis){return '<label class="ss">'+lb+'<select data-ds="'+name+'"'+(dis?' disabled':'')+'>'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(val)===String(o[0])?' selected':'')+'>'+o[1]+'</option>';}).join("")+'</select>'+(unit||"")+'</label>';}
 function ctlHTML(sens,src,full){
-  var h='<div class="ctl">'+seg("mont",[["bip","縦双極"],["ref","基準"]],DS.mont)+seg("view",[["all","全"],["tmp","側頭"],["par","傍矢状"],["L","左"],["R","右"]],DS.view)+seg("color",[["mono","白黒"],["lr","左青・右赤"]],DS.color)+'</div>';
-  h+='<div class="ctl">'+sel("sens","感度",[[5,"5"],[7,"7"],[10,"10"],[15,"15"],[20,"20"],[30,"30"],[50,"50"]],sens,"µV/mm")+sel("tc","時定数",[[.1,"0.1"],[.3,"0.3"],[1,"1.0"]],DS.tc,"s")+sel("hff","高域",[[30,"30 Hz"],[60,"60 Hz"],[0,"切"]],DS.hff,"")+sel("xz","横",[["fit","画面幅"],["1","×1"],["1.5","×1.5"],["2","×2"]],DS.xz,"")+(full?"":sel("vz","縦",[[.75,"小"],[1,"中"],[1.3,"大"]],DS.vz,""))+
-    '<label class="ss"><input type="checkbox" data-ds="ecg"'+(DS.ecg?' checked':'')+'>ECG</label>'+(full?'':'<button type="button" class="btn sm" data-full="'+src+'">大きく表示</button>')+'</div>';
+  var M=MONT[DS.mont];
+  var h='<div class="ctl">'+sel("sens","Sens",[[5,"5"],[7,"7"],[10,"10"],[15,"15"],[20,"20"],[30,"30"],[50,"50"]],sens,"µV")+sel("tc","TC",[[.1,"0.1"],[.3,"0.3"],[1,"1.0"]],DS.tc,"s")+sel("hff","HF",[[15,"15"],[30,"30"],[60,"60"],[0,"OFF"]],DS.hff,"Hz")+
+    sel("mont","Pat",Object.keys(MONT).map(function(k){return [k,k==="LB"?"LB 縦の双極（ACNS）":MONT[k].name.replace(/（.*$/,"")];}),DS.mont,"")+sel("ref","Ref",Object.keys(REFN).map(function(k){return [k,REFN[k]];}),DS.ref,"",!M.ref)+'</div>';
+  h+='<div class="ctl">'+sel("page","1頁",[["10","10秒"],["5","5秒"],["3","3秒"],["2","2秒"],["1","1秒"],["real","実寸30mm/s"]],DS.page,"")+
+    (DS.page==="real"?'':'<div class="seg nav" role="group"><button type="button" data-nav="-p" aria-label="1頁戻る">◀◀</button><button type="button" data-nav="-1" aria-label="1秒戻る">◀</button><button type="button" data-nav="+1" aria-label="1秒進む">▶</button><button type="button" data-nav="+p" aria-label="1頁進む">▶▶</button></div>')+
+    seg("view",[["all","全"],["tmp","側頭"],["par","傍矢状"],["L","左"],["R","右"]],DS.view)+seg("color",[["mono","白黒"],["lr","左青右赤"]],DS.color)+
+    (full?"":sel("vz","縦",[[.75,"小"],[1,"中"],[1.3,"大"]],DS.vz,""))+'<label class="ss"><input type="checkbox" data-ds="ecg"'+(DS.ecg?' checked':'')+'>ECG</label>'+(full?'':'<button type="button" class="btn sm" data-full="'+src+'">全画面</button>')+'</div>';
   return h;}
-function opts(sens,extra){var o={mont:DS.mont,view:DS.view,sens:sens,tc:+DS.tc,hff:+DS.hff,xz:DS.xz,vz:+DS.vz,ecg:!!DS.ecg,color:DS.color};if(extra)for(var k in extra)o[k]=extra[k];return o;}
+function opts(sens,extra){var o={mont:DS.mont,ref:DS.ref,view:DS.view,sens:sens,tc:+DS.tc,hff:+DS.hff,page:DS.page,vz:+DS.vz,ecg:!!DS.ecg,color:DS.color};if(extra)for(var k in extra)o[k]=extra[k];return o;}
 
 /* 表示中の波形（出題・一覧の見本・全画面） */
 var VIEWS={};
-function view(src){if(src==="q"){var q=st.cur;if(!q)return null;return {B:build(q.pid,q.seed,q.x),sens:q.sens,host:document.getElementById("trQ"),par:document.getElementById("parQ"),ctl:document.getElementById("ctlQ")};}
+function view(src){if(src==="q"){var q=st.cur;if(!q)return null;var w=document.querySelector('.viewer[data-src="q"]');return {B:build(q.pid,q.seed,q.x),sens:q.sens,host:document.getElementById("trQ"),par:document.getElementById("parQ"),ctl:document.getElementById("ctlQ"),map:w?w.querySelector("canvas.map"):null};}
   var v=VIEWS[src];if(!v||!document.body.contains(v.host))return null;return v;}
-function redraw(src){var v=view(src);if(!v||!v.host)return;var o=opts(v.sens,{src:src,onCur:function(){redraw(src);}});drawTrace(v.host,v.B,o);if(v.par)v.par.innerHTML=parText(o,v.B);if(v.ctl)v.ctl.innerHTML=ctlHTML(v.sens,src,false);}
+function redraw(src){var v=view(src);if(!v||!v.host)return;var o=opts(v.sens,{src:src,onCur:function(){redraw(src);}});var g=drawTrace(v.host,v.B,o);if(v.par)v.par.innerHTML=parText(o,v.B,g);if(v.ctl)v.ctl.innerHTML=ctlHTML(v.sens,src,false);if(v.map)drawMap(v.map,v.B,o);}
 function redrawAll(){redraw("q");Object.keys(VIEWS).forEach(redraw);if(fs.src)drawFull();}
 function setSens(src,n){if(src==="q"&&st.cur){st.cur.sens=n;save();}else if(VIEWS[src])VIEWS[src].sens=n;}
-document.addEventListener("click",function(e){var b=e.target.closest?e.target.closest("button[data-ds]"):null;
-  if(b){DS[b.getAttribute("data-ds")]=b.getAttribute("data-v");saveDS();redrawAll();return;}
-  var f=e.target.closest?e.target.closest("button[data-full]"):null;if(f){openFull(f.getAttribute("data-full"));}});
+function srcOf(el){var h=el.closest("[data-src]");return h?h.getAttribute("data-src"):(fs.src||"q");}
+document.addEventListener("click",function(e){var t=e.target.closest?e.target:null;if(!t)return;
+  var b=t.closest("button[data-ds]");if(b){DS[b.getAttribute("data-ds")]=b.getAttribute("data-v");saveDS();CUR={};redrawAll();return;}
+  var n=t.closest("button[data-nav]");if(n){var src=srcOf(n),PL=pageLen(),k=n.getAttribute("data-nav"),dlt=k==="-p"?-PL:k==="+p"?PL:k==="-1"?-1:1;OFFS[src]=Math.max(0,Math.min(DUR-PL,(OFFS[src]||0)+dlt));if(src===fs.src)drawFull();else redraw(src);return;}
+  var f=t.closest("button[data-full]");if(f){openFull(f.getAttribute("data-full"));}});
 document.addEventListener("change",function(e){var s=e.target;if(!s.getAttribute||!s.getAttribute("data-ds"))return;var k=s.getAttribute("data-ds");
-  if(k==="sens"){var host=s.closest("[data-src]"),src=host?host.getAttribute("data-src"):(fs.src||"q");setSens(src,+s.value);}
-  else if(k==="ecg")DS.ecg=s.checked;else if(k==="xz")DS.xz=s.value;else DS[k]=+s.value;
-  saveDS();redrawAll();});
+  if(k==="sens")setSens(srcOf(s),+s.value);
+  else if(k==="ecg")DS.ecg=s.checked;else if(k==="page"||k==="mont"||k==="ref")DS[k]=s.value;else DS[k]=+s.value;
+  if(k==="page")OFFS={};
+  saveDS();CUR={};redrawAll();});
 var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(redrawAll,150);});
 
 /* 全画面表示（横向きにすると広く見える） */
@@ -956,7 +1028,7 @@ function openFull(src){if(!view(src))return;fs.src=src;fsv.hidden=false;document
 function closeFull(){fs.src=null;fsv.hidden=true;document.body.classList.remove("fsopen");["wcClrBtn","wcQrBtn"].forEach(function(id){var b=document.getElementById(id);if(b)b.style.visibility="";});redrawAll();}
 function drawFull(){var v=view(fs.src);if(!v){closeFull();return;}var host=document.getElementById("fsTr");
   document.getElementById("fsCtl").setAttribute("data-src",fs.src);document.getElementById("fsCtl").innerHTML=ctlHTML(v.sens,fs.src,true);
-  var o=opts(v.sens,{fitH:host.clientHeight-4,src:fs.src,onCur:drawFull});drawTrace(host,v.B,o);document.getElementById("fsPar").innerHTML=parText(o,v.B);}
+  var o=opts(v.sens,{fitH:host.clientHeight-4,src:fs.src,onCur:drawFull});var g=drawTrace(host,v.B,o);document.getElementById("fsPar").innerHTML=parText(o,v.B,g);}
 document.getElementById("fsClose").onclick=closeFull;
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&fs.src)closeFull();});
 
@@ -974,7 +1046,7 @@ function newQ(pid,seed,x){var id=pid||pick();if(!id){st.cur=null;save();renderQ(
   var P=byId[id];seed=seed||(Math.floor(Math.random()*2147483646)+1);if(x===undefined)x=st.set.lvl>=3&&Math.random()<.35;
   var B=build(id,seed,x),m=makeOpts(P,B.info);
   st.cur={pid:id,seed:seed,x:!!x,o:m.o,cl:m.cl,sens:P.sens||10,a1:null,a2:null,done:false,hint:false,reveal:!st.set.hide,no:st.cnt+1};
-  CUR.q=[];save();renderQ();try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}}
+  CUR.q=[];OFFS.q=0;save();renderQ();try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}}
 var qArea=document.getElementById("qArea");
 function renderQ(){var q=st.cur;
   if(!q){var c=PATS.filter(inSet).length;
@@ -984,7 +1056,7 @@ function renderQ(){var q=st.cur;
   var h='<div class="card"><div class="qhead"><span>第'+q.no+'問</span><span class="lv" title="難易度">'+lvDots(P.lvl)+'</span>'+((q.hint||q.done)?'<span class="regtag">'+esc(GRPN[P.grp])+'</span>':'')+'</div>';
   if(info.vigT)h+='<p class="pt">'+esc(info.vigT)+'</p>';
   if(q.hint&&!q.done)h+='<p class="hintbox">注目：'+esc(info.focus||"")+'　／　状態：'+esc(info.state||"")+'</p>';
-  h+='<div class="trwrap viewer" data-src="q"><div class="vbar" id="ctlQ"></div><div class="trace" id="trQ"></div><div class="vstat" id="parQ"></div></div>';
+  h+='<div class="trwrap viewer" data-src="q"><div class="vbar" id="ctlQ"></div><div class="trace" id="trQ"></div><div class="vstat" id="parQ"></div><div class="vmap" hidden><canvas class="map"></canvas><p>電位マップ：カーソルAの時点（平均電位基準）。青＝陰性、赤＝陽性。棘波の頂点に合わせると焦点の位置がわかる。</p></div></div>';
   h+='<p class="ask">① 所見名は？</p>';
   if(!q.reveal&&!q.done)h+='<div class="nav"><button class="btn primary" type="button" id="revBtn">考えたら選択肢を表示</button></div>';
   else{
@@ -1053,13 +1125,13 @@ function renderAtlas(){var q=aQ.value.trim().toLowerCase(),h="";VIEWS={};
         '<p class="hint" style="margin-top:0">'+esc(p.en)+'　意味：'+p.mean.map(function(m){return MEAN[m].t;}).join("／")+'</p>'+
         '<div class="sub">見分ける決め手</div><ul class="why">'+keyList(p)+'</ul><div class="sub">紛らわしいもの</div><ul class="why">'+confList(p)+'</ul>'+
         '<div class="sub">臨床的な意味</div><p class="tx">'+esc(p.clin)+'</p>'+txBox(p)+'<p class="chk">'+esc(CHK[p.chk])+'</p>'+
-        '<div class="trwrap viewer" data-src="a_'+p.id+'" hidden><div class="vbar ctlA"></div><div class="trace"></div><div class="vstat par"></div></div>'+
+        '<div class="trwrap viewer" data-src="a_'+p.id+'" hidden><div class="vbar ctlA"></div><div class="trace"></div><div class="vstat par"></div><div class="vmap" hidden><canvas class="map"></canvas><p>電位マップ：カーソルAの時点（平均電位基準）。青＝陰性、赤＝陽性。</p></div></div>'+
         '<div class="nav"><button class="btn sm" type="button" data-ex="'+p.id+'">見本の波形</button><button class="btn sm" type="button" data-q="'+p.id+'">この所見で出題</button></div></details>';}).join("")+'</div>';});
   aList.innerHTML=h||'<div class="card empty">該当する所見がありません。</div>';
   Array.prototype.forEach.call(aList.querySelectorAll("[data-q]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-q"));show("v-q");};});
   Array.prototype.forEach.call(aList.querySelectorAll("[data-ex]"),function(b){b.onclick=function(){var id=b.getAttribute("data-ex"),w=aList.querySelector('[data-src="a_'+id+'"]'),src="a_"+id;
     var seed=(VIEWS[src]&&VIEWS[src].seed?VIEWS[src].seed+1:7001+PATS.indexOf(byId[id])*13);w.hidden=false;
-    VIEWS[src]={B:build(id,seed,false),seed:seed,sens:byId[id].sens||10,host:w.querySelector(".trace"),par:w.querySelector(".par"),ctl:w.querySelector(".ctlA")};redraw(src);b.textContent="別の見本";};});}
+    VIEWS[src]={B:build(id,seed,false),seed:seed,sens:byId[id].sens||10,host:w.querySelector(".trace"),par:w.querySelector(".par"),ctl:w.querySelector(".ctlA"),map:w.querySelector("canvas.map")};CUR[src]=[];OFFS[src]=0;redraw(src);b.textContent="別の見本";};});}
 aQ.addEventListener("input",renderAtlas);
 
 /* ── 成績 ── */
