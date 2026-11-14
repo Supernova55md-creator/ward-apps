@@ -151,6 +151,7 @@ table.tl td.g{font-weight:800;white-space:nowrap;text-align:center}
 a{color:var(--info)}
 textarea.out{width:100%;min-height:150px;font:13px/1.55 var(--num);border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:8px}
 @media print{header.top{position:static}}
+.nonebar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
 </style>
 </head>
 <body>
@@ -194,7 +195,7 @@ textarea.out{width:100%;min-height:150px;font:13px/1.55 var(--num);border:1px so
     <label class="f"><span>年齢</span><input type="number" id="age" inputmode="numeric" min="0" max="110"></label>
     <label class="f"><span>発症前 mRS</span><select id="mrs"><option value="">未入力</option><option value="0">0 症状なし</option><option value="1">1 症状はあるが障害なし</option><option value="2">2 軽度の障害</option><option value="3">3 中等度の障害（歩行は介助不要）</option><option value="4">4 中等度〜重度（歩行に介助）</option><option value="5">5 重度（寝たきり）</option></select></label>
     <label class="f"><span>NIHSS <a href="../nih/" style="font-size:12px">評価アプリ</a></span><input type="number" id="nihss" inputmode="numeric" min="0" max="42"></label>
-    <label class="f"><span>体重（kg）</span><input type="number" id="wt" inputmode="decimal" min="20" max="200" step="0.5"></label>
+    <label class="f"><span>体重（kg）</span><input type="number" id="wt" data-wp="weight" inputmode="decimal" min="20" max="200" step="0.5"></label>
   </div>
   <label class="chk hidden" id="disWrap"><input type="checkbox" id="disabling"><span>NIHSS 5以下だが<b>機能障害性の症状</b>がある（失語、半盲、無視、歩行・起立不能、上肢挙上不能など、このまま残ると日常生活に支障）</span></label>
 </section>
@@ -240,6 +241,7 @@ textarea.out{width:100%;min-height:150px;font:13px/1.55 var(--num);border:1px so
     <label class="f"><span>抗アミロイドβ抗体薬</span><select id="aab"><option value="none">投与なし</option><option value="noaria">投与中・MRIでARIAなし</option><option value="aria">投与中・MRIでARIAあり</option><option value="unk">投与中・MRI未確認</option></select></label>
   </div>
   <p class="hint">血小板10万以下は肝硬変・血液疾患の病歴がある場合に適応外。結果が出る前でも、病歴から疑いがなければ待たずに開始できます（指針の注記どおり）。</p>
+  <div class="nonebar"><button type="button" class="btn" id="ckNone">手入力の項目はすべて該当なし</button><span class="hint" id="ckNoneMsg"></span></div>
   <div class="ck" id="ckEx"></div>
   <div class="ck care" id="ckCa"></div>
 </section>
@@ -387,6 +389,10 @@ function buildCk(){
   const mk=(arr,el,care)=>{ $(el).innerHTML='<div class="sec-h">'+(care?'慎重投与（1つでも該当すれば適応を慎重に検討）':'適応外（禁忌）— 1つでも該当すれば行わない')+'</div>'+
     arr.map(([id,tx,auto])=>'<div class="it'+(auto?' auto':'')+'" id="r_'+id+'"><div class="tx">'+tx+'</div><input type="checkbox" class="tg" id="'+id+'" aria-label="'+tx+'"'+(auto?' disabled':'')+'></div>').join("");};
   mk(EX,"ckEx",false); mk(CA,"ckCa",true);
+  const nb=document.getElementById("ckNone");
+  if(nb&&!nb.dataset.on){nb.dataset.on=1;nb.addEventListener("click",()=>{
+    document.querySelectorAll("#ckEx input.tg:not([disabled]),#ckCa input.tg:not([disabled])").forEach(x=>{if(x.checked){x.checked=false;x.dispatchEvent(new Event("change",{bubbles:true}))}});
+    const d=new Date();document.getElementById("ckNoneMsg").textContent="確認済み "+d.getHours()+":"+String(d.getMinutes()).padStart(2,"0")+"（自動判定の項目は数値で判定）";});}
 }
 
 /* ---------- 入力の読み取り ---------- */
@@ -478,6 +484,8 @@ function judgeIVT(s,ex,ca){
   if(s.aab==="unk")add("avoid","抗Aβ抗体薬投与中でMRI未確認：投与前MRIでARIAの有無を確認（ARIAありは適応外）");
   if(s.lvo&&!(s.mild&&!s.dis))add("do","主幹動脈閉塞あり：rt-PAは血栓回収の開始前に行い、効果確認のために血栓回収を遅らせない"+src("GL","RT"));
   add("note","治療中〜24時間：血圧180/105 mmHg未満に管理");
+  add("avoid","投与後24時間は抗血栓薬（抗血小板薬・抗凝固薬）を開始しない。24時間後の画像で出血がないことを確認してから"+src("RT"));
+  add("avoid","併用禁忌：デフィブロチド（デファイテリオ）。アルテプラーゼの添付文書で併用禁忌");
   return r;
 }
 
@@ -737,7 +745,7 @@ buildCk(); buildEv(); load();
 if(!$("tNow").value)$("tNow").value=nowStr();
 setTab(curTab); renderAll();
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{setTab(b.dataset.v);save();window.scrollTo({top:0})}));
-document.addEventListener("input",e=>{if(e.target.closest("main")){renderAll();save()}});
+document.addEventListener("input",e=>{if(e.target.closest("main")){if(e.target.classList.contains("tg")&&!e.target.disabled){CK[e.target.id]=e.target.checked}renderAll();save()}});
 document.addEventListener("change",e=>{if(e.target.closest("main")){if(e.target.classList.contains("tg")&&!e.target.disabled){CK[e.target.id]=e.target.checked}renderAll();save()}});
 document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g){setTab(g.dataset.go);save();window.scrollTo({top:0})}});
 $("btnNow").addEventListener("click",()=>{$("tNow").value=nowStr();renderAll();save()});
@@ -823,6 +831,7 @@ $("btnCopy").addEventListener("click",()=>{const t=$("note");try{navigator.clipb
 })();
 </script>
 <!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
 <script src="../share.js" defer></script>
 </body>
 </html>
