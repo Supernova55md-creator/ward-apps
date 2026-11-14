@@ -128,6 +128,11 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
 @media (prefers-color-scheme: dark){.route li.hl{background:#4A3D12}}
 .pillk{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:0 7px;margin-right:6px;border:1px solid var(--muted);color:var(--muted);vertical-align:2px}
 .pillk.em{border-color:var(--accent);color:var(--accent-strong);background:var(--accent-soft)}
+.summary{margin-top:6px;gap:5px}
+.summary .tile{display:flex;align-items:baseline;gap:5px;padding:3px 8px;min-height:30px}
+.summary .tile .k{font-size:10.5px;white-space:nowrap}
+.summary .tile .v{font-size:14.5px}
+.summary .tile.small .v{font-size:12.5px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -136,9 +141,9 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
 <header class="top">
   <div class="brand"><span class="mark" aria-hidden="true"></span><h1>感染症治療ナビ</h1><small>サンフォード2026準拠</small></div>
   <div class="summary" aria-live="polite">
-    <div class="tile" data-go="v-pt"><span class="k">CrCl（mL/分）</span><span class="v" id="sumCrcl">—</span></div>
-    <div class="tile small" data-go="v-pt"><span class="k">腎代替療法</span><span class="v" id="sumRrt">なし</span></div>
-    <div class="tile small" data-go="v-focus"><span class="k">選択中のFocus</span><span class="v" id="sumFocus">—</span></div>
+    <div class="tile" data-go="v-pt"><span class="k">CrCl</span><span class="v" id="sumCrcl">—</span></div>
+    <div class="tile small" data-go="v-pt"><span class="k">透析</span><span class="v" id="sumRrt">なし</span></div>
+    <div class="tile small" data-go="v-focus"><span class="k">Focus</span><span class="v" id="sumFocus">—</span></div>
   </div>
 </header>
 
@@ -149,9 +154,9 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
     <div class="grid2">
       <label class="f" for="age">年齢（歳）<input type="number" id="age" inputmode="numeric" min="16" max="110"></label>
       <div class="f"><span>性別</span>
-        <div class="seg" id="sex" role="group" aria-label="性別"><button type="button" data-v="M" aria-pressed="false">男性</button><button type="button" data-v="F" aria-pressed="false">女性</button></div>
+        <div class="seg" id="sex" role="group" aria-label="性別"><button type="button" data-v="M" data-wp="sex" data-wp-v="m" aria-pressed="false">男性</button><button type="button" data-v="F" data-wp="sex" data-wp-v="f" aria-pressed="false">女性</button></div>
       </div>
-      <label class="f" for="wt">体重（kg）<input type="number" id="wt" inputmode="decimal"></label>
+      <label class="f" for="wt">体重（kg）<input type="number" id="wt" inputmode="decimal" data-wp="weight"></label>
       <label class="f" for="ht">身長（cm、肥満補正用）<input type="number" id="ht" inputmode="decimal"></label>
       <label class="f" for="cr">血清Cr（mg/dL）<input type="number" id="cr" inputmode="decimal" step="0.01"></label>
       <label class="f" for="crclManual">CrCl 直接入力（任意・優先）<input type="number" id="crclManual" inputmode="decimal"></label>
@@ -161,7 +166,13 @@ ol.flow{list-style:none;padding:0;margin:0;counter-reset:f}
         <button type="button" data-v="none" aria-pressed="true">なし</button><button type="button" data-v="hd" aria-pressed="false">HD</button><button type="button" data-v="capd" aria-pressed="false">CAPD</button><button type="button" data-v="crrt" aria-pressed="false">CRRT</button>
       </div>
     </div>
+    <div class="f" style="margin-top:10px"><span>腎機能の区分（Crが手元にないとき。共通の患者プロファイルと連動）</span>
+      <div class="seg" id="rcat" role="group" aria-label="腎機能の区分">
+        <button type="button" data-v="ge60" data-wp="renal" data-wp-v="ge60" aria-pressed="false">60以上</button><button type="button" data-v="30-59" data-wp="renal" data-wp-v="30-59" aria-pressed="false">30〜59</button><button type="button" data-v="15-29" data-wp="renal" data-wp-v="15-29" aria-pressed="false">15〜29</button><button type="button" data-v="lt15" data-wp="renal" data-wp-v="lt15" aria-pressed="false">15未満</button>
+      </div>
+    </div>
     <div class="res" id="crclRes"></div>
+    <div id="wpNote"></div>
     <p class="hint" id="crclNote"></p>
     <div class="row-btn" style="margin-top:8px">
       <button class="btn" id="btnClear" type="button">入力をクリア</button>
@@ -311,10 +322,19 @@ function calc(){
   return r;
 }
 let K=calc();
-function crclText(){if(st.rrt!=="none")return {hd:"HD",capd:"CAPD",crrt:"CRRT"}[st.rrt];return K.use==null?"—":Math.round(K.use)+"";}
+const CAT={"ge60":{lb:"60以上",lo:60,hi:150},"30-59":{lb:"30〜59",lo:30,hi:59.9},"15-29":{lb:"15〜29",lo:15,hi:29.9},"lt15":{lb:"15未満",lo:1,hi:14.9}};
+function catOf(v){return v>=60?"ge60":v>=30?"30-59":v>=15?"15-29":"lt15";}
+function useCat(){return st.rrt==="none"&&K.use==null&&st.rcat&&CAT[st.rcat]?CAT[st.rcat]:null;}
+function catSamples(c){const a=[];for(let v=c.lo;v<=c.hi+1e-9;v+=0.5)a.push(Math.round(v*10)/10);return a;}
+function rowInCat(r,c){return !!r&&catSamples(c).some(v=>inRange(r,v));}
+function hasRenal(){return st.rrt!=="none"||K.use!=null||!!useCat();}
+function crclText(){if(st.rrt!=="none")return {hd:"HD",capd:"CAPD",crrt:"CRRT"}[st.rrt];if(K.use!=null)return Math.round(K.use)+"";const c=useCat();return c?"区分 "+c.lb:"—";}
 function renderPt(){
   $$("#sex button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st.sex)));
   $$("#rrt button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st.rrt)));
+  {const k0=calc();if(st.rrt==="hd"||st.rrt==="capd")st.rcat="lt15";else if(k0.use!=null)st.rcat=catOf(k0.use);
+   if(st.rcat&&window.WardProfile){try{const p=WardProfile.get();if(p.renal!==st.rcat)WardProfile.set({renal:st.rcat});}catch(e){}}}
+  $$("#rcat button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===st.rcat)));
   ["age","wt","ht","cr","crclManual"].forEach(k=>{const el=$("#"+k);if(document.activeElement!==el)el.value=st[k]==null?"":st[k];});
   K=calc();
   const box=$("#crclRes"),cell=(k,v,use)=>`<div class="${use?"use":""}"><span class="k">${k}</span><span class="v">${v==null?"—":Math.round(v)}</span></div>`;
@@ -322,7 +342,8 @@ function renderPt(){
   else box.innerHTML=cell("CrCl 実体重",K.crclAct,!K.obese)+cell("CrCl 補正体重",K.crclAdj,K.obese)+cell("IBW（kg）",K.ibw,false);
   let note="Cockcroft-Gault式（女性×0.85）。";
   if(K.obese)note+="実体重がIBWの120%超のため補正体重のCrClを用量判定に使っています。";
-  if(K.use==null&&st.rrt==="none")note+="年齢・性別・体重・Crを入れると計算します。";
+  if(K.use==null&&st.rrt==="none")note+=useCat()?"CrClの数値がないため、腎機能の区分（"+useCat().lb+"）に入る行を表示します。区分内で用量が分かれる薬は両方を出します。":"年齢・性別・体重・Crを入れると計算します（区分だけでも可）。";
+  else if(K.use!=null&&st.rrt==="none")note+="区分 "+CAT[catOf(K.use)].lb+" を共通の患者プロファイルにも反映します。";
   if(st.rrt!=="none")note+="腎代替療法中は各薬剤の"+crclText()+"欄を強調します。";
   $("#crclNote").textContent=note;
   $("#sumCrcl").textContent=crclText();
@@ -330,8 +351,11 @@ function renderPt(){
 }
 ["age","wt","ht","cr","crclManual"].forEach(k=>$("#"+k).addEventListener("input",e=>{st[k]=e.target.value===""?null:e.target.value;save();renderPt();renderAllDrugDeps();}));
 $("#sex").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.sex=b.dataset.v;save();renderPt();renderAllDrugDeps();});
+$("#rcat").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(K.use!=null&&st.rrt==="none")return; /* 数値があるときは数値を優先 */
+  st.rcat=st.rcat===b.dataset.v&&e.isTrusted?null:b.dataset.v;save();renderPt();renderAllDrugDeps();});
 $("#rrt").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.rrt=b.dataset.v;save();renderPt();renderAllDrugDeps();});
-$("#btnClear").addEventListener("click",()=>{["age","sex","wt","ht","cr","crclManual"].forEach(k=>st[k]=null);st.rrt="none";save();renderPt();renderAllDrugDeps();});
+$("#btnClear").addEventListener("click",()=>{["age","sex","wt","ht","cr","crclManual","rcat"].forEach(k=>st[k]=null);st.rrt="none";save();renderPt();renderAllDrugDeps();});
 
 /* ---------- CrCl 行の判定 ---------- */
 function norm(s){return String(s).replace(/CrCI|CrC1|CrcI|Crcl|CCr/g,"CrCl").replace(/[＜]/g,"<").replace(/[＞]/g,">").replace(/[≦]/g,"≤").replace(/[≧]/g,"≥").replace(/[〜～]/g,"~").replace(/[－―ー−–]/g,"-").replace(/\s+/g," ");}
@@ -376,8 +400,14 @@ function rgroups(entry){
 function renalPick(entry){
   // 返り値：該当する行の配列 [{label,text}]
   if(st.rrt!=="none"){const t=entry[st.rrt];return t?[{label:"",text:t}]:[];}
-  if(K.use==null)return [];
+  const C=useCat();
+  if(K.use==null&&!C)return [];
   const out=[],gs=rgroups(entry);
+  if(C){gs.forEach(g=>{const hs=g.rows.filter(r=>rowInCat(r.range,C));
+      if(hs.length===1)out.push({label:g.label,text:hs[0].text});
+      else if(hs.length>1)out.push({label:g.label,text:hs.map(r=>r.text+"（"+r.cond+"）").join(" ／ ")+"［区分内で分かれる：CrClを入れると1つに絞れます］"});
+      else if(g.rows.length===1&&!g.rows[0].range&&/不要/.test(g.rows[0].text))out.push({label:g.label,text:g.rows[0].text});});
+    return out;}
   gs.forEach(g=>{
     const hit=g.rows.find(r=>inRange(r.range,K.use));
     if(hit)out.push({label:g.label,text:hit.text});
@@ -405,12 +435,12 @@ function rdoseBlock(ids){
     const picks=[];(d.renalRows||[]).forEach(e=>renalPick(e).forEach(p=>picks.push({p,e})));
     const multi=(d.renalRows||[]).length>1;
     let txt;
-    if(st.rrt==="none"&&K.use==null)txt="（患者タブで腎機能を入れると表示）";
+    if(!hasRenal())txt="（患者タブで腎機能を入れると表示）";
     else if(!picks.length)txt=(d.renalRows&&d.renalRows.length)?"該当行なし：薬剤タブで確認":"表17Aに記載なし";
     else txt=picks.map(x=>{const lab=[multi?x.e.label:"",x.p.label].filter(Boolean).join("・");return `<div style="margin-left:8px">・${lab?esc(lab)+"：":""}${esc(x.p.text)}${!multi&&!x.p.label&&x.e.usualDose?`<span style="color:var(--muted);font-size:12px">（通常量 ${esc(x.e.usualDose)} からの調整）</span>`:""}</div>`;}).join("");
     lines.push(`<div><b>${esc(d.name)}</b>（${esc(d.abbr||"")}）${picks.length?"":"："}${txt}</div>`);
   });
-  return `<div class="rdose"><div style="font-size:12px;color:var(--muted)">この患者の腎機能での用量（表17A）${st.rrt!=="none"||K.use!=null?"：<b>"+esc(crclText())+"</b>":""}</div>${lines.join("")}<div style="font-size:11.5px;color:var(--muted);margin-top:4px">表17Aは通常量を基準にした調整です。髄膜炎などの高用量処方では、薬剤タブの原本行・TDMで確認してください。</div></div>`;
+  return `<div class="rdose"><div style="font-size:12px;color:var(--muted)">この患者の腎機能での用量（表17A）${hasRenal()?"：<b>"+esc(crclText())+"</b>":""}</div>${lines.join("")}<div style="font-size:11.5px;color:var(--muted);margin-top:4px">表17Aは通常量を基準にした調整です。髄膜炎などの高用量処方では、薬剤タブの原本行・TDMで確認してください。</div></div>`;
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest("button.dl");if(!b)return;
@@ -555,7 +585,7 @@ $("#qDrug").addEventListener("input",renderDrugs);
 function drugSummaryLine(d){
   const rows=d.renalRows||[];
   if(!rows.length)return "腎機能別の記載なし（表17A）";
-  if(st.rrt==="none"&&K.use==null)return "";
+  if(!hasRenal())return "";
   const multi=rows.length>1,ps=[];
   rows.forEach(e=>renalPick(e).forEach(p=>{const lab=[multi?e.label:"",p.label].filter(Boolean).join("・");ps.push((lab?lab+"：":"")+p.text);}));
   if(!ps.length)return crclText()+"：該当行を開いて確認";
@@ -567,7 +597,7 @@ function renalTable(e){
   if(e.usualDose)h+=`<tr><th>通常量</th><td>${esc(e.usualDose)}</td></tr>`;
   rgroups(e).forEach(g=>{
     if(g.label)h+=`<tr><th colspan="2" style="color:var(--accent-strong);padding-top:9px">${esc(g.label)}</th></tr>`;
-    g.rows.forEach(r=>{const hit=st.rrt==="none"&&K.use!=null&&inRange(r.range,K.use);h+=`<tr class="${hit?"hit":""}"><th>${esc(r.cond||"注記")}</th><td>${esc(r.text)}</td></tr>`;});
+    g.rows.forEach(r=>{const hit=st.rrt==="none"&&(K.use!=null?inRange(r.range,K.use):(useCat()?rowInCat(r.range,useCat()):false));h+=`<tr class="${hit?"hit":""}"><th>${esc(r.cond||"注記")}</th><td>${esc(r.text)}</td></tr>`;});
   });
   [["hd","血液透析"],["capd","CAPD"],["crrt","CRRT"],["sled","SLED"]].forEach(([k,l])=>{if(e[k])h+=`<tr class="${st.rrt===k?"hit":""}"><th>${l}</th><td>${esc(e[k])}</td></tr>`;});
   if(e.halfLifeNormal||e.halfLifeESRD)h+=`<tr><th>半減期</th><td>正常 ${esc(e.halfLifeNormal||"—")} 時間／ESRD ${esc(e.halfLifeESRD||"—")} 時間</td></tr>`;
@@ -583,6 +613,8 @@ function drugBody(d){
   if((d.adverse||[]).length)parts.push(`<h4>副作用・注意</h4><ul>${d.adverse.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`);
   if((d.dnotes||[]).length)parts.push(`<h4>TDM・相互作用ほか</h4><ul>${d.dnotes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`);
   if(d.bookNote)parts.push(`<div class="alert"><b>原本の表記について</b>${esc(d.bookNote)}</div>`);
+  if((d.renalRows||[]).length)parts.push(`<p class="hint"><a href="../ren/">腎機能・用量調整ナビ（電子添文ベース）でも確認 →</a></p>`);
+  parts.push(wpNoteHTML());
   parts.push(pages(d.pages));
   return parts.join("");
 }
@@ -719,10 +751,11 @@ function renderFlow(){
     h+=`<div class="card"><h2>最初にやること</h2>${F.sev==="shock"?`<p style="font-size:14px;margin:0 0 4px">${esc(ss.context||"")}</p>`:""}${hlList(F.sev==="shock"?b:b.slice(0,1),[],ids)}${pages(ss.pages)}</div>`;
   }
   const R=routes();
+  if(R.length&&FX[R[0].id])$("#sumFocus").textContent=FX[R[0].id].name;
   h+=`<div class="card"><h2>推奨される経験的治療</h2>`;
   if(!R.length)h+=`<p class="empty">${F.site==="unknown"||!F.site?"全身状態（1）と感染巣（3）を選ぶと表示します。":"全身状態（1）を選ぶと表示します。"}</p>`;
-  R.forEach(r=>{const f=FX[r.id];
-    h+=`<div class="route"><h3>${esc(f.name)}</h3><div class="why">根拠の分岐：${esc(r.why)}${f.context?"｜"+esc(f.context):""}</div>`+
+  R.forEach((r,ri)=>{const f=FX[r.id];
+    h+=`<div class="route${ri===0?" verdict info":""}">${ri===0?`<span class="pill" hidden>経験的治療</span><span class="big" hidden>${esc(f.name)}${R.length>1?" ほか"+(R.length-1)+"項目":""}</span>`:""}<h3>${esc(f.name)}</h3><div class="why">根拠の分岐：${esc(r.why)}${f.context?"｜"+esc(f.context):""}</div>`+
       ((f.organisms||[]).length?`<div class="orgs" style="margin:4px 0">${f.organisms.map(o=>`<span>${esc(o)}</span>`).join("")}</div>`:"")+
       `<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">第一選択</h4>${hlList(f.primary,r.hl,ids)}`+
       ((f.alternative||[]).length?`<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">代替</h4>${hlList(f.alternative,r.hl,ids)}`:"")+
@@ -737,6 +770,29 @@ function renderFlow(){
   h+=`<div class="card"><h2>次の一手</h2><ul style="padding-left:18px;margin:0;font-size:14px"><li>培養・グラム染色が出たら：起因菌タブ（表4Aの活性・耐性菌）と、Focusの「起因菌判明後」「菌別」項目で狭域化を検討（アプリの整理）。</li><li>治療期間：期間タブ（表3）。</li></ul></div>`;
   box.innerHTML=h;
 }
+
+/* ---------- 共通の患者プロファイル（profile.js）との連動 ---------- */
+function wpNoteHTML(){
+  let p=null;try{p=window.WardProfile?WardProfile.get():null;}catch(e){}
+  if(!p)return "";const a=[];
+  if(p.preg==="preg"||p.preg==="lact")a.push(`<b>${p.preg==="preg"?"妊娠中":"授乳中"}（患者プロファイル）</b>抗菌薬の妊娠・授乳時の扱いはサンフォード表8A（このアプリには未収載）で確認してください。`);
+  if(p.liver==="cpB"||p.liver==="cpC")a.push(`<b>肝機能 ${p.liver==="cpB"?"Child-Pugh B":"Child-Pugh C"}（患者プロファイル）</b>肝障害時の用量調整はサンフォード表18A（このアプリには未収載）で確認してください。`);
+  return a.map(x=>`<div class="alert">${x}</div>`).join("");
+}
+function renderWp(){const el=$("#wpNote");if(el)el.innerHTML=wpNoteHTML();}
+window.addEventListener("load",()=>{
+  renderWp();
+  try{if(window.WardProfile){
+    const p=WardProfile.get();
+    if(!st.rcat&&p.renal&&K.use==null&&st.rrt==="none"){st.rcat=p.renal;save();renderPt();renderAllDrugDeps();}
+    WardProfile.onChange(q=>{renderWp();
+      if(!q.renal&&!q.sex&&q.weight==null&&!q.age){/* 新しい患者：数値入力もリセット */["age","sex","wt","ht","cr","crclManual","rcat"].forEach(k=>st[k]=null);st.rrt="none";save();}
+      else if(K.use==null&&st.rrt==="none"&&q.renal!==st.rcat){st.rcat=q.renal;save();}
+      renderPt();renderAllDrugDeps();});
+  }}catch(e){}
+  setHH();
+  try{new ResizeObserver(setHH).observe($("header.top"));}catch(e){}
+});
 
 /* ---------- タブ ---------- */
 function show(id){
@@ -774,6 +830,69 @@ window.__inf={calc,parseRange,inRange,renalPick,st};
   }catch(e){}
 })();
 </script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=["#v-flow .verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
+
 <!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
 <style>
 #wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -836,6 +955,7 @@ window.__inf={calc,parseRange,inRange,renalPick,st};
 })();
 </script>
 <!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
 <script src="../share.js" defer></script>
 </body>
 </html>
