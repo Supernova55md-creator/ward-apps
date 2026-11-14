@@ -49,13 +49,6 @@ header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10p
 .brand h1{font-size:19px;font-weight:900;white-space:nowrap}
 @media (max-width:420px){.brand small{display:none}}
 .brand small{color:var(--muted);font-size:12px;margin-left:auto}
-.summary{margin-top:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px;min-width:0}
-.tile .k{font-size:11px;color:var(--muted);display:block}
-.tile .v{font-size:18px;font-weight:700;font-family:var(--font-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tile.cat .v{font-size:15px}
-.tile.gap.ok{border-color:var(--ok);background:var(--ok-soft)}
-.tile.gap.ng{border-color:var(--warn);background:var(--warn-soft)}
 section.view{display:none;padding-top:12px}
 section.view.active{display:block}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
@@ -135,11 +128,6 @@ details summary{cursor:pointer;font-weight:700;font-size:14px}
 <div class="app">
 <header class="top">
   <div class="brand"><span class="drop" aria-hidden="true"></span><h1>脂質異常症治療ナビ</h1><small>JAS2022準拠＋国際GL参照</small></div>
-  <div class="summary" aria-live="polite">
-    <div class="tile cat"><span class="k">管理区分</span><span class="v" id="sumCat">—</span></div>
-    <div class="tile"><span class="k" id="sumMetricK">LDL-C 目標</span><span class="v" id="sumTgt">—</span></div>
-    <div class="tile gap" id="sumGapTile"><span class="k">現在値 → 必要低下</span><span class="v" id="sumGap">—</span></div>
-  </div>
 </header>
 
 <!-- ===================== INPUT ===================== -->
@@ -147,10 +135,9 @@ details summary{cursor:pointer;font-weight:700;font-size:14px}
   <div class="card">
     <div class="row-btn">
       <button class="btn" id="btnExample" type="button">例を読み込む</button>
-      <button class="btn" id="btnClear" type="button">入力をクリア</button>
       <button class="btn primary" id="btnGo" type="button">結果を見る →</button>
     </div>
-    <p class="hint" id="saveNote">入力はこの端末のブラウザ内にのみ自動保存されます。患者氏名・IDは入力しないでください。</p>
+    <p class="hint" id="saveNote">入力はこの端末のブラウザ内にのみ自動保存されます。消すときは右上の「入力クリア」。患者氏名・IDは入力しないでください。</p>
   </div>
 
   <div class="card">
@@ -158,11 +145,12 @@ details summary{cursor:pointer;font-weight:700;font-size:14px}
     <div class="grid2">
       <label class="f" for="age">年齢（歳）<input type="number" id="age" inputmode="numeric" min="18" max="110"></label>
       <div class="f"><span style="font-size:13px;color:var(--muted)">性別</span>
-        <div class="seg" id="sex" role="group" aria-label="性別"><button type="button" data-v="M" aria-pressed="false">男性</button><button type="button" data-v="F" aria-pressed="false">女性</button></div>
+        <div class="seg" id="sex" role="group" aria-label="性別"><button type="button" data-v="M" data-wp="sex" data-wp-v="m" aria-pressed="false">男性</button><button type="button" data-v="F" data-wp="sex" data-wp-v="f" aria-pressed="false">女性</button></div>
       </div>
       <label class="f" for="sbp">収縮期血圧（mmHg）<input type="number" id="sbp" inputmode="numeric"></label>
       <label class="f" for="egfr">eGFR（mL/分/1.73m²）<input type="number" id="egfr" inputmode="decimal"></label>
     </div>
+    <p class="hint" id="profHint">性別・年齢区分・腎機能・妊娠授乳・抗凝固薬は、全アプリ共通の患者プロファイル（ヘッダー下の帯）と連動します。久山町スコアには年齢の数値が必要です。</p>
   </div>
 
   <div class="card">
@@ -257,8 +245,8 @@ details summary{cursor:pointer;font-weight:700;font-size:14px}
       <label class="chk"><input type="checkbox" id="cyclo"><span>シクロスポリン併用</span></label>
       <label class="chk"><input type="checkbox" id="cyp"><span>強いCYP3A4阻害薬（アゾール系抗真菌薬、クラリスロマイシン、HIVプロテアーゼ阻害薬など）</span></label>
       <label class="chk"><input type="checkbox" id="warf"><span>ワルファリン併用</span></label>
-      <label class="chk"><input type="checkbox" id="anticoag"><span>抗凝固薬併用（DOAC含む）</span></label>
-      <label class="chk"><input type="checkbox" id="preg"><span>妊娠中・妊娠希望・授乳中</span></label>
+      <label class="chk"><input type="checkbox" id="anticoag" data-wp="at" data-wp-v="ac,both" data-wp-ro><span>抗凝固薬併用（DOAC含む）</span></label>
+      <label class="chk"><input type="checkbox" id="preg" data-wp="preg" data-wp-v="preg,lact" data-wp-ro><span>妊娠中・妊娠希望・授乳中</span></label>
       <label class="chk"><input type="checkbox" id="dysph"><span>嚥下障害（経口錠剤の内服が難しい）</span></label>
     </div>
   </div>
@@ -387,6 +375,12 @@ function load(){try{var t=localStorage.getItem(KEY);return t?JSON.parse(t):null;
 
 var EXAMPLE={age:72,sex:"M",sbp:138,egfr:58,stroke:"athero",cad:false,acs:false,pad:false,dm:true,dmMicro:false,igt:false,ckd:false,smoke:false,fasting:"1",tc:212,tg:168,hdl:46,ldl:null,lpa:null,ck:120,ckUln:200,alt:22,altUln:40,statin:"none",intol:"none",mode:"jas",dysph:true};
 
+/* ---------- shared patient profile (../profile.js) ---------- */
+function prof(){try{return window.WardProfile?WardProfile.get():null;}catch(e){return null;}}
+function renalOf(s){
+  if(s.egfr!=null)return {c:s.egfr<15?"lt15":s.egfr<30?"15-29":s.egfr<60?"30-59":"ge60",src:"eGFR "+s.egfr};
+  var p=prof();return (p&&p.renal)?{c:p.renal,src:"共通プロファイル"}:null;
+}
 /* ---------- Hisayama ---------- */
 // 10-year ASCVD probability (%) indexed by (score + age offset); index < 8 => "<1.0%". Source: JAS2022 Fig (Hisayama score).
 var HSEQ=[null,null,null,null,null,null,null,null,1.1,1.3,1.4,1.7,1.9,2.2,2.6,3.0,3.4,3.9,4.5,5.2,6.0,6.9,7.9,9.1,10.4,11.9,13.6,15.5,17.7,20.2,22.9,25.9,29.3,33.0,37.0,41.1];
@@ -582,12 +576,14 @@ function strokePanel(s,secondary){
 }
 
 function safety(s,R,ldl){
+  var rn=renalOf(s),pf=prof();
+  if(pf&&(pf.liver==="cpB"||pf.liver==="cpC"))R.safety.push({c:"crit",h:"肝機能低下（共通プロファイル："+(pf.liver==="cpC"?"Child-Pugh C":"Child-Pugh B")+"）",b:"重篤な肝障害・非代償性肝硬変では多くのスタチンが禁忌または慎重投与。ペマフィブラートはChild-Pugh B・Cの肝硬変で禁忌、エゼチミブもスタチン併用時は重篤な肝障害で禁忌。開始前に添付文書と肝臓内科の判断を確認。"});
   if(s.mg)R.safety.push({c:"crit",h:"重症筋無力症",b:"スタチンは添付文書の重大な副作用に重症筋無力症（増悪を含む）の記載あり。開始・増量後は眼瞼下垂・複視・球症状・筋力低下を観察。増悪時は中止し、非スタチン薬（エゼチミブ、ベムペド酸、PCSK9阻害薬）へ。"});
   if(s.cyclo)R.safety.push({c:"crit",h:"シクロスポリン併用",b:"ロスバスタチン・ピタバスタチンは併用禁忌。ペマフィブラートも併用禁忌。プラバスタチン少量などで、筋症状・CKを監視。"});
   if(s.cyp)R.safety.push({c:"warn",h:"強いCYP3A4阻害薬",b:"シンバスタチンは併用禁忌、アトルバスタチンは血中濃度上昇。短期の抗菌薬・抗真菌薬の期間は休薬、または ピタバスタチン／ロスバスタチン／プラバスタチン を選択。"});
   if(s.warf)R.safety.push({c:"warn",h:"ワルファリン併用",b:"ロスバスタチン・フルバスタチンなどでPT-INRが上昇し得る。開始・変更後はINRを確認。"});
-  if(s.egfr!=null&&s.egfr<30)R.safety.push({c:"warn",h:"高度腎機能低下（eGFR<30）",b:"ロスバスタチンは2.5mgで開始・最大5mg。ベザフィブラート・フェノフィブラートは禁忌・減量規定あり。スタチン＋フィブラートは横紋筋融解症に注意。"});
-  else if(s.egfr!=null&&s.egfr<60)R.safety.push({c:"info",h:"腎機能低下（eGFR<60）",b:"フィブラート系は用量・併用に注意。スタチン単独は通常どおり使用可。"});
+  if(rn&&(rn.c==="15-29"||rn.c==="lt15"))R.safety.push({c:"warn",h:"高度腎機能低下（eGFR<30、"+rn.src+"）",b:"ロスバスタチンは2.5mgで開始・最大5mg。ベザフィブラート・フェノフィブラートは禁忌・減量規定あり。スタチン＋フィブラートは横紋筋融解症に注意。"});
+  else if(rn&&rn.c==="30-59")R.safety.push({c:"info",h:"腎機能低下（eGFR 30〜59、"+rn.src+"）",b:"フィブラート系は用量・併用に注意。スタチン単独は通常どおり使用可。"});
   if(s.ck!=null){
     var u=s.ckUln||200;
     if(s.ck>10*u)R.safety.push({c:"crit",h:"CK >10×基準上限",b:"スタチン中止。腎機能・尿ミオグロビンを確認。中止後もCK高値や近位筋力低下が続く場合は抗HMGCR抗体（免疫介在性壊死性ミオパチー）を測定し、筋MRI・筋生検を検討。"});
@@ -615,9 +611,9 @@ function intl(s,R){
     acc="<55（very high ASCVD）／<70（それ以外のASCVD）";
   } else if(s.fh){
     esc="<70 かつ 50%以上低下（high）";acc="原典参照（重症高LDL-C）";
-  } else if(s.egfr!=null&&s.egfr<30){
+  } else if(renalOf(s)&&(renalOf(s).c==="15-29"||renalOf(s).c==="lt15")){
     esc="<55（very high：eGFR<30）";acc="PREVENTで評価";
-  } else if(s.egfr!=null&&s.egfr<60){
+  } else if(renalOf(s)&&renalOf(s).c==="30-59"){
     esc="<70（high：eGFR 30〜59）";acc="PREVENTで評価";
   } else if(s.dm){
     esc="SCORE2-Diabetes／臓器障害で判定（<55〜<100）";acc="PREVENTで評価";
@@ -632,32 +628,36 @@ function intl(s,R){
 }
 
 /* ---------- render ---------- */
+function sumSet(t,o){try{if(window.wcSum)window.wcSum.set(t,o);else if(t)setTimeout(function(){if(window.wcSum)window.wcSum.set(t,o);},300);}catch(e){}}
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
 function render(){
   var s=read();save(s);
   // LDL calc note
   var hasInput=NUM.some(function(k){return s[k]!=null;})||CHK.some(function(k){return s[k];})||s.stroke!=="none"||s.statin!=="none";
   if(!hasInput){
-    ["sumCat","sumTgt","sumGap"].forEach(function(id){$(id).textContent="—";});
-    $("sumMetricK").textContent="LDL-C 目標";$("sumGapTile").classList.remove("ok","ng");
+    sumSet(null);
     $("ldlCalcNote").textContent="LDL-C未入力時は、空腹時かつTG<400でFriedewald式（TC−HDL−TG/5）を用います。";
     $("resultArea").innerHTML='<p class="empty">「入力」で年齢と検査値を入れると、ここに結果が出ます。</p>';
     return;
   }
   var R=compute(s);
+  var pf=prof(),ph=$("profHint"),base="性別・年齢区分・腎機能・妊娠授乳・抗凝固薬は、全アプリ共通の患者プロファイル（ヘッダー下の帯）と連動します。久山町スコアには年齢の数値が必要です。";
+  if(pf&&pf.age&&s.age!=null){var ac=s.age<65?"lt65":s.age<75?"65-74":"ge75";ph.textContent=ac!==pf.age?"年齢 "+s.age+" 歳が共通プロファイルの年齢区分と違います。別の患者の入力が残っていないか確認してください。":base;ph.style.color=ac!==pf.age?"var(--crit)":"";}
+  else if(pf&&pf.age&&s.age==null){ph.textContent="共通プロファイルの年齢区分は "+({"lt65":"65未満","65-74":"65〜74","ge75":"75以上"})[pf.age]+"。久山町スコアには年齢の数値を入れてください。";ph.style.color="";}
+  else{ph.textContent=base;ph.style.color="";}
   var ln=$("ldlCalcNote");
   if(s.ldl==null&&R.ldl!=null)ln.textContent="Friedewald式で LDL-C ≈ "+R.ldl+" mg/dL（直接法の値があれば上書きしてください）";
   else if(s.ldl==null&&s.tc!=null&&(s.fasting!=="1"||(s.tg!=null&&s.tg>=400)))ln.textContent="随時採血またはTG≥400のためFriedewald式は使えません。直接法LDL-Cかnon-HDL-Cで判定します。";
   else ln.textContent="LDL-C未入力時は、空腹時かつTG<400でFriedewald式（TC−HDL−TG/5）を用います。";
-  // summary
-  $("sumCat").textContent=R.t.cat;
-  $("sumMetricK").textContent=(R.metric||"LDL-C")+" 目標";
-  $("sumTgt").textContent=R.tgt!=null?"<"+R.tgt:"—";
-  var gt=$("sumGapTile");gt.classList.remove("ok","ng");
+  // fixed summary (wc-sum)
+  var stxt=R.t.cat+"：目標 "+(R.metric||"LDL-C")+" "+(R.tgt!=null?"<"+R.tgt:"—"),stone="info";
   if(R.cur!=null&&R.tgt!=null){
-    if(R.cur<R.tgt){$("sumGap").textContent=R.cur+" 達成";gt.classList.add("ok");}
-    else{$("sumGap").textContent=R.cur+" → "+Math.ceil(R.need*100)+"%↓";gt.classList.add("ng");}
-  } else $("sumGap").textContent="—";
+    if(R.cur<R.tgt){stxt+="　現在 "+R.cur+"（達成）";stone="ok";}
+    else{stxt+="　現在 "+R.cur+" → あと "+Math.ceil(R.need*100)+"%↓";stone="warn";}
+  }
+  if(s.tg!=null&&s.tg>=1000){stxt+="　TG≥1,000：膵炎リスク";stone="crit";}
+  if(R.t.cat==="入力不足"&&!(s.tg!=null&&s.tg>=1000))sumSet(null);else
+  sumSet(stxt,{tone:stone,pill:R.t.cat==="入力不足"?"":(s.mode==="strict"&&R.secondary?"厳格":"JAS2022")});
 
   var h=[];
   // 1 category
@@ -733,9 +733,11 @@ document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListe
 $("btnGo").addEventListener("click",function(){show("v-result");});
 $("btnGo2").addEventListener("click",function(){show("v-result");});
 $("btnExample").addEventListener("click",function(){write(Object.assign(blank(),EXAMPLE));render();});
-$("btnClear").addEventListener("click",function(){write(blank());render();});
 function blank(){var s={};NUM.forEach(function(k){s[k]=null;});CHK.forEach(function(k){s[k]=false;});Object.keys(SEG).forEach(function(k){s[k]=SEG[k];});Object.keys(SEL).forEach(function(k){s[k]=SEL[k];});return s;}
 
+$("age").addEventListener("change",function(){var a=$("age").value;if(a===""||!window.WardProfile)return;a=Number(a);try{WardProfile.set({age:a<65?"lt65":a<75?"65-74":"ge75"});}catch(e){}});
+$("egfr").addEventListener("change",function(){var g=$("egfr").value;if(g===""||!window.WardProfile)return;g=Number(g);try{WardProfile.set({renal:g<15?"lt15":g<30?"15-29":g<60?"30-59":"ge60"});}catch(e){}});
+(function hookProfile(n){if(window.WardProfile){try{WardProfile.onChange(function(){setTimeout(render,0);});}catch(e){}render();}else if(n<25)setTimeout(function(){hookProfile(n+1);},200);})(0);
 write(Object.assign(blank(),load()||{}));
 render();
 window.__lipid={compute:compute,hisayama:hisayama,blank:blank};
@@ -759,6 +761,68 @@ window.__lipid={compute:compute,hisayama:hisayama,blank:blank};
   }catch(e){}
 })();
 </script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
 <!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
 <style>
 #wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -821,6 +885,7 @@ window.__lipid={compute:compute,hisayama:hisayama,blank:blank};
 })();
 </script>
 <!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
 <script src="../share.js" defer></script>
 </body>
 </html>
