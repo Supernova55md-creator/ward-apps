@@ -33,282 +33,269 @@ header.top .brand{max-width:760px;margin:0 auto}
 header.top h1{font-size:19px;margin:0;line-height:1.3}
 header.top small{font-size:12px;opacity:.9}
 nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-nav.tabs button{font:inherit;font-size:13.5px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.18);color:inherit;min-height:40px;cursor:pointer;line-height:1.2}
+nav.tabs button{font:inherit;font-size:13.5px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.18);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
 nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
 @media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.2)}}
 main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
 section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
-h2{font-size:16px;margin:0 0 10px;line-height:1.4}
-h3{font-size:14.5px;margin:14px 0 6px}
-.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
-.q{margin:0 0 16px}
-.q:last-child{margin-bottom:0}
+h2{font-size:16px;margin:0 0 4px;line-height:1.4}
+h2 small{font-size:12px;color:var(--muted);font-weight:500}
+.lead{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+.grp{margin:10px 0 0}
+.grp>.gh{font-size:13px;line-height:1.45;padding:6px 0 4px;border-top:1px solid var(--line)}
+.grp>.gh b{color:var(--accent);margin-right:4px}
+.grp>.gh em{display:block;font-style:normal;font-size:12px;color:var(--muted)}
+.rks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rks.one{grid-template-columns:1fr}
+.rk{font:inherit;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 9px;min-height:46px;cursor:pointer;display:flex;gap:6px;align-items:flex-start;line-height:1.4;font-size:13px}
+.rk b{flex:none;min-width:1.7em;font-size:17px;color:var(--accent);line-height:1.2}
+.rk[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.rk:focus-visible{outline:3px solid var(--info);outline-offset:2px}
+.det{margin-top:10px;border:2px solid var(--accent);border-radius:12px;padding:10px 12px;background:var(--accent-soft);font-size:14px}
+.det .t{font-weight:800;color:var(--accent);font-size:15px}
+.det p{margin:4px 0 0}
+.det .nt{font-size:13px;color:var(--muted)}
+details.help{margin-top:10px;border:1px dashed var(--line);border-radius:10px;padding:0 10px}
+details.help>summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--info);padding:9px 0;list-style:none}
+details.help>summary::-webkit-details-marker{display:none}
+details.help>summary::before{content:"＋ "}
+details.help[open]>summary::before{content:"－ "}
+.q{margin:0 0 12px}
 .q[hidden]{display:none}
-.q>.lb{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
-.opts{display:flex;flex-direction:column;gap:6px}
-.opt{position:relative;display:block}
-.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.opt span{display:block;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 12px;font-size:14.5px;line-height:1.45;cursor:pointer}
-.opt span em{display:block;font-style:normal;font-size:12.5px;color:var(--muted);margin-top:2px}
-.opt input:checked + span{background:var(--accent-soft);border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
-.opt input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
-.sum{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sum div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
-.sum small{display:block;font-size:11.5px;color:var(--muted);line-height:1.3}
-.sum b{font-size:24px;line-height:1.3;color:var(--accent)}
-.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.btn{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:9px;padding:8px 14px;min-height:40px;cursor:pointer}
-.res{border:2px solid var(--accent);border-radius:12px;padding:12px 14px;background:var(--accent-soft)}
-.res .rk{font-size:30px;font-weight:800;color:var(--accent);line-height:1.2}
-.res .df{font-size:14.5px;margin:4px 0 0}
-.res .nt{font-size:13px;color:var(--muted);margin:8px 0 0}
-.res.empty{border-style:dashed;background:transparent;color:var(--muted);font-size:14px}
-.note{background:var(--info-soft);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.55}
+.q>.lb{font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:4px;display:block}
+.seg{display:flex;flex-direction:column;gap:5px}
+.seg button{font:inherit;font-size:13.5px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:7px 10px;min-height:40px;cursor:pointer;line-height:1.4}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.bar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:9px;padding:8px 14px;min-height:42px;cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.note{background:var(--info-soft);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.6}
 .note ul{margin:4px 0 0;padding-left:1.2em}
-.caution{background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.55}
-table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.5}
-th,td{border:1px solid var(--line);padding:6px 7px;vertical-align:top;text-align:left}
-th{background:var(--accent-soft);white-space:nowrap}
-td.rk{font-weight:800;white-space:nowrap;color:var(--accent)}
+.caution{background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6}
 .src{font-size:12.5px;line-height:1.6;padding-left:1.2em;margin:0}
 .src a{color:var(--info);word-break:break-all}
 [hidden]{display:none!important}
 #toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 14px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:50;max-width:90vw}
 #toast.on{opacity:.95}
-@media print{header.top nav,.row{display:none}}
+@media print{header.top nav,.bar,details.help{display:none}}
 </style>
 </head>
 <body>
 <header class="top">
-  <div class="brand"><h1>主治医意見書 自立度判定</h1><small>障害高齢者（寝たきり度）／認知症高齢者の日常生活自立度</small></div>
+  <div class="brand" data-wc-hs><h1>意見書 自立度判定</h1><small>寝たきり度・認知症自立度（介護保険）</small></div>
   <nav class="tabs" role="tablist">
-    <button type="button" data-v="d" aria-selected="true">日常生活<br><small>寝たきり度</small></button>
-    <button type="button" data-v="n" aria-selected="false">認知面<br><small>認知症自立度</small></button>
-    <button type="button" data-v="t" aria-selected="false">判定基準表</button>
+    <button type="button" data-v="j" aria-selected="true">判定</button>
+    <button type="button" data-v="p" aria-selected="false">ポイント</button>
+    <button type="button" data-v="s" aria-selected="false">出典</button>
   </nav>
 </header>
 
 <main>
-<section class="card">
-  <div class="sum">
-    <div><small>障害高齢者の日常生活自立度</small><b id="sumD">—</b></div>
-    <div><small>認知症高齢者の日常生活自立度</small><b id="sumN">—</b></div>
-  </div>
-  <div class="row"><button type="button" class="btn" id="copyBtn">記載用にコピー</button></div>
+<!-- 判定（早見表をそのまま押す） -->
+<div data-p="j">
+<section class="card" id="cardD">
+  <h2>障害高齢者の日常生活自立度 <small>寝たきり度</small></h2>
+  <p class="lead">能力ではなく、実際の<b>移動</b>の状態で選ぶ。補装具・自助具を使った状態でよい。</p>
+  <div id="rkD"></div>
+  <div class="det" id="detD" hidden></div>
+  <details class="help" id="helpD"><summary>迷ったら：2問で決める</summary><div id="flowD"></div></details>
 </section>
 
-<!-- 日常生活 -->
-<div data-p="d">
-<section class="card">
-  <h2>障害高齢者の日常生活自立度（寝たきり度）</h2>
-  <div class="q" id="dq1"><span class="lb">① 普段の生活の状態（「できる」能力ではなく、実際の「移動」の状態で選ぶ）</span>
-    <div class="opts">
-      <label class="opt"><input type="radio" name="d1" value="0"><span>障害等はまったくない<em>→ 自立</em></span></label>
-      <label class="opt"><input type="radio" name="d1" value="J"><span>何らかの障害等はあるが、日常生活はほぼ自立し、独力で外出する<em>ランクJ（生活自立）</em></span></label>
-      <label class="opt"><input type="radio" name="d1" value="A"><span>屋内の生活はおおむね自立しているが、介助なしには外出しない<em>ランクA（準寝たきり・house-bound）</em></span></label>
-      <label class="opt"><input type="radio" name="d1" value="B"><span>屋内でも何らかの介助が必要で、日中もベッド上が主体。ただし座位は保つ<em>ランクB（寝たきり・chair-bound）</em></span></label>
-      <label class="opt"><input type="radio" name="d1" value="C"><span>1日中ベッド上で過ごし、排泄・食事・着替えに介助が必要<em>ランクC（寝たきり・bed-bound）</em></span></label>
-    </div>
-  </div>
-  <div class="q" id="dq2" hidden><span class="lb" id="dq2lb">② 細分類</span><div class="opts" id="dq2opts"></div></div>
+<section class="card" id="cardN">
+  <h2>認知症高齢者の日常生活自立度</h2>
+  <p class="lead">Ⅲ・Ⅳは症状の内容は同じで<b>頻度</b>で分ける。a／bはⅡが<b>場面</b>、Ⅲが<b>時間帯</b>。</p>
+  <div id="rkN"></div>
+  <div class="det" id="detN" hidden></div>
+  <details class="help" id="helpN"><summary>迷ったら：3〜4問で決める</summary><div id="flowN"></div></details>
 </section>
-<section class="card"><div id="dres" class="res empty">①から選ぶと判定が出ます。</div></section>
-<section class="card note">
-  <b>判定のポイント</b>
-  <ul>
-    <li>「～することができる」という<b>能力ではなく状態</b>、特に<b>移動</b>に関わる状態像で判定する。</li>
-    <li>補装具や自助具などを使った状態で評価してよい。</li>
-    <li>ランクB：夜間のみおむつを使う場合は、排泄の介助を要するとはみなさない。「車いす」は一般のいすやポータブルトイレに読み替えてよい。</li>
-    <li>時間帯や体調で状態が変わる場合は、日頃より頻回にみられる状況で選ぶ。</li>
-  </ul>
+
+<section class="card">
+  <div class="bar"><button type="button" class="btn pri" id="copyBtn">記載用にコピー</button></div>
+  <p class="lead" style="margin:8px 0 0">2つの判定を2行の文章でコピーします。</p>
 </section>
 </div>
 
-<!-- 認知面 -->
-<div data-p="n" hidden>
-<section class="card">
-  <h2>認知症高齢者の日常生活自立度</h2>
-  <div class="q" id="nq1"><span class="lb">① 認知症の有無</span>
-    <div class="opts">
-      <label class="opt"><input type="radio" name="n1" value="0"><span>認知症はない<em>→ 自立</em></span></label>
-      <label class="opt"><input type="radio" name="n1" value="1"><span>何らかの認知症がある</span></label>
-    </div>
-  </div>
-  <div class="q" id="nq2" hidden><span class="lb">② 専門医療が必要な状態か</span>
-    <div class="opts">
-      <label class="opt"><input type="radio" name="n2" value="M"><span>著しい精神症状・周辺症状、または重篤な身体疾患があり、専門医療を必要とする<em>例：せん妄、妄想、興奮、自傷・他害などの精神症状や、それに起因する問題行動が継続する → ランクM</em></span></label>
-      <label class="opt"><input type="radio" name="n2" value="no"><span>上記にはあたらない</span></label>
-    </div>
-  </div>
-  <div class="q" id="nq3" hidden><span class="lb">③ 日常生活に支障を来す症状・行動や意思疎通の困難さ</span>
-    <div class="opts">
-      <label class="opt"><input type="radio" name="n3" value="I"><span>日常生活は家庭内・社会的にほぼ自立している<em>ランクⅠ</em></span></label>
-      <label class="opt"><input type="radio" name="n3" value="II"><span>多少みられるが、誰かが注意していれば自立できる<em>ランクⅡ</em></span></label>
-      <label class="opt"><input type="radio" name="n3" value="III"><span>ときどきみられ、介護を必要とする<em>ランクⅢ（一時も目が離せないほどではない）</em></span></label>
-      <label class="opt"><input type="radio" name="n3" value="IV"><span>頻繁にみられ、常に介護を必要とする<em>ランクⅣ（常に目が離せない）</em></span></label>
-    </div>
-  </div>
-  <div class="q" id="nq4" hidden><span class="lb" id="nq4lb">④ 細分類</span><div class="opts" id="nq4opts"></div></div>
-</section>
-<section class="card"><div id="nres" class="res empty">①から選ぶと判定が出ます。</div></section>
+<!-- ポイント -->
+<div data-p="p" hidden>
 <section class="card note">
-  <b>判定のポイント</b>
+  <b>寝たきり度の判定のポイント</b>
   <ul>
-    <li>ⅢとⅣは症状・行動の内容は同じで、<b>頻度</b>（ときどき／頻繁）で分ける。</li>
-    <li>Ⅱa／Ⅱbは支障がみられる<b>場面</b>（家庭外のみ／家庭内でも）、Ⅲa／Ⅲbは<b>時間帯</b>（日中中心／夜間中心）で分ける。</li>
-    <li>Mは、Ⅰ〜Ⅳだった人が精神科や認知症専門病棟などでの治療、または重篤な身体疾患の治療を必要とする状態。</li>
+    <li>「～することができる」という能力ではなく<b>状態</b>、特に<b>移動</b>に関わる状態で判定する。</li>
+    <li>J：障害等はあるが独力で外出する。J1は交通機関でかなり遠くまで、J2は町内程度まで。</li>
+    <li>A（house-bound）：食事・排泄・着替えはおおむね自分で行うが、外出には介助が要る。A1は日中ベッドから離れている時間が長く介助で比較的よく外出、A2は介護者がいてもまれにしか外出しない。</li>
+    <li>B（chair-bound）：B1とB2は、車いすへの移乗を自力でするか、介助が要るかで分ける。夜間のみのおむつは排泄の介助とみなさない。「車いす」はいすやポータブルトイレに読み替えてよい。</li>
+    <li>C（bed-bound）：食事・排泄・着替えのすべてに全面的な介助。C1は自力で寝返りをうつ、C2はうたない。</li>
+    <li>時間帯や体調で変わる場合は、日頃より頻回にみられる状況で選ぶ。</li>
+  </ul>
+</section>
+<section class="card note">
+  <b>認知症自立度の判定のポイント</b>
+  <ul>
+    <li>Ⅰ：在宅生活が基本で、一人暮らしも可能な程度。</li>
+    <li>Ⅱ：誰かが注意していれば自立できる。Ⅱaは家庭外のみ（道に迷う、買物・金銭管理のミス）、Ⅱbは家庭内でも（服薬管理ができない、一人で留守番ができない）。</li>
+    <li>Ⅲ：介護を要するが、一時も目が離せないほどではない。Ⅲaは日中中心、Ⅲbは夜間中心。</li>
+    <li>Ⅳ：Ⅲと同じ症状・行動が頻繁にみられ、常に目が離せない。</li>
+    <li>M：Ⅰ〜Ⅳだった人が、精神症状・周辺症状や重篤な身体疾患のため専門医療を必要とする状態（せん妄、妄想、興奮、自傷・他害などが継続）。</li>
   </ul>
 </section>
 <section class="card caution">
-  意見書の認知症自立度は、一次判定で要支援2と要介護1を振り分ける「認知機能の低下の評価」に、認定調査の結果とともに使われます。
+  意見書の認知症自立度は、一次判定で要支援2と要介護1を振り分ける「認知機能の低下の評価」に、認定調査の結果とともに使われます。認定調査員の判定と食い違う場合は、根拠を特記事項に書いておくと審査会で読み取ってもらいやすくなります。
 </section>
 </div>
 
-<!-- 判定基準表 -->
-<div data-p="t" hidden>
-<section class="card">
-  <h2>障害高齢者の日常生活自立度（寝たきり度）判定基準</h2>
-  <div style="overflow-x:auto"><table>
-    <tr><th>ランク</th><th>判定基準</th></tr>
-    <tr><td class="rk">J<br><small>生活自立</small></td><td>何らかの障害等を有するが、日常生活はほぼ自立しており独力で外出する<br>1．交通機関等を利用して外出する<br>2．隣近所へなら外出する</td></tr>
-    <tr><td class="rk">A<br><small>準寝たきり</small></td><td>屋内での生活は概ね自立しているが、介助なしには外出しない<br>1．介助により外出し、日中はほとんどベッドから離れて生活する<br>2．外出の頻度が少なく、日中も寝たり起きたりの生活をしている</td></tr>
-    <tr><td class="rk">B<br><small>寝たきり</small></td><td>屋内での生活は何らかの介助を要し、日中もベッド上での生活が主体であるが、座位を保つ<br>1．車いすに移乗し、食事、排泄はベッドから離れて行う<br>2．介助により車いすに移乗する</td></tr>
-    <tr><td class="rk">C<br><small>寝たきり</small></td><td>1日中ベッド上で過ごし、排泄、食事、着替において介助を要する<br>1．自力で寝返りをうつ<br>2．自力では寝返りもうたない</td></tr>
-  </table></div>
-  <p class="hint">平成3年11月18日 老健第102-2号 厚生省大臣官房老人保健福祉部長通知。障害等がまったくない者は「自立」。</p>
-</section>
-<section class="card">
-  <h2>認知症高齢者の日常生活自立度判定基準</h2>
-  <div style="overflow-x:auto"><table>
-    <tr><th>ランク</th><th>判定基準</th><th>みられる症状・行動の例</th></tr>
-    <tr><td class="rk">Ⅰ</td><td>何らかの認知症を有するが、日常生活は家庭内及び社会的にほぼ自立している</td><td>—</td></tr>
-    <tr><td class="rk">Ⅱ</td><td>日常生活に支障を来すような症状・行動や意思疎通の困難さが多少見られても、誰かが注意していれば自立できる</td><td>—</td></tr>
-    <tr><td class="rk">Ⅱa</td><td>家庭外で上記Ⅱの状態が見られる</td><td>たびたび道に迷う、買物や事務、金銭管理などそれまでできたことにミスが目立つ 等</td></tr>
-    <tr><td class="rk">Ⅱb</td><td>家庭内でも上記Ⅱの状態が見られる</td><td>服薬管理ができない、電話の応対や訪問者との対応など一人で留守番ができない 等</td></tr>
-    <tr><td class="rk">Ⅲ</td><td>日常生活に支障を来すような症状・行動や意思疎通の困難さがときどき見られ、介護を必要とする</td><td>—</td></tr>
-    <tr><td class="rk">Ⅲa</td><td>日中を中心として上記Ⅲの状態が見られる</td><td>着替え、食事、排便・排尿が上手にできない・時間がかかる、やたらに物を口に入れる、物を拾い集める、徘徊、失禁、大声・奇声をあげる、火の不始末、不潔行為、性的異常行為 等</td></tr>
-    <tr><td class="rk">Ⅲb</td><td>夜間を中心として上記Ⅲの状態が見られる</td><td>ランクⅢaに同じ</td></tr>
-    <tr><td class="rk">Ⅳ</td><td>日常生活に支障を来すような症状・行動や意思疎通の困難さが頻繁に見られ、常に介護を必要とする</td><td>ランクⅢに同じ</td></tr>
-    <tr><td class="rk">M</td><td>著しい精神症状や周辺症状あるいは重篤な身体疾患が見られ、専門医療を必要とする</td><td>せん妄、妄想、興奮、自傷・他害等の精神症状や精神症状に起因する問題行動が継続する状態 等</td></tr>
-  </table></div>
-  <p class="hint">平成5年10月26日 老健第135号（平成18年4月3日 老発第0403003号で改正）。認知症がない者は「自立」。</p>
-</section>
+<!-- 出典 -->
+<div data-p="s" hidden>
 <section class="card">
   <h2>出典</h2>
   <ol class="src">
-    <li>厚生労働省 資料「認知症高齢者の日常生活自立度」<br><a href="https://www.mhlw.go.jp/topics/2013/02/dl/tp0215-11-11d.pdf">https://www.mhlw.go.jp/topics/2013/02/dl/tp0215-11-11d.pdf</a></li>
-    <li>茨城県 認定調査員テキスト「障害高齢者の日常生活自立度（寝たきり度）」（判定の基準・留意点）<br><a href="https://www.pref.ibaraki.jp/hokenfukushi/chofuku/shichoson/kaigo/seido/documents/chousaintext6.pdf">https://www.pref.ibaraki.jp/hokenfukushi/chofuku/shichoson/kaigo/seido/documents/chousaintext6.pdf</a></li>
+    <li>障害高齢者の日常生活自立度（寝たきり度）判定基準：平成3年11月18日 老健第102-2号 厚生省大臣官房老人保健福祉部長通知。判定の留意点は 茨城県 認定調査員テキスト「障害高齢者の日常生活自立度（寝たきり度）」<br><a href="https://www.pref.ibaraki.jp/hokenfukushi/chofuku/shichoson/kaigo/seido/documents/chousaintext6.pdf">https://www.pref.ibaraki.jp/hokenfukushi/chofuku/shichoson/kaigo/seido/documents/chousaintext6.pdf</a></li>
+    <li>認知症高齢者の日常生活自立度判定基準：平成5年10月26日 老健第135号（平成18年4月3日 老発第0403003号で改正）。厚生労働省 資料「認知症高齢者の日常生活自立度」<br><a href="https://www.mhlw.go.jp/topics/2013/02/dl/tp0215-11-11d.pdf">https://www.mhlw.go.jp/topics/2013/02/dl/tp0215-11-11d.pdf</a></li>
     <li>健康長寿ネット（長寿科学振興財団）「障害高齢者の日常生活自立度とは」<br><a href="https://www.tyojyu.or.jp/net/kaigo-seido/kaigo-hoken/shougai-jiritsu.html">https://www.tyojyu.or.jp/net/kaigo-seido/kaigo-hoken/shougai-jiritsu.html</a></li>
   </ol>
+  <p class="lead" style="margin-top:10px">判定基準の文言は上記の通知・資料と照合済み。「ポイント」タブの留意事項は通知の要点を短くまとめたもの。</p>
+</section>
+<section class="card">
+  <p style="margin:0 0 8px">アプリの版：<b>2026-11-14</b>　<button type="button" class="btn" id="forceUpdate">最新版に更新</button></p>
+  <p class="lead" style="margin:0">記載の参考資料です。最終的な判定は診察と日頃の状態に基づいて主治医が行ってください。入力はこの端末にだけ保存され、患者の氏名などは扱いません。</p>
 </section>
 </div>
 </main>
 <div id="toast" role="status"></div>
 
 <script>
-var KEY="iken-nav-v1";
-var S={tab:"d",d1:"",d2:"",n1:"",n2:"",n3:"",n4:""};
+var KEY="iken-nav-v2";
+var S={tab:"j",d:"",n:""};
+var F={d1:"",n1:"",n2:"",n3:""};
 function $(i){return document.getElementById(i);}
-function load(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in S)if(k in o)S[k]=o[k];}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function load(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)for(var k in S)if(k in o)S[k]=o[k];}catch(e){}
+  try{localStorage.removeItem("iken-nav-v1");}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
+/* 障害高齢者の日常生活自立度：群 → ランク（短文）＋判定基準・留意事項 */
+var DG=[
+  {h:"",em:"",r:[["0","自立","障害等をまったく有しない"]]},
+  {h:"J 生活自立",em:"障害等はあるが、日常生活はほぼ自立しており独力で外出する",r:[["J1","J1","交通機関等を利用して外出する"],["J2","J2","隣近所へなら外出する"]]},
+  {h:"A 準寝たきり",em:"屋内の生活はおおむね自立しているが、介助なしには外出しない",r:[["A1","A1","介助により外出し、日中はほとんどベッドから離れて生活"],["A2","A2","外出の頻度が少なく、日中も寝たり起きたり"]]},
+  {h:"B 寝たきり",em:"屋内でも何らかの介助が要り、日中もベッド上が主体だが座位を保つ",r:[["B1","B1","車いすに移乗し、食事・排泄はベッドから離れて行う"],["B2","B2","介助により車いすに移乗する"]]},
+  {h:"C 寝たきり",em:"1日中ベッド上で過ごし、排泄・食事・着替えに介助を要する",r:[["C1","C1","自力で寝返りをうつ"],["C2","C2","自力では寝返りもうたない"]]}
+];
 var D={
   "0":{rk:"自立",df:"障害等をまったく有しない。"},
-  J1:{rk:"J1",df:"日常生活はほぼ自立。交通機関等を利用して外出する。",nt:"バス・電車などの公共交通機関を使い、積極的に、かなり遠くまで外出する。"},
-  J2:{rk:"J2",df:"日常生活はほぼ自立。隣近所へなら外出する。",nt:"近所への買い物や老人会への参加など、町内程度の範囲までなら外出する。"},
-  A1:{rk:"A1",df:"屋内はおおむね自立、介助なしには外出しない。介助により外出し、日中はほとんどベッドから離れて生活する。",nt:"食事・排泄・着替えはおおむね自分で行う。日中ベッドから離れている時間が長く、介護者がいれば比較的多く外出する。"},
-  A2:{rk:"A2",df:"屋内はおおむね自立、介助なしには外出しない。外出の頻度が少なく、日中も寝たり起きたりの生活をしている。",nt:"日中ベッドから離れている時間は長いが、介護者がいてもまれにしか外出しない。"},
-  B1:{rk:"B1",df:"屋内でも介助を要し日中ベッド上主体だが座位を保つ。車いすに移乗し、食事・排泄はベッドから離れて行う。",nt:"介助なしに車いすへ移乗し、食事も排泄もベッドから離れて行う。"},
-  B2:{rk:"B2",df:"屋内でも介助を要し日中ベッド上主体だが座位を保つ。介助により車いすに移乗する。",nt:"介助で車いす等へ移乗し、食事または排泄にも介護者の援助を要する。"},
-  C1:{rk:"C1",df:"1日中ベッド上で過ごし、排泄・食事・着替えに介助を要する。自力で寝返りをうつ。",nt:"常時臥床しているが、自力で寝返りをうち体位を変える。"},
-  C2:{rk:"C2",df:"1日中ベッド上で過ごし、排泄・食事・着替えに介助を要する。自力では寝返りもうたない。",nt:"自力で寝返りをうつこともなく、常時臥床している。"}
+  J1:{rk:"J1",df:"何らかの障害等を有するが、日常生活はほぼ自立しており独力で外出する。交通機関等を利用して外出する。",nt:"バス・電車などの公共交通機関を使い、積極的に、かなり遠くまで外出する。"},
+  J2:{rk:"J2",df:"何らかの障害等を有するが、日常生活はほぼ自立しており独力で外出する。隣近所へなら外出する。",nt:"近所への買い物や老人会への参加など、町内程度の範囲までなら外出する。"},
+  A1:{rk:"A1",df:"屋内での生活は概ね自立しているが、介助なしには外出しない。介助により外出し、日中はほとんどベッドから離れて生活する。",nt:"食事・排泄・着替えはおおむね自分で行う。日中ベッドから離れている時間が長く、介護者がいれば比較的多く外出する。"},
+  A2:{rk:"A2",df:"屋内での生活は概ね自立しているが、介助なしには外出しない。外出の頻度が少なく、日中も寝たり起きたりの生活をしている。",nt:"日中ベッドから離れている時間は長いが、介護者がいてもまれにしか外出しない。"},
+  B1:{rk:"B1",df:"屋内での生活は何らかの介助を要し、日中もベッド上での生活が主体であるが、座位を保つ。車いすに移乗し、食事、排泄はベッドから離れて行う。",nt:"介助なしに車いすへ移乗し、食事も排泄もベッドから離れて行う。夜間のみのおむつは介助とみなさない。"},
+  B2:{rk:"B2",df:"屋内での生活は何らかの介助を要し、日中もベッド上での生活が主体であるが、座位を保つ。介助により車いすに移乗する。",nt:"介助で車いす等へ移乗し、食事または排泄にも介護者の援助を要する。"},
+  C1:{rk:"C1",df:"1日中ベッド上で過ごし、排泄、食事、着替において介助を要する。自力で寝返りをうつ。",nt:"常時臥床しているが、自力で寝返りをうち体位を変える。"},
+  C2:{rk:"C2",df:"1日中ベッド上で過ごし、排泄、食事、着替において介助を要する。自力では寝返りもうたない。",nt:"自力で寝返りをうつこともなく、常時臥床している。"}
 };
-var DSUB={
-  J:["交通機関等を利用して外出する（遠くまで外出できる）→ J1","隣近所へなら外出する（町内程度まで）→ J2"],
-  A:["介助により外出し、日中はほとんどベッドから離れて生活する → A1","外出の頻度が少なく、日中も寝たり起きたりの生活 → A2"],
-  B:["介助なしに車いすへ移乗し、食事・排泄はベッドから離れて行う → B1","介助により車いすに移乗する → B2"],
-  C:["自力で寝返りをうつ → C1","自力では寝返りもうたない → C2"]
-};
+/* 認知症高齢者の日常生活自立度 */
+var NG=[
+  {h:"",em:"",one:1,r:[["0","自立","認知症を有しない"],["I","Ⅰ","認知症はあるが、家庭内・社会的にほぼ自立"]]},
+  {h:"Ⅱ",em:"支障を来す症状・行動や意思疎通の困難さが多少あっても、誰かが注意していれば自立できる",r:[["IIa","Ⅱa","家庭外で（道に迷う、買物・金銭管理のミス）"],["IIb","Ⅱb","家庭内でも（服薬管理ができない、一人で留守番ができない）"]]},
+  {h:"Ⅲ",em:"ときどきみられ、介護を要する（着替え・食事・排泄が上手にできない、徘徊、失禁、大声、火の不始末、不潔行為など）",r:[["IIIa","Ⅲa","日中を中心にみられる"],["IIIb","Ⅲb","夜間を中心にみられる"]]},
+  {h:"",em:"",one:1,r:[["IV","Ⅳ","Ⅲの状態が頻繁にみられ、常に介護を要する（常に目が離せない）"],["M","M","著しい精神症状・周辺症状や重篤な身体疾患で専門医療を要する（せん妄、妄想、興奮、自傷・他害が継続）"]]}
+];
 var N={
   "0":{rk:"自立",df:"認知症を有しない。"},
   I:{rk:"Ⅰ",df:"何らかの認知症を有するが、日常生活は家庭内及び社会的にほぼ自立している。",nt:"在宅生活が基本で、一人暮らしも可能。相談・指導等で症状の改善や進行の阻止を図る。"},
-  IIa:{rk:"Ⅱa",df:"日常生活に支障を来す症状・行動や意思疎通の困難さが多少みられても、誰かが注意していれば自立できる。家庭外でその状態がみられる。",nt:"例：たびたび道に迷う、買物や事務、金銭管理などそれまでできたことにミスが目立つ。一人暮らしは困難な場合もあり、日中の居宅サービスで支援する。"},
-  IIb:{rk:"Ⅱb",df:"日常生活に支障を来す症状・行動や意思疎通の困難さが多少みられても、誰かが注意していれば自立できる。家庭内でもその状態がみられる。",nt:"例：服薬管理ができない、電話の応対や訪問者との対応など一人で留守番ができない。"},
-  IIIa:{rk:"Ⅲa",df:"日常生活に支障を来す症状・行動や意思疎通の困難さがときどきみられ、介護を必要とする。日中を中心にみられる。",nt:"例：着替え・食事・排便・排尿が上手にできない／時間がかかる、物を口に入れる、物を拾い集める、徘徊、失禁、大声・奇声、火の不始末、不潔行為、性的異常行為。一人暮らしは困難で、夜間も含めた居宅サービスを組み合わせる。"},
-  IIIb:{rk:"Ⅲb",df:"日常生活に支障を来す症状・行動や意思疎通の困難さがときどきみられ、介護を必要とする。夜間を中心にみられる。",nt:"症状・行動の例はⅢaに同じ。"},
-  IV:{rk:"Ⅳ",df:"日常生活に支障を来す症状・行動や意思疎通の困難さが頻繁にみられ、常に介護を必要とする。",nt:"常に目を離せない状態。症状・行動はⅢと同じで、頻度の違いで区分する。在宅継続か施設サービスかを家族の介護力等で選ぶ。"},
-  M:{rk:"M",df:"著しい精神症状や周辺症状、あるいは重篤な身体疾患がみられ、専門医療を必要とする。",nt:"例：せん妄、妄想、興奮、自傷・他害などの精神症状や、それに起因する問題行動が継続する。専門医療機関の受診を勧める。"}
-};
-var NSUB={
-  II:[["IIa","家庭外でのみ支障がみられる（道に迷う、買物・金銭管理のミス など）→ Ⅱa"],["IIb","家庭内でもみられる（服薬管理ができない、一人で留守番ができない など）→ Ⅱb"]],
-  III:[["IIIa","日中を中心にみられる → Ⅲa"],["IIIb","夜間を中心にみられる → Ⅲb"]]
+  IIa:{rk:"Ⅱa",df:"日常生活に支障を来すような症状・行動や意思疎通の困難さが多少見られても、誰かが注意していれば自立できる。家庭外でその状態が見られる。",nt:"例：たびたび道に迷う、買物や事務、金銭管理などそれまでできたことにミスが目立つ。"},
+  IIb:{rk:"Ⅱb",df:"日常生活に支障を来すような症状・行動や意思疎通の困難さが多少見られても、誰かが注意していれば自立できる。家庭内でもその状態が見られる。",nt:"例：服薬管理ができない、電話の応対や訪問者との対応など一人で留守番ができない。"},
+  IIIa:{rk:"Ⅲa",df:"日常生活に支障を来すような症状・行動や意思疎通の困難さがときどき見られ、介護を必要とする。日中を中心として見られる。",nt:"例：着替え・食事・排便・排尿が上手にできない／時間がかかる、やたらに物を口に入れる、物を拾い集める、徘徊、失禁、大声・奇声、火の不始末、不潔行為、性的異常行為。"},
+  IIIb:{rk:"Ⅲb",df:"日常生活に支障を来すような症状・行動や意思疎通の困難さがときどき見られ、介護を必要とする。夜間を中心として見られる。",nt:"症状・行動の例はⅢaに同じ。"},
+  IV:{rk:"Ⅳ",df:"日常生活に支障を来すような症状・行動や意思疎通の困難さが頻繁に見られ、常に介護を必要とする。",nt:"常に目を離せない状態。症状・行動はⅢと同じで、頻度の違いで区分する。"},
+  M:{rk:"M",df:"著しい精神症状や周辺症状あるいは重篤な身体疾患が見られ、専門医療を必要とする。",nt:"例：せん妄、妄想、興奮、自傷・他害等の精神症状や精神症状に起因する問題行動が継続する。専門医療機関の受診を勧める。"}
 };
 
-function radios(name,list){return list.map(function(x){return '<label class="opt"><input type="radio" name="'+name+'" value="'+x[0]+'"><span>'+x[1]+'</span></label>';}).join("");}
-function setChecked(name,v){Array.prototype.forEach.call(document.getElementsByName(name),function(r){r.checked=(r.value===v);});}
-function resHTML(o){if(!o)return null;return '<div class="rk">'+o.rk+'</div><p class="df">'+o.df+'</p>'+(o.nt?'<p class="nt">'+o.nt+'</p>':'');}
-function showRes(id,o,msg){var el=$(id);if(o){el.className="res";el.innerHTML=resHTML(o);}else{el.className="res empty";el.textContent=msg;}}
+function rankHTML(groups,attr){
+  return groups.map(function(g){
+    var head=g.h?'<div class="gh"><b>'+g.h+'</b>'+g.em+'</div>':'';
+    var btns=g.r.map(function(r){return '<button type="button" class="rk" data-'+attr+'="'+r[0]+'" aria-pressed="false"><b>'+r[1]+'</b><span>'+r[2]+'</span></button>';}).join("");
+    return '<div class="grp">'+head+'<div class="rks'+(g.one?' one':'')+'">'+btns+'</div></div>';
+  }).join("");
+}
+function detHTML(o){return '<div class="t">判定：'+o.rk+'</div><p>'+o.df+'</p>'+(o.nt?'<p class="nt">'+o.nt+'</p>':'');}
 
-function dRank(){if(S.d1==="0")return "0";if(S.d1&&S.d2)return S.d1+S.d2;return "";}
-function nRank(){
-  if(S.n1==="0")return "0";
-  if(S.n1!=="1")return "";
-  if(S.n2==="M")return "M";
-  if(S.n2!=="no")return "";
-  if(S.n3==="I"||S.n3==="IV")return S.n3;
-  if((S.n3==="II"||S.n3==="III")&&S.n4&&S.n4.indexOf(S.n3)===0&&S.n4.length===S.n3.length+1)return S.n4;
-  return "";
+/* 迷ったときの質問（答えるとランクを選ぶ） */
+var QD=[
+  {k:"d1",lb:"① 普段の移動の状態",o:[["0","障害等はまったくない"],["J","独力で外出する"],["A","屋内はおおむね自立、外出には介助が要る"],["B","日中もベッド上が主体だが座位は保つ"],["C","1日中ベッド上、食事・排泄・着替えに介助"]]}
+];
+var QD2={J:[["J1","交通機関でかなり遠くまで出かける"],["J2","町内程度（隣近所）まで"]],
+  A:[["A1","日中はほとんどベッドから離れ、介助でよく外出する"],["A2","日中も寝たり起きたり、外出はまれ"]],
+  B:[["B1","車いすへ自力で移乗し、食事・排泄はベッドを離れて"],["B2","車いすへの移乗に介助が要る"]],
+  C:[["C1","自力で寝返りをうつ"],["C2","寝返りもうたない"]]};
+function segHTML(name,lb,opts,cur,attr){
+  return '<div class="q"><span class="lb">'+lb+'</span><div class="seg">'+opts.map(function(o){
+    return '<button type="button" data-'+attr+'="'+name+'" data-val="'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>';}).join("")+'</div></div>';
 }
-function renderD(){
-  setChecked("d1",S.d1);
-  var sub=DSUB[S.d1];
-  $("dq2").hidden=!sub;
-  if(sub){
-    $("dq2lb").textContent="② ランク"+S.d1+"の細分類";
-    $("dq2opts").innerHTML=radios("d2",[["1",sub[0]],["2",sub[1]]]);
-    setChecked("d2",S.d2);
-  }
-  var r=dRank();
-  showRes("dres",D[r],S.d1?"②を選ぶと判定が出ます。":"①から選ぶと判定が出ます。");
+function renderFlowD(){
+  var h=segHTML("d1",QD[0].lb,QD[0].o,F.d1,"fd");
+  if(QD2[F.d1])h+=segHTML("d2","② ランク"+F.d1+"の細分類",QD2[F.d1],S.d,"fd");
+  $("flowD").innerHTML=h;
 }
-function renderN(){
-  setChecked("n1",S.n1);setChecked("n2",S.n2);setChecked("n3",S.n3);
-  $("nq2").hidden=S.n1!=="1";
-  $("nq3").hidden=!(S.n1==="1"&&S.n2==="no");
-  var sub=(S.n1==="1"&&S.n2==="no")?NSUB[S.n3]:null;
-  $("nq4").hidden=!sub;
-  if(sub){$("nq4lb").textContent="④ ランク"+(S.n3==="II"?"Ⅱ":"Ⅲ")+"の細分類";$("nq4opts").innerHTML=radios("n4",sub);setChecked("n4",S.n4);}
-  var r=nRank();
-  showRes("nres",N[r],S.n1?"続けて選ぶと判定が出ます。":"①から選ぶと判定が出ます。");
+function renderFlowN(){
+  var h=segHTML("n1","① 認知症の有無",[["0","ない"],["1","ある"]],F.n1,"fn");
+  if(F.n1==="1")h+=segHTML("n2","② 著しい精神症状・周辺症状や重篤な身体疾患で、専門医療が必要か",[["M","必要（せん妄・妄想・興奮・自傷他害が継続など）"],["no","必要ではない"]],F.n2,"fn");
+  if(F.n1==="1"&&F.n2==="no")h+=segHTML("n3","③ 生活に支障を来す症状・行動や意思疎通の困難さ",[["I","ほぼない（家庭内・社会的にほぼ自立）"],["II","多少あるが、誰かが注意すれば自立"],["III","ときどきあり、介護が要る"],["IV","頻繁にあり、常に介護が要る"]],F.n3,"fn");
+  if(F.n1==="1"&&F.n2==="no"&&F.n3==="II")h+=segHTML("n4","④ どこでみられるか",[["IIa","家庭外のみ"],["IIb","家庭内でも"]],S.n,"fn");
+  if(F.n1==="1"&&F.n2==="no"&&F.n3==="III")h+=segHTML("n4","④ いつ多いか",[["IIIa","日中が中心"],["IIIb","夜間が中心"]],S.n,"fn");
+  $("flowN").innerHTML=h;
 }
-function renderSum(){var d=D[dRank()],n=N[nRank()];$("sumD").textContent=d?d.rk:"—";$("sumN").textContent=n?n.rk:"—";}
-function renderAll(){renderD();renderN();renderSum();}
+
+function renderSel(){
+  Array.prototype.forEach.call(document.querySelectorAll("[data-dr]"),function(b){b.setAttribute("aria-pressed",String(b.dataset.dr===S.d));});
+  Array.prototype.forEach.call(document.querySelectorAll("[data-nr]"),function(b){b.setAttribute("aria-pressed",String(b.dataset.nr===S.n));});
+  var d=D[S.d],n=N[S.n];
+  $("detD").hidden=!d;if(d)$("detD").innerHTML=detHTML(d);
+  $("detN").hidden=!n;if(n)$("detN").innerHTML=detHTML(n);
+  renderFlowD();renderFlowN();
+  sum();
+}
+function sum(){
+  if(!window.wcSum)return;
+  var d=D[S.d],n=N[S.n];
+  if(!d&&!n){wcSum.set(null);return;}
+  wcSum.set("寝たきり度 "+(d?d.rk:"—")+" ／ 認知症 "+(n?n.rk:"—"),{tone:(d&&n)?"ok":"info",pill:(d&&n)?"判定済":"未判定あり"});
+}
 function setTab(v){S.tab=v;Array.prototype.forEach.call(document.querySelectorAll("nav.tabs button"),function(b){b.setAttribute("aria-selected",b.dataset.v===v?"true":"false");});
   Array.prototype.forEach.call(document.querySelectorAll("[data-p]"),function(p){p.hidden=p.dataset.p!==v;});}
 function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on");},3000);}
 
-document.addEventListener("change",function(e){
-  var t=e.target;if(t.type!=="radio")return;
-  if(t.name==="d1"){S.d1=t.value;S.d2="";}
-  else if(t.name==="d2"){S.d2=t.value;}
-  else if(t.name==="n1"){S.n1=t.value;if(t.value==="0"){S.n2="";S.n3="";S.n4="";}}
-  else if(t.name==="n2"){S.n2=t.value;if(t.value==="M"){S.n3="";S.n4="";}}
-  else if(t.name==="n3"){S.n3=t.value;S.n4="";}
-  else if(t.name==="n4"){S.n4=t.value;}
-  else return;
-  renderAll();save();
-});
 document.addEventListener("click",function(e){
-  var b=e.target.closest("nav.tabs button");if(b){setTab(b.dataset.v);save();window.scrollTo(0,0);return;}
-  if(e.target.id==="copyBtn"){
-    var d=D[dRank()],n=N[nRank()];
+  var t=e.target.closest("button");if(!t)return;
+  if(t.closest("nav.tabs")){setTab(t.dataset.v);save();window.scrollTo(0,0);return;}
+  if(t.dataset.dr!==undefined){S.d=(S.d===t.dataset.dr)?"":t.dataset.dr;save();renderSel();return;}
+  if(t.dataset.nr!==undefined){S.n=(S.n===t.dataset.nr)?"":t.dataset.nr;save();renderSel();return;}
+  if(t.dataset.fd){var k=t.dataset.fd,v=t.dataset.val;
+    if(k==="d1"){F.d1=v;if(v==="0")S.d="0";else if(S.d.charAt(0)!==v)S.d="";}
+    else S.d=v;
+    save();renderSel();return;}
+  if(t.dataset.fn){var k2=t.dataset.fn,v2=t.dataset.val;
+    if(k2==="n1"){F.n1=v2;F.n2="";F.n3="";S.n=(v2==="0")?"0":"";}
+    else if(k2==="n2"){F.n2=v2;F.n3="";S.n=(v2==="M")?"M":"";}
+    else if(k2==="n3"){F.n3=v2;S.n=(v2==="I"||v2==="IV")?v2:"";}
+    else S.n=v2;
+    save();renderSel();return;}
+  if(t.id==="copyBtn"){
+    var d=D[S.d],n=N[S.n];
     var txt="障害高齢者の日常生活自立度（寝たきり度）："+(d?d.rk:"未判定")+"\n認知症高齢者の日常生活自立度："+(n?n.rk:"未判定");
     var done=function(){toast("コピーしました");};
-    try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done,fallback);}else fallback();}catch(err){fallback();}
-    function fallback(){try{var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();done();}catch(x){toast("コピーできませんでした");}}
-  }
+    var fb=function(){try{var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();done();}catch(x){toast("コピーできませんでした");}};
+    try{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(done,fb);else fb();}catch(err){fb();}
+    return;}
+  if(t.id==="forceUpdate"){toast("最新版を確認しています…");
+    (function(){var p=Promise.resolve();
+      try{if("serviceWorker" in navigator)p=navigator.serviceWorker.getRegistration("../").then(function(r){if(r)return r.update();}).catch(function(){});}catch(x){}
+      p.then(function(){return fetch(location.href,{cache:"reload"});}).then(function(){setTimeout(function(){location.reload();},800);},function(){toast("通信できないため更新を確認できません");});
+    })();return;}
 });
-load();setTab(S.tab);renderAll();
+load();
+$("rkD").innerHTML=rankHTML(DG,"dr");
+$("rkN").innerHTML=rankHTML(NG,"nr");
+setTab(S.tab);renderSel();
+window.addEventListener("load",sum);
 </script>
 <script>
 (function(){
@@ -328,6 +315,68 @@ load();setTab(S.tab);renderAll();
   }catch(e){}
 })();
 </script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".wc-none"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
 <!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
 <style>
 #wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -355,7 +404,7 @@ load();setTab(S.tab);renderAll();
 <div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
 <script>
 (function(){
-  var KEYS=["iken-nav-v1"];
+  var KEYS=["iken-nav-v2"];
   try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
   var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
   function close(){dlg.classList.remove("on");}
