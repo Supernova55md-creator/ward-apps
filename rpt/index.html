@@ -236,7 +236,7 @@ textarea.out{width:100%;min-height:150px;font:13px/1.55 var(--num);border:1px so
     <label class="f"><span>血糖（mg/dL、補正後）</span><input type="number" id="glu" inputmode="numeric"></label>
     <label class="f"><span>血小板（万/µL）</span><input type="number" id="plt" inputmode="decimal" step="0.1"></label>
     <label class="f"><span>PT-INR</span><input type="number" id="inr" inputmode="decimal" step="0.01"></label>
-    <label class="f"><span>抗凝固薬</span><select id="ac"><option value="none">なし</option><option value="war">ワルファリン</option><option value="dabi">ダビガトラン</option><option value="xa">抗Xa薬（リバーロ・アピキ・エドキ）</option><option value="hep">ヘパリン投与中</option></select></label>
+    <label class="f"><span>抗凝固薬</span><select id="ac"><option value="none">なし</option><option value="war">ワルファリン（ワーファリン）</option><option value="dabi">ダビガトラン（プラザキサ）</option><option value="xa">抗Xa薬（リバーロキサバン〈イグザレルト〉・アピキサバン〈エリキュース〉・エドキサバン〈リクシアナ〉）</option><option value="hep">ヘパリン投与中</option></select></label>
     <label class="f" id="doacWrap"><span>DOAC最終服用からの時間（h）</span><input type="number" id="doacH" inputmode="decimal" step="0.5" placeholder="不明なら空欄"></label>
     <label class="f"><span>抗アミロイドβ抗体薬</span><select id="aab"><option value="none">投与なし</option><option value="noaria">投与中・MRIでARIAなし</option><option value="aria">投与中・MRIでARIAあり</option><option value="unk">投与中・MRI未確認</option></select></label>
   </div>
@@ -355,7 +355,7 @@ const EX=[
  ["ex_plt","血小板10万/mm³以下（肝硬変・血液疾患の病歴がある患者）",1],
  ["ex_inr","PT-INR 1.7超",1],
  ["ex_aptt","aPTTの延長（前値の1.5倍［目安 約40秒］を超える）"],
- ["ex_doac","DOACの最終服用後4時間以内",1],
+ ["ex_doac","DOAC（ダビガトラン〈プラザキサ〉、抗Xa薬〈イグザレルト・エリキュース・リクシアナ〉）の最終服用後4時間以内",1],
  ["ex_eic","広汎な早期虚血性変化"],
  ["ex_mass","圧排所見（正中構造偏位）"],
  ["ex_aria","抗アミロイドβ抗体薬投与中でMRI上ARIAあり",1]
@@ -377,7 +377,7 @@ const CA=[
  ["ca_ulc","消化管潰瘍・憩室炎、大腸炎"],
  ["ca_tb","活動性結核"],
  ["ca_ret","糖尿病性出血性網膜症・出血性眼症"],
- ["ca_at","血栓溶解薬、抗血栓薬投与中（とくに経口抗凝固薬投与中）",1],
+ ["ca_at","血栓溶解薬、抗血栓薬投与中（とくに経口抗凝固薬投与中：ワルファリン〈ワーファリン〉・DOAC）",1],
  ["ca_mens","月経期間中"],
  ["ca_ckd","重篤な腎障害"],
  ["ca_dm","コントロール不良の糖尿病"]
@@ -471,7 +471,7 @@ function judgeIVT(s,ex,ca){
   add("note","来院から1時間以内（できるだけ早く）に開始"+src("GL"));
   if(s.mild&&!s.dis){r.cls="warn";r.st="軽症・非障害性";
     r.big="NIHSS "+s.nih+"の非障害性軽症：rt-PAよりDAPTを考慮";
-    add("caution","非障害性の軽症では、アルテプラーゼの代わりに抗血小板薬を考慮しても良い（推奨度C）。PRISMSでIVTの上乗せ効果なし、ARAMISでDAPTがIVTに非劣性"+src("GL","prisms","aramis"));
+    add("caution","非障害性の軽症では、アルテプラーゼの代わりに抗血小板薬（アスピリン〈バイアスピリン〉＋クロピドグレル〈プラビックス〉のDAPT）を考慮しても良い（推奨度C）。PRISMSでIVTの上乗せ効果なし、ARAMISでDAPTがIVTに非劣性"+src("GL","prisms","aramis"));
     if(s.lvo)add("note","主幹動脈閉塞を伴う軽症例は血栓回収を考慮しても良い（6時間以内、推奨度C）。症状の進行に注意");}
   else if(s.mild&&s.dis){add("note","NIHSSは低いが機能障害性の症状あり：rt-PAの対象（軽症は慎重投与項目として説明と同意）")}
   if(ca.length){if(r.cls==="ok")r.cls="warn";r.st+="・慎重投与"+ca.length;
@@ -483,8 +483,8 @@ function judgeIVT(s,ex,ca){
   if(s.ac==="hep")add("caution","ヘパリン投与中：aPTTが前値の1.5倍（約40秒）超なら適応外");
   if(s.aab==="unk")add("avoid","抗Aβ抗体薬投与中でMRI未確認：投与前MRIでARIAの有無を確認（ARIAありは適応外）");
   if(s.lvo&&!(s.mild&&!s.dis))add("do","主幹動脈閉塞あり：rt-PAは血栓回収の開始前に行い、効果確認のために血栓回収を遅らせない"+src("GL","RT"));
-  add("note","治療中〜24時間：血圧180/105 mmHg未満に管理");
-  add("avoid","投与後24時間は抗血栓薬（抗血小板薬・抗凝固薬）を開始しない。24時間後の画像で出血がないことを確認してから"+src("RT"));
+  add("note","治療中〜24時間：血圧180/105 mmHg未満に管理（降圧薬の例：ニカルジピン〈ペルジピン〉・ジルチアゼム〈ヘルベッサー〉の静注）");
+  add("avoid","投与後24時間は抗血栓薬（抗血小板薬：アスピリン〈バイアスピリン〉・クロピドグレル〈プラビックス〉など、抗凝固薬：ヘパリン・ワルファリン〈ワーファリン〉・DOACなど）を開始しない。24時間後の画像で出血がないことを確認してから"+src("RT"));
   add("avoid","併用禁忌：デフィブロチド（デファイテリオ）。アルテプラーゼの添付文書で併用禁忌");
   return r;
 }
@@ -573,7 +573,7 @@ function judgeEVT(s){
       add("caution","NIHSS 10未満の脳底動脈閉塞はRCTで十分検討されていない。症状の動揺・進行があれば個別に検討")}
   }
   if(r.grade&&s.lvo&&s.tL<=4.5)add("note","rt-PAの適応があれば先に投与し、血栓回収を遅らせない");
-  if(r.grade)add("note","血栓回収後は収縮期血圧180 mmHg以下に速やかに降圧、140 mmHg以下の過度な低下は避ける"+src("GL"));
+  if(r.grade)add("note","血栓回収後は収縮期血圧180 mmHg以下に速やかに降圧（降圧薬の例：ニカルジピン〈ペルジピン〉静注）、140 mmHg以下の過度な低下は避ける"+src("GL"));
   if(r.grade)add("note","再開通が得られない場合は保存療法より死亡リスクが増える可能性があり、事前に説明（機器の添付文書）");
   return r;
 }
@@ -659,7 +659,7 @@ const GLR=[
  ["rt-PA","発症4.5時間以内、0.6 mg/kg静注（慎重に適応判断）","A"],
  ["rt-PA","来院後できるだけ早く（遅くとも1時間以内）開始","A"],
  ["rt-PA","発症時刻不明でDWIの虚血がFLAIRで不明瞭","C"],
- ["rt-PA","非障害性の軽症ではアルテプラーゼの代わりに抗血小板薬","C"],
+ ["rt-PA","非障害性の軽症ではアルテプラーゼの代わりに抗血小板薬（アスピリン〈バイアスピリン〉＋クロピドグレル〈プラビックス〉のDAPT）","C"],
  ["rt-PA","抗Aβ抗体薬投与中：投与前MRIを確認し、より慎重に検討（ARIAありは適応外）","—"],
  ["血栓回収","ICA/M1・6時間以内：発症前mRS 0–1、NIHSS≥6、ASPECTS≥6、18歳以上（rt-PAを含む内科治療に追加）","A"],
  ["血栓回収","ICA/M1・6時間超：救済可能領域が十分と判定されれば24時間以内","A"],

@@ -96,6 +96,10 @@ table.rt td,table.rt th{border-top:1px solid var(--line);padding:6px 4px;vertica
 table.rt th{color:var(--muted);font-size:12px;font-weight:700;width:7em}
 tr.hit td,tr.hit th{background:var(--accent-soft);font-weight:700}
 .pg{font-size:11px;color:var(--muted);margin-top:8px}
+.rep{font-size:12.5px;background:var(--bg);border:1px dashed var(--line);border-radius:9px;padding:6px 9px;margin-top:8px}
+.rep>b{display:block;font-size:12px;color:var(--muted);margin-bottom:1px}
+.rep div{margin:1px 0}
+.rep .rep-n{font-size:11px;color:var(--muted);margin-top:2px}
 .alert{border-left:5px solid var(--warn);background:var(--warn-soft);border-radius:9px;padding:9px 12px;margin:8px 0;font-size:13.5px}
 .alert.info{border-color:var(--accent);background:var(--accent-soft)}
 .alert>b:first-child{display:block;margin-bottom:2px}
@@ -418,6 +422,43 @@ document.addEventListener("click",e=>{
 /* ---------- 共通 ---------- */
 function list(arr,cls){arr=(arr||[]).filter(x=>x&&String(x).trim());if(!arr.length)return "";const f=new Set();return {html:`<ul class="${cls||""}">${arr.map(x=>`<li>${linkify(x,f)}</li>`).join("")}</ul>`,f};}
 function pages(p){p=(p||[]).filter(Boolean);return p.length?`<div class="pg">出典：サンフォード2026 p.${p.join(", ")}</div>`:"";}
+/* ---------- 系統名の代表薬（表示のみ。推奨内容は変えない） ---------- */
+const CEPH_REP={
+  "注1":"セファゾリン（セファメジンα）",
+  "注2":"セフメタゾール（セフメタゾン）、セフォチアム（パンスポリン）",
+  "注3":"セフトリアキソン（ロセフィン）、セフォタキシム（クラフォラン、セフォタックス）",
+  "注4":"セフェピム、セフォゾプラン（ファーストシン）",
+  "経口1":"セファレキシン（ケフレックス）",
+  "経口2":"セフロキシム アキセチル（オラセフ）",
+  "経口3":"セフジトレン ピボキシル（メイアクトMS）、セフカペン ピボキシル（フロモックス）、セフポドキシム プロキセチル（バナン）"
+};
+const CLASS_REP=[
+  [/(?<![A-Za-z])(?:AP-)?AG(?![A-Za-z])|アミノグリコシド/,"アミノグリコシド系（AG）","ゲンタマイシン（ゲンタシン）、トブラマイシン（トブラシン）、アミカシン（アミカシン硫酸塩）"],
+  [/(?<![A-Za-z])FQ(?![A-Za-z])|キノロン/,"フルオロキノロン系（FQ）","レボフロキサシン（クラビット）、シプロフロキサシン（シプロキサン）、モキシフロキサシン（アベロックス）"],
+  [/カルバペネム/,"カルバペネム系","メロペネム（メロペン）、イミペネム・シラスタチン（チエナム）"],
+  [/マクロライド/,"マクロライド系","アジスロマイシン（ジスロマック）、クラリスロマイシン（クラリス、クラリシッド）"],
+  [/テトラサイクリン|(?<![A-Za-z])TCs(?![A-Za-z])/,"テトラサイクリン系","ミノサイクリン（ミノマイシン）、ドキシサイクリン（ビブラマイシン）"],
+  [/エキノキャンディン/,"エキノキャンディン系","ミカファンギン（ファンガード）、カスポファンギン（カンサイダス）"],
+  [/アゾール/,"アゾール系","フルコナゾール（ジフルカン）、ボリコナゾール（ブイフェンド）"],
+  [/抗凝固/,"抗凝固薬","未分画ヘパリン、ワルファリン（ワーファリン）"],
+  [/ステロイド/,"ステロイド","メチルプレドニゾロン（ソル・メドロール）、デキサメタゾン（デキサート）"]
+];
+function classReps(texts){
+  const t=(texts||[]).flat().filter(Boolean).join(" ／ ");
+  const out=[],seen=new Set();
+  const addC=(route,n)=>{const k=route+n;if(seen.has(k)||!CEPH_REP[k])return;seen.add(k);out.push([(route==="経口"?"経口":"注射")+"第"+n+"世代セフェム（"+route+"Ceph "+n+"）",CEPH_REP[k]]);};
+  let m;const re1=/(経口|注)?\s*Ceph\s*([1-4](?:\s*[,，、\/]\s*[1-4])*)/g;
+  while((m=re1.exec(t))){const route=m[1]==="経口"?"経口":"注";(m[2].match(/[1-4]/g)||[]).forEach(n=>addC(route,n));}
+  const re2=/第([1-4])世代\s*(?:Ceph|セフェム|セファロスポリン)/g;
+  while((m=re2.exec(t)))addC("注",m[1]);
+  out.sort((a,b)=>a[0].localeCompare(b[0],"ja"));
+  CLASS_REP.forEach(([re,lab,reps])=>{if(re.test(t))out.push([lab,reps]);});
+  return out;
+}
+function repHTML(texts){
+  const r=classReps(texts);if(!r.length)return "";
+  return `<div class="rep"><b>系統名の代表薬（国内の一般名と商品名）</b>${r.map(([l,x])=>`<div>・${esc(l)}：${esc(x)}</div>`).join("")}<div class="rep-n">原本の系統名に対応する代表例。処方は上の記載と添付文書で確認。</div></div>`;
+}
 function hay(o){return JSON.stringify(o).toLowerCase();}
 function matchQ(o,q){if(!q)return true;const h=o.__h||(o.__h=hay(o));return q.toLowerCase().split(/\s+/).filter(Boolean).every(w=>h.includes(w));}
 
@@ -435,6 +476,7 @@ function focusBody(f){
   const a=list(f.alternative);if(a){parts.push(`<h4>代替</h4>`+a.html);a.f.forEach(x=>ids.add(x));}
   const n=list(f.notes);if(n){parts.push(`<h4>注記</h4>`+n.html);n.f.forEach(x=>ids.add(x));}
   if(f.duration)parts.push(`<h4>治療期間</h4><p>${linkify(f.duration)}</p>`);
+  parts.push(repHTML([f.primary,f.alternative,f.notes,f.duration]));
   parts.push(`<div data-rd="${esc(f.id)}">${rdoseBlock(ids)}</div>`);
   if(f.__spec)parts.push(`<p class="hint">この項目は起因菌が判明した後の治療です。菌が未確定なら上の「起因菌がはっきりしないとき」から。</p>`);
   parts.push(pages(f.pages));
@@ -487,6 +529,7 @@ function orgBody(o){
   const p=list(o.primary,"pri");if(p){parts.push(`<h4>第一選択</h4>`+p.html);p.f.forEach(x=>ids.add(x));}
   const a=list(o.alternative);if(a){parts.push(`<h4>代替</h4>`+a.html);a.f.forEach(x=>ids.add(x));}
   const n=list(o.notes);if(n){parts.push(`<h4>注記</h4>`+n.html);n.f.forEach(x=>ids.add(x));}
+  parts.push(repHTML([o.situation,o.primary,o.alternative,o.notes]));
   parts.push(`<div data-rd="1">${rdoseBlock(ids)}</div>`);
   parts.push(pages(o.pages));o.__ids=ids;return parts.join("");
 }
@@ -580,7 +623,7 @@ $("#qDur").addEventListener("input",renderDur);
 function renderDur(){
   const q=$("#qDur").value.trim();
   const arr=(DATA.org.durations||[]).filter(d=>matchQ(d,q));
-  $("#durList").innerHTML=arr.length?`<table class="rt">${arr.map(d=>`<tr><td style="width:55%">${esc(d.site)}${d.note?`<div class="hint" style="margin:0">${esc(d.note)}</div>`:""}</td><td><b>${esc(d.duration)}</b></td></tr>`).join("")}</table>${pages([...new Set(arr.flatMap(d=>d.pages||[]))])}`:`<p class="empty">該当なし</p>`;
+  $("#durList").innerHTML=arr.length?`<table class="rt">${arr.map(d=>`<tr><td style="width:55%">${esc(d.site)}${d.note?`<div class="hint" style="margin:0">${esc(d.note)}</div>`:""}</td><td><b>${esc(d.duration)}</b></td></tr>`).join("")}</table>${repHTML(arr.map(d=>[d.site,d.duration,d.note]))}${pages([...new Set(arr.flatMap(d=>d.pages||[]))])}`:`<p class="empty">該当なし</p>`;
 }
 function simpleCard(sel,title,o){
   if(!o||(!(o.rows||[]).length&&!(o.notes||[]).length)){$(sel).remove();return;}
@@ -684,6 +727,7 @@ function renderFlow(){
       `<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">第一選択</h4>${hlList(f.primary,r.hl,ids)}`+
       ((f.alternative||[]).length?`<h4 style="font-size:12px;color:var(--muted);margin:6px 0 2px">代替</h4>${hlList(f.alternative,r.hl,ids)}`:"")+
       (f.duration?`<p style="font-size:13.5px;margin:6px 0 0"><b>期間：</b>${esc(f.duration)}</p>`:"")+
+      repHTML([f.primary,f.alternative])+
       `<div class="row-btn" style="margin-top:6px"><button type="button" class="dl" data-focus="${esc(f.id)}">注記を含めてFocusで見る →</button></div>${pages(f.pages)}</div>`;});
   const sn=sepsisNotes();
   if(sn.length)h+=`<h4 style="font-size:12px;color:var(--muted);margin:8px 0 2px">条件に関係する注記（敗血症・感染源不明の項より）</h4>${hlList(sn,[],ids)}${pages((FX.sepsis_unknown||{}).pages)}`;

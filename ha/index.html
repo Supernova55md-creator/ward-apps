@@ -273,6 +273,7 @@ details.more .cnt{font-weight:400;color:var(--muted);font-size:12.5px;margin-lef
         <label class="chip"><input type="checkbox" id="a-gi" data-wp="at" data-wp-v="ap,ac,both"><span>消化性潰瘍・抗血栓薬</span></label>
         <label class="chip"><input type="checkbox" id="a-drive"><span>服用後に運転</span></label>
       </div>
+      <p class="hint">代表薬：強いCYP3A4阻害薬＝クラリスロマイシン（クラリス）、イトラコナゾール（イトリゾール）、リトナビル（ノービア）／SSRI・SNRI＝セルトラリン（ジェイゾロフト）、エスシタロプラム（レクサプロ）、デュロキセチン（サインバルタ）／抗血栓薬＝アスピリン（バイアスピリン）、クロピドグレル（プラビックス）、アピキサバン（エリキュース）</p>
       <div class="q" style="margin-top:10px"><span class="lb">急性期薬を飲む日（月あたり）</span>
         <div class="chips">
           <label class="chip"><input type="radio" name="a-days" value="3" data-l="月5日以下"><span>5日以下</span></label>
@@ -345,6 +346,7 @@ details.more .cnt{font-weight:400;color:var(--muted);font-size:12.5px;margin-lef
         <label class="chip"><input type="checkbox" id="p-f-gep"><span>ゲパント</span></label>
         <label class="chip"><input type="checkbox" id="p-f-mab"><span>CGRP関連抗体</span></label>
       </div>
+      <p class="hint">ゲパント＝リメゲパント（ナルティーク）、アトゲパント（アクイプタ）／CGRP関連抗体＝ガルカネズマブ（エムガルティ）、フレマネズマブ（アジョビ）、エレヌマブ（アイモビーグ）</p>
       <div class="sec-h">ほかの背景</div>
       <div class="chips">
         <label class="chip"><input type="checkbox" id="p-noacute"><span>急性期薬が使えない・効かない</span></label>
@@ -357,6 +359,7 @@ details.more .cnt{font-weight:400;color:var(--muted);font-size:12.5px;margin-lef
         <label class="chip"><input type="checkbox" id="p-const"><span>便秘が強い</span></label>
         <label class="chip"><input type="checkbox" id="p-cyp"><span>強いCYP3A4阻害薬</span></label>
       </div>
+      <p class="hint">強いCYP3A4阻害薬＝クラリスロマイシン（クラリス）、イトラコナゾール（イトリゾール）、リトナビル（ノービア）など</p>
       <p class="hint">65歳以上・腎機能・肝機能はプロファイルから取ります。</p>
     </details>
   </section>
@@ -379,6 +382,7 @@ details.more .cnt{font-weight:400;color:var(--muted);font-size:12.5px;margin-lef
     <div class="mrow"><span>オピオイド</span><div class="chips"><label class="chip"><input type="radio" name="m-opi" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-opi" value="12"><span>10日以上</span></label></div></div>
     <div class="mrow"><span>ラスミジタン・急性期のゲパント</span><div class="chips"><label class="chip"><input type="radio" name="m-new" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-new" value="12"><span>10日以上</span></label></div></div>
     <div class="mrow"><span>すべての急性期薬の合計</span><div class="chips"><label class="chip"><input type="radio" name="m-tot" value="5"><span>1〜9日</span></label><label class="chip"><input type="radio" name="m-tot" value="12"><span>10日以上</span></label></div></div>
+    <p class="hint">代表薬：トリプタン＝スマトリプタン（イミグラン）、リザトリプタン（マクサルト）、エレトリプタン（レルパックス）／エルゴタミン＝クリアミン配合錠／オピオイド＝トラマドール（トラマール）、トラマドール・アセトアミノフェン（トラムセット）、ペンタゾシン（ソセゴン）</p>
     <div class="bulk"><button type="button" data-mclr="1">服用日数をリセット</button></div>
     <div class="sec-h">背景</div>
     <div class="chips">
@@ -472,6 +476,7 @@ details.more .cnt{font-weight:400;color:var(--muted);font-size:12.5px;margin-lef
         <label class="chip"><input type="checkbox" id="c-hf"><span>うっ血性心不全</span></label>
         <label class="chip"><input type="checkbox" id="c-bb"><span>β遮断薬・ジゴキシン・強いCYP3A4阻害薬</span></label>
       </div>
+      <p class="hint">β遮断薬＝ビソプロロール（メインテート）、カルベジロール（アーチスト）、プロプラノロール（インデラル）／ジゴキシン（ジゴシン）／強いCYP3A4阻害薬＝クラリスロマイシン（クラリス）、イトラコナゾール（イトリゾール）</p>
       <div id="c-vout" style="margin-top:10px"></div>
     </section>
   </div>
@@ -566,7 +571,7 @@ const $=id=>document.getElementById(id);
 const val=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:""};
 const num=id=>{const e=$(id);let v;if(e)v=parseFloat(e.value);else v=parseFloat(val(id));return isNaN(v)?null:v};
 const lab=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?(e.dataset.l||""):""};
-const APP_VERSION="ha-2026-11-14a";
+const APP_VERSION="ha-2026-11-14b";
 const ck=id=>{const e=$(id);return !!(e&&e.checked)};
 
 /* ============ タブ ============ */
@@ -709,7 +714,7 @@ function renderAc(){
     if(!nsaidNG) L.push(item("do","NSAIDs（イブプロフェン 200〜400 mg、ロキソプロフェン 60 mg、ナプロキセン 100〜300 mg など）","頓用。"+(nsaidCare?"消化管・腎・心血管リスクがあるので短期・最小量で。":""),["BOOK","GL21"],"bk"));
     L.push(item("do","アセトアミノフェン 500〜1000 mg","妊娠中・授乳中・NSAIDsが使えない人の第一選択。1日4000 mgまで。",["BOOK","GL21"],"bk"));
     L.push(item("caution","カフェイン配合の市販薬は効くが使いすぎに注意","月15日以上（複合鎮痛薬は10日以上）で薬剤の使用過多による頭痛になりうる。",["BOOK"],"bk"));
-    L.push(item("avoid","トリプタンは緊張型頭痛には効かない","片頭痛が混在していないか頭痛ダイアリーで確認する。",["GL21"],"sec"));
+    L.push(item("avoid","トリプタンは緊張型頭痛には効かない","スマトリプタン〈イミグラン〉、リザトリプタン〈マクサルト〉など。片頭痛が混在していないか頭痛ダイアリーで確認する。",["GL21"],"sec"));
     if(warnMoh) L.push(item("avoid",`急性期薬が${lab("a-days")}`,"使用過多タブで評価。月に頭痛が多い場合は予防（アミトリプチリン）を考える。",["BOOK"],"bk"));
     $("a-out").innerHTML=card("緊張型頭痛の急性期",ul(L));return;
   }
@@ -747,9 +752,9 @@ function renderAc(){
       if(exclude[base]){avoid.push(item("avoid",T[k][0]+"は使わない",exclude[base],["BOOK"],"bk"));return}
       pick.push(item("do",T[k][0],T[k][1],["BOOK"],"bk"));
     });
-    if(ck("a-ssri"))care.push(item("caution","SSRI/SNRIとトリプタン","セロトニン症候群は理論上の注意。併用は通常可能だが、初回は症状（発汗・振戦・興奮）を説明する。",["GL21"],"sec"));
+    if(ck("a-ssri"))care.push(item("caution","SSRI/SNRIとトリプタン","SSRI（セルトラリン〈ジェイゾロフト〉、エスシタロプラム〈レクサプロ〉）、SNRI（デュロキセチン〈サインバルタ〉）など。セロトニン症候群は理論上の注意。併用は通常可能だが、初回は症状（発汗・振戦・興奮）を説明する。",["GL21"],"sec"));
   }else{
-    avoid.push(item("avoid","トリプタン・エルゴタミンは使わない",esc(ci.join("・"))+"は禁忌。",["BOOK","GL21"],"bk"));
+    avoid.push(item("avoid","トリプタン・エルゴタミンは使わない",esc(ci.join("・"))+"は禁忌。<br>スマトリプタン〈イミグラン〉、リザトリプタン〈マクサルト〉、エレトリプタン〈レルパックス〉などのトリプタン、エルゴタミン配合剤〈クリアミン〉を含む。",["BOOK","GL21"],"bk"));
   }
   /* 軽症・NSAIDs */
   const nsaid=item("do","NSAIDs（ナプロキセン 300 mg、イブプロフェン 400 mg、ロキソプロフェン 60〜120 mg、ジクロフェナク 25〜50 mg）"+(nv?"＋制吐薬":""),"痛みが軽いうちに。"+(nv===2?"ジクロフェナク坐剤 25〜50 mg も。":"")+(nsaidCare?"<br>消化管・腎・心血管リスクがあり短期・最小量で。":""),["BOOK","GL21"],"bk");
@@ -762,11 +767,11 @@ function renderAc(){
   /* 妊娠・授乳 */
   if(preg==="p1"||preg==="p3"){
     other.push(apap);
-    if(preg==="p1"&&!ck("a-asthma")) other.push(item("caution","NSAIDsは妊娠中期まで短期に限る","妊娠後期（28週以降）は禁忌（動脈管収縮）。妊娠20週以降は羊水過少にも注意。",["GL21"],"sec"));
-    else if(preg==="p3") avoid.push(item("avoid","NSAIDs（妊娠28週以降）","動脈管の早期閉鎖のため禁忌。",["GL21"],"sec"));
+    if(preg==="p1"&&!ck("a-asthma")) other.push(item("caution","NSAIDsは妊娠中期まで短期に限る","ロキソプロフェン〈ロキソニン〉、イブプロフェン〈ブルフェン〉、ナプロキセン〈ナイキサン〉など。妊娠後期（28週以降）は禁忌（動脈管収縮）。妊娠20週以降は羊水過少にも注意。",["GL21"],"sec"));
+    else if(preg==="p3") avoid.push(item("avoid","NSAIDs（妊娠28週以降）","ロキソプロフェン〈ロキソニン〉、イブプロフェン〈ブルフェン〉、ジクロフェナク〈ボルタレン〉など。動脈管の早期閉鎖のため禁忌。",["GL21"],"sec"));
     other.push(item("do","メトクロプラミド 10 mg","悪心・嘔吐に。ドンペリドンは妊婦禁忌。",["BOOK"],"bk"));
     if(tripOK) other.push(item("caution","トリプタンは有益性が上回るときに（スマトリプタンの情報が最も多い）","妊娠初期の使用で奇形の増加は報告されていない。",["BOOK","GL21"],"bk"));
-    avoid.push(item("avoid","エルゴタミン（妊婦禁忌）、ラスミジタン・リメゲパント（データ不足）","",["L_cle","L_rim","L_las"],"ok"));
+    avoid.push(item("avoid","エルゴタミン〈クリアミン〉（妊婦禁忌）、ラスミジタン〈レイボー〉・リメゲパント〈ナルティーク〉（データ不足）","",["L_cle","L_rim","L_las"],"ok"));
     $("a-out").innerHTML=verdict("warn","妊娠中","アセトアミノフェンを第一に、必要ならスマトリプタン","")+card("使える薬",ul(other))+card("避ける薬",ul(avoid));return;
   }
   if(preg==="lac"){
@@ -786,7 +791,7 @@ function renderAc(){
     E.push(item("do","アセトアミノフェン 1000 mg 静注（アセリオ、15分）","体重50 kg未満は15 mg/kg。",["BOOK"],"bk"));
     E.push(item("caution","プロクロルペラジン 5 mg 筋注、クロルプロマジン 10 mg 筋注","眠気・低血圧・錐体外路症状に注意。",["BOOK"],"bk"));
     E.push(item("do","デキサメタゾン 6.6〜9.9 mg 静注（単回）","72時間以内の再発を減らす（痛み自体はとらない）。重積・再発例に。",["BOOK","GL21"],"sec"));
-    E.push(item("avoid","オピオイド・ペンタゾシン","効果が乏しく使用過多・依存の原因。",["GL21"],"sec"));
+    E.push(item("avoid","オピオイド・ペンタゾシン","トラマドール〈トラマール〉、ペンタゾシン〈ソセゴン〉など。効果が乏しく使用過多・依存の原因。",["GL21"],"sec"));
     E.push(item("note","帰宅時","今回の誘因、急性期薬の使い方、予防の要否を見直す。重積・頻回受診は予防を始める。",[],""));
     er=card(status?"片頭痛発作重積・救急での対応":"救急外来・病棟での対応",ul(E));
   }
@@ -809,7 +814,7 @@ function renderAc(){
     if(!nsaidNG) other.push(item("note","効果不十分ならNSAIDsを併用","ナプロキセン・ロキソプロフェンなど。",["GL21"],"sec"));
     other.push(rim);
   }
-  if(nsaidNG&&preg==="no") avoid.push(item("avoid","NSAIDs","アスピリン喘息・NSAIDs過敏。アセトアミノフェンも高用量で交差反応がありうる（1回300 mg以下から）。",["GL21"],"sec"));
+  if(nsaidNG&&preg==="no") avoid.push(item("avoid","NSAIDs","ロキソプロフェン〈ロキソニン〉、イブプロフェン〈ブルフェン〉、ジクロフェナク〈ボルタレン〉など。アスピリン喘息・NSAIDs過敏。アセトアミノフェンも高用量で交差反応がありうる（1回300 mg以下から）。",["GL21"],"sec"));
   if(warnMoh) care.push(item("avoid",`急性期薬が${lab("a-days")}`,"トリプタン・複合鎮痛薬は月10日以上、単一鎮痛薬は15日以上で使用過多になりうる。予防療法を始める（予防タブ）。",["ICHD3","BOOK"],"ok"));
   else if(days!==null&&days>=6) care.push(item("caution",`急性期薬が${lab("a-days")}`,"月6日以上で予防療法を考える目安。",["BOOK"],"bk"));
   if(mens) care.push(item("note","月経時片頭痛","ナラトリプタンなど半減期の長いトリプタン。月経周期が規則的なら月経2日前から5〜6日間の短期予防（ナラトリプタン 1日2回など、適応外）もある。",["BOOK"],"bk"));
@@ -876,7 +881,7 @@ function renderPv(){
   else add(1+(ck("p-htn")?3:0)+(ck("p-ae")?1:0),"do","カンデサルタン 4〜8 mg/日（ブロプレス、試験は16 mg）","高血圧の併存に。副作用が少ない。腎機能・カリウム。",["BOOK","CARLSEN"],"bk",OFF);
   /* ゲパント */
   const gepNG=isPreg||ck("p-f-gep");
-  if(isPreg) rej("ゲパント・CGRP関連抗体薬","妊娠中の安全性は確立していない（有益性が上回る場合のみ）。妊娠を希望したら計画的に中止。",["L_rim","JHSATO"],"ok");
+  if(isPreg) rej("ゲパント・CGRP関連抗体薬","リメゲパント〈ナルティーク〉、アトゲパント〈アクイプタ〉、ガルカネズマブ〈エムガルティ〉、フレマネズマブ〈アジョビ〉、エレヌマブ〈アイモビーグ〉。妊娠中の安全性は確立していない（有益性が上回る場合のみ）。妊娠を希望したら計画的に中止。",["L_rim","JHSATO"],"ok");
   else{
     const lr=(mmd===null||mmd>=2)&&(dis||lev>=1);
     if(!ck("p-f-gep")){
@@ -909,7 +914,7 @@ function renderPv(){
     ${verdict(allOK?"ok":ck("p-f-mab")?"warn":"info",allOK?"対象":"要件",allOK?"保険診療で投与できる（医師・施設要件も満たすこと）":ck("p-f-mab")?"抗体薬1剤が無効：別の抗体薬（リガンド⇔受容体の切替など）への変更を検討":"未充足または未入力の項目がある","")}
     <p class="hint">医師要件：初期研修後に頭痛診療5年以上、かつ神経学会・頭痛学会・総合内科・脳神経外科のいずれかの専門医。効果判定は3か月（点滴は3〜6か月）、改善がなければ中止を考慮。日本頭痛学会は2025年10月、抗体薬を他の予防薬と同等に第一選択に含めると表明したが、保険上の前治療要件（4番目）は残る。</p>
     ${src(["GLEPT","JHSPS","AHS24","EHF22"],"ok")}${mabList}</section>`;
-  if(ck("p-vasc")) X.push(item("caution","CGRP関連薬（抗体・ゲパント）と虚血性血管疾患","CGRPは虚血時の側副血行に関わる。虚血性脳卒中・心疾患・脳小血管病・レイノー現象では有益性を慎重に。ゲパントと抗体の併用は特に慎重に。",["JHSRIM"],"ok"));
+  if(ck("p-vasc")) X.push(item("caution","CGRP関連薬（抗体・ゲパント）と虚血性血管疾患","ガルカネズマブ〈エムガルティ〉、フレマネズマブ〈アジョビ〉、エレヌマブ〈アイモビーグ〉、リメゲパント〈ナルティーク〉、アトゲパント〈アクイプタ〉。CGRPは虚血時の側副血行に関わる。虚血性脳卒中・心疾患・脳小血管病・レイノー現象では有益性を慎重に。ゲパントと抗体の併用は特に慎重に。",["JHSRIM"],"ok"));
   if(ck("p-const")) X.push(item("caution","便秘","エレヌマブ・アトゲパント・ベラパミル・アミトリプチリンで悪化しうる。",["L_ere","JHSATO"],"ok"));
 
   C.sort((a,b)=>b.score-a.score);
@@ -957,9 +962,9 @@ function mohCards(on){
   const L=[
     item("do","説明と教育がいちばん効く","しくみを説明し、頭痛ダイアリーで服薬日数を記録。単純型は説明だけで改善することが多い。",["BOOK","GL21"],"bk"),
     item("do","原因薬を中止し、同時に予防薬を始める","離脱＋開始時からの予防が、離脱のみ・予防のみより慢性から反復性への移行・治癒率がよかった（Carlsen 2020）。",["CARLSEN"],"ok"),
-    item("do","予防薬の選択","慢性片頭痛としての予防：CGRP関連抗体薬（乱用があっても効く）、トピラマート、アミトリプチリン、バルプロ酸、プロプラノロール、アトゲパント。",["GL21","EHF22","JHSATO"],"sec"),
-    item("caution","離脱中の頭痛（反跳頭痛）への対処","制吐薬、それまで使っていない系統のNSAIDsを短期間、数日のステロイド（エビデンスは弱い）。トリプタン乱用は数日〜2週、鎮痛薬は長引きやすい。",["BOOK"],"bk"),
-    item("note","離脱後の急性期薬","本来の片頭痛発作にはトリプタンを月10日未満で。ゲパントは使用過多を起こしにくいとされるが、頻回なら方針を見直す。",["JHSRIM","BOOK"],"ok"),
+    item("do","予防薬の選択","慢性片頭痛としての予防：CGRP関連抗体薬（ガルカネズマブ〈エムガルティ〉、フレマネズマブ〈アジョビ〉、エレヌマブ〈アイモビーグ〉。乱用があっても効く）、トピラマート、アミトリプチリン、バルプロ酸、プロプラノロール、アトゲパント。",["GL21","EHF22","JHSATO"],"sec"),
+    item("caution","離脱中の頭痛（反跳頭痛）への対処","制吐薬（メトクロプラミド〈プリンペラン〉など）、それまで使っていない系統のNSAIDs（ナプロキセン〈ナイキサン〉など）を短期間、数日のステロイド（プレドニゾロン〈プレドニン〉など、エビデンスは弱い）。トリプタン乱用は数日〜2週、鎮痛薬は長引きやすい。",["BOOK"],"bk"),
+    item("note","離脱後の急性期薬","本来の片頭痛発作にはトリプタン（スマトリプタン〈イミグラン〉など）を月10日未満で。ゲパント（リメゲパント〈ナルティーク〉）は使用過多を起こしにくいとされるが、頻回なら方針を見直す。",["JHSRIM","BOOK"],"ok"),
     item(cx?"caution":"note","複雑型（うつ・不安・依存、オピオイド乱用、外来で失敗）"+(cx?"：該当":""),"入院での離脱、精神科との連携を考える。再発は1年以内に多い（約3〜4割）ので1年はダイアリーで管理。",["BOOK"],"bk")
   ];
   return card("治療の進め方",ul(L));
@@ -974,12 +979,12 @@ const CH={
      item("caution","スマトリプタン点鼻 20 mg、ゾルミトリプタン 5 mg 経口","群発頭痛には適応外。皮下注が使えないとき。",["BOOK"],"bk")])+
    `<div class="sec-h">つなぎ（群発期の始めに短期間）</div>`+ul([
      item("do","プレドニゾロン 60〜100 mg/日で開始し、2〜3週で漸減","例：PredCH試験は100 mg×5日、以後3日ごとに20 mgずつ減量。国内の経験例は60 mg 分2×7日→30 mg×4日→15 mg×3日。PPIを併用。",["PREDCH","BOOK"],"ok"),
-     item("caution","大後頭神経ブロック（リドカイン＋ステロイド）","薬が効かない・使えないときのつなぎ。",["BOOK"],"bk")])+
+     item("caution","大後頭神経ブロック（リドカイン〈キシロカイン〉＋ステロイド〈デキサメタゾン、トリアムシノロンなど〉）","薬が効かない・使えないときのつなぎ。",["BOOK"],"bk")])+
    `<div class="sec-h">予防（群発期のあいだ）</div>`+ul([
      item("do","ベラパミル 120〜240 mg/日から（国内は360 mgまで、海外は960 mgまで）","審査上認められている。効くまで1〜2週。増量前ごとに心電図（PR延長・房室ブロック）。下の増量チェックを使う。",["BOOK","GL21"],"bk"),
      item("caution","炭酸リチウム 600〜900 mg/日","ベラパミル無効時。血中濃度・甲状腺・腎機能を測る。",["BOOK"],"bk"),
      item("caution","トピラマート・バルプロ酸・ガバペンチン・メラトニン","エビデンスは弱い。",["BOOK"],"bk"),
-     item("note","CGRP関連抗体（ガルカネズマブ）","海外では反復性群発頭痛に承認がある国があるが、国内では適応がない。",["GL21"],"sec")])+
+     item("note","CGRP関連抗体（ガルカネズマブ〈エムガルティ〉）","海外では反復性群発頭痛に承認がある国があるが、国内では適応がない。",["GL21"],"sec")])+
    `<div class="sec-h">生活</div>`+ul([
      item("avoid","群発期の飲酒・昼寝・ニトログリセリン","発作を誘発する。禁煙を勧める。",["BOOK"],"bk")])),
  tac:()=>card("その他の三叉神経・自律神経性頭痛（TACs）など",ul([
@@ -987,15 +992,15 @@ const CH={
      item("do","SUNCT/SUNA（1秒〜10分、1日数十〜数百回）：ラモトリギン","ほかにトピラマート・ガバペンチン、発作群発時はリドカイン静注。下垂体病変・後頭蓋窩の血管圧迫を画像で除外。",["BOOK"],"bk"),
      item("do","一次性穿刺様頭痛：多くは治療不要、頻回ならインドメタシン・メラトニン","",["BOOK"],"bk"),
      item("do","睡眠時頭痛（50歳以上、睡眠中に起きる）：就寝前のカフェイン（コーヒー1杯）","ほかにリチウム・インドメタシン・メラトニン。睡眠時無呼吸・夜間高血圧を除外。",["BOOK"],"bk"),
-     item("caution","可逆性脳血管攣縮症候群（RCVS）：誘因薬（SSRI・血管作動薬・大麻）中止、ニモジピン/ベラパミル","トリプタン・エルゴタミンは避ける。ステロイドは転帰を悪くするので使わない。",["BOOK"],"bk"),
+     item("caution","可逆性脳血管攣縮症候群（RCVS）：誘因薬（SSRI〈セルトラリン、エスシタロプラムなど〉・血管作動薬〈プソイドエフェドリン配合薬など〉・大麻）中止、ニモジピン/ベラパミル","トリプタン・エルゴタミンは避ける。ステロイドは転帰を悪くするので使わない。",["BOOK"],"bk"),
      item("do","三叉神経痛：カルバマゼピン 100〜200 mgから","効かない・使えないときはオクスカルバゼピン（適応外）、ラモトリギン、バクロフェン。MRIで血管圧迫・MS・腫瘍を確認し、微小血管減圧術を検討。",["BOOK"],"bk"),
      item("caution","新規発症持続性連日性頭痛（NDPH）","発症日を覚えている連日性頭痛。低髄圧・静脈洞血栓症・感染後などを除外し、表現型（片頭痛様・緊張型様）に応じて予防。",["BOOK"],"bk")])),
  er:()=>card("救急・片頭痛重積（72時間以上）",ul([
      item("do","輸液、メトクロプラミド 10 mg 静注","",["BOOK"],"bk"),
      item("do","スマトリプタン 3 mg 皮下注（24時間以内にトリプタン・エルゴタミン未使用）","",["BOOK"],"bk"),
-     item("do","アセトアミノフェン 1000 mg 静注、またはNSAIDs（坐剤・静注）","",["BOOK"],"bk"),
+     item("do","アセトアミノフェン 1000 mg 静注、またはNSAIDs（坐剤・静注）","ジクロフェナク坐剤〈ボルタレンサポ〉、フルルビプロフェン アキセチル静注〈ロピオン〉など。",["BOOK"],"bk"),
      item("caution","クロルプロマジン・プロクロルペラジン筋注、ジアゼパム静注","鎮静・低血圧に注意。ジアゼパムは不安・興奮の強い重積に。",["BOOK"],"bk"),
-     item("do","デキサメタゾン静注（6.6〜9.9 mg 単回）、重積にはステロイドの短期投与","再発予防。",["BOOK","GL21"],"sec"),
+     item("do","デキサメタゾン静注（6.6〜9.9 mg 単回）、重積にはステロイドの短期投与","再発予防。短期投与はプレドニゾロン〈プレドニン〉など。",["BOOK","GL21"],"sec"),
      item("caution","マグネシウム静注（硫酸マグネシウム 1〜2 g）","前兆のある片頭痛で効果の報告。適応外。",["BOOK"],"sec"),
      item("avoid","オピオイド・ペンタゾシン","",["GL21"],"sec"),
      item("note","雷鳴頭痛・神経症状・発熱・意識障害","まず二次性頭痛を除外（鑑別タブ）。",["SNNOOP"],"ok")])),
@@ -1003,11 +1008,11 @@ const CH={
    `<div class="sec-h">妊娠中</div>`+ul([
      item("do","急性期：アセトアミノフェン、メトクロプラミド","",["BOOK","GL21"],"bk"),
      item("caution","スマトリプタン：有益性が上回るとき","妊娠初期の使用で奇形増加は報告されていない。",["BOOK"],"bk"),
-     item("caution","NSAIDs：妊娠中期まで短期のみ","28週以降は禁忌。",["GL21"],"sec"),
-     item("avoid","エルゴタミン、バルプロ酸、トピラマート、カンデサルタン・ACE阻害薬、ロメリジン、ドンペリドン","",["BOOK","L_cle"],"bk"),
+     item("caution","NSAIDs：妊娠中期まで短期のみ","ロキソプロフェン〈ロキソニン〉、イブプロフェン〈ブルフェン〉など。28週以降は禁忌。",["GL21"],"sec"),
+     item("avoid","エルゴタミン、バルプロ酸、トピラマート、カンデサルタン・ACE阻害薬、ロメリジン、ドンペリドン","エルゴタミン配合剤〈クリアミン〉、バルプロ酸〈デパケン〉、トピラマート〈トピナ〉、カンデサルタン〈ブロプレス〉、ACE阻害薬（エナラプリル〈レニベース〉、イミダプリル〈タナトリル〉など）、ロメリジン〈ミグシス〉、ドンペリドン〈ナウゼリン〉。",["BOOK","L_cle"],"bk"),
      item("caution","予防が必要なら少量のプロプラノロールまたはアミトリプチリン","",["BOOK"],"bk"),
      item("avoid","妊娠中の新しい頭痛・増悪・前兆の初発","静脈洞血栓症・子癇前症・PRES・RCVS・下垂体卒中を考える。血圧と尿蛋白を測る。",["SNNOOP"],"ok"),
-     item("caution","群発頭痛：酸素とスマトリプタン皮下注、予防はステロイド短期、ベラパミルは慎重に","",["BOOK"],"bk")])+
+     item("caution","群発頭痛：酸素とスマトリプタン皮下注、予防はステロイド短期、ベラパミルは慎重に","ステロイドはプレドニゾロン〈プレドニン〉。",["BOOK"],"bk")])+
    `<div class="sec-h">授乳中</div>`+ul([
      item("do","アセトアミノフェン、イブプロフェン","",["GL21"],"sec"),
      item("do","スマトリプタン（乳汁移行が少ない）・エレトリプタン","スマトリプタンの添付文書の授乳の記載は最新版で確認。",["BOOK"],"bk"),
@@ -1015,18 +1020,18 @@ const CH={
      item("caution","予防：プロプラノロール、アミトリプチリン（少量）","",["BOOK"],"bk")])),
  old:()=>card("高齢者・小児",
    `<div class="sec-h">高齢者</div>`+ul([
-     item("avoid","50歳以上の新しい頭痛は二次性を先に","巨細胞性動脈炎（赤沈・CRP、側頭動脈）、硬膜下血腫、腫瘍、緑内障、薬剤性（硝酸薬・Ca拮抗薬など）。",["SNNOOP","BOOK"],"ok"),
-     item("caution","トリプタンは心血管リスクを確認してから","リスクがあればラスミジタン（転倒に注意）・リメゲパントを考える。",["L_las","JHSRIM"],"ok"),
-     item("caution","NSAIDsは腎・消化管・心不全、アミトリプチリンは抗コリン作用（せん妄・転倒・尿閉）","",["BOOK"],"bk"),
+     item("avoid","50歳以上の新しい頭痛は二次性を先に","巨細胞性動脈炎（赤沈・CRP、側頭動脈）、硬膜下血腫、腫瘍、緑内障、薬剤性（硝酸薬〈ニトログリセリン、一硝酸イソソルビド（アイトロール）〉・Ca拮抗薬〈ニフェジピン（アダラート）など〉）。",["SNNOOP","BOOK"],"ok"),
+     item("caution","トリプタンは心血管リスクを確認してから","スマトリプタン〈イミグラン〉、リザトリプタン〈マクサルト〉など。リスクがあればラスミジタン（転倒に注意）・リメゲパントを考える。",["L_las","JHSRIM"],"ok"),
+     item("caution","NSAIDsは腎・消化管・心不全、アミトリプチリンは抗コリン作用（せん妄・転倒・尿閉）","NSAIDsはロキソプロフェン〈ロキソニン〉、イブプロフェン〈ブルフェン〉など。アミトリプチリンは〈トリプタノール〉。",["BOOK"],"bk"),
      item("do","予防：ロメリジン、カンデサルタン（高血圧）、少量から","",["BOOK"],"bk")])+
    `<div class="sec-h">小児・思春期</div>`+ul([
      item("do","アセトアミノフェン 10〜15 mg/kg/回（4〜6時間あけ）、イブプロフェン 5〜10 mg/kg/回","アセトアミノフェンが第一選択。",["BOOK"],"bk"),
      item("caution","トリプタン：国内は小児の適応なし","思春期にはスマトリプタン点鼻・リザトリプタンが海外で使われる。",["BOOK"],"bk"),
-     item("caution","ラスミジタン・ゲパント・CGRP関連抗体：国内は成人のみ","",["L_rim","L_las","JHSATO"],"ok"),
+     item("caution","ラスミジタン・ゲパント・CGRP関連抗体：国内は成人のみ","ラスミジタン〈レイボー〉、ゲパント（リメゲパント〈ナルティーク〉、アトゲパント〈アクイプタ〉）、CGRP関連抗体（ガルカネズマブ〈エムガルティ〉、フレマネズマブ〈アジョビ〉、エレヌマブ〈アイモビーグ〉）。",["L_rim","L_las","JHSATO"],"ok"),
      item("do","予防：まず生活指導（睡眠・朝食・水分・スクリーン時間）。薬は少量のアミトリプチリン、プロプラノロール、シプロヘプタジン等","",["BOOK"],"bk"),
      item("caution","親の服薬行動が子どもの使用過多のリスクになる","",["BOOK"],"bk")])),
  tth:()=>card("緊張型頭痛",ul([
-     item("do","急性期：アセトアミノフェン、NSAIDs（頓用）","月15日（複合鎮痛薬は10日）以上の使用を避ける。",["BOOK","GL21"],"bk"),
+     item("do","急性期：アセトアミノフェン、NSAIDs（頓用）","アセトアミノフェン〈カロナール〉、NSAIDs（イブプロフェン〈ブルフェン〉、ロキソプロフェン〈ロキソニン〉など）。月15日（複合鎮痛薬は10日）以上の使用を避ける。",["BOOK","GL21"],"bk"),
      item("do","予防（頻発・慢性）：アミトリプチリン 10 mgから","ほかにミルタザピン・ベンラファキシン（適応外）。",["BOOK","GL21"],"bk"),
      item("caution","チザニジン（テルネリン）・エペリゾン","筋緊張を伴う例に。エビデンスは限られる。チザニジンはフルボキサミン・シプロフロキサシンと併用禁忌。",["BOOK"],"bk"),
      item("do","非薬物療法：頭痛体操、姿勢、運動、認知行動療法、鍼","",["BOOK"],"bk"),
@@ -1051,7 +1056,7 @@ function renderVer(){
       if(vd!==null&&vd>=360)cls="warn";
     }
   }
-  if(ck("c-bb"))L.push(item("caution","併用薬","β遮断薬・ジゴキシンで徐脈が強まる。強いCYP3A4阻害薬でベラパミル濃度が上昇。シンバスタチン・コルヒチンの濃度も上がる。",["BOOK"],"sec"));
+  if(ck("c-bb"))L.push(item("caution","併用薬","β遮断薬（ビソプロロール〈メインテート〉、カルベジロール〈アーチスト〉など）・ジゴキシン〈ジゴシン〉で徐脈が強まる。強いCYP3A4阻害薬（クラリスロマイシン〈クラリス〉、イトラコナゾール〈イトリゾール〉など）でベラパミル濃度が上昇。シンバスタチン・コルヒチンの濃度も上がる。",["BOOK"],"sec"));
   L.push(item("note","増量のたびに心電図","開始前、増量前、維持量で定期的に。便秘・浮腫・歯肉腫脹。",["BOOK"],"bk"));
   $("c-vout").innerHTML=verdict(cls,"ベラパミル",big,"")+ul(L);
 }

@@ -234,15 +234,15 @@ details summary{cursor:pointer;font-weight:700;font-size:14px}
     <label class="f" for="statin">スタチン
       <select id="statin">
         <option value="none">なし</option>
-        <option value="std">スタンダードスタチン（プラバ・シンバ・フルバ）</option>
+        <option value="std">スタンダードスタチン（プラバスタチン〈メバロチン〉・シンバスタチン〈リポバス〉・フルバスタチン〈ローコール〉）</option>
         <option value="strongLow">ストロングスタチン 通常量（アトルバ10・ロスバ2.5〜5・ピタバ1〜2mg）</option>
         <option value="strongHigh">ストロングスタチン 高用量（アトルバ20以上・ロスバ10以上・ピタバ4mg）</option>
       </select>
     </label>
     <div class="chks" style="margin-top:10px">
-      <label class="chk"><input type="checkbox" id="eze"><span>エゼチミブ</span></label>
+      <label class="chk"><input type="checkbox" id="eze"><span>エゼチミブ（ゼチーア）</span></label>
       <label class="chk"><input type="checkbox" id="bemp"><span>ベムペド酸（ネクセトール）</span></label>
-      <label class="chk"><input type="checkbox" id="pcsk9"><span>PCSK9抗体（レパーサ）またはインクリシラン（レクビオ）</span></label>
+      <label class="chk"><input type="checkbox" id="pcsk9"><span>PCSK9抗体：エボロクマブ（レパーサ）、またはインクリシラン（レクビオ）</span></label>
     </div>
     <div class="f" style="margin-top:10px"><span style="font-size:13px;color:var(--muted)">スタチン不耐</span>
       <div class="seg" id="intol" role="group" aria-label="スタチン不耐"><button type="button" data-v="none" aria-pressed="false">なし</button><button type="button" data-v="partial">部分的</button><button type="button" data-v="complete">完全</button></div>
@@ -300,7 +300,7 @@ details summary{cursor:pointer;font-weight:700;font-size:14px}
   <div class="card">
     <h2>TG低下薬</h2>
     <div class="drug"><h3>ペマフィブラート（パルモディア）</h3><p class="m">0.1mg 1日2回、0.2mg 1日2回まで</p><p>TGを強く下げるが、PROMINENT（2型糖尿病・高TG・低HDL）で心血管イベントは減らず。シクロスポリン・リファンピシン併用禁忌。腎機能障害時は添付文書の注意に従う。</p></div>
-    <div class="drug"><h3>ベザフィブラート・フェノフィブラート</h3><p>腎機能障害で禁忌・減量の規定あり。スタチン併用時は横紋筋融解症に注意（2018年の改訂で原則併用禁忌は解除、腎機能異常例では慎重に）。</p></div>
+    <div class="drug"><h3>ベザフィブラート（ベザトールSR）・フェノフィブラート（リピディル、トライコア）</h3><p>腎機能障害で禁忌・減量の規定あり。スタチン併用時は横紋筋融解症に注意（2018年の改訂で原則併用禁忌は解除、腎機能異常例では慎重に）。</p></div>
     <div class="drug"><h3>イコサペント酸エチル（エパデール）</h3><p class="m">1回600mg 1日3回（1.8g/日）、TG高値では1回900mg 1日3回まで</p><p>JELIS（日本人、スタチン併用）で主要冠イベント低下。REDUCE-IT（4g/日）でもイベント低下。出血傾向・心房細動に注意。</p></div>
     <div class="drug"><h3>オメガ-3脂肪酸エチル（ロトリガ）</h3><p class="m">2g 1日1回、TG高値では2g 1日2回まで</p><p>EPA＋DHA製剤。心血管イベント抑制の根拠はEPA単剤ほど確立していない。</p></div>
   </div>
@@ -474,8 +474,8 @@ function compute(s){
   R.stroke=strokePanel(s,secondary);
   // TG / HDL / Lp(a)
   if(s.tg!=null){
-    if(s.tg>=1000)R.alerts.push({c:"crit",h:"TG≥1,000 mg/dL：急性膵炎のリスク",b:"空腹時で再検。脂肪制限・禁酒、TG低下薬（フィブラート系・ペマフィブラート）を優先し、腹痛があれば膵酵素を確認。原発性高TG血症（家族性高カイロミクロン血症など）を考えて専門医へ。"});
-    else if(s.tg>=500)R.alerts.push({c:"warn",h:"TG≥500 mg/dL：膵炎予防のためTG低下を優先",b:"二次性（糖尿病コントロール不良、飲酒、甲状腺機能低下、腎疾患、薬剤）を確認し、フィブラート系／ペマフィブラート、n-3系を検討。"});
+    if(s.tg>=1000)R.alerts.push({c:"crit",h:"TG≥1,000 mg/dL：急性膵炎のリスク",b:"空腹時で再検。脂肪制限・禁酒、TG低下薬（フィブラート系：ベザフィブラート〈ベザトールSR〉・フェノフィブラート〈リピディル、トライコア〉、ペマフィブラート〈パルモディア〉）を優先し、腹痛があれば膵酵素を確認。原発性高TG血症（家族性高カイロミクロン血症など）を考えて専門医へ。"});
+    else if(s.tg>=500)R.alerts.push({c:"warn",h:"TG≥500 mg/dL：膵炎予防のためTG低下を優先",b:"二次性（糖尿病コントロール不良、飲酒、甲状腺機能低下、腎疾患、薬剤）を確認し、フィブラート系（ベザフィブラート〈ベザトールSR〉、フェノフィブラート〈リピディル、トライコア〉）／ペマフィブラート（パルモディア）、n-3系（イコサペント酸エチル〈エパデール〉、オメガ-3脂肪酸エチル〈ロトリガ〉）を検討。"});
     else if(tgHigh)R.alerts.push({c:"info",h:"高TG血症（"+(s.fasting==="1"?"空腹時≥150":"随時≥175")+"）",b:"まずLDL-C目標、次にnon-HDL-C目標（"+(useNh!=null?"<"+useNh:"—")+"）を確認。高リスク・二次予防でLDL-C達成後もTG高値ならEPA製剤を検討（JELIS・REDUCE-IT）。ペマフィブラートはTGを下げるが心血管イベント抑制は示されていない（PROMINENT）。"});
   }
   if(nonHDL!=null&&useNh!=null&&ldl!=null&&ldl<useLdl&&nonHDL>=useNh)R.alerts.push({c:"warn",h:"LDL-Cは達成、non-HDL-Cは未達（"+nonHDL+" ≥ "+useNh+"）",b:"残余リスク（TGリッチリポ蛋白）。生活習慣（体重・飲酒・糖質）を見直し、TG低下治療を検討。"});
@@ -496,7 +496,7 @@ function compute(s){
   if(ldlU!=null&&ldlU>=180||(s.tg!=null&&s.tg>=500))R.notes.push("続発性脂質異常症を除外：TSH/FT4（甲状腺機能低下）、尿蛋白・アルブミン（ネフローゼ）、HbA1c、肝胆道系酵素、薬剤（ステロイド、シクロスポリン、抗精神病薬、サイアザイドなど）。");
 
   // consult: PCSK9 needed
-  if(R.ladder&&R.ladder.needInj&&!s.pcsk9)R.consults.push({c:"warn",to:"循環器内科 または 内分泌代謝内科",why:"推定でPCSK9抗体／インクリシランが必要。最適使用推進ガイドラインの施設・患者要件の確認と、導入・自己注射指導の連携先を決める。"});
+  if(R.ladder&&R.ladder.needInj&&!s.pcsk9)R.consults.push({c:"warn",to:"循環器内科 または 内分泌代謝内科",why:"推定でPCSK9抗体（エボロクマブ〈レパーサ〉）／インクリシラン（レクビオ）が必要。最適使用推進ガイドラインの施設・患者要件の確認と、導入・自己注射指導の連携先を決める。"});
   if(R.ladder&&R.ladder.unreached)R.consults.push({c:"crit",to:"脂質専門施設",why:"利用可能な薬剤を全て重ねても推定で目標未達。HoFHや難治例の治療（アフェレシスなど）を相談。"});
   // coronary evaluation in stroke
   if(athStroke&&!s.cad)R.consults.push({c:"info",to:"循環器内科（症状・心電図異常・多領域の動脈硬化がある場合）",why:"アテローム血栓性脳梗塞では無症候性冠動脈疾患の合併が多い。冠動脈疾患があればJAS目標はLDL-C<70に下がる。"});
@@ -526,22 +526,22 @@ function ladder(s,cur,tgt,R){
   } else {
     if(st==="none"){
       if(startCombo){push("ストロングスタチン＋エゼチミブで開始","必要低下率が50%以上。例：ロスバスタチン5mg＋エゼチミブ（ロスーゼット）、アトルバスタチン10mg＋エゼチミブ（アトーゼット）",1-(1-0.45)*(1-0.22),"combo");}
-      else push("ストロングスタチン開始","アトルバスタチン10mg／ロスバスタチン2.5〜5mg／ピタバスタチン2mg（約40〜50%↓）",0.45);
+      else push("ストロングスタチン開始","アトルバスタチン（リピトール）10mg／ロスバスタチン（クレストール）2.5〜5mg／ピタバスタチン（リバロ）2mg（約40〜50%↓）",0.45);
     } else if(st==="std"){
-      push("ストロングスタチンへ変更","スタンダードからの切替で追加約25%↓",0.27);
+      push("ストロングスタチンへ変更","スタンダードからの切替で追加約25%↓。例：アトルバスタチン（リピトール）、ロスバスタチン（クレストール）、ピタバスタチン（リバロ）",0.27);
     }
     if(!hit()&&st!=="strongHigh"){
       push("ストロングスタチンを増量","アトルバ20mg／ロスバ10mg／ピタバ4mg（倍量で追加約6〜10%↓）",0.08);
     }
   }
-  if(!hit()&&!s.eze&&!steps.some(function(x){return x.kind==="combo";}))push("エゼチミブ 10mg 追加","上乗せで約20〜25%↓（IMPROVE-IT）",0.22);
+  if(!hit()&&!s.eze&&!steps.some(function(x){return x.kind==="combo";}))push("エゼチミブ（ゼチーア）10mg 追加","上乗せで約20〜25%↓（IMPROVE-IT）",0.22);
   var vBeforeAlt=v;
-  if(!hit()&&intol!=="none"&&!s.bemp)push("ベムペド酸 180mg 追加","スタチン不耐・効果不十分例に。約20%↓（CLEAR Outcomes）。尿酸・胆石に注意",intol==="complete"?0.22:0.18);
+  if(!hit()&&intol!=="none"&&!s.bemp)push("ベムペド酸（ネクセトール）180mg 追加","スタチン不耐・効果不十分例に。約20%↓（CLEAR Outcomes）。尿酸・胆石に注意",intol==="complete"?0.22:0.18);
   if(!hit()&&!s.pcsk9){
-    push("PCSK9抗体（エボロクマブ）またはインクリシラン","約50〜60%↓。最適使用推進ガイドラインの要件を確認（FOURIER・ORION-10/11）",0.55,"inj");needInj=true;
+    push("PCSK9抗体：エボロクマブ（レパーサ）またはインクリシラン（レクビオ）","約50〜60%↓。最適使用推進ガイドラインの要件を確認（FOURIER・ORION-10/11）",0.55,"inj");needInj=true;
   }
   var alt=null;
-  if(intol==="none"&&!s.bemp&&needInj){var va=Math.round(vBeforeAlt*(1-0.18));alt={txt:"注射が難しい場合の代替：ベムペド酸 180mg 追加",v:va,hit:va<tgt};}
+  if(intol==="none"&&!s.bemp&&needInj){var va=Math.round(vBeforeAlt*(1-0.18));alt={txt:"注射が難しい場合の代替：ベムペド酸（ネクセトール）180mg 追加",v:va,hit:va<tgt};}
   return {steps:steps,ok:false,cur:cur,needInj:needInj,unreached:!hit(),alt:alt};
 }
 

@@ -311,13 +311,13 @@ table.bgt tr.sep td{height:4px}
     <div class="body">
       <div class="chk row">
         <label><input type="checkbox" class="med" value="met">メトホルミン（メトグルコ）</label>
-        <label><input type="checkbox" class="med" value="dpp4">DPP-4阻害薬（ジャヌビア・グラクティブ、エクア、トラゼンタ、テネリアなど）</label>
-        <label><input type="checkbox" class="med" value="sglt2">SGLT2阻害薬（ジャディアンス、フォシーガ、カナグル、スーグラなど）</label>
-        <label><input type="checkbox" class="med" value="glp1">GLP-1受容体作動薬（オゼンピック、トルリシティ、ビクトーザ、経口リベルサス）</label>
+        <label><input type="checkbox" class="med" value="dpp4">DPP-4阻害薬（シタグリプチン〈ジャヌビア・グラクティブ〉、ビルダグリプチン〈エクア〉、リナグリプチン〈トラゼンタ〉、テネリグリプチン〈テネリア〉など）</label>
+        <label><input type="checkbox" class="med" value="sglt2">SGLT2阻害薬（エンパグリフロジン〈ジャディアンス〉、ダパグリフロジン〈フォシーガ〉、カナグリフロジン〈カナグル〉、イプラグリフロジン〈スーグラ〉など）</label>
+        <label><input type="checkbox" class="med" value="glp1">GLP-1受容体作動薬（セマグルチド〈オゼンピック、経口リベルサス〉、デュラグルチド〈トルリシティ〉、リラグルチド〈ビクトーザ〉）</label>
         <label><input type="checkbox" class="med" value="tirz">チルゼパチド（マンジャロ）</label>
-        <label><input type="checkbox" class="med" value="su">SU薬（アマリール、グリミクロンなど）</label>
-        <label><input type="checkbox" class="med" value="glinide">グリニド薬（グルファスト、シュアポスト、スターシス・ファスティック）</label>
-        <label><input type="checkbox" class="med" value="agi">α-グルコシダーゼ阻害薬（ベイスン、グルコバイ、セイブル）</label>
+        <label><input type="checkbox" class="med" value="su">SU薬（グリメピリド〈アマリール〉、グリクラジド〈グリミクロン〉など）</label>
+        <label><input type="checkbox" class="med" value="glinide">グリニド薬（ミチグリニド〈グルファスト〉、レパグリニド〈シュアポスト〉、ナテグリニド〈スターシス・ファスティック〉）</label>
+        <label><input type="checkbox" class="med" value="agi">α-グルコシダーゼ阻害薬（ボグリボース〈ベイスン〉、アカルボース〈グルコバイ〉、ミグリトール〈セイブル〉）</label>
         <label><input type="checkbox" class="med" value="tzd">ピオグリタゾン（アクトス）</label>
         <label><input type="checkbox" class="med" value="imeg">イメグリミン（ツイミーグ）</label>
         <label><input type="checkbox" class="med" value="ins">インスリン（配合注のゾルトファイ・ソリクアを含む）</label>
@@ -660,7 +660,7 @@ function judge(p){
     if(p.ketone) x2.push("ケトン陽性：直ちに中止");
     if(p.stroke!=="none") x2.push("脳卒中急性期：脱水を避ける。経口摂取が不安定な間は休薬を考える");
     if(p.ward==="icu"||p.infect) x2.push("重症疾患・重症感染症では休薬");
-    M.push(["SGLT2阻害薬（ジャディアンス、フォシーガなど）", x2.length?"ng":"ok", x2.length?x2:["食事・水分が十分摂れていれば継続可。脱水に注意"], cite("SGLT2","ADA16")]);
+    M.push(["SGLT2阻害薬（エンパグリフロジン〈ジャディアンス〉、ダパグリフロジン〈フォシーガ〉など）", x2.length?"ng":"ok", x2.length?x2:["食事・水分が十分摂れていれば継続可。脱水に注意"], cite("SGLT2","ADA16")]);
   }
   if(m.su){
     var x3=[];
@@ -668,27 +668,27 @@ function judge(p){
     if(E!==null&&E<30) x3.push("高度腎障害では使わない（遷延性低血糖）");
     if(elderly) x3.push("高齢者は低血糖リスクが高い。続けるなら最小量（グリメピリド（アマリール）0.5〜1 mg 程度）");
     if(m.ins||needSched) x3.push("定時インスリン開始時は中止または減量");
-    M.push(["SU薬（アマリール、グリミクロンなど）", x3.length?"ng":"cau", x3.length?x3:["食事が全量摂れていれば継続可。入院中は多くの場合インスリンに切り替える"], cite("JDSalg","ADA16")]);
+    M.push(["SU薬（グリメピリド〈アマリール〉、グリクラジド〈グリミクロン〉など）", x3.length?"ng":"cau", x3.length?x3:["食事が全量摂れていれば継続可。入院中は多くの場合インスリンに切り替える"], cite("JDSalg","ADA16")]);
   }
   if(m.glinide){
-    M.push(["グリニド薬（グルファスト、シュアポスト、スターシス・ファスティック）", (poorIntake||p.nutr==="npo")?"ng":"cau", [(poorIntake||p.nutr==="npo")?"食事が摂れない回は内服しない（絶食中は中止）":"食直前に内服。食べない時は飲まない", (E!==null&&E<30)?"腎排泄型（ナテグリニド）は高度腎障害で禁忌":"" ].filter(Boolean), cite("JDSalg")]);
+    M.push(["グリニド薬（ミチグリニド〈グルファスト〉、レパグリニド〈シュアポスト〉、ナテグリニド〈スターシス・ファスティック〉）", (poorIntake||p.nutr==="npo")?"ng":"cau", [(poorIntake||p.nutr==="npo")?"食事が摂れない回は内服しない（絶食中は中止）":"食直前に内服。食べない時は飲まない", (E!==null&&E<30)?"腎排泄型（ナテグリニド）は高度腎障害で禁忌":"" ].filter(Boolean), cite("JDSalg")]);
   }
   if(m.dpp4){
     var x4=["低血糖を起こしにくく、入院中も継続しやすい（軽度の高血糖なら補正インスリンと併用で可）"];
     if(E!==null&&E<50) x4.push("腎機能に応じて減量（リナグリプチン（トラゼンタ）・テネリグリプチン（テネリア）は調整不要）");
     if(m.glp1||m.tirz) x4.push("GLP-1受容体作動薬・チルゼパチドとは併用しない");
     if(p.panc) x4.push("膵炎の既往：慎重に");
-    M.push(["DPP-4阻害薬（ジャヌビア・グラクティブ、エクア、トラゼンタなど）", (m.glp1||m.tirz)?"cau":"ok", x4, cite("ES22","JDSalg")]);
+    M.push(["DPP-4阻害薬（シタグリプチン〈ジャヌビア・グラクティブ〉、ビルダグリプチン〈エクア〉、リナグリプチン〈トラゼンタ〉など）", (m.glp1||m.tirz)?"cau":"ok", x4, cite("ES22","JDSalg")]);
   }
   if(m.glp1||m.tirz){
     var x5=[];
     if(p.dysph) x5.push("嘔気・嘔吐・腹部症状・嚥下障害がある間は継続を慎重に判断（胃排出遅延・誤嚥）");
     if(p.surg) x5.push("手術・内視鏡：胃内容残存のリスク。麻酔科と院内ルールに従う（消化器症状があれば延期・休薬を検討）");
     if(p.nutr==="npo") x5.push("絶食が長引く場合は休薬を考える");
-    M.push([m.tirz?"GLP-1受容体作動薬／チルゼパチド（マンジャロ）":"GLP-1受容体作動薬（オゼンピック、トルリシティ、ビクトーザ、リベルサス）", x5.length?"cau":"ok", x5.length?x5:["食事が摂れていれば継続可"], cite("ADA16","ADA9")]);
+    M.push([m.tirz?"GLP-1受容体作動薬／チルゼパチド（マンジャロ）":"GLP-1受容体作動薬（セマグルチド〈オゼンピック、リベルサス〉、デュラグルチド〈トルリシティ〉、リラグルチド〈ビクトーザ〉）", x5.length?"cau":"ok", x5.length?x5:["食事が摂れていれば継続可"], cite("ADA16","ADA9")]);
   }
   if(m.agi){
-    M.push(["α-グルコシダーゼ阻害薬（ベイスン、グルコバイ、セイブル）", (p.nutr==="npo")?"ng":"ok", [p.nutr==="npo"?"絶食中は中止":"食事に合わせて継続可", "併用中の低血糖はブドウ糖で処置する（砂糖は効きにくい）", p.ileus?"腸閉塞の既往：慎重に":""].filter(Boolean), cite("JDSgl")]);
+    M.push(["α-グルコシダーゼ阻害薬（ボグリボース〈ベイスン〉、アカルボース〈グルコバイ〉、ミグリトール〈セイブル〉）", (p.nutr==="npo")?"ng":"ok", [p.nutr==="npo"?"絶食中は中止":"食事に合わせて継続可", "併用中の低血糖はブドウ糖で処置する（砂糖は効きにくい）", p.ileus?"腸閉塞の既往：慎重に":""].filter(Boolean), cite("JDSgl")]);
   }
   if(m.tzd){
     M.push(["ピオグリタゾン（アクトス）", p.hf?"ng":"ok", [p.hf?"心不全では使わない（体液貯留）→ 中止":"浮腫・体重増加を確認しながら継続可", p.liver===2?"重度の肝障害では使わない":""].filter(Boolean), cite("JDSalg")]);
@@ -705,7 +705,7 @@ function judge(p){
   var nonObeseList=["dpp4","met","agi","glinide","su","sglt2","glp1","imeg"];
   var obeseList=["met","sglt2","glp1","dpp4","tzd","agi","su","glinide","imeg","tirz"];
   var step1 = (p.bmi===null)? null : (obese?obeseList:nonObeseList);
-  var NAMES={met:"ビグアナイド薬<small>（メトホルミン：メトグルコ）</small>",dpp4:"DPP-4阻害薬<small>（ジャヌビア・グラクティブ、エクア、ネシーナ、トラゼンタ、テネリア、スイニー、週1回：ザファテック・マリゼブ）</small>",sglt2:"SGLT2阻害薬<small>（ジャディアンス、フォシーガ、カナグル、スーグラ、ルセフィ、デベルザ）</small>",glp1:"GLP-1受容体作動薬<small>（週1回：オゼンピック・トルリシティ、1日1回：ビクトーザ、経口：リベルサス）</small>",tirz:"チルゼパチド<small>（GIP/GLP-1受容体作動薬：マンジャロ）</small>",tzd:"チアゾリジン薬<small>（ピオグリタゾン：アクトス）</small>",agi:"α-グルコシダーゼ阻害薬<small>（ボグリボース：ベイスン、アカルボース：グルコバイ、ミグリトール：セイブル）</small>",su:"SU薬<small>（グリメピリド：アマリール、グリクラジド：グリミクロン）</small>",glinide:"グリニド薬<small>（ミチグリニド：グルファスト、レパグリニド：シュアポスト、ナテグリニド：スターシス・ファスティック）</small>",imeg:"イメグリミン<small>（ツイミーグ）</small>"};
+  var NAMES={met:"ビグアナイド薬<small>（メトホルミン：メトグルコ）</small>",dpp4:"DPP-4阻害薬<small>（シタグリプチン：ジャヌビア・グラクティブ、ビルダグリプチン：エクア、アログリプチン：ネシーナ、リナグリプチン：トラゼンタ、テネリグリプチン：テネリア、アナグリプチン：スイニー、週1回：トレラグリプチン〈ザファテック〉・オマリグリプチン〈マリゼブ〉）</small>",sglt2:"SGLT2阻害薬<small>（エンパグリフロジン：ジャディアンス、ダパグリフロジン：フォシーガ、カナグリフロジン：カナグル、イプラグリフロジン：スーグラ、ルセオグリフロジン：ルセフィ、トホグリフロジン：デベルザ）</small>",glp1:"GLP-1受容体作動薬<small>（週1回：セマグルチド〈オゼンピック〉・デュラグルチド〈トルリシティ〉、1日1回：リラグルチド〈ビクトーザ〉、経口：セマグルチド〈リベルサス〉）</small>",tirz:"チルゼパチド<small>（GIP/GLP-1受容体作動薬：マンジャロ）</small>",tzd:"チアゾリジン薬<small>（ピオグリタゾン：アクトス）</small>",agi:"α-グルコシダーゼ阻害薬<small>（ボグリボース：ベイスン、アカルボース：グルコバイ、ミグリトール：セイブル）</small>",su:"SU薬<small>（グリメピリド：アマリール、グリクラジド：グリミクロン）</small>",glinide:"グリニド薬<small>（ミチグリニド：グルファスト、レパグリニド：シュアポスト、ナテグリニド：スターシス・ファスティック）</small>",imeg:"イメグリミン<small>（ツイミーグ）</small>"};
   var order=["sglt2","glp1","tirz","met","dpp4","tzd","imeg","agi","glinide","su"];
   var C={};
   order.forEach(function(k){ C[k]={k:k, lvl:"ok", why:[]}; });

@@ -190,7 +190,7 @@ body.sel{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
   <div class="chips">
     <label class="chip"><input type="checkbox" class="sf" value="elder"><span>高齢（75歳以上）</span></label>
     <label class="chip"><input type="checkbox" class="sf" value="lowK"><span>低K血症・アルドステロン症・ミオパチー</span></label>
-    <label class="chip"><input type="checkbox" class="sf" value="diur"><span>ループ・サイアザイド利尿薬</span></label>
+    <label class="chip"><input type="checkbox" class="sf" value="diur"><span>ループ・サイアザイド利尿薬（フロセミド〈ラシックス〉、トリクロルメチアジド〈フルイトラン〉など）</span></label>
     <label class="chip"><input type="checkbox" class="sf" value="otherK"><span>他の甘草含有漢方・グリチルリチン製剤</span></label>
     <label class="chip"><input type="checkbox" class="sf" value="cardio"><span>高血圧・虚血性心疾患・不整脈・心不全</span></label>
     <label class="chip"><input type="checkbox" class="sf" value="thy"><span>甲状腺機能亢進症</span></label>
@@ -221,11 +221,11 @@ body.sel{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
   <div class="pick" style="margin-top:8px"><div class="chips" id="mixPick"></div></div>
   <div class="lbl">併用している西洋薬など</div>
   <div class="chips">
-    <label class="chip"><input type="checkbox" class="mw" value="diur"><span>ループ・サイアザイド利尿薬</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="diur"><span>ループ・サイアザイド利尿薬（フロセミド〈ラシックス〉、トリクロルメチアジド〈フルイトラン〉など）</span></label>
     <label class="chip"><input type="checkbox" class="mw" value="glyc"><span>グリチルリチン製剤（強力ネオミノファーゲンシー・グリチロン など）</span></label>
-    <label class="chip"><input type="checkbox" class="mw" value="ifn"><span>インターフェロン製剤</span></label>
-    <label class="chip"><input type="checkbox" class="mw" value="symp"><span>エフェドリン類・MAO阻害薬・甲状腺製剤・カテコラミン・キサンチン系</span></label>
-    <label class="chip"><input type="checkbox" class="mw" value="stim"><span>刺激性下剤（センノシド・ピコスルファート）</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="ifn"><span>インターフェロン製剤（MSのインターフェロンβ〈ベタフェロン、アボネックス〉も含む）</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="symp"><span>エフェドリン類・MAO阻害薬（セレギリン〈エフピー〉、ラサギリン〈アジレクト〉など）・甲状腺製剤（レボチロキシン〈チラーヂンS〉）・カテコラミン・キサンチン系（テオフィリン〈テオドール〉など）</span></label>
+    <label class="chip"><input type="checkbox" class="mw" value="stim"><span>刺激性下剤（センノシド〈プルゼニド〉・ピコスルファート〈ラキソベロン〉）</span></label>
     <label class="chip"><input type="checkbox" class="mw" value="lowK"><span>低K血症がある</span></label>
     <label class="chip"><input type="checkbox" class="mw" value="elder"><span>高齢（75歳以上）</span></label>
   </div>
@@ -680,7 +680,7 @@ const SCENES = [
   ]},
 
  {id:'constip', label:'便秘（PD・脳卒中後を含む）',
-  red:'腸閉塞・宿便・薬剤性（抗コリン薬・オピオイド・Ca拮抗薬など）を確認。大黄含有方剤は刺激性下剤と同じ扱い。',
+  red:'腸閉塞・宿便・薬剤性（抗コリン薬〈トリヘキシフェニジル：アーテンなど〉・オピオイド・Ca拮抗薬〈アムロジピン：ノルバスク、アムロジンなど〉）を確認。大黄含有方剤は刺激性下剤と同じ扱い。',
   feat:[
    {id:'bloat',label:'腹部膨満・ガス・冷えると腹痛',boost:{daikenchu:3,keishikashakuyaku:1}},
    {id:'hard',label:'硬いコロコロ便',boost:{mashinin:2,junchou:2}},
@@ -772,7 +772,7 @@ const SCENES = [
   ]},
 
  {id:'edema', label:'浮腫・慢性硬膜下血腫',
-  red:'心不全・腎障害・肝硬変・低Alb・DVT・薬剤性（Ca拮抗薬・プレガバリン）を確認。CSDHは症候性・増大なら手術。',
+  red:'心不全・腎障害・肝硬変・低Alb・DVT・薬剤性（Ca拮抗薬〈アムロジピン：ノルバスク、アムロジンなど〉・プレガバリン〈リリカ〉）を確認。CSDHは症候性・増大なら手術。',
   feat:[
    {id:'csdh',label:'慢性硬膜下血腫（術後再発予防・軽症例）',boost:{gorei:3}},
    {id:'thirst',label:'口渇・尿量減少',boost:{gorei:2}},

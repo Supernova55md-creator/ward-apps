@@ -119,6 +119,7 @@ button.ghost{background:transparent}
 .bar i{display:block;height:100%;background:var(--accent)}
 .rk-name{font-size:14px}
 .rk-name small{display:block;color:var(--muted);font-size:12px}
+.rk-name .exs{display:block;color:var(--ink);opacity:.8}
 .refs{font-size:13px;padding-left:18px;margin:0;display:flex;flex-direction:column;gap:6px}
 .refs a{color:var(--info);word-break:break-all}
 .refs .tag{font-family:var(--font-num);font-size:11px;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 5px;margin-right:4px}
@@ -436,20 +437,20 @@ const REF_ORDER = ['JSH2025','JSHKEY','STROKE','RTPA','STROKEBP','INT3','ENC2','
 
 /* ======================= 降圧薬クラス ======================= */
 const CLS = {
-  CCB:{name:'Ca拮抗薬（ジヒドロピリジン系）', g:1, ex:'アムロジピン、ベニジピン、アゼルニジピン、シルニジピン、ニフェジピン徐放'},
-  ARB:{name:'ARB', g:1, ras:true, ex:'アジルサルタン、オルメサルタン、テルミサルタン、カンデサルタン、ロサルタン'},
-  ACEI:{name:'ACE阻害薬', g:1, ras:true, ex:'ペリンドプリル、イミダプリル、エナラプリル'},
-  THZ:{name:'サイアザイド系（類似）利尿薬', g:1, ex:'トリクロルメチアジド、インダパミド、ヒドロクロロチアジド（少量）'},
-  BB:{name:'β遮断薬', g:1, ex:'ビソプロロール、カルベジロール（αβ）、メトプロロール'},
-  ARNI:{name:'ARNI', g:2, ras:true, ex:'サクビトリルバルサルタン（ACE阻害薬からは36時間あける）'},
-  MRA:{name:'MR拮抗薬', g:2, ex:'エサキセレノン、スピロノラクトン、エプレレノン'},
-  LOOP:{name:'ループ利尿薬', g:3, ex:'フロセミド、アゾセミド、トラセミド'},
-  ALPHA:{name:'α遮断薬', g:3, ex:'ドキサゾシン（就寝前）'}
+  CCB:{name:'Ca拮抗薬（ジヒドロピリジン系）', g:1, ex:'アムロジピン（アムロジン・ノルバスク）、ベニジピン（コニール）、アゼルニジピン（カルブロック）、シルニジピン（アテレック）、ニフェジピン徐放（アダラートCR）', rep:'アムロジピン（アムロジン・ノルバスク）、ニフェジピン徐放（アダラートCR）'},
+  ARB:{name:'ARB', g:1, ras:true, ex:'アジルサルタン（アジルバ）、オルメサルタン（オルメテック）、テルミサルタン（ミカルディス）、カンデサルタン（ブロプレス）、ロサルタン（ニューロタン）', rep:'アジルサルタン（アジルバ）、テルミサルタン（ミカルディス）'},
+  ACEI:{name:'ACE阻害薬', g:1, ras:true, ex:'ペリンドプリル（コバシル）、イミダプリル（タナトリル）、エナラプリル（レニベース）', rep:'ペリンドプリル（コバシル）、イミダプリル（タナトリル）'},
+  THZ:{name:'サイアザイド系（類似）利尿薬', g:1, ex:'トリクロルメチアジド（フルイトラン）、インダパミド（ナトリックス）、ヒドロクロロチアジド（少量）', rep:'トリクロルメチアジド（フルイトラン）、インダパミド（ナトリックス）'},
+  BB:{name:'β遮断薬', g:1, ex:'ビソプロロール（メインテート）、カルベジロール（アーチスト、αβ遮断）、メトプロロール（セロケン・ロプレソール）', rep:'ビソプロロール（メインテート）、カルベジロール（アーチスト）'},
+  ARNI:{name:'ARNI', g:2, ras:true, ex:'サクビトリルバルサルタン（エンレスト）。ACE阻害薬からは36時間あける', rep:'サクビトリルバルサルタン（エンレスト）'},
+  MRA:{name:'MR拮抗薬', g:2, ex:'エサキセレノン（ミネブロ）、スピロノラクトン（アルダクトンA）、エプレレノン（セララ）', rep:'エサキセレノン（ミネブロ）、スピロノラクトン（アルダクトンA）'},
+  LOOP:{name:'ループ利尿薬', g:3, ex:'フロセミド（ラシックス）、アゾセミド（ダイアート）、トラセミド（ルプラック）', rep:'フロセミド（ラシックス）、アゾセミド（ダイアート）'},
+  ALPHA:{name:'α遮断薬', g:3, ex:'ドキサゾシン（カルデナリン、就寝前）', rep:'ドキサゾシン（カルデナリン）'}
 };
 
 
 /* ======================= 入力の読み取り（改訂：主要5項目＋共通プロファイル） ======================= */
-const APP_VER='2026-11-14a';
+const APP_VER='2026-11-14b';
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const num = id => { const v = parseFloat($('#'+id).value); return isNaN(v) ? null : v; };
@@ -538,7 +539,7 @@ function oralPlan(d){
   } else if(d.co.includes('pregnant')){
     items.push(it('do','最初の内服薬（妊娠中）','ニフェジピン徐放、ラベタロール、メチルドパから選ぶ。ACE阻害薬・ARB・ARNI・MR拮抗薬は使わない。産科と同時に方針を決める。',['JSH2025'],'ニフェジピン徐放（アダラートCR）／ラベタロール（トランデート）／メチルドパ（アルドメット）'));
   } else if(pick.length){
-    items.push(it('do','最初の内服薬', pick.map(k=>CLS[k].name+(R._debug.why&&R._debug.why[k]&&R._debug.why[k].length?'（'+[...new Set(R._debug.why[k])].join('・')+'）':'')).join(' または ')+'。少量で開始し、静注は経口の効果を見ながら漸減。', ['JSH2025','STROKE','PRAC'], pick.map(k=>CLS[k].ex).join(' ／ ')));
+    items.push(it('do','最初の内服薬', pick.map(k=>CLS[k].name+(R._debug.why&&R._debug.why[k]&&R._debug.why[k].length?'（'+[...new Set(R._debug.why[k])].join('・')+'）':'')).join(' または ')+'。少量で開始し、静注は経口の効果を見ながら漸減。', ['JSH2025','STROKE','PRAC'], pick.map(k=>exOf(k)).join(' ／ ')));
   }
   if(d.route==='tube') items.push(it('caution','経管投与','普通錠・OD錠は簡易懸濁で投与できるものが多い。徐放錠（ニフェジピン徐放など）は粉砕・懸濁しない。個々の可否は薬剤部に確認。',['PRAC']));
   if(R._debug && R._debug.avoidList && R._debug.avoidList.length) items.push(it('avoid','この患者で避ける薬', R._debug.avoidList.join('／'), ['JSH2025']));
@@ -573,7 +574,7 @@ function evaluate(d){
   const acute = ['isNone','ivt','evt','ich','sah'].includes(d.scene);
   if(acute){
     const acts=[];
-    const ivDrugs = it('do','静注薬の選択','ニカルジピン持続静注（0.5〜6 μg/kg/分）またはジルチアゼム持続静注（5〜15 μg/kg/分）を少量から。急激な降圧と血圧変動を避ける。',['STROKEBP','STROKE'],'用量は高血圧緊急症の添付文書範囲。開始量・増量幅は施設のプロトコルに合わせる');
+    const ivDrugs = it('do','静注薬の選択','ニカルジピン持続静注（0.5〜6 μg/kg/分）またはジルチアゼム持続静注（5〜15 μg/kg/分）を少量から。急激な降圧と血圧変動を避ける。',['STROKEBP','STROKE'],'ニカルジピン（ペルジピン注）、ジルチアゼム（ヘルベッサー注射用）。用量は高血圧緊急症の添付文書範囲。開始量・増量幅は施設のプロトコルに合わせる');
     if(d.scene==='isNone'){
       R.targets=[{k:'原則',v:'降圧しない'},{k:'降圧を考える閾値',v:'>220/120'}];
       if(s!=null&&(s>220||di>120)){
@@ -677,11 +678,11 @@ function evaluate(d){
     R.level='crit'; R.headline='高血圧緊急症の疑い'; R.sub='静注薬で管理できる環境（ICU・HCU）へ。病態ごとに目標が異なる';
     const e=[];
     e.push(it('do','初期の降圧幅','最初の1時間は平均血圧の25%以内、その後2〜6時間で160/100〜110程度、24〜48時間で通常の目標へ。',['JSH2025','AHA']));
-    if(d.emerg.includes('aad')) e.push(it('avoid','大動脈解離は例外','収縮期120 mmHg未満・心拍60/分未満を速やかに。β遮断薬静注を先行し、心臓血管外科へ。',['AHA','ESC']));
+    if(d.emerg.includes('aad')) e.push(it('avoid','大動脈解離は例外','収縮期120 mmHg未満・心拍60/分未満を速やかに。β遮断薬静注を先行し、心臓血管外科へ。',['AHA','ESC'],'ランジオロール（オノアクト）、エスモロール（ブレビブロック）'));
     if(d.emerg.includes('eclampsia')||pregnant) e.push(it('avoid','妊娠関連は例外','ACE阻害薬・ARB・ARNI・MR拮抗薬は使わない。ニカルジピン静注、硫酸Mgなど。産科と同時に対応。',['JSH2025']));
-    if(d.emerg.includes('pheo')) e.push(it('avoid','褐色細胞腫クリーゼ疑い','α遮断（フェントラミン）を先行。β遮断薬単独は禁忌。',['JSH2025']));
+    if(d.emerg.includes('pheo')) e.push(it('avoid','褐色細胞腫クリーゼ疑い','α遮断（フェントラミン）を先行。β遮断薬単独は禁忌。',['JSH2025'],'フェントラミン（レギチーン）'));
     if(d.emerg.includes('enceph')) e.push(it('do','高血圧性脳症／PRES','MRI（FLAIR）で評価。2〜3時間で約25%の降圧。けいれんは抗てんかん薬で治療。',['JSH2025','PRAC']));
-    e.push(it('do','静注薬','ニカルジピン（0.5〜6 μg/kg/分）、ジルチアゼム（5〜15 μg/kg/分）、ニトログリセリン（心不全・ACS、0.5〜5 μg/kg/分）。',['JSH2025'],'用量は添付文書の範囲'));
+    e.push(it('do','静注薬','ニカルジピン（0.5〜6 μg/kg/分）、ジルチアゼム（5〜15 μg/kg/分）、ニトログリセリン（心不全・ACS、0.5〜5 μg/kg/分）。',['JSH2025'],'ニカルジピン（ペルジピン注）、ジルチアゼム（ヘルベッサー注射用）、ニトログリセリン（ミリスロール）。用量は添付文書の範囲'));
     R.blocks.push({title:'いまやること', items:e});
     consult.push(it('consult','集中治療／循環器内科','緊急症の全身管理。',['JSH2025']));
     if(d.emerg.includes('aad')) consult.push(it('consult','心臓血管外科（緊急）','大動脈解離の評価。',['PRAC']));
@@ -795,32 +796,32 @@ function evaluate(d){
     if(stepNow===0){
       if(grade.g>=4 || (grade.g>=3 && highRisk)){
         const p=pickPair();
-        plan.push(it('do','STEP 1〜2：2剤併用（配合剤）から開始を考慮', p.map(clsLine).join(' ＋ ') + '。単剤高用量より作用機序の異なる少量併用で速やかに下げる。',['JSH2025','AHA'], p.map(k=>CLS[k].ex).join(' ／ ')));
+        plan.push(it('do','STEP 1〜2：2剤併用（配合剤）から開始を考慮', p.map(clsLine).join(' ＋ ') + '。単剤高用量より作用機序の異なる少量併用で速やかに下げる。',['JSH2025','AHA'], p.map(k=>exOf(k)).join(' ／ ') + comboEx(p)));
       } else {
         const k=ranked[0];
-        if(k) plan.push(it('do','STEP 1：グループ1降圧薬を単剤で開始', clsLine(k)+'。目標未達なら速やかに2剤へ。',['JSH2025'], CLS[k].ex));
+        if(k) plan.push(it('do','STEP 1：グループ1降圧薬を単剤で開始', clsLine(k)+'。目標未達なら速やかに2剤へ。',['JSH2025'], exOf(k)));
       }
     } else if(stepNow===1){
       const k = ranked.find(x=>CLS[x].g<=2);
-      if(k) plan.push(it('do','STEP 2：2剤併用へ', clsLine(k)+' を追加。'+(d.roomUp?'増量余地はあるが、JSH2025は単剤増量より作用機序の異なる併用を優先。':''),['JSH2025'], CLS[k].ex));
-      if(onMed('ARB') && !avoid.ARNI) plan.push(it('do','ARB→ARNIへの切替も選択肢','STEP 2以降でグループ2のARNIが使える。同じ1錠のまま降圧を強化できる。',['JSH2025'], CLS.ARNI.ex));
+      if(k) plan.push(it('do','STEP 2：2剤併用へ', clsLine(k)+' を追加。'+(d.roomUp?'増量余地はあるが、JSH2025は単剤増量より作用機序の異なる併用を優先。':''),['JSH2025'], exOf(k)));
+      if(onMed('ARB') && !avoid.ARNI) plan.push(it('do','ARB→ARNIへの切替も選択肢','STEP 2以降でグループ2のARNIが使える。同じ1錠のまま降圧を強化できる。',['JSH2025'], exOf('ARNI')));
     } else if(stepNow===2){
       if(!onMed('THZ') && !avoid.THZ && !(d.egfr!=null&&d.egfr<30)){
-        plan.push(it('do','STEP 3：サイアザイド系利尿薬を加えて3剤','STEP 3では原則サイアザイド系を含める。'+(onMed('CCB')&&rasCurrent.length?'Ca拮抗薬＋RAS阻害薬＋利尿薬の組み合わせ。':''),['JSH2025'], CLS.THZ.ex));
+        plan.push(it('do','STEP 3：サイアザイド系利尿薬を加えて3剤','STEP 3では原則サイアザイド系を含める。'+(onMed('CCB')&&rasCurrent.length?'Ca拮抗薬＋RAS阻害薬＋利尿薬の組み合わせ。':''),['JSH2025'], exOf('THZ') + (onMed('CCB')&&onMed('ARB')?' ／ 3剤配合剤の例：テルミサルタン/アムロジピン/ヒドロクロロチアジド（ミカトリオ）':'')));
       } else if(d.egfr!=null&&d.egfr<30 && !onMed('LOOP')){
-        plan.push(it('do','STEP 3：ループ利尿薬を加えて3剤','eGFR<30ではサイアザイドの効果が落ちるため。',['JSH2025','JSN'], CLS.LOOP.ex));
+        plan.push(it('do','STEP 3：ループ利尿薬を加えて3剤','eGFR<30ではサイアザイドの効果が落ちるため。',['JSH2025','JSN'], exOf('LOOP')));
       } else {
         const k = ranked.find(x=>CLS[x].g<=2);
-        if(k) plan.push(it('do','STEP 3：3剤併用へ', clsLine(k)+' を追加。',['JSH2025'], CLS[k].ex));
+        if(k) plan.push(it('do','STEP 3：3剤併用へ', clsLine(k)+' を追加。',['JSH2025'], exOf(k)));
       }
     } else {
       const hasDiuretic = onMed('THZ')||onMed('LOOP');
       if(!hasDiuretic && !avoid.THZ){
-        plan.push(it('do','利尿薬を含める','3剤以上でも利尿薬が入っていない。サイアザイド系（eGFR<30はループ）を加える。',['JSH2025'], CLS.THZ.ex));
+        plan.push(it('do','利尿薬を含める','3剤以上でも利尿薬が入っていない。サイアザイド系（eGFR<30はループ）を加える。',['JSH2025'], exOf('THZ')));
       } else {
         plan.push(it('caution','治療抵抗性高血圧','利尿薬を含む3剤で未達。まず服薬アドヒアランス、白衣効果（家庭血圧）、食塩摂取、併用薬、二次性高血圧を確認。',['JSH2025','AHA']));
-        if(!onMed('MRA') && !avoid.MRA) plan.push(it('do','STEP 4：MR拮抗薬を追加', 'K・eGFRを2〜4週後に再検。'+(caution.MRA?'注意：'+caution.MRA.join('、'):''),['JSH2025','ESC'], CLS.MRA.ex));
-        if(!onMed('BB') && !avoid.BB) plan.push(it('do','β遮断薬も選択肢','心拍数が高い例など。',['JSH2025'], CLS.BB.ex));
+        if(!onMed('MRA') && !avoid.MRA) plan.push(it('do','STEP 4：MR拮抗薬を追加', 'K・eGFRを2〜4週後に再検。'+(caution.MRA?'注意：'+caution.MRA.join('、'):''),['JSH2025','ESC'], exOf('MRA')));
+        if(!onMed('BB') && !avoid.BB) plan.push(it('do','β遮断薬も選択肢','心拍数が高い例など。',['JSH2025'], exOf('BB')));
         consult.push(it('consult','高血圧専門医（腎臓内科・内分泌内科・循環器内科）','治療抵抗性高血圧の評価。',['JSH2025']));
       }
     }
@@ -858,7 +859,7 @@ function evaluate(d){
   if((!egfrUnsure && d.egfr!=null && d.egfr<egfrRef) || d.prot==='A3') consult.push(it('consult','腎臓内科',`eGFR ${egfrLabel}（紹介目安 <${egfrRef}）／尿蛋白 ${d.prot}。CKDの評価と降圧薬の調整。`,['JSN','PRAC']));
   else if(egfrUnsure) notes.push(it('caution','腎臓内科への紹介','eGFR 30〜59 の区分のみ入力。実測値が45未満（70歳以上は40未満、40歳未満は60未満）なら紹介を考慮。「詳しく」に実測値を入れると判定します。',['JSN','PRAC']));
   if(d.k!=null && d.k>=5.5) consult.push(it('consult','腎臓内科（高K）','K≥5.5。RAS阻害薬・MR拮抗薬の調整、K吸着薬の検討。',['PRAC']));
-  if(pregnant) consult.push(it('consult','産婦人科','妊娠中の降圧薬はニフェジピン、ラベタロール、メチルドパ、ヒドララジンから。',['JSH2025']));
+  if(pregnant) consult.push(it('consult','産婦人科','妊娠中の降圧薬はニフェジピン、ラベタロール、メチルドパ、ヒドララジンから。',['JSH2025'],'ニフェジピン徐放（アダラートCR）、ラベタロール（トランデート）、メチルドパ（アルドメット）、ヒドララジン（アプレゾリン）'));
   if(has('hfref')) consult.push(it('consult','循環器内科','HFrEFの心保護薬（ARNI・β遮断薬・MR拮抗薬・SGLT2阻害薬）の最適化。',['JSH2025','ESC']));
   if(has('mg') && onMed('BB')) consult.push(it('consult','薬剤部','重症筋無力症に影響する薬剤の総点検（β遮断薬のほか抗菌薬・Mg製剤など）。',['PRAC']));
 
@@ -877,9 +878,27 @@ function evaluate(d){
   return R;
 }
 function srcFor(k,reasons){ return ['JSH2025']; }
+/* 配合剤の例（2剤の組み合わせに合うものだけ表示） */
+function exOf(k){ return CLS[k].rep + (k==='ARNI'?'。ACE阻害薬からは36時間あける':''); }
+function comboEx(p){
+  const has=k=>p.includes(k), m=[];
+  if(has('CCB')&&has('ARB')) m.push('アジルサルタン/アムロジピン（ザクラス）','テルミサルタン/アムロジピン（ミカムロ）');
+  if(has('ARB')&&has('THZ')) m.push('ロサルタン/ヒドロクロロチアジド（プレミネント）','テルミサルタン/ヒドロクロロチアジド（ミコンビ）');
+  return m.length ? ' ／ 配合剤の例：'+m.join('、') : '';
+}
 
 
 /* ======================= 描画 ======================= */
+/* 薬効分類だけが書かれた項目に、代表的な一般名（商品名）を添える */
+const CLS_KW=[['RAS阻害薬',['ARB','ACEI']],['Ca拮抗薬',['CCB']],['ACE阻害薬',['ACEI']],['ARNI',['ARNI']],['ARB',['ARB']],['サイアザイド',['THZ']],['β遮断薬',['BB']],['MR拮抗薬',['MRA']],['ループ利尿薬',['LOOP']],['α遮断薬',['ALPHA']]];
+function repFor(x){
+  if(x.kind==='consult') return '';
+  const txt=x.t+' '+x.d; const ks=[];
+  CLS_KW.forEach(([w,cl])=>{ if(txt.includes(w)) cl.forEach(c=>{ if(!ks.includes(c)) ks.push(c); }); });
+  const list=ks.filter(k=>!CLS[k].rep.split('、').some(n=>txt.includes(n.replace(/（.*$/,''))));
+  if(!list.length) return '';
+  return (x.kind==='avoid'?'該当する薬：':'代表薬：')+list.map(k=>CLS[k].rep).join('／');
+}
 const LV = {crit:'要対応', warn:'要調整', ok:'良好', info:'目標'};
 function srcChips(src){
   return '<span class="src">'+src.map(s=>{const r=REFS[s]; if(!r) return ''; return r.url?`<a href="#ref-${s}">${r.label}</a>`:`<a class="prac" href="#refs">${r.label}</a>`;}).join('')+'</span>';
@@ -922,9 +941,9 @@ function render(){
   $('#blocks').innerHTML = R.blocks.map(b=>{
     if(b.rank){
       const max=Math.max(...b.rank.map(r=>r.score));
-      return `<h3>${b.title}</h3><div class="rank">${b.rank.map(r=>`<div class="rk-name">${CLS[r.k].name}<small>${r.why.length?r.why.join('・'):'グループ'+CLS[r.k].g+'の標準候補'}${r.caution.length?' ／ 注意：'+r.caution.join('、'):''}</small></div><div class="bar" aria-label="相対スコア"><i style="width:${Math.round(r.score/max*100)}%"></i></div>`).join('')}</div><p class="hint">スコアは積極的適応・禁忌・注意から算出した相対値です。</p>`;
+      return `<h3>${b.title}</h3><div class="rank">${b.rank.map(r=>`<div class="rk-name">${CLS[r.k].name}<small>${r.why.length?r.why.join('・'):'グループ'+CLS[r.k].g+'の標準候補'}${r.caution.length?' ／ 注意：'+r.caution.join('、'):''}<span class="exs">${esc(CLS[r.k].rep||CLS[r.k].ex)}</span></small></div><div class="bar" aria-label="相対スコア"><i style="width:${Math.round(r.score/max*100)}%"></i></div>`).join('')}</div><p class="hint">スコアは積極的適応・禁忌・注意から算出した相対値です。</p>`;
     }
-    return `<h3>${b.title}</h3><ul class="list">${b.items.map(x=>`<li class="item ${x.kind}"><div class="t">${esc(x.t)}</div><div class="d">${esc(x.d)}</div>${x.ex?`<div class="ex">${esc(x.ex)}</div>`:''}${srcChips(x.src)}</li>`).join('')}</ul>`;
+    return `<h3>${b.title}</h3><ul class="list">${b.items.map(x=>{const ex=x.ex||repFor(x);return `<li class="item ${x.kind}"><div class="t">${esc(x.t)}</div><div class="d">${esc(x.d)}</div>${ex?`<div class="ex">${esc(ex)}</div>`:''}${srcChips(x.src)}</li>`;}).join('')}</ul>`;
   }).join('');
   window._last={d,R};
   try{ localStorage.setItem('htnnavi.draft', JSON.stringify({v:2, ui:snapshot()})); }catch(e){}

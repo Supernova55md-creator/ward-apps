@@ -211,11 +211,11 @@ details.more[open]{padding-bottom:14px}
     </div>
     <h3>併用薬</h3>
     <div class="chips" id="p-co">
-      <label class="chip"><input type="checkbox" value="doac" data-s><span>DOAC</span></label>
+      <label class="chip"><input type="checkbox" value="doac" data-s><span>DOAC（アピキサバン〈エリキュース〉など）</span></label>
       <label class="chip"><input type="checkbox" value="warf" data-s><span>ワルファリン</span></label>
       <label class="chip"><input type="checkbox" value="onc" data-s><span>抗がん剤（化学療法・分子標的薬）</span></label>
       <label class="chip"><input type="checkbox" value="imsup" data-s><span>免疫抑制薬（タクロリムスなど）</span></label>
-      <label class="chip"><input type="checkbox" value="carba" data-s><span>カルバペネム系</span></label>
+      <label class="chip"><input type="checkbox" value="carba" data-s><span>カルバペネム系（メロペネム〈メロペン〉など）</span></label>
       <label class="chip"><input type="checkbox" value="oc" data-s><span>経口避妊薬・ホルモン剤</span></label>
       <label class="chip"><input type="checkbox" value="vpa" data-s><span>バルプロ酸を併用中</span></label>
       <label class="chip"><input type="checkbox" value="ind" data-s><span>酵素誘導薬を併用中（CBZ・PHT・PB）</span></label>
@@ -336,8 +336,8 @@ details.more[open]{padding-bottom:14px}
     <div class="wrapx"><table class="tl">
       <thead><tr><th>型</th><th>薬</th><th>起こること</th></tr></thead>
       <tbody>
-        <tr><td><b>強い酵素誘導</b></td><td>カルバマゼピン、フェニトイン（ホスフェニトイン）、フェノバルビタール</td><td>CYP3A4・P-gp などを誘導し、DOAC・ワルファリン・抗がん剤・免疫抑制薬・ステロイド・他の抗てんかん薬の濃度を下げる。中止後も誘導が抜けるまで2〜4週かかる</td></tr>
-        <tr><td><b>弱い誘導（用量依存）</b></td><td>トピラマート（200mg/日超）、ペランパネル（12mg/日）</td><td>経口避妊薬の効果を弱める</td></tr>
+        <tr><td><b>強い酵素誘導</b></td><td>カルバマゼピン、フェニトイン（ホスフェニトイン）、フェノバルビタール</td><td>CYP3A4・P-gp などを誘導し、DOAC（アピキサバン〈エリキュース〉、エドキサバン〈リクシアナ〉など）・ワルファリン・抗がん剤・免疫抑制薬（タクロリムス〈プログラフ〉、シクロスポリン〈ネオーラル〉など）・ステロイド（デキサメタゾン〈デカドロン〉など）・他の抗てんかん薬の濃度を下げる。中止後も誘導が抜けるまで2〜4週かかる</td></tr>
+        <tr><td><b>弱い誘導（用量依存）</b></td><td>トピラマート（200mg/日超）、ペランパネル（12mg/日）</td><td>経口避妊薬（レボノルゲストレル・エチニルエストラジオール〈トリキュラー〉など）の効果を弱める</td></tr>
         <tr><td><b>阻害</b></td><td>バルプロ酸</td><td>グルクロン酸抱合を阻害し、ラモトリギンの濃度が約2倍に。フェノバルビタールも上昇。フェニトインの遊離型が増える</td></tr>
         <tr><td><b>影響を受けやすい</b></td><td>ラモトリギン、ペランパネル、トピラマート、ゾニサミド、バルプロ酸</td><td>誘導薬の併用・中止で濃度が大きく動く</td></tr>
         <tr><td><b>相互作用が少ない</b></td><td>レベチラセタム、ラコサミド、ブリーバラセタム、ガバペンチン</td><td>併用薬が多い高齢者・担がん患者で使いやすい</td></tr>
@@ -863,6 +863,7 @@ function renderPts(p){
 /* ============ 相互作用 ============ */
 const IA_AED=["LEV","LCM","LTG","BRV","PER","CBZ","VPA","ZNS","TPM","PHT","PB","CLB","GBP"];
 const IA_CO={doac:"DOAC",warf:"ワルファリン",onc:"抗がん剤",imsup:"免疫抑制薬",ster:"ステロイド",carba:"カルバペネム",macro:"マクロライド（クラリスロマイシンなど）",azole:"アゾール系抗真菌薬",rif:"リファンピシン",inh:"イソニアジド",oc:"経口避妊薬",prcard:"β遮断薬・ベラパミル・ジゴキシン",statin:"スタチン・Ca拮抗薬",psych:"抗精神病薬・抗うつ薬",mtx:"メトトレキサート"};
+const IA_EX={doac:"アピキサバン〈エリキュース〉、エドキサバン〈リクシアナ〉、リバーロキサバン〈イグザレルト〉、ダビガトラン〈プラザキサ〉",onc:"イマチニブ〈グリベック〉、パクリタキセル〈タキソール〉、ドセタキセル〈タキソテール〉、イリノテカン〈カンプト・トポテシン〉",imsup:"タクロリムス〈プログラフ〉、シクロスポリン〈ネオーラル〉、エベロリムス〈サーティカン・アフィニトール〉",ster:"デキサメタゾン〈デカドロン〉、プレドニゾロン〈プレドニン〉、メチルプレドニゾロン〈ソル・メドロール〉",carba:"メロペネム〈メロペン〉、イミペネム・シラスタチン〈チエナム〉",macro:"クラリスロマイシン〈クラリス・クラリシッド〉、エリスロマイシン〈エリスロシン〉",azole:"ボリコナゾール〈ブイフェンド〉、イトラコナゾール〈イトリゾール〉、フルコナゾール〈ジフルカン〉",oc:"レボノルゲストレル・エチニルエストラジオール〈トリキュラー〉、デソゲストレル・エチニルエストラジオール〈マーベロン〉",prcard:"ビソプロロール〈メインテート〉、カルベジロール〈アーチスト〉、ベラパミル〈ワソラン〉、ジゴキシン〈ジゴシン〉",statin:"シンバスタチン〈リポバス〉、アトルバスタチン〈リピトール〉、アムロジピン〈アムロジン・ノルバスク〉、ニフェジピン〈アダラート〉",psych:"クエチアピン〈セロクエル〉、アリピプラゾール〈エビリファイ〉、セルトラリン〈ジェイゾロフト〉、ミルタザピン〈リフレックス・レメロン〉、アミトリプチリン〈トリプタノール〉（三環系）"};
 const IA_RULES=[
  {a:["CBZ","PHT","PB"],c:"doac",s:"avoid",t:"DOAC の濃度が下がり、脳梗塞予防が弱まる",d:"強い CYP3A4・P-gp 誘導。EHRA 2021 は併用を避けるよう推奨。講演症例3（アピキサバン内服中）では CBZ を避けて LEV を少量から。",r:["EHRA","LEC"]},
  {a:["LEV"],c:"doac",s:"caution",t:"EHRA は注意喚起しているが、ヒトでの根拠は乏しい",d:"動物の P-gp データに基づく注意喚起。ヒトで臨床的な P-gp 誘導は示されておらず、欧州神経学会は併用を支持。実臨床では LEV は DOAC 併用例で使いやすい選択肢。",r:["EHRA","MATHY"]},
@@ -922,7 +923,7 @@ function renderIa(){
   if(pc.has("vpa")&&!aed.includes("VPA"))aed.push("VPA");
   const out=[];
   const cls={avoid:"avoid",caution:"caution",ok:"do",note:"note"}, lab={avoid:"避ける",caution:"注意",ok:"問題少",note:"参考"};
-  IA_RULES.forEach(r=>{const hit=r.a.filter(x=>aed.includes(x));if(hit.length&&co.has(r.c))out.push({s:r.s,h:`${hit.map(x=>DN[x]).join("・")} × ${IA_CO[r.c]}`,t:r.t,d:r.d,r:r.r})});
+  IA_RULES.forEach(r=>{const hit=r.a.filter(x=>aed.includes(x));if(hit.length&&co.has(r.c))out.push({s:r.s,h:`${hit.map(x=>DN[x]).join("・")} × ${IA_CO[r.c]}`,t:r.t,d:r.d,r:r.r,ex:IA_EX[r.c]})});
   const isInd=x=>IND.has(x);
   for(let i=0;i<aed.length;i++)for(let j=i+1;j<aed.length;j++){
     const a=aed[i],b=aed[j];
@@ -934,7 +935,7 @@ function renderIa(){
   const ord={avoid:0,caution:1,note:2,ok:3};out.sort((x,y)=>ord[x.s]-ord[y.s]);
   if(!aed.length){$("ia-out").innerHTML=`<li class="item note"><div class="d">抗てんかん薬を選んでください。</div></li>`;return}
   const uniq=[];const seen=new Set();out.forEach(o=>{const k=o.h+o.t;if(!seen.has(k)){seen.add(k);uniq.push(o)}});
-  $("ia-out").innerHTML=(uniq.length?uniq.map(o=>`<li class="item ${cls[o.s]}"><div class="t">【${lab[o.s]}】${esc(o.h)}</div><div class="d"><b>${esc(o.t)}</b>${o.d?"<br>"+esc(o.d):""}</div>${o.r.length?src(o.r):""}</li>`).join(""):`<li class="item do"><div class="d">選んだ組み合わせで、登録している相互作用はありません（すべてを網羅してはいません）。</div></li>`)
+  $("ia-out").innerHTML=(uniq.length?uniq.map(o=>`<li class="item ${cls[o.s]}"><div class="t">【${lab[o.s]}】${esc(o.h)}</div><div class="d"><b>${esc(o.t)}</b>${o.d?"<br>"+esc(o.d):""}${o.ex?`<br><small>代表薬：${esc(o.ex)}</small>`:""}</div>${o.r.length?src(o.r):""}</li>`).join(""):`<li class="item do"><div class="d">選んだ組み合わせで、登録している相互作用はありません（すべてを網羅してはいません）。</div></li>`)
    +(aed.some(isInd)?`<li class="item caution"><div class="t">誘導薬を中止・減量するとき</div><div class="d">誘導が抜けるまで2〜4週かけて、併用薬（DOAC・ワルファリン・LTG・PER・スタチンなど）の濃度が上がります。</div></li>`:"");
 }
 
@@ -1168,9 +1169,9 @@ function renderSe(){
     `<li class="item note"><div class="t"><span class="role ns">看護師</span>酸素・吸引、SpO2・心電図・血圧モニター、静脈路と採血</div><div class="d">血糖・電解質（Na・Ca・Mg）・血算・肝腎機能・CK・NH3・抗てんかん薬の血中濃度。</div></li>`,
     `<li class="item caution"><div class="t"><span class="role ns">看護師</span>まず血糖を測る</div><div class="d">低血糖なら医師の指示で ビタミンB1 100mg 静注のあと 50%ブドウ糖 40〜50mL。</div></li>`];
   const c=p.cause;
-  if(c.has("b1"))st.push(`<li class="item caution"><div class="t">アルコール・低栄養：ブドウ糖の前にビタミンB1 100mg</div><div class="d">Wernicke 脳症の予防。アルコール離脱けいれんでは BZD が中心。</div></li>`);
+  if(c.has("b1"))st.push(`<li class="item caution"><div class="t">アルコール・低栄養：ブドウ糖の前にビタミンB1 100mg</div><div class="d">Wernicke 脳症の予防。アルコール離脱けいれんでは BZD（ジアゼパム〈セルシン・ホリゾン〉、ロラゼパム〈ロラピタ〉）が中心。</div></li>`);
   if(c.has("na"))st.push(`<li class="item caution"><div class="t">低Na・電解質異常：原因の補正が治療の中心</div><div class="d">症候性の高度低Naは高張食塩水で数 mEq/L 上げる（医師指示、過補正に注意）。低Ca・低Mgも補正。</div></li>`);
-  if(c.has("drug"))st.push(`<li class="item caution"><div class="t">薬剤性：原因薬の中止・用量見直し</div><div class="d">腎機能低下時のセフェピム・カルバペネム、テオフィリン、トラマドールなど。VPA 内服中にカルバペネムを使っていないか確認。</div></li>`);
+  if(c.has("drug"))st.push(`<li class="item caution"><div class="t">薬剤性：原因薬の中止・用量見直し</div><div class="d">腎機能低下時のセフェピム・カルバペネム（メロペネム〈メロペン〉、イミペネム・シラスタチン〈チエナム〉など）、テオフィリン、トラマドールなど。VPA 内服中にカルバペネムを使っていないか確認。</div></li>`);
   if(c.has("acute"))st.push(`<li class="item note"><div class="t">急性症候性：原因の治療を並行</div><div class="d">画像・必要なら髄液。脳炎を疑えば早期にアシクロビル。自己免疫性脳炎は別ナビ参照。</div></li>`);
   if(p.miss)st.push(`<li class="item note"><div class="t">怠薬・減量：普段の抗てんかん薬を静注で再開</div><div class="d">静注がある薬（LEV・LCM・BRV・PHT・PB）は下の推奨で優先度を上げています。VPA は国内に静注製剤がなく、LEV 静注でつなぎます。</div></li>`);
   if(p.home.has("VPA")&&p.co.has("carba"))st.push(`<li class="item avoid"><div class="t">VPA 内服中にカルバペネム：併用禁忌</div><div class="d">VPA 濃度が急に下がり、重積の原因になりえます。抗菌薬を変更し、LEV 静注で補う。</div></li>`);
@@ -1289,7 +1290,7 @@ function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clear
 $("sw-a").innerHTML=SW_D.map(k=>`<option value="${k}">${DN[k]}</option>`).join("");
 $("sw-b").innerHTML=SW_D.map(k=>`<option value="${k}">${DN[k]}</option>`).join("");
 $("sw-a").value="CBZ";$("sw-b").value="LEV";
-const APP_VER="2026-11-14a";
+const APP_VER="2026-11-14b";
 $("appVer").textContent=APP_VER;
 $("forceUpdate").addEventListener("click",async()=>{
   toast("最新版を確認しています…");

@@ -330,7 +330,7 @@ a{color:var(--info)}
   <section class="card fine">
     <p><span class="st ok">原本で確認</span> PubMed抄録・PMDA添付文書・学会GL原本で記載を直接確認。<span class="st sec">二次資料のみ</span> 原本に当たれず、解説記事・総説による。<span class="st na">未確認</span> 確認できず値を入れていない。</p>
     <p>周術期の値は「抗血栓薬 休薬早見」（2026年11月5日作成、原本と別担当で照合済み）から、脳卒中診療でよく使う9剤を抜き出したものです。</p>
-    <p>アプリの版：<b>2026-11-14</b>　<button type="button" class="pf-edit" id="forceUpdate">最新版に更新</button></p>
+    <p>アプリの版：<b>2026-11-14b</b>　<button type="button" class="pf-edit" id="forceUpdate">最新版に更新</button></p>
     <p>判断の参考資料です。最終判断は患者の血栓・出血リスクを踏まえて主治医・処置医が行い、院内の取り決めがあればそちらを優先してください。データ作成：Claude（2026年11月9日）。</p>
   </section>
 </div>
@@ -514,7 +514,7 @@ function renderDapt(){
   if(ivt) mods.push(item("avoid","静注血栓溶解後24時間は抗血小板薬を始めない","24時間後の画像で出血がないことを確認してから開始する。CHANCE・POINT・INSPIRESは血栓溶解例を除外しており、DAPTの根拠は外挿になる。",["INSPIRES","AHA26"],"sec"));
   if(stent) mods.push(item("caution","ステントを留置した場合は術者の方針（通常DAPT）に従う","期間は留置部位とデバイスで異なる。",[],null));
   if(oac) mods.push(item("avoid","抗凝固薬と併用する場合","DAPTの試験は抗凝固薬内服例を除外。抗凝固＋抗血小板は出血が増えるため、併用の理由（ステント等）がなければ抗凝固単独を基本にする。",["AHA26"],"sec"));
-  if(hbr) mods.push(item("caution","出血リスクが高い","DAPTは21日を超えて延ばさない（統合解析で利益は最初の21日に集中）。プロトンポンプ阻害薬の併用を検討。",["POOL"],"ok"));
+  if(hbr) mods.push(item("caution","出血リスクが高い","DAPTは21日を超えて延ばさない（統合解析で利益は最初の21日に集中）。プロトンポンプ阻害薬（ラベプラゾール〈パリエット〉、ランソプラゾール〈タケプロン〉など）の併用を検討。",["POOL"],"ok"));
   let doses="";
   if(dur){
     doses=`<h3>処方の目安</h3><div class="dose">
@@ -573,11 +573,11 @@ function renderDoac(){
   if(bp) cau.push(item("caution","血圧が管理できていない","出血性変化のリスクを上げる。降圧を先に整える。",[],null));
   if(ap) cau.push(item("avoid","抗血小板薬は原則中止して抗凝固単独へ","冠動脈疾患の活動期・最近のステントがなければ、上乗せは出血を増やす（AHA 2026：3: Harm）。",["AHA26"],"sec"));
   const p=prof();
-  if(p.renal==="lt15") cau.push(item("avoid","腎機能 15未満・透析（プロファイル）","DOACはいずれも使えない区分（ダビガトランはCCr 30未満で禁忌）。ワルファリンを検討する。",[],"sec"));
+  if(p.renal==="lt15") cau.push(item("avoid","腎機能 15未満・透析（プロファイル）","DOACはいずれも使えない区分（ダビガトランはCCr 30未満で禁忌）。ワルファリン（ワーファリン）を検討する。",[],"sec"));
   else if(p.renal==="15-29") cau.push(item("caution","腎機能 15〜29（プロファイル）","ダビガトランは禁忌（CCr 30未満）。Xa阻害薬は添付文書の減量基準・慎重投与を確認する。",[],"sec"));
   cau.push(item("note","ヘパリンでつながない","ELAN・OPTIMASはDOACを直接開始した試験。DOACは腎機能・年齢・体重の基準どおりの用量で（不適切な減量は再発を増やす）。",["ELAN","OPTIMAS"],"sec"));
   cau.push(item("note","国内ガイドライン","脳卒中治療GL改訂2025で、発症早期（4日以内）のDOAC開始を妥当とする方向に改訂された（推奨文・推奨度は原本で確認）。",["JSS25"],"sec"));
-  $("c-out").innerHTML=verdict(cls,pill,big,"")+`<section class="card"><h2>開始日の比較</h2>${tbl}</section><section class="card"><h2>注意すること</h2>${profNote(["renal","at"])}<ul class="list">${cau.join("")}</ul></section>`;
+  $("c-out").innerHTML=verdict(cls,pill,big,`<p class="hint" style="margin:6px 0 0">DOAC：アピキサバン（エリキュース）、エドキサバン（リクシアナ）、リバーロキサバン（イグザレルト）、ダビガトラン（プラザキサ）</p>`)+`<section class="card"><h2>開始日の比較</h2>${tbl}</section><section class="card"><h2>注意すること</h2>${profNote(["renal","at"])}<ul class="list">${cau.join("")}</ul></section>`;
 }
 
 /* ============ 周術期（休薬早見から抜粋） ============ */
@@ -686,11 +686,11 @@ function periStroke(){return `<section class="card"><h2>脳卒中の患者で加
 
 /* ============ 出血・中和 ============ */
 const BLEED_QUICK=`<section class="card"><h2>早見：中和薬</h2><div class="wrapx"><table class="tl"><thead><tr><th>内服薬</th><th>中和</th></tr></thead><tbody>
- <tr><td>ワルファリン</td><td>乾燥濃縮人プロトロンビン複合体（ケイセントラ）INR別 25／35／50 IU/kg＋ビタミンK静注</td></tr>
- <tr><td>ダビガトラン</td><td>イダルシズマブ（プリズバインド）5 g</td></tr>
- <tr><td>Xa阻害薬</td><td>アンデキサネット アルファ（オンデキサ）A法／B法。血栓性イベント増加に注意</td></tr>
+<tr><td>ワルファリン<br><small>ワーファリン</small></td><td>乾燥濃縮人プロトロンビン複合体（ケイセントラ）INR別 25／35／50 IU/kg＋ビタミンK静注</td></tr>
+ <tr><td>ダビガトラン<br><small>プラザキサ</small></td><td>イダルシズマブ（プリズバインド）5 g</td></tr>
+ <tr><td>Xa阻害薬<br><small>アピキサバン（エリキュース）、リバーロキサバン（イグザレルト）、エドキサバン（リクシアナ）</small></td><td>アンデキサネット アルファ（オンデキサ）A法／B法。血栓性イベント増加に注意</td></tr>
  <tr><td>ヘパリン</td><td>プロタミン硫酸塩 1,000単位あたり10〜15 mg（1回50 mgまで）</td></tr>
- <tr><td>抗血小板薬</td><td>手術をしない脳出血では血小板輸血をしない</td></tr>
+ <tr><td>抗血小板薬<br><small>アスピリン（バイアスピリン）、クロピドグレル（プラビックス）、シロスタゾール（プレタール）など</small></td><td>手術をしない脳出血では血小板輸血をしない</td></tr>
  </tbody></table></div><p class="hint">①で薬を選ぶと、量の計算と注意点を出します。</p>${src(["L_kcentra","L_prizbind","L_ondexxya","L_protamine","PATCH"])}</section>`;
 function renderBleed(){
   const bd=val("b-drug");
@@ -720,7 +720,7 @@ function renderBleed(){
        ${item("note","使うのは作用が残っている時期","最終内服からの時間と腎機能から、抗凝固作用が残っていると推定される場合に使う（添付文書5.1）。透析でも除去できる。",["L_prizbind"],"sec")}</ul>`+src(["L_prizbind"],"ok"));
   }else if(bd==="xa"){
     h=verdict("crit","Xa阻害薬","アンデキサネット アルファ（オンデキサ）。血栓性イベントの増加に注意",
-      `<div class="dose"><div class="bx"><div class="k">A法</div><div class="v">400 mg（30 mg/分）<small>続けて480 mgを4 mg/分で2時間</small></div></div>
+      `<p class="hint" style="margin:0 0 6px">対象：アピキサバン（エリキュース）、リバーロキサバン（イグザレルト）、エドキサバン（リクシアナ）</p><div class="dose"><div class="bx"><div class="k">A法</div><div class="v">400 mg（30 mg/分）<small>続けて480 mgを4 mg/分で2時間</small></div></div>
        <div class="bx"><div class="k">B法</div><div class="v">800 mg（30 mg/分）<small>続けて960 mgを8 mg/分で2時間</small></div></div></div>
        <p class="hint">A法とB法は、薬剤・最終投与時の1回量・最終投与からの時間（8時間未満または不明／8時間以上）で選ぶ。添付文書7.1の表で確認する。</p>
        <ul class="list" style="margin-top:8px">
@@ -737,7 +737,7 @@ function renderBleed(){
        <ul class="list" style="margin-top:8px">${item("caution","急速投与で血圧低下・徐脈・呼吸困難","プロタミン含有インスリンや心カテ・心臓手術の既往があると過敏反応が起きやすい。投与後にAPTTで効果を確認。",["L_protamine"],"ok")}</ul>`+src(["L_protamine"],"ok"));
   }else if(bd==="ap"){
     h=verdict("warn","抗血小板薬","手術をしない脳出血では血小板輸血をしない",
-      `<ul class="list">
+      `<p class="hint" style="margin:0 0 6px">代表薬：アスピリン（バイアスピリン）、クロピドグレル（プラビックス）、シロスタゾール（プレタール）、プラスグレル（エフィエント）</p><ul class="list">
        ${item("avoid","PATCH（2016）","抗血小板薬内服中の脳出血で、血小板輸血は3か月の死亡・要介助を増やした。",["PATCH"],"ok")}
        ${item("avoid","AHA 2022","緊急手術を行わない場合、血小板輸血は有害の可能性がある（3: Harm）。",["AHA22ICH"],"sec")}
        ${item("note","緊急手術をする場合","血小板輸血を検討する。デスモプレシンは考慮してよい程度（2b）。",["AHA22ICH"],"sec")}
