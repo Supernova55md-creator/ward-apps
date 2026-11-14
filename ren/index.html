@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#7d3c62">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="腎・用量ナビ">
+<title>腎機能・用量調整ナビ</title>
+<style>
+:root{
+  /* 腎＝プラム。結果の色：ok緑・warn琥珀・crit赤・info青 */
+  --accent:#7d3c62; --accent-ink:#fff; --accent-soft:#f6eaf1;
+  --bg:#f7f4f6; --surface:#fff; --ink:#221a20; --muted:#665a62; --line:#e3d8df;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --info:#2b5b9a; --info-soft:#e7eef8;
+  --na:#6a6f73; --na-soft:#efeeee;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#e29bc4; --accent-ink:#2a1020; --accent-soft:#3a2231;
+  --bg:#151215; --surface:#1f1a1e; --ink:#f0eaee; --muted:#b4a8b0; --line:#3a3238;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  --na:#b3b8bb; --na-soft:#2a2d2f; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 8px calc(14px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:18px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.92}
+header.top #wpBandWrap,header.top #wcSum{max-width:760px;margin-left:auto;margin-right:auto}
+main{max-width:760px;margin:0 auto;padding:12px calc(12px + env(safe-area-inset-right)) 12px calc(12px + env(safe-area-inset-left))}
+section[hidden]{display:none!important}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 12px}
+.card h2{font-size:16px;margin:0 0 8px}
+.card h3{font-size:15px;margin:12px 0 6px}
+.mu{color:var(--muted)}
+.sm{font-size:13px}
+p{margin:6px 0}
+/* 区分ボタン */
+.seg{display:grid;gap:6px}
+.seg.c4{grid-template-columns:repeat(4,1fr)}
+.seg.c2{grid-template-columns:repeat(2,1fr)}
+.seg.c3{grid-template-columns:repeat(3,1fr)}
+.seg label{display:block;position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:flex;align-items:center;justify-content:center;text-align:center;min-height:44px;padding:6px 4px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);font-size:14px;font-weight:600;line-height:1.25;cursor:pointer}
+.seg input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.seg input:focus-visible+span{outline:2px solid var(--info);outline-offset:2px}
+.tg{display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer;width:100%;text-align:left}
+.tg .bx{width:20px;height:20px;border-radius:5px;border:2px solid var(--muted);flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.tg[aria-pressed=true]{border-color:var(--crit);background:var(--crit-soft)}
+.tg[aria-pressed=true] .bx{background:var(--crit);border-color:var(--crit);color:#fff}
+.tg[aria-pressed=true] .bx::after{content:"✓"}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fld{display:block;margin:0 0 8px}
+.fld>b{display:block;font-size:13px;margin:0 0 3px}
+.fld input,.fld select{width:100%;font:inherit;font-size:17px;padding:9px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);min-height:46px}
+.fld .u{font-size:12px;color:var(--muted)}
+.inp{display:flex;align-items:center;gap:6px}
+.inp input{flex:1}
+.inp .u{flex:none}
+details.more{border-top:1px dashed var(--line);margin-top:6px;padding-top:6px}
+details.more>summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
+.btn{font:inherit;font-size:14px;font-weight:700;border-radius:10px;padding:9px 12px;min-height:44px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn.sm{min-height:36px;padding:6px 10px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:default}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+/* 判定（wc-sum の元） */
+.verdict{border-radius:12px;padding:10px 12px;margin:10px 0 0;border-left:6px solid var(--na);background:var(--na-soft)}
+.verdict .big{display:block;font-weight:700;font-size:15.5px;line-height:1.45}
+.verdict .pill{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--na);color:#fff;margin-right:6px;vertical-align:1px}
+.verdict .sub{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+.verdict.ok{border-left-color:var(--ok);background:var(--ok-soft)}.verdict.ok .pill{background:var(--ok)}
+.verdict.warn{border-left-color:var(--warn);background:var(--warn-soft)}.verdict.warn .pill{background:var(--warn)}
+.verdict.crit{border-left-color:var(--crit);background:var(--crit-soft)}.verdict.crit .pill{background:var(--crit)}
+.verdict.info{border-left-color:var(--info);background:var(--info-soft)}.verdict.info .pill{background:var(--info)}
+@media (prefers-color-scheme: dark){.verdict .pill{color:#111}}
+/* 計算結果 */
+.res{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.res .r{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}
+.res .r b{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.res .r .v{font-family:var(--num);font-size:22px;font-weight:700;line-height:1.2}
+.res .r .v small{font-family:var(--font);font-size:11.5px;font-weight:500;color:var(--muted)}
+.res .r .c{font-size:12.5px;font-weight:700}
+.res .r.sel{border:2px solid var(--accent)}
+.c-ge60{color:var(--ok)}.c-30-59{color:var(--warn)}.c-15-29{color:var(--warn)}.c-lt15{color:var(--crit)}
+.note{font-size:13px;border-radius:10px;padding:7px 10px;margin:8px 0 0;background:var(--warn-soft);color:var(--ink);border-left:4px solid var(--warn)}
+.note.i{background:var(--info-soft);border-left-color:var(--info)}
+/* フィルター */
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;font:inherit;font-size:13.5px;font-weight:600;border-radius:999px;padding:6px 12px;min-height:36px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.srch{width:100%;font:inherit;font-size:16px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);min-height:44px;margin-top:4px}
+.flt2{display:flex;gap:8px;align-items:center;margin-top:6px}
+.flt2 .tg{width:auto;flex:1;min-height:40px;font-size:13px}
+.tg.adj[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft)}
+.tg.adj[aria-pressed=true] .bx{background:var(--accent);border-color:var(--accent)}
+/* 薬カード */
+.grp{font-size:13px;font-weight:700;color:var(--muted);margin:14px 2px 6px;letter-spacing:.04em}
+.drug{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin:0 0 10px;overflow:hidden}
+.drug .hd{display:flex;gap:8px;align-items:flex-start;padding:10px 12px 6px}
+.drug .nm{flex:1;min-width:0}
+.drug .nm b{font-size:15.5px;display:block;line-height:1.35}
+.drug .nm span{font-size:12.5px;color:var(--muted);display:block;line-height:1.35}
+.bdg{flex:none;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap;background:var(--na-soft);color:var(--na)}
+.bdg.n{background:var(--ok-soft);color:var(--ok)}
+.bdg.r{background:var(--warn-soft);color:var(--warn)}
+.bdg.x{background:var(--crit-soft);color:var(--crit)}
+.bdg.c{background:var(--info-soft);color:var(--info)}
+.drug .now{margin:0 12px 8px;padding:7px 10px;border-radius:10px;font-size:14.5px;font-weight:600;line-height:1.5;background:var(--na-soft)}
+.drug .now.n{background:var(--ok-soft)}.drug .now.r{background:var(--warn-soft)}.drug .now.x{background:var(--crit-soft)}.drug .now.c{background:var(--info-soft)}
+.drug .now small{display:block;font-weight:500;font-size:12.5px;color:var(--muted)}
+.drug .dyn{margin:0 12px 8px;font-size:13.5px;padding:6px 10px;border-radius:10px;border:1px dashed var(--accent);background:var(--accent-soft)}
+table.rt{width:calc(100% - 24px);margin:0 12px 6px;border-collapse:collapse;font-size:13.5px}
+table.rt th{font-weight:600;text-align:left;color:var(--muted);font-size:12px;padding:3px 6px;border-bottom:1px solid var(--line)}
+table.rt td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+table.rt td.cr{white-space:nowrap;font-family:var(--num);font-size:12.5px;width:1%}
+table.rt tr.hit td{background:var(--accent-soft);font-weight:700}
+table.rt tr.hit td.cr{box-shadow:inset 4px 0 0 var(--accent)}
+table.rt.dim tr:not(.hit) td{opacity:.55}
+table.rt tr.k-x td:last-child{color:var(--crit)}
+table.rt tr.hd td.cr{font-family:var(--font)}
+.drug details{margin:0 12px 8px}
+.drug details>summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:600;min-height:32px;display:flex;align-items:center}
+.drug details ul{margin:4px 0 6px;padding-left:18px;font-size:13.5px}
+.drug details li{margin:2px 0}
+.drug .src{font-size:12px;color:var(--muted);margin:0 12px 10px;line-height:1.5}
+.drug .src a{color:var(--info)}
+.vf{display:inline-block;font-size:11px;font-weight:700;padding:0 6px;border-radius:6px;margin-right:4px;vertical-align:1px}
+.vf.ok{background:var(--ok-soft);color:var(--ok)}
+.vf.part{background:var(--warn-soft);color:var(--warn)}
+.vf.un{background:var(--na-soft);color:var(--na)}
+.empty{padding:20px;text-align:center;color:var(--muted)}
+/* 総論・出典 */
+.ref ol{padding-left:20px;margin:6px 0}
+.ref li{margin:4px 0;font-size:14px;line-height:1.5;word-break:break-word}
+.ref a{color:var(--info)}
+.kv{font-size:14px}
+.kv dt{font-weight:700;margin-top:8px}
+.kv dd{margin:2px 0 0 0}
+code.f{font-family:var(--num);font-size:12.5px;background:var(--na-soft);padding:1px 5px;border-radius:5px}
+/* 下部タブ */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:4px calc(6px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left))}
+nav.tabs button{font:inherit;font-size:12px;font-weight:600;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:1px;min-height:54px;justify-content:center;cursor:pointer;border-radius:10px}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button[aria-selected=true]{color:var(--accent);background:var(--accent-soft)}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:9px 14px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;max-width:90vw}
+#toast.on{opacity:.95}
+.disc{font-size:12.5px;color:var(--muted);margin:4px 2px 12px}
+@media print{nav.tabs{display:none}header.top{position:static}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>腎機能・用量調整ナビ</h1>
+    <small>CCr・eGFR の計算と、神経内科でよく使う薬の腎機能別用量</small>
+  </div>
+</header>
+
+<main>
+<!-- ============ 用量（早見表） ============ -->
+<section id="t-dose" role="tabpanel" aria-label="用量">
+  <div class="card">
+    <h2>判定に使う腎機能</h2>
+    <div id="srcLine" class="sm mu">区分を選ぶか、「計算」タブで CCr を計算してください。</div>
+    <div class="seg c4" style="margin-top:8px" role="radiogroup" aria-label="腎機能の区分">
+      <label><input type="radio" name="renal" value="ge60" data-wp="renal" data-wp-v="ge60"><span>60以上</span></label>
+      <label><input type="radio" name="renal" value="30-59" data-wp="renal" data-wp-v="30-59"><span>30〜59</span></label>
+      <label><input type="radio" name="renal" value="15-29" data-wp="renal" data-wp-v="15-29"><span>15〜29</span></label>
+      <label><input type="radio" name="renal" value="lt15" data-wp="renal" data-wp-v="lt15"><span>15未満・透析</span></label>
+    </div>
+    <div style="margin-top:8px" data-wp-show="renal:lt15" hidden>
+      <button type="button" class="tg" id="hdBtn" aria-pressed="false"><span class="bx"></span>血液透析（HD）中 — 透析時の用量を表示</button>
+    </div>
+    <div id="vDose" class="verdict info"><span class="big"><span class="pill">未設定</span>腎機能を選ぶと、各薬の該当する用量が強調されます</span></div>
+  </div>
+
+  <div class="chips" id="chips" role="tablist" aria-label="薬の分類"></div>
+  <input type="search" class="srch" id="q" placeholder="薬の名前で絞り込み（一般名・商品名）" autocomplete="off">
+  <div class="flt2">
+    <button type="button" class="tg adj" id="onlyAdj" aria-pressed="false"><span class="bx"></span>調整が必要な薬だけ</button>
+  </div>
+  <div id="list"></div>
+  <p class="disc">用量は成人の目安。<span class="vf ok">照合済</span>は電子添文（PMDA／JAPIC 掲載版）と照合した記載、<span class="vf un">未照合</span>は添付文書に具体的な量がなく成書・一般的な目安で補ったもの。診療判断の補助であり、最終判断は診察と最新の添付文書で行う。</p>
+</section>
+
+<!-- ============ 計算 ============ -->
+<section id="t-calc" role="tabpanel" aria-label="計算" hidden>
+  <div class="card">
+    <h2>CCr・eGFR を計算</h2>
+    <div class="row2">
+      <label class="fld"><b>年齢</b><span class="inp"><input type="number" id="age" inputmode="numeric" min="18" max="110" step="1" placeholder="例 78"><span class="u">歳</span></span></label>
+      <label class="fld"><b>血清Cr</b><span class="inp"><input type="number" id="cr" inputmode="decimal" min="0.1" max="20" step="0.01" placeholder="例 1.10"><span class="u">mg/dL</span></span></label>
+    </div>
+    <div class="fld"><b>性別</b>
+      <div class="seg c2" role="radiogroup" aria-label="性別">
+        <label><input type="radio" name="sex" value="m" data-wp="sex" data-wp-v="m"><span>男性</span></label>
+        <label><input type="radio" name="sex" value="f" data-wp="sex" data-wp-v="f"><span>女性</span></label>
+      </div>
+    </div>
+    <label class="fld"><b>体重（実体重）</b><span class="inp"><input type="number" id="wt" data-wp="weight" inputmode="decimal" min="20" max="250" step="0.1" placeholder="例 52"><span class="u">kg</span></span></label>
+    <details class="more" id="calcMore">
+      <summary>詳しく（身長・シスタチンC・Cr の補正）</summary>
+      <div class="row2" style="margin-top:6px">
+        <label class="fld"><b>身長</b><span class="inp"><input type="number" id="ht" inputmode="decimal" min="100" max="220" step="0.1" placeholder="任意"><span class="u">cm</span></span><span class="u">体表面積で戻した eGFR・肥満の補正に使う</span></label>
+        <label class="fld"><b>シスタチンC</b><span class="inp"><input type="number" id="cys" inputmode="decimal" min="0.2" max="10" step="0.01" placeholder="任意"><span class="u">mg/L</span></span><span class="u">筋肉量が少ない人で参考に</span></label>
+      </div>
+      <button type="button" class="tg adj" id="adj02" aria-pressed="false"><span class="bx"></span>CG式に使う Cr に 0.2 を足す（酵素法 Cr の補正）</button>
+      <p class="sm mu">CG式はヤッフェ法の Cr で作られた式で、日本の酵素法 Cr では CCr が高めに出るため、0.2 を足して計算する方法がある（目安・未照合）。</p>
+      <label class="fld" style="margin-top:8px"><b>用量の判定に使う値</b>
+        <select id="basis">
+          <option value="ccr">CCr（Cockcroft-Gault・実体重）mL/分 — 既定</option>
+          <option value="egfrInd">eGFR（体表面積で戻した値）mL/分 — 身長が必要</option>
+          <option value="egfr">eGFR（mL/分/1.73m²）</option>
+          <option value="cys">eGFRcys（mL/分/1.73m²）— シスタチンCが必要</option>
+        </select>
+      </label>
+    </details>
+    <div id="calcOut"></div>
+    <div id="vCalc" class="verdict info"><span class="big"><span class="pill">計算</span>年齢・性別・体重・Cr を入れると計算します</span></div>
+    <div class="btns">
+      <button type="button" class="btn pri" id="wbCcr" disabled>CCr の区分をプロファイルへ</button>
+      <button type="button" class="btn" id="wbEgfr" disabled>eGFR の区分をプロファイルへ</button>
+      <button type="button" class="btn" id="goDose">用量を見る</button>
+    </div>
+    <p class="sm mu" style="margin-top:6px">区分（60以上／30〜59／15〜29／15未満）は共通の患者プロファイルに入り、他のナビでも使われます。年齢の区分は年齢を入れると自動で反映されます。</p>
+  </div>
+  <div class="card sm">
+    <b>使い分けの目安</b>
+    <ul style="margin:4px 0;padding-left:18px">
+      <li>添付文書の多くは <b>CLcr（mL/分）</b>で用量を決めている。DOAC・レベチラセタム・プレガバリンなどは CG式の CCr で判断する。</li>
+      <li>eGFR（mL/分/1.73m²）は体格で標準化した値。小柄な高齢者では、薬の量を決めるときは体表面積で戻した値（mL/分）を使う。</li>
+      <li>高齢・低体重・長期臥床では Cr が低く出て、CCr・eGFR とも過大評価になりやすい。シスタチンCが参考になる。</li>
+      <li>Cr が急に変動している（AKI）ときは、どの式も正しく出ない。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 総論・出典 ============ -->
+<section id="t-ref" role="tabpanel" aria-label="出典" hidden>
+  <div class="card ref">
+    <h2>総論</h2>
+    <dl class="kv">
+      <dt>計算式</dt>
+      <dd>CCr（Cockcroft-Gault）＝ (140−年齢) × 体重 ÷ (72 × Cr)、女性は ×0.85<br>
+      eGFRcreat（日本人）＝ 194 × Cr<sup>−1.094</sup> × 年齢<sup>−0.287</sup>、女性は ×0.739（mL/分/1.73m²）<br>
+      eGFRcys（日本人）＝ 104 × Cys<sup>−1.019</sup> × 0.996<sup>年齢</sup>（女性は ×0.929）− 8<br>
+      体表面積で戻した eGFR ＝ eGFR × 体表面積 ÷ 1.73（体表面積は DuBois 式）<br>
+      理想体重（IBW）＝ 男 50／女 45.5 ＋ 0.91 ×（身長−152.4）。実体重が IBW の 1.3倍を超えるときは、調整体重 IBW＋0.4×(実体重−IBW) の CCr も表示する（目安・未照合）。</dd>
+      <dt>区分</dt>
+      <dd>共通プロファイルの区分（60以上／30〜59／15〜29／15未満・透析）は薬の表の境目（例 レベチラセタム 80・50・30）と一致しないことがある。区分だけのときは、区分にかかる行をすべて強調する。数値で絞り込むには「計算」タブで CCr を出す。</dd>
+      <dt>透析</dt>
+      <dd>血液透析中は CCr を計算しても意味がないため、「血液透析（HD）中」を押して透析時の記載を表示する。腹膜透析・CRRT は本アプリの対象外（薬剤部に相談）。</dd>
+      <dt>この版で扱う薬</dt>
+      <dd>抗てんかん薬 7、抗ヘルペスウイルス薬 4、DOAC 4、ガバペンチノイド 3（ガバペンチンは抗てんかん薬と重複）、パーキンソン病・認知症 3、抗菌薬 9、その他 3。</dd>
+    </dl>
+  </div>
+  <div class="card ref">
+    <h2>出典</h2>
+    <p class="sm mu">添付文書は JAPIC 収載の電子添文（KEGG MEDICUS 掲載版、2026年11月14日閲覧）で照合。最新版は PMDA の医療用医薬品 情報検索で確認する。</p>
+    <ol id="refList"></ol>
+  </div>
+  <div class="card">
+    <h2>このアプリについて</h2>
+    <p class="sm">入力はこの端末の中にだけ保存し、外部に送らない。患者の氏名・ID は入れない。診療判断の補助であり、最終判断は診察と原典（添付文書・ガイドライン）で行う。</p>
+    <div class="btns" style="align-items:center"><span class="sm mu">アプリの版：<b id="appVer"></b></span><button type="button" class="btn sm" id="forceUpdate">最新版に更新</button></div>
+  </div>
+</section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="画面">
+  <button type="button" role="tab" data-tab="dose" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="18" height="7" rx="3.5"/><path d="M12 9v7"/></svg>用量</button>
+  <button type="button" role="tab" data-tab="calc" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h2M12 18h4"/></svg>計算</button>
+  <button type="button" role="tab" data-tab="ref" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h6"/></svg>総論・出典</button>
+</nav>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+const APP_VERSION="ren-2026-11-14a";
+const KEY="ren-nav-v1";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const INF=9999;
+
+/* ---------- 出典 ---------- */
+const KEGG="https://www.kegg.jp/medicus-bin/japic_med?japic_code=";
+const REF={
+  CG:{t:"Cockcroft DW, Gault MH. Prediction of creatinine clearance from serum creatinine. Nephron. 1976;16:31-41.",u:"https://pubmed.ncbi.nlm.nih.gov/1244564/"},
+  JSN:{t:"Matsuo S, et al. Revised equations for estimated GFR from serum creatinine in Japan. Am J Kidney Dis. 2009;53:982-92.",u:"https://pubmed.ncbi.nlm.nih.gov/19339088/"},
+  CYS:{t:"Horio M, et al. GFR estimation using standardized serum cystatin C in Japan. Am J Kidney Dis. 2013;61:197-203.",u:"https://pubmed.ncbi.nlm.nih.gov/22892396/"},
+  PMDA:{t:"PMDA 医療用医薬品 情報検索（電子添文の最新版）",u:"https://www.pmda.go.jp/PmdaSearch/iyakuSearch/"}
+};
+
+/* ---------- 薬のデータ ----------
+  rows: lo≦CLcr<hi（mL/分）。k: n=通常量 r=減量・間隔延長 x=禁忌・避ける c=慎重・要確認
+  v: ok=添付文書と照合 part=一部未照合 un=未照合（目安） */
+const CLS=[["all","すべて"],["aed","抗てんかん薬"],["av","抗ウイルス"],["doac","DOAC"],["gaba","ガバペンチノイド"],["pd","PD・認知症"],["abx","抗菌薬"],["oth","その他"]];
+const D=[
+/* ===== 抗てんかん薬 ===== */
+{id:"lev",cls:["aed"],g:"レベチラセタム",b:"イーケプラ 錠250・500mg／点滴静注500mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:80,hi:INF,c:"≧80",t:"1000〜3000mg/日（通常 500mg×2、最大 1500mg×2）",k:"n"},
+  {lo:50,hi:80,c:"50〜80",t:"1000〜2000mg/日（通常 500mg×2、最大 1000mg×2）",k:"r"},
+  {lo:30,hi:50,c:"30〜50",t:"500〜1500mg/日（通常 250mg×2、最大 750mg×2）",k:"r"},
+  {lo:0,hi:30,c:"<30",t:"500〜1000mg/日（通常 250mg×2、最大 500mg×2）",k:"r"}],
+ hd:"透析中：500〜1000mg/日（通常 500mg×1、最大 1000mg×1）＋透析後に 250mg（最大 500mg）を追加",
+ notes:["点滴静注も同じ表（重積状態の用量を除く）。点滴は経口と同じ1日量・回数で15分かけて投与。","表はシミュレーションに基づく値。眠気・易刺激性・精神症状をみながら調節。"],
+ v:"ok",src:[["イーケプラ錠 電子添文 7.2（2026年3月改訂 第6版）",KEGG+"00058813"],["イーケプラ点滴静注 電子添文 7.2（2024年4月改訂 第6版）",KEGG+"00063084"]]},
+{id:"lcm",cls:["aed"],g:"ラコサミド",b:"ビムパット 錠50・100mg／点滴静注100・200mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:30.001,hi:INF,c:">30",t:"通常量：100mg/日から開始、維持 200mg/日（最大 400mg/日）、分2",k:"n"},
+  {lo:0,hi:30.001,c:"≦30",t:"1日最高 300mg とするなど慎重に",k:"r"}],
+ hd:"透析中：1日最高 300mg。透析後に最大で1回量の半量の追加を考慮（4時間の透析で AUC 約46%低下）",
+ notes:["CLcr 30以下は「重度・末期腎機能障害」。PR延長・房室ブロックに注意（心電図）。"],
+ v:"ok",src:[["ビムパット錠 電子添文 7.1・9.2・16.6（2026年8月改訂 第6版）",KEGG+"00066392"]]},
+{id:"tpm",cls:["aed"],g:"トピラマート",b:"トピナ 錠25・50・100mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:70,hi:INF,c:"≧70",t:"通常量：50mg 1日1〜2回で開始、維持 200〜400mg/日 分2（最高 600mg/日）",k:"n"},
+  {lo:0,hi:70,c:"<70",t:"投与量を半量にするなど慎重に",k:"r"}],
+ hd:"透析中：透析で除去されるため、透析実施日は補充投与を考慮",
+ notes:["区分の境目は 70（共通プロファイルの 60 とずれる）。尿路結石・代謝性アシドーシスに注意。"],
+ v:"ok",src:[["トピナ錠 電子添文 7.3・9.2（2024年2月改訂 第3版）",KEGG+"00058829"]]},
+{id:"gbp",cls:["aed","gaba"],g:"ガバペンチン",b:"ガバペン 錠200・300・400mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:60,hi:INF,c:"≧60",t:"600〜2400mg/日、分3",k:"n"},
+  {lo:30,hi:60,c:"30〜59",t:"400〜1000mg/日、分2",k:"r"},
+  {lo:15,hi:30,c:"15〜29",t:"200〜500mg/日、1日1回",k:"r"},
+  {lo:0,hi:15,c:"5〜14",t:"100〜200mg/日（5に近ければ 200mg 2日に1回を考慮）",k:"r"}],
+ hd:"透析中：CLcr 5以上は表の量＋透析後に 200mg 追加。CLcr 5未満は初日 200mg 単回、以後は透析後に 200・300・400mg",
+ notes:["国内の承認は「他の抗てんかん薬で十分な効果が認められないてんかんの部分発作に対する併用療法」。神経障害性疼痛は適応外。","1日量と回数は照合済み。各区分の初日量・維持量の内訳は表が細かいため電子添文 7.4 で確認。"],
+ v:"part",src:[["ガバペン錠 電子添文 7.4・7.5（2026年4月改訂 第4版）",KEGG+"00052158"]]},
+{id:"per",cls:["aed"],g:"ペランパネル",b:"フィコンパ 錠2・4mg／細粒1%／点滴静注用2mg",basis:"—",
+ rows:[{lo:0,hi:INF,c:"全区分",t:"腎機能による用量調整の規定なし（重度腎障害・透析は臨床試験なし→慎重に）",k:"c"}],
+ hd:"透析中：臨床試験なし。慎重に",
+ notes:["肝機能で上限あり：軽度 1日最高 8mg、中等度 4mg、重度は禁忌。CYP3A誘導薬で血中濃度低下。"],
+ v:"ok",src:[["フィコンパ錠 電子添文 7.3・9.2・9.3（2025年10月改訂 第6版）",KEGG+"00068471"]]},
+{id:"ltg",cls:["aed"],g:"ラモトリギン",b:"ラミクタール 錠25・100mg",basis:"—",
+ rows:[{lo:0,hi:INF,c:"全区分",t:"腎機能による用量表はなし。腎不全では主代謝物（グルクロン酸抱合体）が高くなる",k:"c"}],
+ hd:"透析中：4時間の HD で体内量の約20%が除去",
+ notes:["CLcr 平均13の腎障害で t1/2 約1.6倍・AUC 約1.8倍、透析患者で t1/2 約2.2倍（16.6.1）。増量はゆっくり。"],
+ v:"ok",src:[["ラミクタール錠 電子添文 9.2・16.6（2026年8月改訂 第8版）",KEGG+"00056026"]]},
+{id:"fos",cls:["aed"],g:"ホスフェニトイン",b:"ホストイン 静注750mg",basis:"—",
+ rows:[{lo:0,hi:INF,c:"全区分",t:"用量の規定なし。重積：初回 22.5mg/kg、維持 5〜7.5mg/kg/日",k:"c"}],
+ hd:"透析中：非結合型フェニトインが上昇するおそれ",
+ notes:["腎機能障害・低アルブミン血症では非結合型（遊離型）フェニトイン濃度が上昇するおそれ。総濃度が治療域でも中毒症状に注意し、可能なら遊離型濃度を測る。","初回の投与速度は 3mg/kg/分か 150mg/分の低い方を超えない。"],
+ v:"ok",src:[["ホストイン静注 電子添文 6・9.1.4・9.2（2026年6月改訂 第5版）",KEGG+"00060154"]]},
+
+/* ===== 抗ウイルス ===== */
+{id:"acv",cls:["av"],g:"アシクロビル（点滴）",b:"ゾビラックス 点滴静注用250",basis:"CLcr（mL/分/1.73m²、外国人データ）",
+ rows:[
+  {lo:50.001,hi:INF,c:">50",t:"1回量 100%・8時間毎",k:"n"},
+  {lo:25,hi:50.001,c:"25〜50",t:"1回量 100%・12時間毎",k:"r"},
+  {lo:10,hi:25,c:"10〜25",t:"1回量 100%・24時間毎",k:"r"},
+  {lo:0,hi:10,c:"0〜10",t:"1回量 50%・24時間毎",k:"r"}],
+ hd:"透析中：0〜10 の行（50%・24時間毎）を目安に、透析日は透析後に投与（透析後投与は未照合の目安）。HD で効率よく除去される（6時間の HD で血漿中濃度 約60%低下）",
+ dyn:"acv",
+ notes:["1回量：通常 5mg/kg、脳炎・髄膜炎は上限 10mg/kg（1時間以上かけて）。肥満では理想体重で計算する方法がある（未照合）。","曝露が増えると精神神経症状（意識障害・幻覚・振戦など）と腎障害が出やすい。脱水になりやすい患者は適切な水分補給。"],
+ v:"ok",src:[["ゾビラックス点滴静注用 電子添文 6・7.2・9.1・9.2・13.2（2026年2月改訂 第3版）",KEGG+"00051720"]]},
+{id:"vacv",cls:["av"],g:"バラシクロビル",b:"バルトレックス 錠500",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:50,hi:INF,c:"≧50",t:"帯状疱疹 1000mg 8時間毎／単純疱疹 500mg 12時間毎",k:"n"},
+  {lo:30,hi:50,c:"30〜49",t:"帯状疱疹 1000mg 12時間毎／単純疱疹 500mg 12時間毎",k:"r"},
+  {lo:10,hi:30,c:"10〜29",t:"帯状疱疹 1000mg 24時間毎／単純疱疹 500mg 24時間毎",k:"r"},
+  {lo:0,hi:10,c:"<10",t:"帯状疱疹 500mg 24時間毎／単純疱疹 500mg 24時間毎",k:"r"}],
+ hd:"透析中：<10 の行を目安。アシクロビルは HD で除去される",
+ notes:["高齢・腎障害で活性代謝物アシクロビルが高濃度で続き、精神神経症状（アシクロビル脳症）が出やすい。意識障害が出たら中止し、透析を考慮。","腎機能が気になる帯状疱疹ではアメナメビルも選択肢。"],
+ v:"ok",src:[["バルトレックス錠 電子添文 7.2・9.2・9.8（2026年2月改訂 第3版）",KEGG+"00046311"]]},
+{id:"fcv",cls:["av"],g:"ファムシクロビル",b:"ファムビル 錠250",basis:"CLcr（mL/分、外国人データ）",
+ rows:[
+  {lo:60,hi:INF,c:"≧60",t:"帯状疱疹 500mg 1日3回",k:"n"},
+  {lo:40,hi:60,c:"40〜59",t:"帯状疱疹 500mg 1日2回",k:"r"},
+  {lo:20,hi:40,c:"20〜39",t:"帯状疱疹 500mg 1日1回",k:"r"},
+  {lo:0,hi:20,c:"<20",t:"帯状疱疹 250mg 1日1回",k:"r"}],
+ hd:"透析中：電子添文 7.1 の表で確認（未照合）",
+ notes:["単純疱疹（通常・再発時の1日療法）の減量は電子添文 7.1 の表で確認（表示していない）。"],
+ v:"ok",src:[["ファムビル錠 電子添文 7.1（2026年4月改訂 第5版）",KEGG+"00055027"]]},
+{id:"amnv",cls:["av"],g:"アメナメビル",b:"アメナリーフ 錠200",basis:"—",
+ rows:[{lo:0,hi:INF,c:"全区分",t:"帯状疱疹 400mg 1日1回 食後。腎機能による用量調整の規定なし",k:"n"}],
+ hd:"透析中：調整の規定なし",
+ notes:["重度腎障害で AUC 約78%増（Cmax は不変）。CYP3A で代謝され、リファンピシンは併用禁忌。相互作用を確認。"],
+ v:"ok",src:[["アメナリーフ錠 電子添文 6・16.6（2023年2月改訂 第2版）",KEGG+"00066990"]]},
+
+/* ===== DOAC ===== */
+{id:"dabi",cls:["doac"],g:"ダビガトラン",b:"プラザキサ カプセル75・110mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:50.001,hi:INF,c:">50",t:"150mg 1日2回（70歳以上・消化管出血の既往・P-gp阻害薬併用では 110mg 1日2回を考慮）",k:"n"},
+  {lo:30,hi:50.001,c:"30〜50",t:"110mg 1日2回を考慮（中等度腎障害）",k:"r"},
+  {lo:0,hi:30,c:"<30",t:"禁忌（透析を含む高度腎障害）",k:"x"}],
+ hd:"透析中：禁忌",
+ notes:["腎排泄率が最も高い DOAC。中和薬はイダルシズマブ（プリズバインド）。"],
+ v:"ok",src:[["プラザキサ 電子添文 2.2・7.1・7.2（2025年11月改訂 第5版）",KEGG+"00059342"]]},
+{id:"riva",cls:["doac"],g:"リバーロキサバン",b:"イグザレルト 錠10・15mg／OD錠",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:50,hi:INF,c:"≧50",t:"心房細動：15mg 1日1回 食後",k:"n"},
+  {lo:30,hi:50,c:"30〜49",t:"心房細動：10mg 1日1回",k:"r"},
+  {lo:15,hi:30,c:"15〜29",t:"心房細動：適否を慎重に検討し、投与するなら 10mg 1日1回",k:"r"},
+  {lo:0,hi:15,c:"<15",t:"禁忌（腎不全）",k:"x"}],
+ hd:"透析中：禁忌",
+ notes:["静脈血栓塞栓症の治療・再発抑制では CLcr 30未満は禁忌（初期3週間 15mg 1日2回→15mg 1日1回）。"],
+ v:"ok",src:[["イグザレルト錠 電子添文 2・6・7.1・7.2・9.2（2026年3月改訂 第10版）",KEGG+"00060251"]]},
+{id:"apix",cls:["doac"],g:"アピキサバン",b:"エリキュース 錠2.5・5mg",basis:"CLcr（mL/分）＋減量基準",
+ rows:[
+  {lo:15,hi:INF,c:"≧15",t:"心房細動：5mg 1日2回。80歳以上・体重60kg以下・Cr 1.5mg/dL以上のうち2つ以上で 2.5mg 1日2回",k:"n"},
+  {lo:0,hi:15,c:"<15",t:"禁忌（腎不全）",k:"x"}],
+ hd:"透析中：禁忌（CLcr 15未満）",
+ dyn:"apix",
+ notes:["CLcr 15〜50 は出血の危険性が増大するおそれ（慎重に）。静脈血栓塞栓症では CLcr 30未満は禁忌（10mg 1日2回×7日→5mg 1日2回）。"],
+ v:"ok",src:[["エリキュース錠 電子添文 2.4・2.5・6・7.1・9.2（2026年3月改訂 第9版）",KEGG+"00061145"]]},
+{id:"edox",cls:["doac"],g:"エドキサバン",b:"リクシアナ 錠・OD錠 15・30・60mg",basis:"CLcr（mL/分）＋体重",
+ rows:[
+  {lo:50.001,hi:INF,c:">50",t:"体重60kg超 60mg、60kg以下 30mg、1日1回（P-gp阻害薬の一部で 30mg）",k:"n"},
+  {lo:30,hi:50.001,c:"30〜50",t:"30mg 1日1回",k:"r"},
+  {lo:15,hi:30,c:"15〜29",t:"有効性・安全性は未確立。慎重に検討し、投与するなら 30mg 1日1回（80歳前後で出血素因があれば 15mg も）",k:"r"},
+  {lo:0,hi:15,c:"<15",t:"禁忌（腎不全）※心房細動・VTE治療",k:"x"}],
+ hd:"透析中：禁忌",
+ dyn:"edox",
+ notes:["15mg（心房細動のみ）：80歳前後で、出血素因（重要臓器の出血既往・体重45kg以下・CLcr 15〜30・NSAIDs常用・抗血小板薬併用）が1つ以上あり、通常用量や他の抗凝固薬が使えない場合に考慮。","下肢整形外科手術後の VTE 予防は CLcr 30未満が禁忌。"],
+ v:"ok",src:[["リクシアナ錠 電子添文 2.4・2.6・6・7.1〜7.5（2025年11月改訂 第8版）",KEGG+"00063167"]]},
+
+/* ===== ガバペンチノイド ===== */
+{id:"pgb",cls:["gaba"],g:"プレガバリン",b:"リリカ カプセル・OD錠 25・75・150mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:60,hi:INF,c:"≧60",t:"150〜600mg/日：初期 75mg×2 → 維持 150mg×2（最高 300mg×2）",k:"n"},
+  {lo:30,hi:60,c:"30〜59",t:"75〜300mg/日：初期 25mg×3 か 75mg×1 → 維持 50mg×3 か 75mg×2（最高 100mg×3 か 150mg×2）",k:"r"},
+  {lo:15,hi:30,c:"15〜29",t:"25〜150mg/日：初期 25mg×1〜2 か 50mg×1 → 維持 75mg×1（最高 75mg×2 か 150mg×1）",k:"r"},
+  {lo:0,hi:15,c:"<15",t:"25〜75mg/日：初期 25mg×1 → 維持 25〜50mg×1（最高 75mg×1）",k:"r"}],
+ hd:"透析中：<15 の量＋透析後に補充（初期 25〜50mg、維持 50〜75mg、最高 100〜150mg）",
+ notes:["神経障害性疼痛の表。線維筋痛症は最高量が低い別の表。","めまい・傾眠・浮腫、高齢者の転倒に注意。腎機能低下例ではまず低用量から。"],
+ v:"ok",src:[["リリカ 電子添文 7.2（2025年12月改訂 第8版）",KEGG+"00066754"]]},
+{id:"mgb",cls:["gaba"],g:"ミロガバリン",b:"タリージェ 錠・OD錠 2.5・5・10・15mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:60,hi:INF,c:"≧60",t:"初期 5mg×2 → 1週以上あけて 5mgずつ増量、10〜15mg×2",k:"n"},
+  {lo:30,hi:60,c:"30〜59",t:"初期 2.5mg×2 → 有効最小 5mg×2、推奨 7.5mg×2",k:"r"},
+  {lo:0,hi:30,c:"<30",t:"初期 2.5mg×1 → 有効最小 5mg×1、推奨 7.5mg×1（HD を含む）",k:"r"}],
+ hd:"透析中：<30 の行（2.5mg 1日1回から、推奨 7.5mg 1日1回）。HD での除去は 15.3%",
+ notes:["めまい・傾眠・浮腫に注意。"],
+ v:"ok",src:[["タリージェ 電子添文 6・7・13.2（2025年1月改訂 第9版）",KEGG+"00070625"]]},
+
+/* ===== PD・認知症 ===== */
+{id:"amt",cls:["pd"],g:"アマンタジン",b:"シンメトレル 錠50・100mg",basis:"CLcr（mL/分/1.73m²、外国人データ・参考）",
+ rows:[
+  {lo:75.001,hi:INF,c:">75",t:"100mg 12時間毎",k:"n"},
+  {lo:35,hi:75.001,c:"35〜75",t:"100mg 24時間毎",k:"r"},
+  {lo:25,hi:35,c:"25〜35",t:"100mg 2日毎",k:"r"},
+  {lo:15,hi:25,c:"15〜25",t:"100mg 3日毎",k:"r"},
+  {lo:0,hi:15,c:"<15",t:"表の範囲外。使用を避ける（透析を要する腎障害は禁忌）",k:"x"}],
+ hd:"透析中：禁忌（透析を必要とする重篤な腎障害）",
+ notes:["腎機能低下で幻覚・せん妄・ミオクローヌス・意識障害が出やすい。高齢者は少量から。","表は 100mg/回としたときの投与間隔の目安（国内の承認用量とは異なる）。"],
+ v:"ok",src:[["シンメトレル錠 電子添文 2.1・7.1（2025年7月改訂 第3版）",KEGG+"00071739"]]},
+{id:"prm",cls:["pd"],g:"プラミペキソール（速放錠）",b:"ビ・シフロール 錠0.125・0.5mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:50,hi:INF,c:"≧50",t:"PD：初回 0.125mg×2、最大 4.5mg/日（1.5mg×3）。1.5mg/日未満は分2、以上は分3",k:"n"},
+  {lo:20,hi:50,c:"20〜49",t:"PD：1日2回。初回 0.125mg×2、最大 2.25mg/日（1.125mg×2）",k:"r"},
+  {lo:0,hi:20,c:"<20",t:"PD：1日1回。初回 0.125mg×1、最大 1.5mg/日。有効性・安全性は未確立",k:"r"}],
+ hd:"透析中：有効性・安全性は未確立。使用経験が乏しい",
+ notes:["レストレスレッグス症候群（最大 0.75mg/日）は CLcr 20以上なら減量不要。","徐放錠（ミラペックスLA）は別の表（未照合）。傾眠・突発的睡眠・幻覚に注意。"],
+ v:"ok",src:[["ビ・シフロール錠 電子添文 7.2・7.3・9.2（2026年9月改訂 第4版）",KEGG+"00049841"]]},
+{id:"mem",cls:["pd"],g:"メマンチン",b:"メマリー 錠・OD錠 5・10・20mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:30,hi:INF,c:"≧30",t:"5mg から開始し週 5mg ずつ増量、維持 20mg 1日1回",k:"n"},
+  {lo:0,hi:30,c:"<30",t:"慎重に。維持量は 10mg 1日1回",k:"r"}],
+ hd:"透析中：<30 の行に準じる（透析時の記載なし）",
+ notes:["腎排泄型。めまい・傾眠・便秘、腎機能低下例ではせん妄にも注意。"],
+ v:"ok",src:[["メマリー錠 電子添文 7.2・9.2（2020年6月改訂 第2版）",KEGG+"00062587"]]},
+
+/* ===== 抗菌薬 ===== */
+{id:"ctrx",cls:["abx"],g:"セフトリアキソン",b:"ロセフィン 静注用0.5・1g／点滴静注用1gバッグ",basis:"—",
+ rows:[
+  {lo:15,hi:INF,c:"≧15",t:"1日 1〜2g、分1〜2（難治・重症は 1日 4g まで分2）。腎機能による減量は原則不要",k:"n"},
+  {lo:0,hi:15,c:"高度障害",t:"血中濃度を頻回に測れなければ 1g/日 を超えない",k:"c"}],
+ hd:"透析中：1g/日 を超えない（血中濃度を頻回に測れない場合）",
+ notes:["胆汁排泄もあるため調整は少ない。細菌性髄膜炎では通常 2g 12時間毎（ガイドラインの量・未照合）で、添付文書の上限 4g/日。","「高度腎障害」の境目は添付文書に数値がなく、ここでは 15 未満で表示（未照合）。"],
+ v:"part",src:[["ロセフィン 電子添文 6・7・9.2（2026年6月改訂 第2版）",KEGG+"00049429"]]},
+{id:"cfpm",cls:["abx"],g:"セフェピム",b:"セフェピム塩酸塩 静注用0.5・1g（後発品）",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:50.001,hi:INF,c:">50",t:"一般感染症 1回1g（発熱性好中球減少症 2g）、12時間毎",k:"n"},
+  {lo:30,hi:50.001,c:"30〜50",t:"1回0.5g（発熱性好中球減少症 1g）、12時間毎",k:"r"},
+  {lo:10,hi:30,c:"10〜30",t:"1回0.5g、12時間毎",k:"r"},
+  {lo:0,hi:10,c:"<10",t:"1回0.5g、24時間毎",k:"r"}],
+ hd:"透析中：1回0.5g、24時間毎。透析後に投与",
+ notes:["意識障害・昏睡・痙攣・振戦・ミオクローヌスが、特に腎機能障害で減量しなかった場合に出やすい（セフェピム脳症、非痙攣性てんかん重積を含む）。意識が変われば脳波を。","表の列（一般・発熱性好中球減少症・間隔）の対応は電子添文 7.1 で確認。"],
+ v:"part",src:[["セフェピム塩酸塩静注用「CMX」電子添文 7.1・11.1.8（2024年3月 第1版）",KEGG+"00058732"]]},
+{id:"mepm",cls:["abx"],g:"メロペネム",b:"メロペン 点滴用バイアル0.25・0.5g／キット0.5g",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:50.001,hi:INF,c:">50",t:"1日 0.5〜1g 分2〜3（重症 1回1g・1日3g まで）。化膿性髄膜炎は 1日6g 分3",k:"n"},
+  {lo:26,hi:50.001,c:"26〜50",t:"1回量はそのまま、12時間毎",k:"r"},
+  {lo:10,hi:26,c:"10〜25",t:"1回量を半量、12時間毎",k:"r"},
+  {lo:0,hi:10,c:"<10",t:"1回量を半量、24時間毎",k:"r"}],
+ hd:"透析中：<10 の行を目安に、透析日は透析終了後に投与",
+ notes:["バルプロ酸ナトリウム投与中は併用禁忌（バルプロ酸の濃度が下がり発作が再発）。抗てんかん薬をレベチラセタムなどに切り替えるか、別の抗菌薬に。"],
+ v:"ok",src:[["メロペン 電子添文 2.2・6・7.1・7.2（2026年4月改訂 第4版）",KEGG+"00054716"]]},
+{id:"abpc",cls:["abx"],g:"アンピシリン",b:"ビクシリン 注射用0.25・0.5・1・2g",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:50.001,hi:INF,c:">50",t:"通常量（点滴 1日1〜4g 分1〜2）。髄膜炎は大量（2g 4時間毎が一般的・未照合）",k:"n"},
+  {lo:10,hi:50.001,c:"10〜50",t:"目安：投与間隔を 6〜12時間毎に延長（未照合）",k:"r"},
+  {lo:0,hi:10,c:"<10",t:"目安：12〜24時間毎（未照合）",k:"r"}],
+ hd:"透析中：目安 12〜24時間毎、透析日は透析後（未照合）",
+ notes:["添付文書は「高度の腎障害では投与間隔をあける」のみで具体的な量はない。区分の量は成書（サンフォード等）の一般的な目安。","腎不全で大量投与すると痙攣など中枢神経症状。"],
+ v:"un",src:[["ビクシリン注射用 電子添文 6・9.2・11.2（2023年5月改訂 第2版）",KEGG+"00057343"]]},
+{id:"sbtabpc",cls:["abx"],g:"スルバクタム・アンピシリン",b:"ユナシン-S キット静注用1.5・3g",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:60,hi:INF,c:"60〜90",t:"3g 6時間毎（肺炎は 1日6g 分2 が基本、重症で 3g×4・12g/日まで）",k:"n"},
+  {lo:30,hi:60,c:"30〜59",t:"3g 6〜8時間毎",k:"r"},
+  {lo:15,hi:30,c:"15〜29",t:"3g 12時間毎",k:"r"},
+  {lo:0,hi:15,c:"5〜14",t:"3g 24時間毎",k:"r"}],
+ hd:"透析中：記載なし。目安は 3g 24時間毎で透析後（未照合）",
+ notes:["表は 3g を30分で点滴したときのシミュレーション（電子添文 16.6.1）で、用量の指示ではない。"],
+ v:"ok",src:[["ユナシン-S 電子添文 6・9.2・16.6.1（2025年9月改訂 第4版）",KEGG+"00052370"]]},
+{id:"tazpipc",cls:["abx"],g:"タゾバクタム・ピペラシリン",b:"ゾシン 静注用2.25・4.5／配合点滴静注用バッグ4.5",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:40,hi:INF,c:">40",t:"4.5g 1日3回（重症・難治の肺炎は 1日4回）",k:"n"},
+  {lo:20,hi:40,c:"20〜40",t:"目安：2.25g 6時間毎（未照合）",k:"r"},
+  {lo:0,hi:20,c:"<20",t:"目安：2.25g 8時間毎（未照合）",k:"r"}],
+ hd:"透析中：目安 2.25g 12時間毎、透析後に追加（未照合）",
+ notes:["添付文書は「腎機能障害の程度に応じて減量又は投与間隔をあける」のみで具体的な量はない。区分の量は成書（サンフォード等）の一般的な目安。"],
+ v:"un",src:[["ゾシン静注用 電子添文 6・7.4・9.2（2023年2月改訂 第2版）",KEGG+"00055816"]]},
+{id:"vcm",cls:["abx"],g:"バンコマイシン（点滴）",b:"塩酸バンコマイシン 点滴静注用0.5g",basis:"CLcr（mL/分）＋TDM",
+ rows:[
+  {lo:50,hi:INF,c:"≧50",t:"1日2g（0.5g 6時間毎か 1g 12時間毎）。初回から TDM",k:"n"},
+  {lo:0,hi:50,c:"<50",t:"投与量・間隔の調節が必要。具体的な量は TDM・薬剤部の投与設計で（AUC を指標）",k:"r"}],
+ hd:"透析中：TDM・薬剤部の投与設計で",
+ notes:["添付文書：腎機能障害では投与量・間隔の調節が必要、投与中は血中濃度のモニタリングが望ましい、ガイドラインでは AUC を指標とした投与設計が推奨。","目標 AUC 400〜600 μg・h/mL・負荷投与 25〜30mg/kg は国内外の TDM ガイドラインの値（未照合）。"],
+ v:"part",src:[["塩酸バンコマイシン点滴静注用 電子添文 6・7.2・8.3・16.8（2026年4月改訂 第2版）",KEGG+"00069571"]]},
+{id:"lvfx",cls:["abx"],g:"レボフロキサシン",b:"クラビット 錠250・500mg／点滴静注500mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:50,hi:INF,c:"≧50",t:"500mg 1日1回",k:"n"},
+  {lo:20,hi:50,c:"20〜49",t:"初日 500mg、2日目以降 250mg 1日1回",k:"r"},
+  {lo:0,hi:20,c:"<20",t:"初日 500mg、3日目以降 250mg 2日に1回",k:"r"}],
+ hd:"透析中：<20 の行を目安（透析時の記載なし）",
+ notes:["重症筋無力症を悪化させることがある。てんかん・痙攣の既往で痙攣、フェニル酢酸系・プロピオン酸系 NSAIDs 併用で痙攣のおそれ。"],
+ v:"ok",src:[["クラビット点滴静注 電子添文 6・7.1・9.1・10.2（2020年8月改訂 第1版）",KEGG+"00059158"]]},
+{id:"cez",cls:["abx"],g:"セファゾリン",b:"セファメジンα 注射用0.25〜2g／点滴用キット",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:35,hi:INF,c:"≧35",t:"通常量（1日1g 分2、重症は 1日5g まで）。目安 1〜2g 8時間毎",k:"n"},
+  {lo:11,hi:35,c:"11〜34",t:"目安：1回量を半量、12時間毎（未照合）",k:"r"},
+  {lo:0,hi:11,c:"≦10",t:"目安：1回量を半量、24時間毎（未照合）",k:"r"}],
+ hd:"透析中：目安 透析後に 1〜2g（週3回）（未照合）",
+ notes:["添付文書は「高度の腎障害では減量し、投与間隔をあける」のみで具体的な量はない。区分の量は成書（サンフォード等）の一般的な目安。"],
+ v:"un",src:[["セファメジンα 電子添文 6・9.2・16.6.1（2026年9月改訂 第3版）",KEGG+"00051899"]]},
+
+/* ===== その他 ===== */
+{id:"fam",cls:["oth"],g:"ファモチジン",b:"ガスター 錠・D錠 10・20mg",basis:"CLcr（mL/分）",
+ rows:[
+  {lo:60,hi:INF,c:"≧60",t:"20mg 1日2回",k:"n"},
+  {lo:30.001,hi:60,c:"30〜60",t:"20mg 1日1回 か 10mg 1日2回",k:"r"},
+  {lo:0,hi:30.001,c:"≦30",t:"20mg 2〜3日に1回 か 10mg 1日1回",k:"r"}],
+ hd:"透析中：20mg 透析後1回 か 10mg 1日1回",
+ notes:["意識障害・痙攣・可逆性の錯乱が、特に腎機能障害で出やすい。高齢者のせん妄の原因として見直す。"],
+ v:"ok",src:[["ガスター錠 電子添文 7.1・11.1.7（2026年9月改訂 第3版）",KEGG+"00049384"]]},
+{id:"bac",cls:["oth"],g:"バクロフェン（内服）",b:"リオレサール 錠5・10mg ほか",basis:"—",
+ rows:[
+  {lo:30,hi:INF,c:"軽〜中等度",t:"低用量から開始（通常 5〜15mg/日から、標準 30mg/日）",k:"c"},
+  {lo:0,hi:30,c:"高度・透析",t:"1日 5mg から開始するなど慎重に。意識障害・呼吸抑制に注意",k:"r"}],
+ hd:"透析中：1日 5mg から開始するなど慎重に",
+ notes:["腎機能低下で血中濃度が上がり、意識障害・呼吸抑制などの中枢抑制が出やすい。","区分の境目（30）は表示のための目安（添付文書は「腎機能が低下している」「透析を必要とする重篤な腎機能障害」と記載）。"],
+ v:"part",src:[["リオレサール錠 電子添文 7.1・9.2・11.1.1（2024年7月改訂 第2版）",KEGG+"00001879"]]},
+{id:"eda",cls:["oth"],g:"エダラボン",b:"ラジカット 注30mg／点滴静注バッグ30mg",basis:"—",
+ rows:[
+  {lo:30,hi:INF,c:"重度でない",t:"30mg 1日2回（脳梗塞急性期）。腎機能を頻回に確認",k:"c"},
+  {lo:0,hi:30,c:"重篤な障害",t:"禁忌（重篤な腎機能障害）",k:"x"}],
+ hd:"透析中：禁忌",
+ notes:["急性腎障害・腎機能悪化があり、致命的な例も。特に投与前の BUN/Cr 比が高い（脱水）例で致命的な経過が多い。","「重篤」の境目は添付文書に数値がなく、ここでは 30 未満で表示（未照合）。"],
+ v:"part",src:[["ラジカット 電子添文 2.1・8.3・9.2（2026年10月改訂 第6版）",KEGG+"00058525"]]}
+];
+
+/* ---------- 状態 ---------- */
+let st={tab:"dose",age:"",cr:"",ht:"",cys:"",adj02:false,basis:"ccr",hd:false,cls:"all",q:"",onlyAdj:false,ignoreCalc:false};
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)st=Object.assign(st,s);}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+const WP=()=>window.WardProfile||null;
+
+/* ---------- 計算 ---------- */
+function num(v){const n=parseFloat(v);return isFinite(n)?n:null;}
+function sexVal(){const r=document.querySelector('input[name=sex]:checked');return r?r.value:null;}
+function wtVal(){const n=num($("wt").value);return n&&n>=20&&n<=250?n:null;}
+function catOf(x){if(x==null)return null;return x>=60?"ge60":x>=30?"30-59":x>=15?"15-29":"lt15";}
+const CATL={"ge60":"60以上","30-59":"30〜59","15-29":"15〜29","lt15":"15未満"};
+const CATR={"ge60":[60,INF],"30-59":[30,60],"15-29":[15,30],"lt15":[0,15]};
+function calc(){
+  const a=num(st.age),cr=num(st.cr),w=wtVal(),s=sexVal(),h=num(st.ht),cy=num(st.cys);
+  const o={a,cr,w,s,h,cy,miss:[]};
+  if(!(a>=18&&a<=110))o.miss.push("年齢");
+  if(!s)o.miss.push("性別");
+  if(!w)o.miss.push("体重");
+  if(!(cr>=0.1&&cr<=20))o.miss.push("Cr");
+  const fs=s==="f";
+  if(a>=18&&a<=110&&cr>=0.1&&cr<=20&&s){
+    o.egfr=194*Math.pow(cr,-1.094)*Math.pow(a,-0.287)*(fs?0.739:1);
+  }
+  if(a>=18&&a<=110&&cr>=0.1&&cr<=20&&s&&w){
+    const crc=st.adj02?cr+0.2:cr;
+    o.ccr=(140-a)*w/(72*crc)*(fs?0.85:1);
+    if(h>=100&&h<=220){
+      const ibw=(fs?45.5:50)+0.91*(h-152.4);
+      o.ibw=ibw;
+      if(ibw>0&&w>1.3*ibw){const abw=ibw+0.4*(w-ibw);o.abw=abw;o.ccrAbw=(140-a)*abw/(72*crc)*(fs?0.85:1);}
+    }
+  }
+  if(w&&h>=100&&h<=220){o.bsa=0.007184*Math.pow(w,0.425)*Math.pow(h,0.725);if(o.egfr!=null)o.egfrInd=o.egfr*o.bsa/1.73;}
+  if(a>=18&&a<=110&&s&&cy>=0.2&&cy<=10){o.cys=104*Math.pow(cy,-1.019)*Math.pow(0.996,a)*(fs?0.929:1)-8;if(o.cys<0)o.cys=0;}
+  // 用量判定に使う値
+  const pick={ccr:["ccr","CCr"],egfrInd:["egfrInd","eGFR（個別）"],egfr:["egfr","eGFR"],cys:["cys","eGFRcys"]};
+  let b=pick[st.basis]||pick.ccr;
+  if(o[b[0]]==null){o.fallback=true;b=o.ccr!=null?pick.ccr:(o.egfr!=null?pick.egfr:null);}
+  if(b){o.use=o[b[0]];o.useKey=b[0];o.useLbl=b[1];}
+  return o;
+}
+const r0=x=>x==null?"—":(Math.round(x*10)/10).toFixed(x<20?1:0);
+const unit=k=>(k==="egfr"||k==="cys")?"mL/分/1.73m²":"mL/分";
+
+function renderCalc(){
+  const o=calc();
+  const box=(k,lbl,val,u,sub)=>{const c=catOf(val);return `<div class="r${o.useKey===k?" sel":""}"><b>${lbl}</b><div class="v">${r0(val)} <small>${u}</small></div>${val!=null?`<div class="c c-${c}">区分 ${CATL[c]}</div>`:""}${sub?`<div class="sm mu">${sub}</div>`:""}</div>`;};
+  let h="";
+  if(o.ccr!=null||o.egfr!=null){
+    h+=`<div class="res">`;
+    h+=box("ccr","CCr（Cockcroft-Gault）",o.ccr,"mL/分",st.adj02?"Cr＋0.2 で計算":"");
+    h+=box("egfr","eGFRcreat",o.egfr,"mL/分/1.73m²","");
+    if(o.egfrInd!=null)h+=box("egfrInd","eGFR（体表面積で戻す）",o.egfrInd,"mL/分",`体表面積 ${o.bsa.toFixed(2)}m²`);
+    if(o.cys!=null)h+=box("cys","eGFRcys",o.cys,"mL/分/1.73m²","");
+    h+=`</div>`;
+    const notes=[];
+    if(o.ccr!=null&&o.egfr!=null&&catOf(o.ccr)!==catOf(o.egfr))notes.push(`CCr と eGFR で区分が違う（CCr ${CATL[catOf(o.ccr)]}／eGFR ${CATL[catOf(o.egfr)]}）。添付文書が CLcr で決めている薬は CCr で判断する。`);
+    if(o.ccrAbw!=null)notes.push(`実体重が理想体重（${o.ibw.toFixed(1)}kg）の 1.3倍を超える。調整体重 ${o.abw.toFixed(1)}kg で計算した CCr は ${r0(o.ccrAbw)} mL/分（実体重の CCr は過大評価になりやすい・目安）。`);
+    if(o.a>=75&&o.cr<0.6)notes.push("高齢で Cr が 0.6 未満。筋肉量が少ないと CCr・eGFR とも過大評価になりやすい。シスタチンCや尿中 Cr を参考に。");
+    if(o.cys!=null&&o.egfr!=null&&Math.abs(o.cys-o.egfr)>15)notes.push("eGFRcreat と eGFRcys の差が大きい。筋肉量の少ない例では eGFRcys の方が実際に近いことが多い。");
+    if(o.fallback&&o.useLbl)notes.push(`選んだ指標は計算できないため、${o.useLbl} で用量を判定している。`);
+    h+=notes.map(n=>`<div class="note">${esc(n)}</div>`).join("");
+  }
+  $("calcOut").innerHTML=h;
+  const v=$("vCalc");
+  if(o.use!=null){
+    const c=catOf(o.use);const tone=c==="ge60"?"ok":c==="lt15"?"crit":"warn";
+    v.className="verdict "+tone;
+    v.innerHTML=`<span class="big"><span class="pill">${esc(o.useLbl)} ${r0(o.use)}</span>${unit(o.useKey)} → 区分 ${CATL[c]}${o.ccr!=null&&o.egfr!=null?`（CCr ${r0(o.ccr)}・eGFR ${r0(o.egfr)}）`:""}</span><span class="sub">用量タブはこの値で該当する行を強調する</span>`;
+  }else if(o.egfr!=null){
+    v.className="verdict info";
+    v.innerHTML=`<span class="big"><span class="pill">eGFR ${r0(o.egfr)}</span>eGFR ${r0(o.egfr)} mL/分/1.73m²。CCr には体重が必要</span>`;
+  }else{
+    v.className="verdict info";
+    v.innerHTML=`<span class="big"><span class="pill">計算</span>入力が足りない：${esc(o.miss.join("・"))}</span>`;
+  }
+  $("wbCcr").disabled=o.ccr==null;$("wbEgfr").disabled=o.egfr==null;
+  return o;
+}
+
+/* ---------- 用量の判定 ---------- */
+function profRenal(){const r=document.querySelector('input[name=renal]:checked');return r?r.value:null;}
+function renalState(o){
+  if(st.hd&&profRenal()==="lt15")return {mode:"hd"};
+  if(o.use!=null&&!st.ignoreCalc)return {mode:"num",x:o.use,lbl:`${o.useLbl} ${r0(o.use)} ${unit(o.useKey)}`,cat:catOf(o.use)};
+  const c=profRenal();
+  if(c)return {mode:"cat",cat:c,rng:CATR[c],lbl:`区分 ${CATL[c]}`};
+  return {mode:"none"};
+}
+function hits(d,rs){
+  if(rs.mode==="num")return d.rows.map(r=>rs.x>=r.lo&&rs.x<r.hi);
+  if(rs.mode==="cat"){const[a,b]=rs.rng;return d.rows.map(r=>Math.min(r.hi,b)-Math.max(r.lo,a)>0.5);}
+  if(rs.mode==="hd")return d.rows.map(r=>r.lo<1);
+  return d.rows.map(()=>false);
+}
+const KL={n:"通常量",r:"減量・間隔延長",x:"禁忌・避ける",c:"慎重・要確認"};
+function status(d,h,rs){
+  if(rs.mode==="none")return null;
+  if(rs.mode==="hd"){
+    const hdt=d.hd||"";
+    if(/禁忌/.test(hdt))return "x";
+    const r=d.rows.filter((_,i)=>h[i]);return r.length?(r.some(x=>x.k==="x")?"x":r[0].k==="n"?"n":r[0].k):"c";
+  }
+  const ks=d.rows.filter((_,i)=>h[i]).map(r=>r.k);
+  if(!ks.length)return "c";
+  const u=[...new Set(ks)];
+  if(u.length===1)return u[0];
+  if(u.includes("x"))return "x";
+  return u.includes("r")?"r":u[0];
+}
+function needsAdj(k){return k==="r"||k==="x";}
+
+function dynLine(d,o,rs){
+  const p=WP()?WP().get():{};
+  if(d.dyn==="acv"){
+    const w=wtVal();if(!w)return "体重を入れると 1回量（mg）を表示";
+    const a=Math.round(w*5),b=Math.round(w*10);
+    let fr="";
+    if(rs.mode==="num"||rs.mode==="hd"){const x=rs.mode==="hd"?0:rs.x;if(x<10){fr=`（0〜10 の行：50% → ${Math.round(a/2)}〜${Math.round(b/2)}mg・24時間毎）`;}}
+    return `体重 ${w}kg：5mg/kg＝約 <b>${a}mg</b>、10mg/kg（脳炎・髄膜炎）＝約 <b>${b}mg</b> ${fr}`;
+  }
+  if(d.dyn==="apix"){
+    let n=0,known=0,it=[];
+    const age=num(st.age);
+    if(age!=null){known++;if(age>=80){n++;it.push("80歳以上");}}else if(p.age==="ge75"){it.push("年齢は75歳以上（80歳以上かは不明）");}
+    const w=wtVal();if(w!=null){known++;if(w<=60){n++;it.push("体重60kg以下");}}
+    const cr=num(st.cr);if(cr!=null){known++;if(cr>=1.5){n++;it.push("Cr 1.5以上");}}
+    if(rs.mode==="hd"||(rs.mode==="num"&&rs.x<15)||(rs.mode==="cat"&&rs.cat==="lt15"))return "CLcr 15未満は禁忌";
+    if(known===0)return "年齢・体重・Cr を入れると減量基準（3項目中2つ以上）を判定";
+    const dose=n>=2?"<b>2.5mg 1日2回</b>（減量）":known===3?"<b>5mg 1日2回</b>":(n===1?"あと1項目の確認が必要":"未入力の項目あり");
+    return `減量基準 ${n}/3 該当${it.length?"（"+it.join("・")+"）":""}：${dose}${known<3?`（${3-known}項目未入力）`:""}`;
+  }
+  if(d.dyn==="edox"){
+    const w=wtVal();
+    if(rs.mode==="hd"||(rs.mode==="num"&&rs.x<15)||(rs.mode==="cat"&&rs.cat==="lt15"))return "CLcr 15未満は禁忌";
+    if(rs.mode==="num"){
+      if(rs.x<=50)return `CLcr ${r0(rs.x)}：<b>30mg 1日1回</b>${rs.x<30?"（15〜29：慎重に。80歳前後で出血素因があれば 15mg も）":""}`;
+      if(w==null)return "体重を入れると 60mg／30mg を判定";
+      return `体重 ${w}kg・CLcr ${r0(rs.x)}：<b>${w<=60?"30mg":"60mg"} 1日1回</b>（P-gp阻害薬の併用を確認）`;
+    }
+    if(w!=null&&w<=60)return `体重 ${w}kg（60kg以下）：腎機能にかかわらず <b>30mg 1日1回</b>`;
+    return w!=null?`体重 ${w}kg：CLcr 50超なら 60mg、30〜50 なら 30mg`:"体重を入れると 60mg／30mg を判定";
+  }
+  return "";
+}
+
+function renderDose(o){
+  const rs=renalState(o);
+  // 判定に使う腎機能の行
+  let sl="";
+  if(rs.mode==="num")sl=`計算値：<b>${esc(rs.lbl)}</b>（区分 ${CATL[rs.cat]}）　<button type="button" class="btn sm" id="ignCalc">区分で見る</button>`;
+  else if(rs.mode==="cat")sl=`共通プロファイルの区分：<b>${CATL[rs.cat]}</b>${o.use!=null?`　<button type="button" class="btn sm" id="useCalc">計算値（${esc(o.useLbl)} ${r0(o.use)}）で見る</button>`:"。数値で絞るには「計算」タブで CCr を出す"}`;
+  else if(rs.mode==="hd")sl=`<b>血液透析（HD）中</b>の記載を表示`;
+  else sl="区分を選ぶか、「計算」タブで CCr を計算してください。";
+  $("srcLine").innerHTML=sl;
+  // 一覧
+  const q=st.q.trim().toLowerCase();
+  const list=D.filter(d=>(st.cls==="all"||d.cls.includes(st.cls))&&(!q||(d.g+d.b+d.id).toLowerCase().includes(q)));
+  let nAdj=0,nX=0,h="",lastCls="";
+  const shown=[];
+  list.forEach(d=>{
+    const hv=hits(d,rs),k=status(d,hv,rs);
+    if(k==="x")nX++;else if(k==="r")nAdj++;
+    if(st.onlyAdj&&rs.mode!=="none"&&!needsAdj(k))return;
+    shown.push(d.id);
+    const grp=CLS.find(c=>c[0]===d.cls[0])[1];
+    if(st.cls==="all"&&grp!==lastCls){h+=`<div class="grp">${esc(grp)}</div>`;lastCls=grp;}
+    const any=hv.some(Boolean);
+    let now="";
+    if(rs.mode==="hd"){now=`<div class="now ${k||""}">${esc(d.hd||"透析時の記載なし")}</div>`;}
+    else if(any){const t=d.rows.filter((_,i)=>hv[i]);now=`<div class="now ${k}">${t.map(r=>(t.length>1?`<small>${esc(r.c)}：</small>`:"")+esc(r.t)).join("")}${t.length>1?`<small>区分の中で用量が分かれる。CCr を計算すると1つに絞れる</small>`:""}</div>`;}
+    const dy=d.dyn?dynLine(d,o,rs):"";
+    const rows=d.rows.map((r,i)=>`<tr class="${hv[i]&&rs.mode!=="hd"?"hit ":""}k-${r.k}"><td class="cr">${esc(r.c)}</td><td>${esc(r.t)}</td></tr>`).join("")
+      +(d.hd?`<tr class="hd${rs.mode==="hd"?" hit":""} k-c"><td class="cr">透析</td><td>${esc(d.hd.replace(/^透析中：/,""))}</td></tr>`:"");
+    const vf=d.v==="ok"?`<span class="vf ok">照合済</span>`:d.v==="part"?`<span class="vf part">一部未照合</span>`:`<span class="vf un">未照合</span>`;
+    h+=`<article class="drug" id="d-${d.id}">
+      <div class="hd"><div class="nm"><b>${esc(d.g)}</b><span>${esc(d.b)}</span></div>${k?`<span class="bdg ${k}">${KL[k]}</span>`:""}</div>
+      ${now}${dy?`<div class="dyn">${dy}</div>`:""}
+      <table class="rt${any||rs.mode==="hd"?" dim":""}"><thead><tr><th>${esc(d.basis)}</th><th>用量</th></tr></thead><tbody>${rows}</tbody></table>
+      <details><summary>注意・根拠</summary><ul>${d.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></details>
+      <div class="src">${vf}${d.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join("／")}</div>
+    </article>`;
+  });
+  $("list").innerHTML=h||`<div class="empty">該当する薬がありません</div>`;
+  // 判定の要約
+  const v=$("vDose");
+  const scope=st.cls==="all"?"":`（${CLS.find(c=>c[0]===st.cls)[1]}）`;
+  if(rs.mode==="none"){v.className="verdict info";v.innerHTML=`<span class="big"><span class="pill">未設定</span>腎機能を選ぶと、各薬の該当する用量が強調されます</span>`;}
+  else{
+    const c=rs.mode==="hd"?"lt15":rs.cat;
+    const tone=rs.mode==="hd"||c==="lt15"?"crit":c==="ge60"?"ok":"warn";
+    const pill=rs.mode==="hd"?"透析":rs.mode==="num"?`${o.useLbl} ${r0(o.use)}`:CATL[c];
+    const head=rs.mode==="hd"?"血液透析中":rs.mode==="num"?`区分 ${CATL[c]}`:"共通プロファイルの区分";
+    v.className="verdict "+tone;
+    v.innerHTML=`<span class="big"><span class="pill">${esc(pill)}</span>${esc(head)}：減量・間隔延長 ${nAdj}剤${nX?`／禁忌・避ける ${nX}剤`:""}${scope}</span>`;
+  }
+  const ig=$("ignCalc");if(ig)ig.onclick=()=>{st.ignoreCalc=true;
+    const c=catOf(o.use);if(c){const r=document.querySelector(`input[name=renal][value="${c}"]`);if(r&&!profRenal())r.checked=true;}
+    save();renderAll();};
+  const uc=$("useCalc");if(uc)uc.onclick=()=>{st.ignoreCalc=false;save();renderAll();};
+}
+
+function renderChips(){
+  $("chips").innerHTML=CLS.map(c=>`<button type="button" class="chip" role="tab" data-cls="${c[0]}" aria-selected="${st.cls===c[0]}">${esc(c[1])}</button>`).join("");
+}
+function renderRefs(){
+  const items=[REF.CG,REF.JSN,REF.CYS,REF.PMDA].map(r=>`<li><a href="${r.u}" target="_blank" rel="noopener">${esc(r.t)}</a></li>`);
+  D.forEach(d=>d.src.forEach(s=>items.push(`<li>${esc(d.g)}：<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a></li>`)));
+  items.push(`<li>添付文書に具体的な量がない抗菌薬の目安（アンピシリン・タゾバクタム/ピペラシリン・セファゾリン、透析時の一部）：『サンフォード感染症治療ガイド』など成書の一般的な目安（未照合）。</li>`);
+  $("refList").innerHTML=items.join("");
+}
+
+let lastO=null;
+function renderAll(){
+  const o=renderCalc();lastO=o;
+  renderDose(o);
+  $("hdBtn").setAttribute("aria-pressed",st.hd?"true":"false");
+  $("onlyAdj").setAttribute("aria-pressed",st.onlyAdj?"true":"false");
+  $("adj02").setAttribute("aria-pressed",st.adj02?"true":"false");
+}
+
+function setTab(t){
+  st.tab=t;
+  ["dose","calc","ref"].forEach(x=>{$("t-"+x).hidden=x!==t;});
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false"));
+  save();
+}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),3000);}
+
+/* ---------- イベント ---------- */
+function bindInputs(){
+  $("age").value=st.age;$("cr").value=st.cr;$("ht").value=st.ht;$("cys").value=st.cys;$("basis").value=st.basis;$("q").value=st.q;
+  if(st.ht||st.cys||st.adj02||st.basis!=="ccr")$("calcMore").open=true;
+  const onNum=(id,k)=>$(id).addEventListener("input",()=>{st[k]=$(id).value;st.ignoreCalc=false;save();renderAll();});
+  onNum("age","age");onNum("cr","cr");onNum("ht","ht");onNum("cys","cys");
+  $("age").addEventListener("change",()=>{const a=num(st.age);if(WP()&&a>=18&&a<=110){WP().set({age:a<65?"lt65":a<75?"65-74":"ge75"});}});
+  $("wt").addEventListener("input",()=>{st.ignoreCalc=false;save();renderAll();});
+  $("basis").addEventListener("change",()=>{st.basis=$("basis").value;st.ignoreCalc=false;save();renderAll();});
+  $("q").addEventListener("input",()=>{st.q=$("q").value;save();renderDose(lastO||calc());});
+  document.addEventListener("change",e=>{
+    if(e.target.name==="sex"){st.ignoreCalc=false;save();renderAll();}
+    if(e.target.name==="renal"){if(e.target.value!=="lt15")st.hd=false;if(e.isTrusted)st.ignoreCalc=true;save();renderAll();}
+  });
+  $("hdBtn").addEventListener("click",()=>{st.hd=!st.hd;save();renderAll();});
+  $("onlyAdj").addEventListener("click",()=>{st.onlyAdj=!st.onlyAdj;save();renderAll();});
+  $("adj02").addEventListener("click",()=>{st.adj02=!st.adj02;save();renderAll();});
+  $("chips").addEventListener("click",e=>{const b=e.target.closest("[data-cls]");if(!b)return;st.cls=b.dataset.cls;save();renderChips();renderDose(lastO||calc());});
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{setTab(b.dataset.tab);window.scrollTo({top:0});}));
+  $("goDose").addEventListener("click",()=>{st.ignoreCalc=false;setTab("dose");renderAll();window.scrollTo({top:0});});
+  function wb(val,lbl){
+    const c=catOf(val);if(!c)return;
+    if(WP()){WP().set({renal:c});}
+    const r=document.querySelector(`input[name=renal][value="${c}"]`);if(r){r.checked=true;}
+    if(c!=="lt15")st.hd=false;
+    save();renderAll();toast(`${lbl} ${r0(val)} → 区分「${CATL[c]}」をプロファイルに入れました`);
+  }
+  $("wbCcr").addEventListener("click",()=>{const o=calc();st.basis=st.basis;wb(o.ccr,"CCr");});
+  $("wbEgfr").addEventListener("click",()=>{const o=calc();wb(o.egfr,"eGFR");});
+  $("forceUpdate").addEventListener("click",async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(()=>location.reload(),800);});
+}
+
+load();
+$("appVer").textContent=APP_VERSION;
+renderChips();renderRefs();bindInputs();setTab(st.tab||"dose");renderAll();
+document.addEventListener("DOMContentLoaded",()=>{
+  if(WP()){WP().onChange(p=>{if(p.renal!=="lt15"&&st.hd){st.hd=false;save();}setTimeout(renderAll,0);});}
+  renderAll();
+});
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=[".verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["ren-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
+<script src="../share.js" defer></script>
+</body>
+</html>
