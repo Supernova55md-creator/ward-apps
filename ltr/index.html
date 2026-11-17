@@ -371,12 +371,13 @@ const SITES = [
 {id:"dc_stn",reg:"dc",lvl:2,lat:1,name:"{S}視床下核",
  hx:"糖尿病・高血圧の高齢者。急に{C}腕を振り回すような動きが止まらない。",
  req:[["{C}上下肢近位の、大きく投げ出すような不随意運動（片側バリズム）","視床下核の障害で淡蒼球内節への興奮性入力が減り、視床への抑制が外れる"],
-      ["睡眠中は消える","不随意運動の一般的特徴"]],
- opt:[["筋力低下・感覚障害はない","内包・視床は保たれる"],
+      ["筋力低下・感覚障害はない","内包・視床は保たれる。被殻出血など内包に及ぶ病変なら片麻痺を伴うのが普通"],
+      ["意識は清明で、共同偏視はない","被殻出血のような大きな病変ではない"]],
+ opt:[["睡眠中は消える","不随意運動の一般的特徴"],
       ["数日〜数週で舞踏運動様に小さくなる","バリズムと舞踏運動は連続した病態"]],
- near:["dc_put","dc_thal","cb_hemi:C","bs_claude"],
- sig:"対側の片側バリズム",
- pearl:"非ケトン性高血糖では被殻（T1高信号）の障害で片側舞踏運動・バリズムが起こる。血糖を必ず確認する。"},
+ near:["dc_thal","cb_hemi:C","bs_claude","dc_ic"],
+ sig:"対側の片側バリズム（麻痺なし）",
+ pearl:"片側バリズムは視床下核の古典的な徴候だが、実際には視床下核以外（線条体＝被殻・尾状核、視床、皮質など）の病変による例の方が多いとされる。被殻の梗塞・出血でも片側舞踏運動・バリズムは起こりうるので、この問題は『麻痺がない』ことで小さな視床下核病変を選ぶ設定になっている。非ケトン性高血糖では被殻（T1高信号）の異常で片側舞踏運動・バリズムが起こるので、血糖を必ず確認する。"},
 {id:"dc_pm",reg:"dc",lvl:3,name:"両側視床傍正中部（Percheron動脈領域）",
  hx:"突然意識がもうろうとなり、呼びかけで開眼してもすぐ眠ってしまう。",
  req:[["過眠・意識障害（呼べば覚醒する）","視床内側の上行性網様体賦活系"],
@@ -1547,7 +1548,7 @@ const ESITES=[
 <script>
 (function(){
 "use strict";
-var APP_VER="ltr-2026-11-14b";
+var APP_VER="ltr-2026-11-17a";
 var KEY="ltr-v1";
 var SIDE={L:"左",R:"右"};
 function opp(x){return x==="L"?"R":"L";}
@@ -1916,7 +1917,8 @@ function renderRefs(){
   function li(a){return '<li>'+a[0]+(a[1]?' <a href="'+a[1]+'" target="_blank" rel="noopener">'+a[2]+'</a>':'')+'</li>';}
   var h='<div class="card"><h2>出典（共通の教科書）</h2><ul class="src">'+[
     ["Brazis PW, Masdeu JC, Biller J. Localization in Clinical Neurology. 8th ed. Wolters Kluwer.（書誌のみ・リンクなし）"],
-    ["Leigh RJ, Zee DS. The Neurology of Eye Movements. 5th ed. Oxford University Press; 2015.（書誌のみ・リンクなし）"]
+    ["Leigh RJ, Zee DS. The Neurology of Eye Movements. 5th ed. Oxford University Press; 2015.（書誌のみ・リンクなし）"],
+    ["Postuma RB, Lang AE. Hemiballism: revisiting a classic disorder. Lancet Neurol 2003;2:661-668.（部位モード：視床下核）","https://doi.org/10.1016/S1474-4422(03)00554-4","doi:10.1016/S1474-4422(03)00554-4"]
   ].map(li).join("")+'</ul></div>';
   h+='<div class="card"><h2>血管支配モード</h2><ul class="src">'+[
     ["日本脳卒中学会 脳卒中ガイドライン委員会 編. 脳卒中治療ガイドライン2021〔改訂2025〕. 協和企画; 2025.（改訂項目一覧）","https://www.jsts.gr.jp/img/guideline2021_kaitei2025_kaiteikoumoku.pdf","jsts.gr.jp"],
