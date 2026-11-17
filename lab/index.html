@@ -191,7 +191,7 @@ small.note{display:block;font-size:12px;color:var(--muted);margin-top:6px}
 
 <script>
 "use strict";
-const APPVER="2026-11-17a";
+const APPVER="2026-11-17b";
 const $=id=>document.getElementById(id);
 const LS_Q="lab-q",LS_FAV="lab-fav",LS_TAB="lab-tab",LS_F="lab-filter",LS_SIG="lab-sig";
 const SRCBASE="https://sites.google.com/kuhp.kyoto-u.ac.jp/gaichukensa/";
@@ -373,12 +373,26 @@ $("unlockGo").addEventListener("click",async()=>{
 });
 $("pass2").addEventListener("keydown",e=>{if(e.key==="Enter")$("unlockGo").click();});
 
+/* 新しい data.enc が置かれていれば、記憶した鍵でそのまま取り込む（同じ salt で再暗号化している場合） */
+async function autoUpd(enc,key){
+  if(!navigator.onLine)return;
+  try{
+    const r=await fetch("data.enc",{cache:"no-cache"});if(!r.ok)return;
+    const nw=checkEnc(await r.json());
+    if(nw.ct===enc.ct)return;
+    if(nw.salt!==enc.salt){toast("新しい検査データがあります（出典・設定 →「新しいデータに更新」）");return;}
+    const obj=await decryptWith(key,nw);
+    await kvSet("blob",nw);
+    const was=DATA&&DATA.updated;prep(obj);
+    toast("検査データを更新しました（"+(obj.updated||"")+"）");
+  }catch(e){}
+}
 async function boot(){
   if(!window.crypto||!crypto.subtle){show("vImport");$("impErr").textContent="この環境では暗号機能が使えません（https で開いてください）";return;}
   try{$("q").value=localStorage.getItem(LS_Q)||"";}catch(_){}
   let enc=null,key=null;try{enc=await kvGet("blob");key=await kvGet("key");}catch(e){}
   if(!enc){startImport(false);return;}
-  if(key){try{prep(await decryptWith(key,enc));return;}catch(e){await kvDel("key").catch(()=>{});}}
+  if(key){try{prep(await decryptWith(key,enc));autoUpd(enc,key);return;}catch(e){await kvDel("key").catch(()=>{});}}
   $("lockErr").textContent="";show("vLock");
 }
 boot();
