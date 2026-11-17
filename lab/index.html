@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f766e">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="外注検査">
+<title>外注・研究検査ナビ</title>
+<style>
+:root{
+  --accent:#0f766e;--accent-ink:#fff;--accent-soft:#e3f3f1;
+  --bg:#f3f6f6;--surface:#fff;--ink:#17201f;--muted:#5a6866;--line:#d5dedd;
+  --crit:#b3122e;--crit-soft:#fde4e7;--ok:#1f7a4d;--ok-soft:#e3f4ea;--warn:#9a5b00;--warn-soft:#fff1d6;--info:#2f55b5;--info-soft:#e6ecfb;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;color-scheme:light}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#5eead4;--accent-ink:#06201d;--accent-soft:#173532;
+  --bg:#101615;--surface:#192120;--ink:#e6eeec;--muted:#a1b0ad;--line:#2f3b39;
+  --crit:#ff6b80;--crit-soft:#3d1a21;--ok:#5fd39a;--ok-soft:#173326;--warn:#f5b453;--warn-soft:#3a2a10;--info:#93b1ff;--info-soft:#1c2645;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:10;background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 8px calc(12px + env(safe-area-inset-left))}
+header .bar{display:flex;align-items:center;gap:8px;min-height:34px}
+header h1{font-size:17px;margin:0;flex:1;white-space:nowrap}
+header h1 small{font-size:11px;font-weight:400;opacity:.85;margin-left:6px}
+.sbox{margin-top:8px;display:flex;gap:6px}
+.sbox input{flex:1;font:inherit;font-size:17px;padding:10px 12px;border-radius:10px;border:0;background:var(--surface);color:var(--ink);min-width:0}
+.btn,.sbox button{font:inherit;font-size:14px;border-radius:10px;padding:9px 12px;min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn.dg{color:var(--crit);border-color:var(--crit)}
+.btn.sm{min-height:36px;padding:6px 10px;font-size:13px}
+.tabs{display:flex;gap:6px;margin-top:8px}
+.tabs button{flex:1;font:inherit;font-size:14px;padding:6px 8px;min-height:36px;border-radius:999px;border:1px solid currentColor;background:transparent;color:var(--accent-ink);cursor:pointer;opacity:.9}
+.tabs button.on{background:var(--surface);color:var(--ink);border-color:var(--surface);font-weight:700;opacity:1}
+main{padding:10px calc(10px + env(safe-area-inset-right)) 10px calc(10px + env(safe-area-inset-left));max-width:760px;margin:0 auto}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.card h2{font-size:16px;margin:0 0 8px}
+.card p,.card li{font-size:14px;color:var(--muted)}
+.card p{margin:0 0 10px}
+.card ul{margin:0;padding-left:1.2em}
+label.f{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
+input[type=password],input[type=text].w{width:100%;font:inherit;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:10px}
+.chk input{width:20px;height:20px}
+.err{color:var(--crit);font-size:14px;margin-top:8px;min-height:1em}
+.meta{font-size:12px;color:var(--muted);margin:2px 4px 8px;display:flex;justify-content:space-between;gap:8px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;font:inherit;font-size:13px;padding:6px 11px;min-height:34px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap}
+.chips button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chips .lab{flex:none;font-size:11.5px;color:var(--muted);align-self:center;padding:0 2px}
+details.it{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+details.it>summary{list-style:none;display:flex;gap:8px;align-items:flex-start;padding:11px 12px;cursor:pointer}
+details.it>summary::-webkit-details-marker{display:none}
+.it .nm{flex:1;min-width:0}
+.it .nm b{display:block;font-size:15.5px;overflow-wrap:anywhere}
+.it .nm>span{display:block;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.badge{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:2px 6px;margin:3px 4px 0 0;white-space:nowrap}
+.b-ins{background:var(--ok-soft);color:var(--ok)}
+.b-self{background:var(--warn-soft);color:var(--warn)}
+.b-res{background:var(--info-soft);color:var(--info)}
+.b-stop{background:var(--crit-soft);color:var(--crit)}
+.b-cat{background:var(--accent-soft);color:var(--accent)}
+.star{border:0;background:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0;min-width:36px;min-height:36px;margin:-6px -4px 0 0}
+.star.on{color:#e0a100}
+.dt{padding:0 12px 12px;border-top:1px solid var(--line)}
+.dt dl{margin:10px 0 0;display:grid;grid-template-columns:4.6em 1fr;gap:6px 8px;font-size:14px}
+.dt dt{color:var(--muted);font-size:12.5px;padding-top:1px}
+.dt dd{margin:0;overflow-wrap:anywhere}
+.dt .lk{margin:10px 0 0;padding:0;list-style:none}
+.dt .lk li{margin:0 0 6px;font-size:14px}
+.dt a{color:var(--accent);overflow-wrap:anywhere}
+.dt .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.sec{font-size:13px;font-weight:700;color:var(--muted);margin:14px 4px 6px}
+.empty{text-align:center;color:var(--muted);padding:24px 8px;font-size:14px}
+mark{background:#fff3a3;color:inherit;border-radius:2px}
+@media (prefers-color-scheme: dark){mark{background:#5a4b00}}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:90%}
+#toast.on{opacity:1}
+.hide{display:none!important}
+small.note{display:block;font-size:12px;color:var(--muted);margin-top:6px}
+.disc{font-size:12px;color:var(--muted);margin:14px 4px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar"><h1>外注・研究検査ナビ</h1><span id="hdrMeta" class="hide"></span></div>
+  <div class="sbox hide" id="sbox">
+    <input id="q" type="search" inputmode="search" placeholder="検査名・疾患・抗体・依頼先で検索" autocomplete="off" enterkeyhint="search" aria-label="検索">
+  </div>
+  <div class="tabs hide" id="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="all">検査</button>
+    <button type="button" role="tab" data-tab="fav">★<span id="favN"></span></button>
+    <button type="button" role="tab" data-tab="info">出典・設定</button>
+  </div>
+</header>
+<main>
+  <section id="vImport" class="hide">
+    <div class="card">
+      <h2>検査データを取り込む（初回のみ）</h2>
+      <p>検査データは暗号化したファイルで置いてあります。パスフレーズで開くと、この端末の中だけに保存され、以後はオフラインで使えます。</p>
+      <div class="row hide" id="dlRow"><button type="button" class="btn pri" id="dlBtn">ダウンロードして取り込む</button></div>
+      <div class="row">
+        <label class="btn" for="fileIn" style="display:inline-flex;align-items:center">ファイルを選ぶ</label>
+        <input type="file" id="fileIn" accept=".enc,.json,application/json,application/octet-stream" class="hide">
+        <span id="fileName" style="font-size:13px;color:var(--muted)"></span>
+      </div>
+      <div id="impPass" class="hide">
+        <label class="f" for="pass1">パスフレーズ</label>
+        <input type="password" id="pass1" autocomplete="current-password">
+        <label class="chk"><input type="checkbox" id="rem1" checked>この端末で記憶する（次回からパスフレーズ不要）</label>
+        <div class="row"><button type="button" class="btn pri" id="impGo">取り込む</button><button type="button" class="btn hide" id="impCancel">やめる</button></div>
+      </div>
+      <div class="err" id="impErr" role="alert"></div>
+    </div>
+  </section>
+
+  <section id="vLock" class="hide">
+    <div class="card">
+      <h2>パスフレーズを入力</h2>
+      <p>この端末には暗号化した検査データが保存されています。</p>
+      <input type="password" id="pass2" autocomplete="current-password" aria-label="パスフレーズ">
+      <label class="chk"><input type="checkbox" id="rem2" checked>この端末で記憶する</label>
+      <div class="row"><button type="button" class="btn pri" id="unlockGo">開く</button></div>
+      <div class="err" id="lockErr" role="alert"></div>
+    </div>
+  </section>
+
+  <section id="vMain" class="hide">
+    <div class="chips" id="qk" aria-label="よく使う検索"></div>
+    <div class="chips" id="fc" aria-label="分類"></div>
+    <div class="chips" id="ft" aria-label="費用区分"></div>
+    <div class="meta"><span id="cnt"></span><span id="sort"></span></div>
+    <div id="res"></div>
+    <p class="disc">提出方法・保険区分は原典の掲載時点の情報です。依頼前に依頼先の最新情報を確認してください。手順の一部は京大病院の院内手順です。診療判断の補助であり、最終判断は原典と依頼先の案内で行ってください。</p>
+  </section>
+
+  <section id="vInfo" class="hide">
+    <div class="card">
+      <h2>出典</h2>
+      <p id="srcInfo"></p>
+      <ul>
+        <li>京都大学医学部附属病院 脳神経内科「脳内検査検索サイト」（外注検査・研究機関への提出検査のまとめ）：<a id="srcLink" href="https://sites.google.com/kuhp.kyoto-u.ac.jp/gaichukensa/%E8%84%B3%E5%86%85%E6%A4%9C%E6%9F%BB%E3%83%9B%E3%83%BC%E3%83%A0" target="_blank" rel="noopener">サイトを開く</a></li>
+        <li>各項目の「原典ページ」から、該当する京大のページを開けます（要通信）。</li>
+        <li>本アプリの記載は原典の事実を項目別に整理したもので、原文の写しではありません。研究機関の文例メールは載せていません（「問い合わせ文」は本アプリ独自の雛形）。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>使い方</h2>
+      <ul>
+        <li>検索は、検査名・抗体名・遺伝子名・疾患名・依頼先（例：岐阜、九州、かずさ、SRL）で引けます。スペース区切りで絞り込み。</li>
+        <li>上段のボタンは症候からの入口、中段は分類、下段は費用区分（保険／保険外・自費／研究）。</li>
+        <li>項目を開くと、依頼先・検体・申込方法・注意点・リンク。☆でお気に入り。</li>
+        <li>「問い合わせ文」は研究機関に送る最初のメールの雛形をコピーします（下の署名を使います）。患者の個人情報は入れずに、送る前に書き足してください。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>問い合わせ文の署名</h2>
+      <p>この端末にだけ保存します。</p>
+      <label class="f" for="sigOrg">所属（病院・診療科）</label>
+      <input type="text" class="w" id="sigOrg" placeholder="例：〇〇病院 脳神経内科">
+      <label class="f" for="sigName">氏名</label>
+      <input type="text" class="w" id="sigName" placeholder="例：〇〇 〇〇">
+      <label class="f" for="sigCt">連絡先（任意）</label>
+      <input type="text" class="w" id="sigCt" placeholder="例：代表電話・メール">
+    </div>
+    <div class="card">
+      <h2>データ</h2>
+      <p id="setInfo"></p>
+      <div class="row">
+        <button type="button" class="btn" id="updBtn">新しいデータに更新</button>
+        <button type="button" class="btn" id="lockBtn">記憶を消してロック</button>
+      </div>
+      <div class="row"><button type="button" class="btn dg" id="wipeBtn">この端末のデータを全部消す</button></div>
+    </div>
+    <div class="card">
+      <h2>版</h2>
+      <p>アプリ：<span id="appVer"></span></p>
+      <div class="row"><button type="button" class="btn" id="swUpd">最新版に更新</button></div>
+    </div>
+  </section>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+const APPVER="2026-11-17a";
+const $=id=>document.getElementById(id);
+const LS_Q="lab-q",LS_FAV="lab-fav",LS_TAB="lab-tab",LS_F="lab-filter",LS_SIG="lab-sig";
+const SRCBASE="https://sites.google.com/kuhp.kyoto-u.ac.jp/gaichukensa/";
+const QUICK=[["自己免疫性脳炎","脳炎"],["末梢神経","ニューロパチー"],["重症筋無力症","重症筋無力症"],["筋疾患","ミオパチー"],["運動ニューロン","運動ニューロン"],["小脳失調","失調"],["認知症・CJD","認知症"],["パーキンソニズム","パーキンソニズム"],["不随意運動","不随意運動"],["白質病変","白質"],["欠乏症","欠乏"],["感染症","感染症"]];
+const CATS=["自己抗体","遺伝子","髄液","代謝・ビタミン","感染症","病理・組織","薬物濃度","その他血液"];
+const TYPES=[["ins","保険"],["self","保険外・自費"],["res","研究"]];
+let TAB="all",FILT={c:"",t:""},DATA=null,pending=null;
+try{TAB=localStorage.getItem(LS_TAB)||"all";if(!["all","fav","info"].includes(TAB))TAB="all";FILT=Object.assign(FILT,JSON.parse(localStorage.getItem(LS_F)||"{}"));}catch(_){}
+
+/* IndexedDB */
+function db(){return new Promise((res,rej)=>{const r=indexedDB.open("lab-db",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function kvGet(k){const d=await db();return new Promise((res,rej)=>{const r=d.transaction("kv").objectStore("kv").get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function kvSet(k,v){const d=await db();return new Promise((res,rej)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});}
+async function kvDel(k){const d=await db();return new Promise((res,rej)=>{const t=d.transaction("kv","readwrite");t.objectStore("kv").delete(k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);});}
+
+/* 暗号（AES-256-GCM／PBKDF2-SHA256） */
+const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function deriveKey(pass,salt,it){
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass.normalize("NFC")),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",hash:"SHA-256",salt,iterations:it},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+}
+async function decryptWith(key,enc){
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64d(enc.iv)},key,b64d(enc.ct));
+  const obj=JSON.parse(new TextDecoder().decode(pt));
+  if(!obj||!Array.isArray(obj.rows))throw new Error("format");
+  return obj;
+}
+function checkEnc(enc){if(!enc||enc.v!==1||enc.kdf!=="PBKDF2-SHA256"||!enc.salt||!enc.iv||!enc.ct||enc.app!=="lab")throw new Error("このファイルは検査データではありません");return enc;}
+async function unlock(enc,pass,remember){
+  const key=await deriveKey(pass,b64d(enc.salt),enc.it);
+  let obj;try{obj=await decryptWith(key,enc);}catch(e){throw new Error("パスフレーズが違います");}
+  if(remember)await kvSet("key",key);else await kvDel("key");
+  return obj;
+}
+
+/* 検索用の正規化 */
+function norm(s){return String(s||"").normalize("NFKC").toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/[\s\-‐－ー・()（）\/／,、。]/g,"");}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function hl(text,terms){let h=esc(text);terms.forEach(t=>{const raw=esc(t).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");if(!raw)return;try{h=h.replace(new RegExp("("+raw+")(?![^<]*>)","gi"),"<mark>$1</mark>");}catch(e){}});return h;}
+function linkify(s){return esc(s).replace(/([\w.+-]+@[\w-]+(\.[\w-]+)+)/g,'<a href="mailto:$1">$1</a>');}
+function tkind(t){t=t||"";if(/停止/.test(t))return "stop";if(/^研究/.test(t))return "res";if(/保険外|自費|なし|有料/.test(t))return "self";if(/保険/.test(t))return "ins";return "";}
+const TLAB={ins:"保険",self:"保険外・自費",res:"研究",stop:"受付停止"};
+
+function show(v){["vImport","vLock","vMain","vInfo"].forEach(x=>$(x).classList.toggle("hide",x!==v));const on=v==="vMain"||v==="vInfo";$("tabs").classList.toggle("hide",!on);$("sbox").classList.toggle("hide",v!=="vMain");}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2400);}
+function favs(){try{return JSON.parse(localStorage.getItem(LS_FAV)||"[]");}catch(e){return [];}}
+function saveF(){try{localStorage.setItem(LS_F,JSON.stringify(FILT));}catch(_){}}
+
+function prep(obj){
+  obj.rows.forEach(r=>{r._k=tkind(r.type);r._s=norm([r.n,r.kw,r.to,r.cat,r.sp,r.note,r.how,TLAB[r._k]].join(" "));r._n=norm(r.n+" "+r.kw);});
+  DATA=obj;
+  $("hdrMeta").textContent=obj.updated?obj.updated+"取得":"";
+  $("srcInfo").textContent=`${obj.rows.length}項目。原典の取得日：${obj.updated||"—"}。原典の最終更新記録：${obj.siteUpdate||"—"}。`;
+  buildChips();setTab(TAB);
+}
+function buildChips(){
+  $("qk").innerHTML=`<span class="lab">症候</span>`+QUICK.map(([l,q])=>`<button type="button" data-q="${esc(q)}">${esc(l)}</button>`).join("");
+  $("fc").innerHTML=`<span class="lab">分類</span>`+CATS.filter(c=>DATA.rows.some(r=>r.cat===c)).map(c=>`<button type="button" data-c="${esc(c)}"${FILT.c===c?' class="on"':""}>${esc(c)}</button>`).join("");
+  $("ft").innerHTML=`<span class="lab">費用</span>`+TYPES.map(([k,l])=>`<button type="button" data-t="${k}"${FILT.t===k?' class="on"':""}>${l}</button>`).join("");
+}
+function setTab(t){
+  TAB=t;try{localStorage.setItem(LS_TAB,t);}catch(_){}
+  document.querySelectorAll("#tabs button").forEach(b=>{const on=b.dataset.tab===t;b.classList.toggle("on",on);b.setAttribute("aria-selected",on);});
+  if(t==="info"){show("vInfo");infoView();}else{show("vMain");render();}
+  window.scrollTo(0,0);
+}
+function itemHTML(r,terms,fav,open){
+  const k=r._k;
+  const badges=`<div><span class="badge b-cat">${esc(r.cat)}</span>`+(k?`<span class="badge b-${k}">${TLAB[k]}</span>`:"")+`</div>`;
+  const links=(r.links||[]).map(([t,u])=>`<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("");
+  const id=esc(r.src);
+  return `<details class="it"${open?" open":""} data-id="${id}"><summary><div class="nm"><b>${hl(r.n,terms)}</b><span>${hl(r.to,terms)}${r.sp?"　｜　"+hl(r.sp,terms):""}</span>${badges}</div>
+  <button type="button" class="star${fav.has(r.src)?" on":""}" data-f="${id}" aria-label="お気に入り">${fav.has(r.src)?"★":"☆"}</button></summary>
+  <div class="dt"><dl>
+  <dt>依頼先</dt><dd>${esc(r.to)}</dd>
+  <dt>区分</dt><dd>${esc(r.type)}</dd>
+  ${r.sp?`<dt>検体</dt><dd>${esc(r.sp)}</dd>`:""}
+  ${r.how?`<dt>申込</dt><dd>${linkify(r.how)}</dd>`:""}
+  ${r.note?`<dt>注意</dt><dd>${linkify(r.note)}</dd>`:""}
+  </dl>${links?`<ul class="lk">${links}</ul>`:""}
+  <div class="acts"><a class="btn sm" href="${SRCBASE+encodeURI(r.src)}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center">原典ページ</a>${/^研究/.test(r.type)?`<button type="button" class="btn sm" data-mail="${id}">問い合わせ文をコピー</button>`:""}</div></div></details>`;
+}
+function render(){
+  if(!DATA)return;
+  const qv=$("q").value.trim();
+  const terms=qv.split(/[\s　]+/).filter(Boolean),nt=terms.map(norm).filter(Boolean);
+  const fav=new Set(favs());
+  $("favN").textContent=fav.size?" "+fav.size:"";
+  document.querySelectorAll("#qk button").forEach(b=>b.classList.toggle("on",norm(b.dataset.q)===norm(qv)));
+  let rows=TAB==="fav"?DATA.rows.filter(r=>fav.has(r.src)):DATA.rows;
+  if(FILT.c)rows=rows.filter(r=>r.cat===FILT.c);
+  if(FILT.t)rows=rows.filter(r=>r._k===FILT.t);
+  if(nt.length)rows=rows.filter(r=>nt.every(t=>r._s.includes(t)));
+  const sc=r=>(nt.length&&nt.every(t=>r._n.includes(t))?-2:0)+(fav.has(r.src)?-1:0);
+  rows=rows.slice().sort((a,b)=>sc(a)-sc(b)||a.n.localeCompare(b.n,"ja"));
+  $("cnt").textContent=rows.length+"件"+(FILT.c||FILT.t?"（絞り込み中）":"")+"　"+(DATA.updated||"")+"取得";
+  $("sort").innerHTML=(FILT.c||FILT.t||qv)?`<a href="#" id="clrF" style="color:var(--accent)">条件を外す</a>`:"";
+  if(!rows.length){$("res").innerHTML=`<div class="empty">${TAB==="fav"&&!fav.size?"まだありません。項目の右の ☆ を押すとここに集まります。":"見つかりません。別の言い方（例：抗体名の英字、疾患名、依頼先の大学名）でも探せます。"}</div>`;return;}
+  const open=rows.length===1;
+  $("res").innerHTML=rows.map(r=>itemHTML(r,terms,fav,open)).join("");
+}
+function mailText(r){
+  let s={};try{s=JSON.parse(localStorage.getItem(LS_SIG)||"{}");}catch(_){}
+  const org=s.org||"〇〇病院 脳神経内科",nm=s.name||"〇〇";
+  return `件名：${r.n.replace(/（.*?）/g,"")}の測定についてのお問い合わせ
+
+${r.to}
+ご担当者様
+
+${org}の${nm}と申します。
+貴施設で実施されている${r.n.replace(/（.*?）/g,"")}の測定のご案内を拝見し、ご連絡いたしました。
+当院で診療中の患者さん（〇歳代・〇性）で、〔臨床経過を簡潔に〕から〔疑う病態〕を疑っております。測定をお願いできますでしょうか。
+
+お手数ですが、以下をご教示ください。
+・必要な検体の種類・量と保存温度
+・送付方法（搬送業者、到着の曜日・時間の指定）
+・依頼書・同意書の入手方法と取得方法
+・費用の有無
+
+どうぞよろしくお願いいたします。
+
+${org}
+${nm}${s.ct?"\n"+s.ct:""}`;
+}
+$("res").addEventListener("click",async e=>{
+  const s=e.target.closest(".star");
+  if(s){e.preventDefault();e.stopPropagation();const id=s.dataset.f;let f=favs();const on=!f.includes(id);f=on?f.concat(id):f.filter(x=>x!==id);try{localStorage.setItem(LS_FAV,JSON.stringify(f));}catch(_){}
+    s.classList.toggle("on",on);s.textContent=on?"★":"☆";$("favN").textContent=f.length?" "+f.length:"";toast(on?"お気に入りに入れました":"お気に入りから外しました");if(TAB==="fav"&&!on)render();return;}
+  const m=e.target.closest("[data-mail]");
+  if(m){const r=DATA.rows.find(x=>x.src===m.dataset.mail);const t=mailText(r);try{await navigator.clipboard.writeText(t);toast("問い合わせ文をコピーしました");}catch(_){prompt("コピーしてください",t);}}
+});
+$("qk").addEventListener("click",e=>{const b=e.target.closest("button[data-q]");if(!b)return;$("q").value=norm(b.dataset.q)===norm($("q").value)?"":b.dataset.q;saveQ();render();});
+$("fc").addEventListener("click",e=>{const b=e.target.closest("button[data-c]");if(!b)return;FILT.c=FILT.c===b.dataset.c?"":b.dataset.c;saveF();buildChips();render();});
+$("ft").addEventListener("click",e=>{const b=e.target.closest("button[data-t]");if(!b)return;FILT.t=FILT.t===b.dataset.t?"":b.dataset.t;saveF();buildChips();render();});
+document.addEventListener("click",e=>{if(e.target.id==="clrF"){e.preventDefault();FILT={c:"",t:""};saveF();$("q").value="";saveQ();buildChips();render();}});
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(b)setTab(b.dataset.tab);});
+function saveQ(){try{localStorage.setItem(LS_Q,$("q").value);}catch(_){}}
+let qt;$("q").addEventListener("input",()=>{clearTimeout(qt);qt=setTimeout(()=>{saveQ();render();},80);});
+
+/* 出典・設定 */
+async function infoView(){
+  $("appVer").textContent=APPVER;
+  let s={};try{s=JSON.parse(localStorage.getItem(LS_SIG)||"{}");}catch(_){}
+  $("sigOrg").value=s.org||"";$("sigName").value=s.name||"";$("sigCt").value=s.ct||"";
+  const key=await kvGet("key").catch(()=>null);
+  $("setInfo").textContent=DATA?`${DATA.rows.length}項目（${DATA.updated||""}取得）。パスフレーズは${key?"この端末に記憶しています":"記憶していません"}。`:"";
+}
+["sigOrg","sigName","sigCt"].forEach(id=>$(id).addEventListener("input",()=>{try{localStorage.setItem(LS_SIG,JSON.stringify({org:$("sigOrg").value.trim(),name:$("sigName").value.trim(),ct:$("sigCt").value.trim()}));}catch(_){}}));
+$("updBtn").addEventListener("click",()=>startImport(true));
+$("lockBtn").addEventListener("click",async()=>{await kvDel("key");DATA=null;$("res").innerHTML="";$("hdrMeta").textContent="";toast("ロックしました");boot();});
+$("wipeBtn").addEventListener("click",async()=>{
+  if(!confirm("この端末の検査データ・記憶したパスフレーズ・お気に入り・署名を消します。よろしいですか？"))return;
+  await kvDel("blob");await kvDel("key");try{[LS_FAV,LS_Q,LS_TAB,LS_F,LS_SIG].forEach(k=>localStorage.removeItem(k));}catch(_){}
+  DATA=null;TAB="all";FILT={c:"",t:""};$("res").innerHTML="";$("q").value="";$("hdrMeta").textContent="";toast("消しました");boot();
+});
+$("swUpd").addEventListener("click",async()=>{try{const r=await navigator.serviceWorker?.getRegistration("../");if(r)await r.update();}catch(_){}location.reload();});
+
+/* 取り込み */
+function startImport(updating){
+  pending=null;$("impPass").classList.add("hide");$("impErr").textContent="";$("fileName").textContent="";$("pass1").value="";
+  $("impCancel").classList.toggle("hide",!updating);show("vImport");
+  $("dlRow").classList.add("hide");
+  fetch("data.enc",{cache:"no-cache"}).then(r=>{if(r.ok)$("dlRow").classList.remove("hide");}).catch(()=>{});
+}
+function gotEnc(enc,label){try{pending=checkEnc(enc);}catch(e){$("impErr").textContent=e.message;return;}$("fileName").textContent=label;$("impErr").textContent="";$("impPass").classList.remove("hide");$("pass1").focus();}
+$("dlBtn").addEventListener("click",async()=>{$("impErr").textContent="";try{const r=await fetch("data.enc",{cache:"no-cache"});if(!r.ok)throw 0;gotEnc(await r.json(),"ダウンロードしました");}catch(e){$("impErr").textContent="ダウンロードできませんでした。通信できる場所で試すか、ファイルを選んでください。";}});
+$("fileIn").addEventListener("change",async()=>{const f=$("fileIn").files[0];if(!f)return;try{gotEnc(JSON.parse(await f.text()),f.name);}catch(e){$("impErr").textContent="このファイルは読めません";}$("fileIn").value="";});
+$("impGo").addEventListener("click",async()=>{
+  if(!pending)return;const b=$("impGo");b.disabled=true;$("impErr").textContent="確認しています…";
+  try{const obj=await unlock(pending,$("pass1").value,$("rem1").checked);await kvSet("blob",pending);$("pass1").value="";pending=null;$("impErr").textContent="";toast("取り込みました（"+obj.rows.length+"項目）");TAB="all";prep(obj);}
+  catch(e){$("impErr").textContent=e.message;}finally{b.disabled=false;}
+});
+$("pass1").addEventListener("keydown",e=>{if(e.key==="Enter")$("impGo").click();});
+$("impCancel").addEventListener("click",()=>{DATA?setTab("info"):boot();});
+$("unlockGo").addEventListener("click",async()=>{
+  const b=$("unlockGo");b.disabled=true;$("lockErr").textContent="確認しています…";
+  try{const enc=await kvGet("blob");const obj=await unlock(enc,$("pass2").value,$("rem2").checked);$("pass2").value="";$("lockErr").textContent="";prep(obj);}
+  catch(e){$("lockErr").textContent=e.message;}finally{b.disabled=false;}
+});
+$("pass2").addEventListener("keydown",e=>{if(e.key==="Enter")$("unlockGo").click();});
+
+async function boot(){
+  if(!window.crypto||!crypto.subtle){show("vImport");$("impErr").textContent="この環境では暗号機能が使えません（https で開いてください）";return;}
+  try{$("q").value=localStorage.getItem(LS_Q)||"";}catch(_){}
+  let enc=null,key=null;try{enc=await kvGet("blob");key=await kvGet("key");}catch(e){}
+  if(!enc){startImport(false);return;}
+  if(key){try{prep(await decryptWith(key,enc));return;}catch(e){await kvDel("key").catch(()=>{});}}
+  $("lockErr").textContent="";show("vLock");
+}
+boot();
+</script>
+<script>
+(function(){try{
+  var h=location.hostname,secure=location.protocol==='https:'||h==='localhost'||h==='127.0.0.1';
+  var onClaude=/(^|\.)claude\.ai$/.test(h)||/claudeusercontent|claude\.site/.test(h)||!!window.claude;
+  if(!('serviceWorker' in navigator)||!secure||onClaude)return;
+  navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+    reg.addEventListener('updatefound',function(){var w=reg.installing;if(!w)return;w.addEventListener('statechange',function(){if(w.state==='installed'&&navigator.serviceWorker.controller)toast('新しい版を取り込みました。次に開いたときに反映されます');});});
+  }).catch(function(){});
+}catch(e){}})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["lab-q","lab-filter"];
+  try{document.querySelectorAll("header .bar").forEach(function(e){e.setAttribute("data-wc-pad","");if(false)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>

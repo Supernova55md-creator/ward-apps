@@ -389,6 +389,18 @@
       ]
     },
     {
+      "name": "外注・研究検査ナビ",
+      "short_name": "外注検査",
+      "url": "lab/",
+      "icons": [
+        {
+          "src": "lab/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "脳神経クリニック紹介先検索",
       "short_name": "神経紹介先",
       "url": "referral/",
