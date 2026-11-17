@@ -146,6 +146,10 @@ nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
 #dlg .rw{display:flex;gap:8px;justify-content:flex-end}
 @keyframes flash{0%{background:var(--accent-soft)}100%{background:transparent}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.tplseg button{flex:1}
+.nihT{display:inline-block;margin-left:6px;padding:0 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-strong)}
+#nihCard select{width:100%;max-width:100%}
+#nihCard td:first-child{width:46%}
 </style>
 </head>
 <body>
@@ -162,6 +166,11 @@ nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
 <!-- ============ 診察 ============ -->
 <section class="view active" id="v-exam" aria-label="診察チェックリスト">
   <p class="hint" style="margin:0 0 10px">診察の順に並べています。各項目で「正常」「異常」「未施行」を選び、異常なら該当所見と左右を押します（もう一度押すと解除）。セクションの「未入力を正常に」で、残りをまとめて正常にできます。</p>
+  <div class="card tplc"><h2>テンプレート</h2>
+    <div class="seg tplseg" id="tplSeg" role="group" aria-label="テンプレート"><button type="button" data-tp="base">基本</button><button type="button" data-tp="st">脳卒中</button><button type="button" data-tp="pn">末梢神経・筋</button></div>
+    <p class="hint" id="tplHint" style="margin:6px 0 0"></p>
+  </div>
+  <div id="nihCard"></div>
   <div id="secs"></div>
 </section>
 
@@ -193,7 +202,7 @@ nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
     <div class="row-btn" style="margin-top:10px">
       <button class="btn primary" type="button" id="btnSend">局在ナビで病巣候補を見る →</button>
     </div>
-    <p class="hint">局在ナビの「所見入力」を、この診察の所見で置き換えます（局在ナビに保存したケースと優位半球の設定は残ります）。麻痺はMMT・Barré・Mingazzini・顔面麻痺から、感覚は感覚の表から、腱反射亢進・低下は腱反射の表から自動で組み立てます。送ったあとは局在ナビ側で追加・修正できます。</p>
+    <p class="hint">局在ナビの「所見入力」を、この診察の所見で置き換えます（局在ナビに保存したケースと優位半球の設定は残ります）。麻痺はMMT・Barré・Mingazzini・顔面麻痺から、感覚は感覚の表から、腱反射亢進・低下は腱反射の表から自動で組み立てます。送ったあとは局在ナビ側で追加・修正できます。局在ナビの「鑑別」タブで経過と背景を選ぶと、鑑別・検査計画を含むアセスメント文（カルテ用）を作れます。</p>
   </div>
 </section>
 
@@ -204,7 +213,8 @@ nav.tabs button[aria-selected="true"] b{border-bottom:3px solid var(--accent)}
     <ol style="font-size:14px;padding-left:20px;margin:0">
       <li>「診察」タブで上から順に診察し、項目ごとに正常／異常／未施行を入れる。右上の「次の未評価 ↓」で抜けている項目へ飛べます。</li>
       <li>「カルテ」タブで定型文と1行要約をコピーして電子カルテへ貼る。</li>
-      <li>局在を考えたいときは「局在」タブから神経病巣局在ナビへ送る。</li>
+      <li>局在を考えたいときは「局在」タブから神経病巣局在ナビへ送る。局在ナビの「鑑別」タブで経過・背景を選ぶと、鑑別とアセスメント文が出ます。</li>
+      <li>上の「テンプレート」で、脳卒中（NIHSSを付ける）・末梢神経・筋（MMTの筋を増やし支配神経を表示）に切り替えられます。</li>
       <li>次の患者さんの前に、右上の「入力クリア」で消す。</li>
     </ol>
     <p class="hint">入力はこの端末のブラウザ内にだけ自動保存されます。氏名・ID・生年月日などは入力しないでください。診察所見の判断を置き換えるものではなく、記載の補助ツールです。</p>
@@ -329,12 +339,17 @@ var IT=[
 ];
 var IM={};IT.forEach(function(it){IM[it.id]=it;});
 
-var MUS=[ /* id, 筋, 髄節, 肢(a/l), 遠位 */
- ["del","三角筋","C5","a",0],["bic","上腕二頭筋","C5-6","a",0],["tri","上腕三頭筋","C7","a",0],["wex","手関節背屈","C6-7","a",1],
- ["ffx","手指屈曲（握力）","C8","a",1],["ios","骨間筋（指の開排）","C8-T1","a",1],["apb","短母指外転筋","C8-T1","a",1],
- ["ilp","腸腰筋","L2-3","l",0],["qua","大腿四頭筋","L3-4","l",0],["ham","大腿屈筋群","L5-S1","l",0],
- ["ta","前脛骨筋","L4-5","l",1],["ehl","長母趾伸筋","L5","l",1],["gas","下腿三頭筋","S1","l",1]
+var MUS=[ /* id, 筋, 髄節, 肢(a/l), 遠位, 詳細（末梢神経・筋テンプレートで表示）, 支配神経 */
+ ["ssp","棘上筋","C5-6","a",0,1,"肩甲上神経"],["del","三角筋","C5","a",0,0,"腋窩神経"],["bic","上腕二頭筋","C5-6","a",0,0,"筋皮神経"],["brd","腕橈骨筋","C5-6","a",0,1,"橈骨神経"],
+ ["tri","上腕三頭筋","C7","a",0,0,"橈骨神経"],["prt","円回内筋","C6-7","a",0,1,"正中神経"],["wex","手関節背屈","C6-7","a",1,0,"橈骨神経"],["fcr","橈側手根屈筋","C6-7","a",1,1,"正中神経"],
+ ["edc","総指伸筋","C7-8","a",1,1,"後骨間神経"],["ffx","手指屈曲（握力）","C8","a",1,0,"正中・尺骨神経"],["fpl","長母指屈筋","C7-8","a",1,1,"前骨間神経"],
+ ["ios","骨間筋（指の開排）","C8-T1","a",1,0,"尺骨神経"],["adm","小指外転筋","C8-T1","a",1,1,"尺骨神経"],["apb","短母指外転筋","C8-T1","a",1,0,"正中神経"],
+ ["ilp","腸腰筋","L2-3","l",0,0,"大腿神経・腰神経叢"],["add","股関節内転筋","L2-4","l",0,1,"閉鎖神経"],["gmd","中殿筋（股外転）","L5","l",0,1,"上殿神経"],["gmx","大殿筋（股伸展）","S1","l",0,1,"下殿神経"],
+ ["qua","大腿四頭筋","L3-4","l",0,0,"大腿神経"],["ham","大腿屈筋群","L5-S1","l",0,0,"坐骨神経"],
+ ["ta","前脛骨筋","L4-5","l",1,0,"深腓骨神経"],["ehl","長母趾伸筋","L5","l",1,0,"深腓骨神経"],["tp","後脛骨筋（足の内がえし）","L5","l",1,1,"脛骨神経"],["per","腓骨筋（足の外がえし）","L5-S1","l",1,1,"浅腓骨神経"],["gas","下腿三頭筋","S1","l",1,0,"脛骨神経"]
 ];
+/* 表示する筋：詳細の筋は「末梢神経・筋」テンプレートか、すでに値が入っているときだけ */
+function MUSV(){return MUS.filter(function(m){var x=st.mm[m[0]];return !m[5]||opt.tp==="pn"||(x&&(x.R||x.L));});}
 var MV=["","5","4+","4","4-","3","2","1","0"];
 function mnum(v){return {"5":5,"4+":4.3,"4":4,"4-":3.7,"3":3,"2":2,"1":1,"0":0}[v];}
 var DTR=[["btr","BTR","上腕二頭筋"],["ttr","TTR","上腕三頭筋"],["br","BR","腕橈骨筋"],["ptr","PTR","膝蓋腱"],["atr","ATR","アキレス腱"]];
@@ -348,10 +363,10 @@ var SIDE={R:"右",L:"左",B:"両側"};
 
 /* ---------------- 状態 ---------------- */
 function sn0(){return {R:{r:{},m:{},d:"低下"},L:{r:{},m:{},d:"低下"}};}
-var st={v:{},cv:{},pu:{},mm:{},dt:{},sn:sn0(),sc:{},open:{con:1}};
-var opt={ab:false,un:true};
-function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.v=j.v||{};st.cv=j.cv||{};st.pu=j.pu||{};st.mm=j.mm||{};st.dt=j.dt||{};st.sn=j.sn||sn0();st.sc=j.sc||{};if(j.open)st.open=j.open;}}catch(e){}
-  try{var k=JSON.parse(localStorage.getItem(OKEY)||"null");if(k){opt.ab=!!k.ab;opt.un=k.un!==false;}}catch(e){}}
+var st={v:{},cv:{},pu:{},mm:{},dt:{},sn:sn0(),sc:{},nih:{},open:{con:1}};
+var opt={ab:false,un:true,tp:"base"};
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.v=j.v||{};st.cv=j.cv||{};st.pu=j.pu||{};st.mm=j.mm||{};st.dt=j.dt||{};st.sn=j.sn||sn0();st.sc=j.sc||{};st.nih=j.nih||{};if(j.open)st.open=j.open;}}catch(e){}
+  try{var k=JSON.parse(localStorage.getItem(OKEY)||"null");if(k){opt.ab=!!k.ab;opt.un=k.un!==false;opt.tp=k.tp||"base";}}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
 function saveOpt(){try{localStorage.setItem(OKEY,JSON.stringify(opt));}catch(e){}}
 function V(id){return st.v[id]||(st.v[id]={s:"",o:{},m:""});}
@@ -405,9 +420,9 @@ function widgetHTML(it){
   if(it.ty==="mmt"){
     h+='<table class="tbl"><tr><th>筋（髄節）</th><th class="c">右</th><th class="c">左</th></tr>';
     var lim="";
-    MUS.forEach(function(m){var x=st.mm[m[0]]||{};
+    MUSV().forEach(function(m){var x=st.mm[m[0]]||{};
       if(m[3]!==lim){lim=m[3];h+='<tr><th colspan="3">'+(lim==="a"?"上肢":"下肢")+'</th></tr>';}
-      h+='<tr><td>'+esc(m[1])+'<small>'+m[2]+'</small></td>'+["R","L"].map(function(S){return '<td class="c">'+selHTML(MV,x[S]||"",'data-w="mm" data-k="'+m[0]+'" data-sd="'+S+'" aria-label="'+(S==="R"?"右":"左")+m[1]+'"',x[S]&&x[S]!=="5"?"ab":"")+'</td>';}).join("")+'</tr>';});
+      h+='<tr><td>'+esc(m[1])+'<small>'+m[2]+(opt.tp==="pn"&&m[6]?"・"+esc(m[6]):"")+'</small></td>'+["R","L"].map(function(S){return '<td class="c">'+selHTML(MV,x[S]||"",'data-w="mm" data-k="'+m[0]+'" data-sd="'+S+'" aria-label="'+(S==="R"?"右":"左")+m[1]+'"',x[S]&&x[S]!=="5"?"ab":"")+'</td>';}).join("")+'</tr>';});
     h+='</table><div class="row-btn" style="margin-top:6px"><button type="button" class="btn sm" data-fill5="1">未入力を5にする</button></div><p class="legend">MRC 0〜5。筋の神経支配は <a href="../mmt/">MMTナビ</a> へ。</p>';}
   if(it.ty==="dtr"){
     h+='<table class="tbl"><tr><th>反射</th><th class="c">右</th><th class="c">左</th></tr>';
@@ -477,7 +492,7 @@ function fillNormal(it){
   if(it.opt) return;
   if(it.ty==="consc"){var c=st.cv;if(!c.jcs)c.jcs="0";if(!c.e)c.e="4";if(!c.v)c.v="5";if(!c.m)c.m="6";}
   else if(it.ty==="pupil"){var p=st.pu;if(!p.r)p.r="3.0";if(!p.l)p.l="3.0";if(!p.lr)p.lr="迅速";if(!p.ll)p.ll="迅速";}
-  else if(it.ty==="mmt"){MUS.forEach(function(m){var x=st.mm[m[0]]||(st.mm[m[0]]={});if(!x.R)x.R="5";if(!x.L)x.L="5";});}
+  else if(it.ty==="mmt"){MUSV().forEach(function(m){var x=st.mm[m[0]]||(st.mm[m[0]]={});if(!x.R)x.R="5";if(!x.L)x.L="5";});}
   else if(it.ty==="dtr"){DTR.forEach(function(d){var x=st.dt[d[0]]||(st.dt[d[0]]={});if(!x.R)x.R="+";if(!x.L)x.L="+";});}
   else if(it.ty==="sens"){if(!snAny())v.s="n";}
   else {v.s="n";v.o={};}
@@ -523,7 +538,7 @@ function itemText(it){ /* {t:本文, ab:異常か, sum:[要約]} */
   if(it.ty==="mmt"){var rows=[],all5=true,filled=0,other5=false;
     MUS.forEach(function(mu){var x=st.mm[mu[0]]||{};if(!x.R&&!x.L)return;filled++;
       if((x.R&&x.R!=="5")||(x.L&&x.L!=="5")){all5=false;rows.push(mu[1]+" "+(x.R||"未")+"/"+(x.L||"未"));}else other5=true;});
-    var t2=all5?(filled===MUS.length?"MMT 上下肢 5/5（左右差なし）":"MMT 評価した筋は5/5"):"MMT（右/左）："+rows.join("、")+(other5?"（他は5/5）":"");
+    var t2=all5?(filled===MUSV().length?"MMT 上下肢 5/5（左右差なし）":"MMT 評価した筋は5/5"):"MMT（右/左）："+rows.join("、")+(other5?"（他は5/5）":"");
     return {t:withMemo([t2],m),ab:s==="a",sum:s==="a"?mmtLimbSum():[]};}
   if(it.ty==="dtr"){var r=[];DTR.forEach(function(d){var x=st.dt[d[0]]||{};if(x.R||x.L)r.push(d[1]+" "+(x.R||"未")+"/"+(x.L||"未"));});
     var ds=dtrSides(),sm2=[];if(ds.hy)sm2.push((ds.hy==="B"?"両側":SIDE[ds.hy])+"腱反射亢進");if(ds.ho)sm2.push((ds.ho==="B"?"両側":SIDE[ds.ho])+"腱反射低下");
@@ -553,6 +568,7 @@ function buildChart(){
     if(parts.length) lines.push("【"+g[1]+"】"+parts.join("。")+"。");
   });
   if(opt.ab&&anyN) lines.push("上記以外の評価項目に異常なし。");
+  var nt=nihTxt(); if(nt){ lines.unshift(nt.line); sum.unshift(nt.sum); anyDone=true; }
   if(opt.un&&un.length) lines.push("（未評価："+un.join("、")+"）");
   /* 電子カルテ（Shift_JIS）で化けないよう、アクセント付き文字は外す */
   function sj(t){return t.replace(/[éè]/g,"e").replace(/[áà]/g,"a").replace(/ö/g,"o").replace(/ü/g,"u");}
@@ -640,7 +656,7 @@ $("secs").addEventListener("click",function(e){
     if(v.o[k]===val)delete v.o[k]; else v.o[k]=val;
     if(!it.ty&&!it.opt)v.s="a"; else if(it.ty&&v.s==="x")v.s="";
     save();refreshItem(id);return;}
-  if(b.hasAttribute("data-fill5")){MUS.forEach(function(m){var x=st.mm[m[0]]||(st.mm[m[0]]={});if(!x.R)x.R="5";if(!x.L)x.L="5";});v.s="";save();refreshItem(id);return;}
+  if(b.hasAttribute("data-fill5")){MUSV().forEach(function(m){var x=st.mm[m[0]]||(st.mm[m[0]]={});if(!x.R)x.R="5";if(!x.L)x.L="5";});v.s="";save();refreshItem(id);return;}
   if(b.hasAttribute("data-fillp")){DTR.forEach(function(d){var x=st.dt[d[0]]||(st.dt[d[0]]={});if(!x.R)x.R="+";if(!x.L)x.L="+";});v.s="";save();refreshItem(id);return;}
   if(b.hasAttribute("data-sn")){var S=b.getAttribute("data-sn"),x=st.sn[S];
     if(b.hasAttribute("data-sr")){var r=b.getAttribute("data-sr");x.r[r]=x.r[r]?0:1;}
@@ -680,8 +696,51 @@ $("dlgNo").addEventListener("click",function(){$("dlg").classList.remove("on");}
 $("dlgYes").addEventListener("click",function(){$("dlg").classList.remove("on");sendLoc();});
 $("dlg").addEventListener("click",function(e){if(e.target===$("dlg"))$("dlg").classList.remove("on");});
 
+/* ---------------- テンプレート（基本／脳卒中／末梢神経・筋） ---------------- */
+var TPH={base:"全身の神経診察。異常のある項目だけ押し、系統ごとに「未入力を正常に」で残りを埋めます。",
+ st:"脳卒中：上にNIHSSを付けます（合計点はカルテ文の先頭に入ります）。診察項目は基本と同じです。",
+ pn:"末梢神経・筋：MMTの筋を増やし、支配神経と髄節を表示します。根・神経叢・末梢神経の区別は局在ナビで。"};
+var NIH=[ /* id, 項目, 選択肢（点:説明） */
+ ["1a","1a 意識水準",["0 覚醒","1 簡単な刺激で覚醒","2 強い・反復刺激で覚醒","3 無反応"]],
+ ["1b","1b 質問（月・年齢）",["0 両方正答","1 片方正答","2 両方誤答"]],
+ ["1c","1c 命令（開閉眼・手の握り）",["0 両方可","1 片方可","2 両方不可"]],
+ ["2","2 最良の注視",["0 正常","1 部分的注視麻痺","2 完全注視麻痺・共同偏視"]],
+ ["3","3 視野",["0 欠損なし","1 部分的半盲","2 完全半盲","3 両側性半盲"]],
+ ["4","4 顔面麻痺",["0 正常","1 軽度","2 部分的","3 完全"]],
+ ["5a","5a 左上肢",["0 10秒保持","1 10秒以内に下垂","2 重力に抗する動きあり","3 重力に抗せない","4 動きなし","UN 切断・関節癒合"]],
+ ["5b","5b 右上肢",["0 10秒保持","1 10秒以内に下垂","2 重力に抗する動きあり","3 重力に抗せない","4 動きなし","UN 切断・関節癒合"]],
+ ["6a","6a 左下肢",["0 5秒保持","1 5秒以内に下垂","2 重力に抗する動きあり","3 重力に抗せない","4 動きなし","UN 切断・関節癒合"]],
+ ["6b","6b 右下肢",["0 5秒保持","1 5秒以内に下垂","2 重力に抗する動きあり","3 重力に抗せない","4 動きなし","UN 切断・関節癒合"]],
+ ["7","7 運動失調",["0 なし","1 1肢","2 2肢","UN 切断・関節癒合"]],
+ ["8","8 感覚",["0 正常","1 軽度〜中等度の低下","2 重度〜完全脱失"]],
+ ["9","9 最良の言語",["0 正常","1 軽度〜中等度の失語","2 重度の失語","3 無言・全失語"]],
+ ["10","10 構音障害",["0 正常","1 軽度〜中等度","2 重度","UN 挿管など"]],
+ ["11","11 消去現象・無視",["0 なし","1 1つの感覚様式","2 2つ以上の様式・重度"]]];
+function nihTot(){var t=0,n=0;NIH.forEach(function(q){var v=st.nih[q[0]];if(v==null||v==="")return;n++;if(v!=="UN")t+=+v;});return {t:t,n:n};}
+function nihTxt(){
+  if(opt.tp!=="st")return null;var r=nihTot();if(!r.n)return null;
+  var parts=NIH.filter(function(q){var v=st.nih[q[0]];return v!=null&&v!==""&&v!=="0";}).map(function(q){return q[0]+":"+st.nih[q[0]];});
+  var miss=NIH.length-r.n;
+  return {line:"【NIHSS】"+r.t+"点"+(parts.length?"（"+parts.join(", ")+"）":"（全項目0点）")+(miss?"　※未評価"+miss+"項目":""),sum:"NIHSS "+r.t+"点"+(miss?"（未評価あり）":"")};
+}
+function renderTpl(){
+  document.querySelectorAll("#tplSeg button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-tp")===opt.tp?"true":"false");});
+  $("tplHint").textContent=TPH[opt.tp]||"";
+  if(opt.tp!=="st"){$("nihCard").innerHTML="";return;}
+  var r=nihTot();
+  var h='<div class="card"><h2>NIHSS <span class="nihT" id="nihT">'+(r.n?r.t+"点":"—")+'</span><small style="font-weight:400;color:var(--muted);margin-left:6px">'+r.n+'/'+NIH.length+'項目</small></h2><table class="tbl">';
+  NIH.forEach(function(q){var v=st.nih[q[0]];v=(v==null)?"":v;
+    h+='<tr><td>'+esc(q[1])+'</td><td><select data-nih="'+q[0]+'" aria-label="'+esc(q[1])+'"'+(v&&v!=="0"?' class="ab"':'')+'><option value="">未</option>'+q[2].map(function(o){var k=o.split(" ")[0];return '<option value="'+k+'"'+(k===v?" selected":"")+'>'+esc(o)+'</option>';}).join("")+'</select></td></tr>';});
+  h+='</table><div class="row-btn" style="margin-top:6px"><button type="button" class="btn sm" id="nih0">未入力を0にする</button> <a class="btn sm" href="../nih/">NIHSS評価（詳しい手順）</a></div>';
+  h+='<p class="legend">上肢・下肢は「a 左・b 右」。UN は合計に入れません。出典：Brott T, et al. Stroke. 1989;20:864-870（<a href="https://pubmed.ncbi.nlm.nih.gov/2749846/" target="_blank" rel="noopener">PubMed 2749846</a>）。</p></div>';
+  $("nihCard").innerHTML=h;
+}
+$("tplSeg").addEventListener("click",function(e){var b=e.target.closest("button[data-tp]");if(!b)return;opt.tp=b.getAttribute("data-tp");saveOpt();renderTpl();buildSecs();refreshCounts();buildChart();});
+$("nihCard").addEventListener("change",function(e){var el=e.target;var k=el.getAttribute("data-nih");if(!k)return;st.nih[k]=el.value;save();renderTpl();buildChart();});
+$("nihCard").addEventListener("click",function(e){if(!e.target.closest("#nih0"))return;NIH.forEach(function(q){if(st.nih[q[0]]==null||st.nih[q[0]]==="")st.nih[q[0]]="0";});save();renderTpl();buildChart();toast("未入力のNIHSS項目を0にしました");});
+
 /* ---------------- 初期化 ---------------- */
-load();
+load();renderTpl();
 $("optAb").checked=opt.ab;$("optUn").checked=opt.un;
 buildSecs();refreshCounts();
 if(location.hash==="#chart")show("v-chart");

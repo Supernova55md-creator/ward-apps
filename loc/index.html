@@ -120,7 +120,7 @@ details.dict summary small{font-weight:400;color:var(--muted);font-size:12px;mar
 .case{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;border-top:1px solid var(--line);padding:6px 0;font-size:14px}
 .case small{color:var(--muted);display:block;font-size:11px}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
 nav.tabs button{font:inherit;font-size:12px;border:0;background:none;color:var(--muted);padding:9px 0 11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
 nav.tabs button b{font-size:16px;font-family:var(--font-display)}
 nav.tabs button[aria-selected="true"]{color:var(--accent-strong)}
@@ -157,6 +157,9 @@ table.sg .mb{min-height:44px;font-size:14px}
 @keyframes flash{0%{background:var(--accent)}100%{background:transparent}}
 .flash{animation:flash 1.4s ease-out}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+.ddg{display:flex;flex-wrap:wrap;gap:6px}
+.ddb{font:inherit;font-size:14px;padding:8px 12px;min-height:40px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.ddb[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#1B1200;font-weight:700}
 </style>
 </head>
 <body>
@@ -180,7 +183,7 @@ table.sg .mb{min-height:44px;font-size:14px}
         <option value="">例を読み込む…</option>
       </select>
     </div>
-    <p class="hint" style="margin-top:8px"><a href="../exam/">神経診察チェック</a>で診察しながら入力し、カルテ文を作ってからここへ送ることもできます。</p>
+    <p class="hint" style="margin-top:8px"><a href="../exam/">神経診察チェック</a>で診察しながら入力し、カルテ文を作ってからここへ送ることもできます。候補が出たら「鑑別」タブで経過を選ぶと、鑑別とアセスメント文が出ます。</p>
     <p class="hint">神経診察の順（高次脳→脳神経→運動→反射→感覚→協調）に並べています。左右のある所見は「<b>症状が出ている側</b>」で入力（眼の偏位は眼が向いている側、注視麻痺は向けない側、舌は偏る側、半盲・無視は欠損側）。もう一度押すと解除。</p>
   </div>
   <div class="card" id="liveCard"><h2>いまの候補</h2><div id="live"></div></div>
@@ -196,6 +199,18 @@ table.sg .mb{min-height:44px;font-size:14px}
 <!-- ============ 候補 ============ -->
 <section class="view" id="v-result" aria-label="病巣候補">
   <div id="resWrap"></div>
+</section>
+
+<!-- ============ 鑑別・アセスメント ============ -->
+<section class="view" id="v-ddx" aria-label="鑑別とアセスメント">
+  <div class="card"><h2>1. 経過</h2><div class="ddg" id="ddCourse"></div></div>
+  <div class="card"><h2>2. 背景（あるものだけ）</h2><div class="ddg" id="ddBg"></div></div>
+  <div id="ddOut"></div>
+  <div class="card"><h2>アセスメント（カルテ用）</h2>
+    <textarea id="ddTxt" spellcheck="false" aria-label="アセスメント文" style="width:100%;min-height:220px;font:inherit;font-size:14px;line-height:1.6;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)"></textarea>
+    <div class="row-btn" style="margin-top:8px"><button class="btn primary" type="button" id="ddCopy">コピー</button><span class="hint" id="ddMsg" style="margin-left:8px"></span></div>
+    <p class="hint">所見の要約・局在・経過・鑑別・検査計画を並べた下書きです。手で直してから貼ってください（直した内容は保存されません）。鑑別は一般的な疾患群の目安で、網羅的ではありません。</p>
+  </div>
 </section>
 
 <!-- ============ 症候群辞典 ============ -->
@@ -252,6 +267,7 @@ table.sg .mb{min-height:44px;font-size:14px}
 <nav class="tabs" aria-label="画面切り替え"><div class="in" role="tablist">
   <button role="tab" data-v="v-input" aria-selected="true"><b>所見</b>入力<span></span></button>
   <button role="tab" data-v="v-result" aria-selected="false"><b>候補</b>病巣</button>
+  <button role="tab" data-v="v-ddx" aria-selected="false"><b>鑑別</b>A文</button>
   <button role="tab" data-v="v-dict" aria-selected="false"><b>辞典</b>症候群</button>
   <button role="tab" data-v="v-src" aria-selected="false"><b>保存</b>・出典</button>
 </div></nav>
@@ -645,9 +661,9 @@ var EX=[
 var KEY="lesionNavi.v1";
 function m0(){return {R:{f:0,a:0,l:0},L:{f:0,a:0,l:0},emph:"eq"};}
 function s0(){return {R:{a:0,t:0,l:0,mod:"all"},L:{a:0,t:0,l:0,mod:"all"}};}
-var st={f:{},m:m0(),sg:s0(),neg:{},dom:"L",cases:[],open:{cn:1,mot:1}};
+var st={f:{},m:m0(),sg:s0(),neg:{},dom:"L",cases:[],ddx:{c:"",bg:{}},open:{cn:1,mot:1}};
 var E={};
-function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.f=j.f||{};st.m=j.m||m0();st.sg=j.sg||s0();st.neg=j.neg||{};st.dom=j.dom||"L";st.cases=j.cases||[];if(j.open)st.open=j.open;
+function load(){try{var j=JSON.parse(localStorage.getItem(KEY)||"null");if(j){st.f=j.f||{};st.m=j.m||m0();st.sg=j.sg||s0();st.neg=j.neg||{};st.dom=j.dom||"L";st.cases=j.cases||[];st.ddx=j.ddx||{c:"",bg:{}};if(j.open)st.open=j.open;
   // 旧版で直接入力された運動パターンは格子へ移す
   ["hemi_fa","hemi_leg","hemi_eq","hemi_nf","mono_arm","mono_leg","para","tetra"].forEach(function(k){if(st.f[k])delete st.f[k];});
   ["s_hemi","s_spth","s_dors"].forEach(function(k){if(st.f[k]){applySens(k,st.f[k]);delete st.f[k];}});}}catch(e){}}
@@ -870,6 +886,7 @@ function compute(){
   }
   renderRes(res);
   renderLive(res);
+  LASTRES=res; renderDdx();
 }
 /* 次に確認したい所見（上位候補の不足中核所見） */
 function nextChecks(res){
@@ -998,9 +1015,190 @@ function show(v){
   window.scrollTo(0,0);
 }
 
+
+/* ---------------- 鑑別・アセスメント ---------------- */
+var LASTRES=[];
+var COURSE=[["sud","突然（秒〜分）"],["acu","急性（時間〜数日）"],["sub","亜急性（数日〜数週）"],["chr","慢性進行（月〜年）"],["rr","再発寛解・多相性"],["tra","一過性・発作性（元に戻る）"]];
+var BG=[["inf","発熱・炎症所見"],["ca","担癌"],["imm","免疫抑制"],["vas","血管リスク・心房細動"],["young","50歳未満"],["drug","薬剤・アルコール・中毒"],["auto","自己免疫疾患・ICI使用"],["trauma","外傷・術後"]];
+/* 名前|背景タグ（一致すると★） */
+var BRAIN={
+ sud:["脳梗塞（心原性塞栓・アテローム血栓性・BAD）|vas","脳出血|vas","頸動脈・椎骨動脈解離による脳梗塞|young,trauma","くも膜下出血","てんかん発作後のTodd麻痺（脳卒中類似）"],
+ acu:["脳梗塞（ラクナ・進行性）|vas","脳出血|vas","脳静脈洞血栓症|young","単純ヘルペス脳炎などの脳炎|inf","脳膿瘍|inf,imm","PRES|drug","低血糖・電解質異常（脳卒中類似）|drug","硬膜下血腫|trauma"],
+ sub:["自己免疫性脳炎|auto,young,ca","脳腫瘍（膠芽腫・転移・リンパ腫）|ca,imm","慢性硬膜下血腫|trauma","PML|imm","脳膿瘍・結核腫・真菌|inf,imm","神経サルコイドーシス・肉芽腫性疾患|auto"],
+ chr:["脳腫瘍（低悪性度グリオーマ・髄膜腫）","神経変性疾患（大脳皮質基底核症候群・前頭側頭葉変性症・非定型アルツハイマー型）","慢性硬膜下血腫|trauma","血管性（多発ラクナ・白質病変）|vas"],
+ rr:["多発性硬化症|young","NMOSD・MOGAD|young,auto","中枢神経血管炎|auto","もやもや病・反復する塞栓|young,vas","CADASIL などの遺伝性小血管病|young"],
+ tra:["TIA|vas","てんかん発作","片頭痛の前兆|young","低血糖|drug","脳アミロイドアンギオパチーによる一過性局所神経症状"]};
+var DDX={
+ cortex:BRAIN, subc:BRAIN,
+ diff:{sud:["脳底動脈閉塞|vas","くも膜下出血","多発塞栓（感染性心内膜炎・Trousseau）|inf,ca"],
+  acu:["代謝性脳症（電解質・肝・腎・血糖）|drug","Wernicke脳症|drug","敗血症性脳症|inf","髄膜脳炎|inf,imm","PRES|drug","薬剤性・中毒|drug","非けいれん性てんかん重積"],
+  sub:["自己免疫性脳炎|auto,ca,young","Creutzfeldt-Jakob病","癌性髄膜炎|ca","血管内リンパ腫|ca","Wernicke脳症|drug"],
+  chr:["神経変性疾患（アルツハイマー型・レビー小体型・前頭側頭型・PSP・MSA）","特発性正常圧水頭症","血管性認知障害・白質病変|vas","甲状腺機能低下・ビタミンB12欠乏など治療可能な病態"],
+  rr:["多発性硬化症|young","中枢神経血管炎|auto","反復する代謝性脳症（肝性脳症など）|drug"],
+  tra:["てんかん（焦点意識減損発作・非けいれん性重積）","一過性全健忘","失神","低血糖|drug"]},
+ vis:{sud:["後大脳動脈領域の脳梗塞|vas","網膜中心動脈閉塞（単眼）|vas","下垂体卒中"],
+  acu:["視神経炎（MS・NMOSD・MOGAD）|young,auto","虚血性視神経症（巨細胞性動脈炎を含む）|vas","PRES|drug"],
+  sub:["視神経炎|auto","下垂体腺腫などの圧迫|ca","浸潤・腫瘍|ca"],
+  chr:["下垂体腫瘍・頭蓋咽頭腫・髄膜腫","遺伝性視神経症（Leber）|young","中毒性・栄養性視神経症|drug"],
+  rr:["MS・NMOSD・MOGADの視神経炎|young,auto"],
+  tra:["一過性黒内障（内頸動脈狭窄）|vas","片頭痛の閃輝暗点|young","後頭葉てんかん"]},
+ bs:{sud:["脳幹梗塞（椎骨脳底動脈系）|vas","椎骨動脈解離|young,trauma","脳幹出血|vas"],
+  acu:["脳幹梗塞|vas","椎骨動脈解離|young,trauma","脳幹脳炎（リステリア・HSV・Bickerstaff）|inf,imm","浸透圧性脱髄症候群|drug","Wernicke脳症|drug"],
+  sub:["自己免疫性・傍腫瘍性脳幹脳炎|ca,auto","腫瘍（グリオーマ・リンパ腫・転移）|ca","海綿状血管腫からの出血"],
+  chr:["腫瘍","神経変性疾患（PSP・MSA）","Chiari奇形など頭蓋頸椎移行部病変|young"],
+  rr:["多発性硬化症|young","NMOSD（最後野症候群など）|auto","神経Behçet病|young,auto","海綿状血管腫の反復出血"],
+  tra:["椎骨脳底動脈系のTIA|vas","脳幹前兆を伴う片頭痛|young"]},
+ cb:{sud:["小脳梗塞・小脳出血|vas","椎骨動脈解離|young,trauma"],
+  acu:["小脳梗塞|vas","椎骨動脈解離|young,trauma","急性小脳炎（感染後）|young,inf","薬剤性（抗てんかん薬・リチウムなど）|drug","Wernicke脳症・アルコール|drug"],
+  sub:["傍腫瘍性小脳変性症|ca","自己免疫性小脳失調（抗GAD抗体など）|auto","Creutzfeldt-Jakob病","腫瘍・転移|ca"],
+  chr:["脊髄小脳変性症（SCA・MSA-C）","アルコール性小脳変性症|drug","甲状腺機能低下症","腫瘍"],
+  rr:["多発性硬化症|young","反復発作性失調症|young"],
+  tra:["椎骨脳底動脈系のTIA|vas","反復発作性失調症|young"]},
+ cn:{sud:["動脈瘤による動眼神経麻痺（瞳孔障害あり）|vas","下垂体卒中","海綿静脈洞病変"],
+  acu:["Bell麻痺","Ramsay Hunt症候群|inf,imm","糖尿病性単神経障害（瞳孔回避の動眼神経麻痺など）|vas","Fisher症候群などのGBS亜型|inf","巨細胞性動脈炎"],
+  sub:["癌性髄膜炎|ca","Tolosa-Hunt症候群","神経サルコイドーシス・肥厚性硬膜炎|auto","頭蓋底腫瘍・転移|ca"],
+  chr:["頭蓋底・小脳橋角部の腫瘍（神経鞘腫・髄膜腫）"],
+  rr:["重症筋無力症（脳神経症状が主体のとき）","再発性の顔面神経麻痺"],
+  tra:["重症筋無力症（易疲労・日内変動）"]},
+ cord:{sud:["脊髄梗塞（前脊髄動脈）|vas","脊髄硬膜外血腫|drug,trauma"],
+  acu:["圧迫性脊髄症（転移・硬膜外膿瘍・椎間板）|ca,inf,trauma","横断性脊髄炎（MS・NMOSD・MOGAD・感染後）|young,auto,inf"],
+  sub:["横断性脊髄炎|auto","亜急性連合性変性症（B12・銅欠乏・亜酸化窒素）|drug","硬膜動静脈瘻","脊髄腫瘍|ca"],
+  chr:["頸椎症性脊髄症","脊髄腫瘍（髄内・髄外）","HTLV-1関連脊髄症","筋萎縮性側索硬化症（上位運動ニューロン優位）","遺伝性痙性対麻痺|young","硬膜動静脈瘻"],
+  rr:["多発性硬化症|young","NMOSD|auto","硬膜動静脈瘻（労作で増悪）"],
+  tra:["硬膜動静脈瘻（間欠性の症状）"]},
+ root:{sud:["急性椎間板ヘルニア|trauma"],
+  acu:["椎間板ヘルニア","帯状疱疹（神経根炎）|imm","神経痛性筋萎縮症（腕神経叢）","Guillain-Barré症候群（多発根）|inf","糖尿病性腰仙部根神経叢障害|vas"],
+  sub:["Guillain-Barré症候群|inf","癌性髄膜炎（馬尾）|ca","腫瘍浸潤（Pancoast腫瘍など）|ca"],
+  chr:["頸椎症性神経根症・腰部脊柱管狭窄症","CIDP","放射線性神経叢障害|ca","腫瘍"],
+  rr:["CIDP（再発型）"],
+  tra:["腰部脊柱管狭窄症（間欠性跛行）"]},
+ pn:{sud:["血管炎による多発単神経炎|auto","圧迫・外傷による単神経障害|trauma"],
+  acu:["Guillain-Barré症候群|inf","血管炎性ニューロパチー|auto","圧迫性麻痺（橈骨神経・腓骨神経）|drug","中毒性ニューロパチー|drug"],
+  sub:["CIDP","血管炎性ニューロパチー|auto","傍腫瘍性ニューロパチー|ca","ビタミンB1欠乏|drug","薬剤性（化学療法など）|drug,ca"],
+  chr:["糖尿病性多発ニューロパチー|vas","アルコール性ニューロパチー|drug","CIDP","遺伝性（Charcot-Marie-Tooth病）|young","アミロイドーシス（ATTR・AL）","絞扼性（手根管・肘部管）","M蛋白血症に伴うニューロパチー"],
+  rr:["CIDP","遺伝性圧脆弱性ニューロパチー（HNPP）|young"],
+  tra:["姿勢による一過性の絞扼"]},
+ pnm:{sud:["圧迫・外傷による単神経障害|trauma,drug","血管炎による多発単神経炎|auto"],
+  acu:["圧迫性麻痺（橈骨神経・腓骨神経：長時間の同じ姿勢・脚組み・体重減少・臥床）|drug,trauma","血管炎による多発単神経炎|auto","糖尿病性単神経障害|vas"],
+  sub:["血管炎による多発単神経炎|auto","腫瘍・ガングリオンによる圧迫|ca","遺伝性圧脆弱性ニューロパチー（HNPP）|young"],
+  chr:["絞扼性ニューロパチー（手根管・肘部管・腓骨頭）","背景疾患（糖尿病・甲状腺機能低下・アミロイドーシス・透析）|vas","神経鞘腫などの腫瘍","神経根症（C6-7・C8・L5）との区別"],
+  rr:["遺伝性圧脆弱性ニューロパチー（HNPP）|young","反復する圧迫"],
+  tra:["姿勢による一過性の絞扼"]},
+ nmj:{sud:["重症筋無力症の急性増悪"],
+  acu:["重症筋無力症（クリーゼを含む）","ボツリヌス症","薬剤による増悪・ICI関連重症筋無力症|drug,auto"],
+  sub:["重症筋無力症","Lambert-Eaton筋無力症候群|ca","ICI関連重症筋無力症|auto,ca"],
+  chr:["重症筋無力症","Lambert-Eaton筋無力症候群|ca","先天性筋無力症候群|young"],
+  rr:["重症筋無力症"],
+  tra:["重症筋無力症（易疲労・日内変動）"]},
+ mus:{sud:["横紋筋融解症|drug,trauma","周期性四肢麻痺（低K・高K・甲状腺中毒性）|young"],
+  acu:["横紋筋融解症|drug","周期性四肢麻痺|young","ウイルス性・急性炎症性筋炎|inf","ICI関連筋炎（重症筋無力症・心筋炎の合併に注意）|auto,ca","重症疾患ミオパチー"],
+  sub:["皮膚筋炎|ca,auto","多発筋炎・抗合成酵素症候群|auto","免疫介在性壊死性ミオパチー（抗HMGCR・抗SRP）|drug,auto","薬剤性ミオパチー（ステロイド・スタチン）|drug","甲状腺機能異常"],
+  chr:["封入体筋炎","筋ジストロフィー|young","ミトコンドリア病|young","代謝性ミオパチー（Pompe病など）"],
+  rr:["周期性四肢麻痺|young","代謝性ミオパチー（運動で誘発される横紋筋融解）|young"],
+  tra:["周期性四肢麻痺|young"]}};
+var WORK={
+ brain:"頭部MRI（DWI・FLAIR・T2*／SWI・MRA。腫瘍・炎症を疑えば造影）、血液（血糖・電解質・肝腎機能・甲状腺・ビタミンB1/B12）",
+ cortex:"脳波（意識障害・一過性の症状・てんかんを疑うとき）、心電図・心エコー（塞栓源）",
+ diff:"脳波、アンモニア・血液ガス、髄液（感染・炎症・腫瘍を疑うとき）",
+ vis:"眼科（眼底・視野・OCT）、抗AQP4抗体・抗MOG抗体、ESR・CRP（50歳以上は巨細胞性動脈炎）",
+ bs:"脳幹は薄いスライス・冠状断で評価、頸部血管（MRA・頸動脈エコー、解離を疑えばT1脂肪抑制の血管壁）",
+ cb:"MRI、薬剤の血中濃度、抗神経抗体（亜急性のとき）",
+ cn:"MRI（造影、頭蓋底・海綿静脈洞を含める）、血糖、ESR・CRP、髄液（細胞診）",
+ cord:"全脊髄MRI（造影）＋頭部MRI、髄液、抗AQP4抗体・抗MOG抗体、ビタミンB12・銅、HTLV-1抗体",
+ root:"脊椎MRI、神経伝導検査・針筋電図（F波）、髄液（蛋白細胞解離）、血糖・HbA1c",
+ pnm:"神経伝導検査（絞扼部位のインチング）・針筋電図（神経根症との区別）、神経エコー、血糖・HbA1c、甲状腺。多発単神経炎ならANCA・CRP・クリオグロブリン",
+ pn:"神経伝導検査・針筋電図、血糖・HbA1c、ビタミンB1/B12、甲状腺、血清・尿の免疫固定（M蛋白）、ANCA・CRP、抗ガングリオシド抗体（GBSを疑うとき）",
+ nmj:"抗AChR抗体・抗MuSK抗体、反復刺激試験、胸部CT（胸腺腫）、抗P/Q型VGCC抗体（LEMSを疑うとき）、%VC",
+ mus:"CK・ミオグロビン、電解質（K）、甲状腺、筋炎特異的抗体、針筋電図、筋MRI、必要なら筋生検"};
+var BRAINLV={cortex:1,subc:1,diff:1,vis:1,bs:1,cb:1};
+var MONO={median:1,ulnar:1,radial:1,peron:1};
+function workFor(lvs){var w=[];if(lvs.some(function(l){return BRAINLV[l]&&l!=="vis";}))w.push(WORK.brain);
+  lvs.forEach(function(l){var x=WORK[l==="subc"?"cortex":l];if(x&&w.indexOf(x)<0)w.push(x);});return w;}
+function LVN(lv){return lv==="pnm"?"末梢神経（単神経）":LV[lv];}
+function ddxAlerts(lvs,c,bg){
+  var a=[];
+  var acute=(c==="sud"||c==="acu");
+  if(acute&&lvs.some(function(l){return BRAINLV[l];}))a.push(["crit","脳卒中の可能性：最終健在時刻を確認し、再灌流療法（rtPA・血栓回収）の適応を直ちに評価する。"]);
+  if(acute&&lvs.indexOf("cb")>=0)a.push(["crit","小脳病変：浮腫・出血による脳幹圧迫と閉塞性水頭症に注意（脳神経外科と連携）。"]);
+  if(acute&&lvs.indexOf("cord")>=0)a.push(["crit","急性脊髄症：圧迫性病変を除外するため緊急で脊髄MRI。"]);
+  if((acute||c==="sub")&&(lvs.indexOf("root")>=0||lvs.indexOf("pn")>=0))a.push(["crit","GBSを疑う場合：%VC・嚥下・自律神経（不整脈・血圧変動）を監視する。"]);
+  if(acute&&lvs.indexOf("nmj")>=0)a.push(["crit","クリーゼの可能性：%VC・嚥下・喀痰の排出を評価する。"]);
+  if(c==="sud"&&lvs.indexOf("cn")>=0)a.push(["crit","瞳孔障害を伴う動眼神経麻痺は動脈瘤を除外する（CTA・MRA）。"]);
+  if(bg.inf&&lvs.some(function(l){return l==="cortex"||l==="subc"||l==="diff"||l==="bs";}))a.push(["crit","髄膜脳炎を疑う場合：検査結果を待たずに抗ウイルス薬・抗菌薬の開始を検討する。"]);
+  return a;
+}
+function topLevels(){
+  var res=LASTRES||[];var lvs=[];var cands=[];
+  res.slice(0,5).forEach(function(r){if(cands.length<3)cands.push(r);var lv=r.c.lv;if(lv==="pn"&&MONO[r.c.id])lv="pnm";if(lvs.indexOf(lv)<0&&lvs.length<2&&r.score>=Math.max(8,(res[0].score||0)*0.6))lvs.push(lv);});
+  return {lvs:lvs,cands:cands};
+}
+function ddxList(lv,c,bg){
+  var src=(DDX[lv]||{})[c]||[];
+  return src.map(function(x){var p=x.split("|"),tags=(p[1]||"").split(",").filter(Boolean);var hit=tags.filter(function(t){return bg[t];});return {n:p[0],hit:hit};})
+    .sort(function(a,b){return b.hit.length-a.hit.length;});
+}
+function findingsText(){
+  var ks=Object.keys(E);if(!ks.length)return "";
+  return ks.map(function(id){return flab(id,E[id]);}).join("、");
+}
+function renderDdx(){
+  if(!$("ddCourse"))return;
+  var d=st.ddx||(st.ddx={c:"",bg:{}});
+  $("ddCourse").innerHTML=COURSE.map(function(c){return '<button type="button" class="ddb" data-dc="'+c[0]+'" aria-pressed="'+(d.c===c[0])+'">'+c[1]+'</button>';}).join("");
+  $("ddBg").innerHTML=BG.map(function(b){return '<button type="button" class="ddb" data-db="'+b[0]+'" aria-pressed="'+!!d.bg[b[0]]+'">'+b[1]+'</button>';}).join("");
+  var T=topLevels(), h="";
+  var CL={};COURSE.forEach(function(c){CL[c[0]]=c[1];});
+  if(!T.cands.length){ h='<div class="card"><p class="hint" style="margin:0">「所見」タブで所見を入れると、上位の病巣候補のレベル（脳・脊髄・末梢など）から鑑別を出します。</p></div>'; }
+  else {
+    h+='<div class="card"><h2>局在（候補タブの上位）</h2><ol style="margin:0;padding-left:20px;font-size:14px">'+T.cands.map(function(r){return '<li>'+esc(candName(r))+' <span class="chip lv">'+LV[r.c.lv]+'</span> <small style="color:var(--muted)">'+r.score+'点・説明'+Math.round(r.cov*100)+'%</small></li>';}).join("")+'</ol>';
+    if(T.cands[0].cov<0.6)h+='<p class="hint" style="margin:6px 0 0">第1候補でも所見の'+Math.round(T.cands[0].cov*100)+'%しか説明できません。多発病変・びまん性病変も考えてください。</p>';
+    h+='</div>';
+    if(!d.c){ h+='<div class="card"><p class="hint" style="margin:0">経過を選ぶと、疾患群の鑑別と検査が出ます。</p></div>'; }
+    else {
+      ddxAlerts(T.lvs,d.c,d.bg).forEach(function(a){h+='<div class="alert '+a[0]+'">'+esc(a[1])+'</div>';});
+      T.lvs.forEach(function(lv){
+        var L=ddxList(lv,d.c,d.bg);
+        h+='<div class="card"><h2>鑑別：'+LVN(lv)+'×'+esc(CL[d.c])+'</h2>';
+        h+=L.length?'<ol style="margin:0;padding-left:20px;font-size:14px">'+L.map(function(x){return '<li>'+esc(x.n)+(x.hit.length?' <b style="color:var(--accent-strong,inherit)">★背景と一致</b>':'')+'</li>';}).join("")+'</ol>':'<p class="hint" style="margin:0">この組み合わせの登録はありません。</p>';
+        var w=workFor([lv]).join("。");
+        h+='<div class="sub" style="margin-top:8px">検査の目安</div><p style="font-size:14px;margin:2px 0 0">'+esc(w)+'</p></div>';
+      });
+    }
+  }
+  $("ddOut").innerHTML=h;
+  /* アセスメント文 */
+  var t=[];
+  var ft=findingsText();
+  if(ft)t.push("【所見の要約】"+ft);
+  if(T.cands.length){
+    t.push("【局在】"+candName(T.cands[0])+"（"+LV[T.cands[0].c.lv]+"）を第一に考える。"+(T.cands.length>1?"次点："+T.cands.slice(1).map(function(r){return candName(r);}).join("、")+"。":"")+(T.cands[0].cov<0.6?"単一病巣では説明しきれず、多発・びまん性病変も考慮。":""));
+  }
+  if(d.c)t.push("【経過】"+CL[d.c]+(Object.keys(d.bg).filter(function(k){return d.bg[k];}).length?"。背景："+BG.filter(function(b){return d.bg[b[0]];}).map(function(b){return b[1];}).join("、"):""));
+  if(d.c&&T.lvs.length){
+    var dd=[];T.lvs.forEach(function(lv){ddxList(lv,d.c,d.bg).slice(0,5).forEach(function(x){if(dd.indexOf(x.n)<0)dd.push(x.n);});});
+    t.push("【鑑別】"+dd.map(function(x,i){return (i+1)+") "+x;}).join("　"));
+    t.push("【検査計画】"+workFor(T.lvs).join("。"));
+    ddxAlerts(T.lvs,d.c,d.bg).forEach(function(a){t.push("【注意】"+a[1]);});
+  }
+  $("ddTxt").value=t.length?"#アセスメント\n"+t.join("\n"):"";
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-dc],button[data-db]");if(!b)return;
+  var d=st.ddx||(st.ddx={c:"",bg:{}});
+  if(b.hasAttribute("data-dc")){var c=b.getAttribute("data-dc");d.c=(d.c===c)?"":c;}
+  else {var k=b.getAttribute("data-db");if(d.bg[k])delete d.bg[k];else d.bg[k]=1;}
+  save();renderDdx();
+});
+(function(){var b=$("ddCopy");if(!b)return;b.addEventListener("click",function(){
+  var t=$("ddTxt").value;if(!t)return;
+  function done(ok){$("ddMsg").textContent=ok?"コピーしました":"コピーできませんでした";setTimeout(function(){$("ddMsg").textContent="";},2000);}
+  function fb(){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.top="-1000px";document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy");}catch(e){}ta.remove();done(ok);}
+  try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){done(true);},fb);return;}}catch(e){}
+  fb();});})();
+
 /* ---------------- 初期化 ---------------- */
 load();buildInput();buildDict();buildRefs();syncInput();compute();renderCases();
-if(location.hash==="#result"){show("v-result");try{history.replaceState(null,"",location.pathname);}catch(e){}}
+if(location.hash==="#result"||location.hash==="#ddx"){show(location.hash==="#ddx"?"v-ddx":"v-result");try{history.replaceState(null,"",location.pathname);}catch(e){}}
 document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){show(b.getAttribute("data-v"));});});
 $("btnGo").addEventListener("click",function(){show("v-result");});
 $("btnClear").addEventListener("click",function(){
