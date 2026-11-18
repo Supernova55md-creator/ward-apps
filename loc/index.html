@@ -1197,7 +1197,14 @@ document.addEventListener("click",function(e){
   fb();});})();
 
 /* ---------------- 初期化 ---------------- */
-load();buildInput();buildDict();buildRefs();syncInput();compute();renderCases();
+/* 神経学的検査チャート（院内アプリ）からの所見の受け取り：#import=<base64url JSON {f,m,sg}>。ハッシュはサーバーに送られない */
+function importFromHash(){var mm=location.hash.match(/^#import=([A-Za-z0-9_\-]+)/);if(!mm)return false;
+  try{var b=mm[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";
+    var j=JSON.parse(decodeURIComponent(escape(atob(b))));
+    if(j&&j.f){st.f=j.f;st.m=j.m||m0();st.sg=j.sg||s0();st.neg={};save();}}catch(e){}
+  try{history.replaceState(null,"",location.pathname);}catch(e){}return true;}
+load();var IMPORTED=importFromHash();buildInput();buildDict();buildRefs();syncInput();compute();renderCases();
+if(IMPORTED)show("v-result");
 if(location.hash==="#result"||location.hash==="#ddx"){show(location.hash==="#ddx"?"v-ddx":"v-result");try{history.replaceState(null,"",location.pathname);}catch(e){}}
 document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){show(b.getAttribute("data-v"));});});
 $("btnGo").addEventListener("click",function(){show("v-result");});
