@@ -32,6 +32,13 @@ header{padding:calc(14px + env(safe-area-inset-top)) 0 10px}
 .hrow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
 .ttl{font-weight:700;font-size:19px;letter-spacing:.02em}
 .sub{color:var(--mute);font-size:13px}
+.helpbtn{flex:none;align-self:center;border:1px solid var(--line);background:var(--card);color:var(--acc);border-radius:99px;padding:5px 10px;font-size:12px;font-weight:700;margin-left:auto}
+.hrow .cd{margin-left:6px}
+.manual details{border-top:1px solid var(--line);padding:4px 0}.manual details:first-of-type{border-top:0}
+.manual summary{font-weight:700;padding:10px 0;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+.manual summary::-webkit-details-marker{display:none}.manual summary::after{content:'＋';color:var(--acc)}.manual details[open] summary::after{content:'−'}
+.manual ol,.manual ul{margin:0 0 10px;padding-left:1.3em}.manual li{margin:4px 0;font-size:15px}.manual p{margin:0 0 10px;font-size:15px}
+.manual .k{display:inline-block;background:var(--acc-soft);color:var(--acc);border-radius:6px;padding:0 6px;font-weight:700;font-size:14px}
 .cd{text-align:right;font-size:14px;color:var(--mute);white-space:nowrap}
 .cd b{font-size:34px;color:var(--acc);font-weight:800;line-height:1;margin:0 2px;font-variant-numeric:tabular-nums}
 .prog{margin-top:12px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mute)}
@@ -316,6 +323,7 @@ function renderHeader() {
     <div class="hrow">
       <div><div class="ttl">${state.meta.child ? esc(state.meta.child) + 'の' : ''}テスト勉強計画</div>
       <div class="sub">テスト ${fmt(state.meta.testStart)}〜${fmt(state.meta.testEnd)}</div></div>
+      <button class="helpbtn" data-act="help" aria-label="使い方">？ 使い方</button>
       <div class="cd">${n > 0 ? `あと<b>${n}</b>日` : n === 0 ? '<b>今日</b>から' : TODAY <= state.meta.testEnd ? 'テスト期間中' : 'おつかれさま！'}</div>
     </div>
     ${tot ? `<div class="prog">${bar(done, tot)}<span>${p}%（${hm(done)}/${hm(tot)}）</span></div>` : ''}
@@ -440,6 +448,7 @@ function viewSetup() {
     <div class="hint">塾や部活で時間が違う日は「計画」タブで日付をタップして個別に変更できます。</div>
     <button class="btn" data-act="savesetup">保存</button>
   </div>
+  <h2>使い方</h2><div class="card"><button class="btn sec" data-act="help" style="margin:0">📖 使い方を見る</button></div>
   <h2>おうちの人に見せる</h2><div class="card">
     <div class="hint" style="font-size:13px">LINEなどで送れます。「計画リンク」を開くと、送った時点の計画と進み具合を見られます（閲覧のみ）。機種変更やバックアップにも使えます。</div>
     <button class="btn" data-act="sendlink">計画リンクを送る</button>
@@ -515,6 +524,48 @@ function sheetDay(d) {
     ${Number.isFinite(o.cap) ? `<button class="btn sec" data-act="resetday" data-d="${d}">標準の時間に戻す</button>` : ''}
     <button class="btn sec" data-act="jumpday" data-d="${d}">この日のやることを開く</button>`);
 }
+
+/* ---------- 使い方 ---------- */
+const K = s => `<span class="k">${s}</span>`;
+function manualHTML() {
+  return `<div class="manual">
+  <details open><summary>① 最初にやること（1回だけ）</summary><ol>
+    <li>${K('📚 教科')}タブで、教科ごとに${K('編集')}を押し、<b>テスト日</b>を時間割どおりに直す。範囲もメモしておくと便利。</li>
+    <li>各教科の「やること」を確認する。足りないものは${K('＋ やることを追加')}、いらないものはタップして${K('削除')}。</li>
+    <li>${K('⚙️ 設定')}で、平日と土日に勉強できる時間を決めて${K('保存')}。</li>
+    <li>${K('🗓️ 計画')}タブで${K('未定を割り振る')}を押す。テストの前日までに、毎日の予定が自動でできる。</li>
+  </ol></details>
+  <details><summary>② 毎日の使い方</summary><ol>
+    <li>アプリを開くと${K('☀️ 今日')}に、今日やることが出る。</li>
+    <li>終わったら左の□をタップして ✓ にする。上の％が進む。</li>
+    <li>今日使える時間が違うとき（塾・部活・疲れた日など）は、${K('−')}${K('＋')}で15分ずつ変える。</li>
+    <li>予定が時間をオーバーしたら${K('残りを他の日に回す')}を押すと、他の日に配り直される。</li>
+    <li>${K('‹')}${K('›')}で前の日・次の日の予定も見られる。</li>
+  </ol></details>
+  <details><summary>③ 予定どおりにいかなかったら</summary><ul>
+    <li>前の日にできなかったものは「やり残し」に出る。${K('今日へ')}で今日に移せる。</li>
+    <li>まとめて立て直したいときは、${K('🗓️ 計画')}の${K('今日から組み直す')}。終わっていないものを今日以降に配り直す（終わったものはそのまま）。</li>
+    <li>先の日の時間を変えたいときは、${K('🗓️ 計画')}で日付をタップ。メモ（塾・部活など）も書ける。</li>
+  </ul></details>
+  <details><summary>④ やることの追加・変更</summary><ul>
+    <li>${K('📚 教科')}で${K('＋ やることを追加')}。内容・1回の時間・日付（「未定」なら自動で割り振り）を入れる。</li>
+    <li>ページ範囲と回数を入れると自動で分けてくれる。<br>例：「ワーク」p10〜p49 を4回 → p10–19、p20–29、p30–39、p40–49 の4つ。</li>
+    <li>やることをタップすると、内容・時間・日付を変えたり、削除したりできる。</li>
+    <li>追加したあとは${K('未定を割り振る')}を押すのを忘れずに。</li>
+  </ul></details>
+  <details><summary>⑤ おうちの人に見せる</summary><ul>
+    <li>${K('⚙️ 設定')}の${K('計画リンクを送る')}を押してLINEなどで送る。開くと、その時点の計画と進み具合が見られる（見るだけで変更はできない）。</li>
+    <li>文字で送りたいときは${K('計画を文字で送る')}。</li>
+  </ul></details>
+  <details><summary>⑥ データについて・困ったとき</summary><ul>
+    <li>計画はこのスマホの中だけに保存される。インターネットがなくても使える。</li>
+    <li><b>ホーム画面のアイコンから開く</b>こと。iPhoneはSafariで開いたときとデータが別になる。</li>
+    <li>機種変更やバックアップは、${K('計画リンクを送る')}で自分に送り、新しいスマホでそのリンクを開いて${K('取り込む')}。</li>
+    <li>${K('すべてのデータを消去')}は2回押すと全部消える。元に戻せないので注意。</li>
+  </ul></details>
+  </div>`;
+}
+function openHelp() { openSheet(`<h3>使い方</h3>${manualHTML()}<button class="btn" data-act="close">閉じる</button>`); try { localStorage.setItem('studyplan-help-seen', '1'); } catch (e) { } }
 
 /* ---------- テキスト出力 ---------- */
 function exportText() {
@@ -597,6 +648,7 @@ document.addEventListener('click', e => {
     case 'resetday': mutate({ days: { [d]: { cap: null } } }); closeSheet(); break;
     case 'jumpday': viewDay = d; tab = 'today'; closeSheet(); render(); window.scrollTo(0, 0); break;
     case 'auto': autoAssign('unassigned'); break;
+    case 'help': openHelp(); break;
     case 'capup': case 'capdown': {
       const c = Math.max(0, Math.min(480, capOf(d) + (a === 'capup' ? 15 : -15)));
       mutate({ days: { [d]: { cap: c } } }); break;
@@ -642,7 +694,11 @@ document.addEventListener('click', e => {
 });
 window.addEventListener('hashchange', () => { if (location.hash.startsWith('#v=')) { loadSnapFromHash().then(render); return; } const h = location.hash.slice(1); if (TABS.includes(h) && h !== tab) { tab = h; render(); } });
 render();
-loadSnapFromHash().then(isSnap => { if (isSnap) render(); });
+loadSnapFromHash().then(isSnap => {
+  if (isSnap) { render(); return; }
+  let seen = true; try { seen = !!localStorage.getItem('studyplan-help-seen'); } catch (e) { }
+  if (!seen && storageOK) openHelp();
+});
 // ホーム画面アプリ（PWA）用
 try {
   const onClaude = /(^|\.)claude\.ai$/.test(location.hostname) || /claudeusercontent|claude\.site/.test(location.hostname) || !!window.claude;
