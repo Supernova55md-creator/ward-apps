@@ -101,6 +101,18 @@
       ]
     },
     {
+      "name": "神経所見アトラス",
+      "short_name": "所見アトラス",
+      "url": "sign/",
+      "icons": [
+        {
+          "src": "sign/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "MMTナビ",
       "short_name": "MMTナビ",
       "url": "mmt/",
