@@ -118,6 +118,19 @@ svg .md{fill:#3B6FB6} svg .ul{fill:#2E8B7A} svg .rd{fill:#E09A2D}
 .ref li{margin:6px 0;font-size:13px}
 .ref a{color:var(--accent-strong)}
 .vbtn{border:1px solid var(--accent);color:var(--accent-strong);background:var(--surface);border-radius:9px;padding:8px 12px;min-height:40px;cursor:pointer}
+/* 教科書の図（端末内だけ） */
+.bfig{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.bfig button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:4px;cursor:pointer;text-align:left;font-size:11.5px;color:var(--muted)}
+.bfig img{width:100%;height:120px;object-fit:contain;background:#fff;border-radius:6px;display:block;margin-bottom:3px}
+#viewer{position:fixed;inset:0;z-index:2147483200;background:#000;display:none;flex-direction:column}
+#viewer.on{display:flex}
+body:has(#viewer.on) #wcClrBtn,body:has(#viewer.on) #wcQrBtn{display:none!important}
+#viewer .vh{display:flex;gap:6px;align-items:center;padding:calc(6px + env(safe-area-inset-top)) 8px 6px;color:#fff;font-size:13px}
+#viewer .vh span{flex:1;line-height:1.35}
+#viewer .vh button{border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:8px;min-height:40px;min-width:44px;padding:0 10px;font-size:14px;cursor:pointer}
+#viewer .vb{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:flex-start;justify-content:center}
+#viewer img{max-width:100%;height:auto;background:#fff}
+#viewer img.z{max-width:none;width:220%}
 .empty{color:var(--muted);text-align:center;padding:24px 8px}
 @media (max-width:360px){.lvlist{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -148,6 +161,13 @@ svg .md{fill:#3B6FB6} svg .ul{fill:#2E8B7A} svg .rd{fill:#E09A2D}
     <p style="margin:0 0 6px">・<b>所見</b>：系統（脳神経・反射・感覚など）か検索で項目を探し、診察法・異常所見・意味・注意点・図・教科書の該当ページを見る。☆で登録した項目は「☆登録」にまとまる。</p>
     <p style="margin:0">・<b>図</b>：模式図の一覧。図から項目へ移れる。</p>
   </div>
+  <h2>教科書の図（この端末の中だけ）</h2>
+  <div class="card" style="font-size:13.5px">
+    <p style="margin:0 0 8px">教科書の図・写真をまとめた別ファイル（sign-figs.json）を取り込むと、各項目に図が出ます。図はアプリ本体（GitHub）には含めていません。端末ごとに1回行います（iPhoneはホーム画面版とSafari版で別保存）。</p>
+    <p style="margin:0 0 8px" id="bfState">未取り込み</p>
+    <label class="vbtn" style="display:inline-flex;align-items:center">図ファイルを選ぶ<input type="file" id="bfFile" accept=".json,application/json" style="display:none"></label>
+    <button class="vbtn" id="bfClear" type="button" style="margin-left:6px">図を消去</button>
+  </div>
   <h2>教科書の該当ページ（Dropboxの教科書PDF）</h2>
   <p class="note">各項目の「教科書」欄は、下の神経診察・症候学の教科書PDF 20冊の全文を項目のキーワードで検索し、ヒットの多いページを選んだものです（2026-11-20作成）。ページは<b>PDFの1ページ目から数えた番号</b>で、本に印刷されたページ番号とは数ページずれます。自動抽出なので、該当しないページが混じることがあります。本文・図は転載していません（記載は要点を自分の言葉でまとめたもの）。</p>
   <div class="card"><ul class="bk" id="booklist" style="margin:0;padding-left:1.1em"></ul></div>
@@ -169,6 +189,7 @@ svg .md{fill:#3B6FB6} svg .ul{fill:#2E8B7A} svg .rd{fill:#E09A2D}
   <button data-v="fig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 15l3-3 3 3 2-2 3 3"/><circle cx="9" cy="8.5" r="1.3"/></svg>図</button>
   <button data-v="src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6"/></svg>出典</button>
 </nav>
+<div id="viewer" role="dialog" aria-modal="true"><div class="vh"><span id="vT"></span><button id="vP" type="button">←</button><button id="vN" type="button">→</button><button id="vZ" type="button">拡大</button><button id="vX" type="button">閉じる</button></div><div class="vb" id="vB"><img id="vI" alt=""></div></div>
 <div id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">
   <div class="sh"><button id="shBack" type="button" aria-label="戻る">←</button><h2 id="shT"></h2><button id="shFav" type="button" aria-label="☆登録">☆</button><button id="shX" type="button" aria-label="閉じる">閉じる</button></div>
   <div class="sb" id="shB"><div id="shC"></div></div>
@@ -738,7 +759,7 @@ return s;})()}
 
 const BOOK={"B":["めまいの診かた・考えかたOCR","イラストで分かる神経症候","グラフィック神経学","ブラッシュアップ神経症候menu","ベッドサイドの神経の診かた","レジデントのための神経診療","不随意運動のみかた","末梢神経と筋のみかた","神経局在診断","神経症候学Note_目次しおり付き","神経症候群を学ぶ人のために","神経症状の診かた考え方第三版","神経症状の診極め方","神経診察の極意","神経診察：実際とその意義","神経診断学を学ぶ人のために","脊椎脊髄・神経筋の神経症候学の基本","脊髄臨床神経学ノート","脳神経内科診断ハンドブック","高次脳機能障害　その概念と画像診断"],"I":{"loc-brain":[[4,310,327,348],[15,278,308,321],[13,26,163,166],[1,513,516,519],[10,235,360,417],[11,106,339]],"cn-va":[[13,43,51],[4,213,280,397],[12,114],[15,42,50,319],[5,314],[14,104,108,191]],"cn-vf":[[3,21,98,101],[15,46,50,319],[4,121,212,330],[5,219,316,370],[1,404,408,543],[18,33,525,570]],"cn-4-6":[[3,23,108,116],[5,311,321,324],[4,125,219,223],[10,66,70,412],[8,132,144,148],[14,89,96]],"eom-dip":[[9,50,62,72],[4,127,222,225],[15,71,74,78],[13,56,146,169],[1,291,436,439],[5,321,325,329]],"eom-nys":[[3,24,168,176],[5,298,301,305],[10,78,412,420],[13,73,77,146],[14,86,100],[4,128,230,233]],"vs-bppv":[[5,298,301,305],[0,45,82,85],[13,74,77],[3,167,174,178],[8,185,191],[11,68,103,419]],"cn-5":[[1,261,287,396],[15,86,90,154],[8,165,194,473],[14,45,52,120],[4,84,131,236],[5,197,331]],"cn-7":[[3,158,184,213],[15,92,97,303],[11,46,78,407],[13,67],[5,329,336,341],[10,50,70,87]],"cn-8":[[1,58,292,420],[14,114,164],[15,102,299,327],[8,181,184,192],[3,160,172,175],[4,26,240,244]],"cn-9-10":[[14,52,109,122],[15,108,113,116],[8,194,197,229],[10,99,103,347],[13,39,82],[11,343,407]],"cn-dysar":[[3,61,222,229],[10,105,338,417],[14,67,118,166],[12,54,138,254],[13,28],[9,189,326]],"rx-path":[[13,124,130,173],[4,93,101,177],[14,13,37,54],[15,109,162,329],[9,156,163,298],[11,393,398]],"mv-trem":[[10,150,156,160],[14,68,126,132],[6,3,10,17],[3,195,199,304],[13,104,145],[11,180,197,207]],"mv-park":[[6,3,12],[11,179,193,203],[3,233,236,242],[4,197,456],[5,352,356,360],[14,12,39,187]],"au-oh":[[11,100,160,410],[3,264,277,281],[10,18,347,418],[4,198,254,288],[18,402,436,445],[16,22]],"loc-jcs":[[14,120,186],[3,17,308,312],[13,23,26],[11,13,329,339],[5,159,165,169],[4,292,368,424]],"hb-aph":[[1,363,380,387],[14,164,169,177],[4,260,263,266],[3,74,78,81],[8,383,397,403],[13,29,169,172]],"hb-apra":[[19,80,84,91],[17,315],[3,19,49,235],[10,19,366,413],[13,35,170],[14,166,172,192]],"hb-neg":[[3,50,85],[8,390,395,495],[1,386],[4,274,329,461],[19,126,129,133],[10,19,371,398]],"cn-olf":[[8,136,392,492],[14,110,191],[3,241],[4,120,211,452],[10,85],[15,40]],"cn-pupil":[[9,43,58,70],[3,23,107,113],[5,163,315,318],[15,53,60,278],[4,124,216,299],[13,53,165,173]],"cn-horner":[[15,58,72,311],[1,235,481,504],[4,213,216,364],[9,17,28,42],[3,107,123,126],[5,210,318,329]],"cn-3":[[4,214,220,367],[11,404,410],[15,53,58,64],[5,314,318,324],[3,109,154,315],[10,66,73,400]],"eom-mlf":[[8,151],[4,221,224,227],[3,116,119,315],[5,325],[15,67,70,105],[1,256,259,455]],"eom-gaze":[[9,14,53,58],[4,217,225,247],[15,69,185],[1,241,257,443],[14,95],[3,121]],"cn-11":[[2,202],[8,118,132,200],[10,133,180,407],[1,215,275,290],[15,120],[4,139,246]],"cn-12":[[2,150,205],[14,123,136],[4,49,140,246],[5,127],[9,78,81],[8,203]],"mt-atro":[[4,49,436,444],[14,32,123,146],[3,181,184,187],[16,33,39,220],[2,150,215,218],[15,116,141,315]],"mt-tone":[[13,89,170],[4,36,51,197],[15,134,153,300],[10,175,245,414],[3,28,223,237],[14,12,39,62]],"mt-mmt":[[16,53,215,310],[18,416,486,510],[3,15,180,184],[11,257,348,398],[5,113,118,148],[4,55,442,445]],"mt-drift":[[16,78,81,84],[13,92,95,172],[17,22,25],[5,29,51,84],[11,305,398],[3,15,32]],"mt-fatig":[[3,123,127,216],[18,453,457,460],[5,110,113,329],[14,37],[15,72,258,299],[11,342,348,405]],"rx-dtr":[[17,21,42,86],[9,148,152,159],[16,34,71,248],[15,160,201,306],[10,206,267,403],[14,46,49,192]],"rx-clonus":[[9,149,205,208],[3,16,38,209],[16,72,164],[14,44,50,136],[17,86,198,320],[1,313,468]],"rx-sup":[[11,393],[4,93,106,306],[3,264,270,279],[14,13,53],[15,163,209,304],[13,119]],"sn-basic":[[16,90,99,113],[5,40,44,59],[10,287,312,394],[14,69,72,76],[3,16,33,247],[4,110,130,205]],"sn-deep":[[5,40,47,142],[11,137,253,399],[13,132,155,158],[14,69,78,179],[10,289,292,295],[3,204,247,257]],"sn-pattern":[[5,30,42,81],[14,13,75],[16,33,95,100],[7,63],[10,303,308,421],[8,41,103,107]],"cb-limb":[[11,111,114,409],[14,12,62,65],[10,157,217,279],[1,313,467],[13,104,145,148],[5,47,309]],"cb-gait":[[15,213],[3,176,290,293],[13,71,145,149],[5,311],[9,191],[1,54,311]],"mv-hyper":[[6,2,5,18],[14,143,150,157],[3,194,203,212],[4,189,455,462],[13,105,109,172],[10,167,240,344]],"mv-myoc":[[9,209,251,262],[14,127,135,142],[13,105,108,169],[15,171,180,184],[6,7,14,17],[11,207,262,273]],"gt-type":[[3,11,170,297],[14,83,156,192],[10,18,333,342],[4,75,197,459],[6,2,12],[17,19,44,99]],"sp-cord":[[4,173,208,343],[14,13,58,76],[12,78,159,168],[10,307,312,404],[3,259,277,297],[11,257,417,420]],"sp-root":[[5,69,72,126],[18,389,395,443],[16,165,195,236],[4,207,407,413],[1,142,146],[17,112,133,231]],"pn-arm":[[16,37,121,124],[10,138,195,404],[1,70,77,81],[5,94,98,126],[8,116],[11,131,134,310]],"pn-leg":[[8,113,119],[5,34,100,133],[1,86,90,94],[16,19,61,140],[17,42,47,212],[7,43,68]],"fn-hoover":[[15,190,261,323],[11,286,295,299],[10,26,324,345],[16,278,304,308],[9,260,288,291],[3,122,297,306]],"mt-umn":[[14,15,33,37],[3,180,183,187],[18,201,213,216],[4,173,436,443],[15,123,142,162],[10,87,199,251]],"hb-agn":[[19,99,117,249],[10,19,368],[4,275,330,375],[14,170,175,192],[15,12,228,237],[3,51,85]],"hb-orient":[[11,220,233,266],[14,184,187,191],[18,100,105,123],[15,32,215,219],[3,18,44,53],[4,147,292,447]],"mt-myot":[[18,478,482,507],[5,120],[10,39,50,212],[15,141,156,259],[4,50,439,442],[2,222]],"gt-gowers":[[15,141,151,301],[5,113,148],[3,188,289],[10,133,182],[2,219],[4,439]],"loc-meng":[[11,38,41,339],[15,121,280,305],[3,16,40,142],[12,64,68,233],[4,296,429,449],[5,163,259,264]],"hb-front":[[15,91,163,304],[3,51,226,297],[9,95],[10,91,213],[14,56],[4,97,151,328]],"vs-hints":[[5,298,304],[9,62],[11,106,112,116],[12,90,126,132],[3,166,176],[8,471]],"rx-hoff":[[15,143,160],[3,16,36],[14,48],[4,96,449],[9,121,152],[12,47]],"sn-cort":[[13,132,135,143],[4,115,210,329],[3,247],[10,17,283],[16,96],[5,40]],"cn-swallow":[[5,115,342,345],[3,63,68,71],[14,118,122],[18,142,456,500],[11,240,345,363],[4,442]]}};
 
-const APPVER="2026-11-20a";
+const APPVER="2026-11-20b";
 const KEY="signnavi.v1";
 let st={fav:[],recent:[],cat:"__all",q:"",view:"map",lv:"cortex"};
 try{Object.assign(st,JSON.parse(localStorage.getItem(KEY)||"{}"));}catch(e){}
@@ -785,7 +806,9 @@ function renderList(){
   if(q)html=`<p class="note">「${esc(st.q)}」：${xs.length}件</p>`+html;
   $("#list").innerHTML=html;
 }
-function renderFigs(){$("#figs").innerHTML=Object.keys(FIGS).map(id=>figHTML(id,true)).join("");}
+function renderFigs(){let h=Object.keys(FIGS).map(id=>figHTML(id,true)).join("");
+  if(typeof BF!=="undefined"&&BF.n){h+=`<h2>教科書の図（端末内）</h2>`+ITEMS.filter(x=>bfFor(x.id).length).map(x=>`<div class="fig"><p class="ft">${esc(x.n)}</p>${bfHTML(x.id).replace('<div class="sec"><h4>教科書の図</h4>','<div>')}<div class="fb links"><button class="lnk" data-open="${x.id}">この項目を開く</button></div></div>`).join("");}
+  $("#figs").innerHTML=h;}
 function renderBooks(){$("#booklist").innerHTML=BOOK.B.map(b=>`<li>${esc(BOOKNAME(b))}</li>`).join("");}
 // 詳細
 let hist=[];
@@ -798,7 +821,7 @@ function openItem(id,push){const x=BYID[id];if(!x)return;
   const bk=(BOOK.I[id]||[]);
   const books=bk.length?`<div class="sec"><h4>教科書（PDFのページ）</h4><ul class="bk">${bk.map(r=>`<li>${esc(BOOKNAME(BOOK.B[r[0]]))}　<span class="pg">p.${r.slice(1).join("・")}</span></li>`).join("")}</ul><p class="note" style="margin:4px 0 0">全文検索で選んだページ。PDFの通し番号（印刷ページとは数ページずれる）。</p></div>`:"";
   const rel=(x.rel||[]).filter(r=>BYID[r]);
-  $("#shC").innerHTML=sec("how","診察法",x.how)+(x.fig?figHTML(x.fig,false):"")+sec("ab","異常所見",x.ab)+sec("mean","意味・局在",x.mean)+sec("pit","注意点",x.pit)
+  $("#shC").innerHTML=sec("how","診察法",x.how)+(x.fig?figHTML(x.fig,false):"")+bfHTML(id)+sec("ab","異常所見",x.ab)+sec("mean","意味・局在",x.mean)+sec("pit","注意点",x.pit)
    +(rel.length?`<div class="sec"><h4>関連</h4><div class="links">${rel.map(r=>`<button class="lnk" data-open="${r}">${esc(BYID[r].n)}</button>`).join("")}</div></div>`:"")+books
    +`<div class="disc">要点は成書の記載を自分の言葉でまとめたもの。最終判断は診察と原典で。</div>`;
   $("#shBack").style.visibility=hist.length?"visible":"hidden";
@@ -829,6 +852,32 @@ qi.addEventListener("keydown",e=>{if(e.key==="Enter")qi.blur();});
 $("#qx").onclick=()=>{qi.value="";st.q="";save();renderList();};
 $("#ver").textContent=APPVER;
 $("#upd").onclick=async()=>{try{const r=await navigator.serviceWorker?.getRegistration?.("../");if(r)await r.update();}catch(e){} location.reload();};
+
+/* ---------- 教科書の図（IndexedDBに端末内保存。GitHubには置かない） ---------- */
+const BF={urls:{},meta:{},ver:"",n:0};
+function bfdb(){return new Promise((res,rej)=>{try{const r=indexedDB.open("signatlas-figs",1);r.onupgradeneeded=()=>r.result.createObjectStore("b");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}catch(e){rej(e);}});}
+async function bfGet(){const db=await bfdb();return new Promise(res=>{const q=db.transaction("b").objectStore("b").get("bundle");q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null);});}
+async function bfPut(v){const db=await bfdb();return new Promise((res,rej)=>{const tx=db.transaction("b","readwrite");v==null?tx.objectStore("b").delete("bundle"):tx.objectStore("b").put(v,"bundle");tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
+function d2b(u){const [h,b]=u.split(",");const bin=atob(b);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:(h.match(/data:([^;]+)/)||[])[1]||"image/jpeg"});}
+function bfApply(b){Object.values(BF.urls).forEach(u=>{try{URL.revokeObjectURL(u);}catch(e){}});BF.urls={};BF.meta={};BF.n=0;BF.ver="";
+  if(b&&b.figs){Object.keys(b.figs).forEach(k=>{const v=b.figs[k];BF.urls[k]=URL.createObjectURL(v instanceof Blob?v:d2b(v));BF.n++;});BF.meta=b.meta||{};BF.ver=b.version||"";}
+  const e=document.getElementById("bfState");if(e)e.textContent=BF.n?`取り込み済み：${BF.n}枚（${BF.ver}）`:"未取り込み";}
+function bfFor(id){return Object.keys(BF.meta).filter(k=>BF.urls[k]&&(BF.meta[k].items||[]).includes(id));}
+function bfCap(k){const m=BF.meta[k]||{};return `${m.cap||""}（${BOOKNAME(m.book||"")}${m.page?" PDF p."+m.page:""}）`;}
+function bfHTML(id){const l=bfFor(id);if(!l.length)return"";return `<div class="sec"><h4>教科書の図</h4><div class="bfig">${l.map(k=>`<button data-bf="${k}" data-bfl="${l.join(",")}"><img src="${BF.urls[k]}" alt="" loading="lazy">${esc(bfCap(k))}</button>`).join("")}</div></div>`;}
+let vw={l:[],i:0};
+function vShow(){const k=vw.l[vw.i];$("#vI").src=BF.urls[k];$("#vI").classList.remove("z");$("#vZ").textContent="拡大";$("#vT").textContent=bfCap(k);$("#vP").disabled=vw.i<=0;$("#vN").disabled=vw.i>=vw.l.length-1;$("#vB").scrollTo(0,0);}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-bf]");if(!b)return;vw={l:b.dataset.bfl.split(","),i:0};vw.i=Math.max(0,vw.l.indexOf(b.dataset.bf));vShow();$("#viewer").classList.add("on");});
+$("#vX").onclick=()=>$("#viewer").classList.remove("on");
+$("#vP").onclick=()=>{if(vw.i>0){vw.i--;vShow();}};$("#vN").onclick=()=>{if(vw.i<vw.l.length-1){vw.i++;vShow();}};
+$("#vZ").onclick=()=>{const z=$("#vI").classList.toggle("z");$("#vZ").textContent=z?"全体":"拡大";};
+$("#bfFile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{let b;try{b=JSON.parse(r.result);}catch(x){alertMsg("ファイルの形式が違います");return;}
+  if(!b||b.kind!=="signatlas-figs"||!b.figs){alertMsg("神経所見アトラス用の図ファイルではありません");return;}
+  const st2={kind:b.kind,version:b.version,meta:b.meta,figs:{}};Object.keys(b.figs).forEach(k=>st2.figs[k]=d2b(b.figs[k]));
+  try{await bfPut(st2);}catch(x){alertMsg("この端末に保存できませんでした");return;}bfApply(st2);renderFigs();alertMsg(`図を${BF.n}枚取り込みました`);};r.readAsText(f);e.target.value="";});
+$("#bfClear").onclick=async()=>{try{await bfPut(null);}catch(x){}bfApply(null);renderFigs();alertMsg("図を消去しました");};
+function alertMsg(t){const n=document.createElement("div");n.textContent=t;n.style.cssText="position:fixed;left:12px;right:12px;bottom:calc(64px + env(safe-area-inset-bottom));background:#14506A;color:#fff;padding:10px 12px;border-radius:10px;z-index:2147483300;font-size:13px";document.body.appendChild(n);setTimeout(()=>n.remove(),3000);}
+bfGet().then(b=>{bfApply(b);renderFigs();}).catch(()=>{});
 renderMap();renderFigs();renderBooks();show(st.view||"map");
 // service worker（https/localhost のみ、claude.ai上では登録しない）
 try{if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")&&!/claude\.ai|claudeusercontent/.test(location.hostname)){
