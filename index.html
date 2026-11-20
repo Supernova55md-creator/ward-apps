@@ -1,950 +1,184 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
+<html lang="ja"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>神経所見アトラス</title>
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#1F6F8B">
+<meta name="theme-color" content="#0b5cad">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="所見アトラス">
+<meta name="apple-mobile-web-app-title" content="病棟アプリ">
+<title>病棟アプリ</title>
 <style>
-/* 神経所見アトラス：基調色は青緑 */
-:root{
-  --bg:#F3F6F7; --surface:#FFFFFF; --ink:#16242A; --muted:#55666D; --line:#DCE3E6;
-  --accent:#1F6F8B; --accent-strong:#14506A; --accent-soft:#E3F0F4;
-  --ok:#2E7D4F; --ok-soft:#E5F3EA; --warn:#B45309; --warn-soft:#FDEEDC; --crit:#B42318; --crit-soft:#FDE7E5;
-  --font-body:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
-  --r:12px; color-scheme:light;
-}
-@media (prefers-color-scheme: dark){
-  :root{--bg:#10171A; --surface:#182226; --ink:#E7EEF0; --muted:#9FB0B6; --line:#2B383D;
-  --accent:#6CC0DA; --accent-strong:#9ED6E7; --accent-soft:#1C3640;
-  --ok:#6FCF97; --ok-soft:#173326; --warn:#F2B36B; --warn-soft:#3A2A16; --crit:#FF8A80; --crit-soft:#3A1D1B; color-scheme:dark;}
-}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--font-body);-webkit-text-size-adjust:100%}
-button,input{font:inherit;color:inherit}
-header.top{position:sticky;top:0;z-index:20;background:var(--accent);color:#fff;padding:calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 10px calc(12px + env(safe-area-inset-left))}
-@media (prefers-color-scheme: dark){header.top{background:#123F50}}
-header.top .brand{display:flex;align-items:baseline;gap:8px;min-height:34px}
-header.top h1{margin:0;font-size:17px;font-weight:800;white-space:nowrap}
-header.top small{opacity:.85;font-size:11.5px}
-.sbox{margin-top:8px;position:relative}
-.sbox input{width:100%;border:0;border-radius:10px;padding:10px 36px 10px 12px;background:#fff;color:#16242A;font-size:16px}
-@media (prefers-color-scheme: dark){.sbox input{background:#0D1A1F;color:#E7EEF0}}
-.sbox button{position:absolute;right:4px;top:4px;border:0;background:transparent;font-size:18px;width:32px;height:32px;color:#678;cursor:pointer}
-main{padding:12px calc(12px + env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));max-width:760px;margin:0 auto}
-.view{display:none}.view.on{display:block}
-nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav.tabs button{flex:1;border:0;background:transparent;padding:8px 2px 9px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;min-height:54px}
-nav.tabs button svg{width:22px;height:22px}
-nav.tabs button.on{color:var(--accent);font-weight:700}
-h2{font-size:15px;margin:16px 2px 8px;color:var(--accent-strong)}
-.note{font-size:12.5px;color:var(--muted);margin:6px 2px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin:8px 0}
-/* 部位マップ */
-.lvwrap{display:block}
-.lvlist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
-.lvlist button{border:1px solid var(--line);border-left:6px solid var(--c);background:var(--surface);border-radius:9px;padding:8px 8px;text-align:left;font-size:13px;cursor:pointer;min-height:38px}
-.lvlist button.on{background:var(--accent-soft);font-weight:700;border-color:var(--c)}
-.lvcard h3{margin:0 0 6px;font-size:16px;color:var(--c)}
-.lvcard ul{margin:0;padding-left:1.1em}.lvcard li{margin:3px 0}
-.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 11px;font-size:13px;cursor:pointer;min-height:34px}
-.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
-@media (prefers-color-scheme: dark){.chip.on{color:#0B1A1F}}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chips .chip{white-space:nowrap;flex:0 0 auto}
-.lnk{border:0;background:var(--accent-soft);color:var(--accent-strong);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;min-height:34px}
-/* 所見リスト */
-.it{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin:6px 0;cursor:pointer;width:100%;text-align:left}
-.it .tl{flex:1;min-width:0}
-.it b{display:block;font-size:14.5px}
-.it span{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.it .cat{font-size:11px;background:var(--accent-soft);color:var(--accent-strong);border-radius:6px;padding:2px 6px;white-space:nowrap}
-.it .fg{font-size:11px;color:var(--accent)}
-.star{color:#C8901A}
-mark{background:#FFE58A;color:inherit;border-radius:3px;padding:0 1px}
-@media (prefers-color-scheme: dark){mark{background:#6B5A12}}
-/* 図 */
-.fig{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0}
-.fig .ft{font-size:13px;font-weight:700;margin:0 0 6px}
-.fig svg{width:100%;height:auto;display:block;font-family:var(--font-body)}
-.fig .fb{display:flex;justify-content:flex-end;margin-top:4px}
-svg .ln{stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
-svg .fl{fill:var(--accent-soft)}
-svg .gm{fill:color-mix(in srgb,var(--muted) 35%,var(--surface));stroke:none}
-svg .pp{fill:var(--ink)}
-svg .lid{fill:#C9A48A;opacity:.85}
-svg .tx{fill:var(--ink);font-size:13px}
-svg .mu{fill:var(--muted);font-size:11.5px}
-svg .lzt{fill:var(--crit);font-size:11.5px;font-weight:700}
-svg .lz{fill:var(--crit);opacity:.75}
-svg .lzn{fill:#fff}
-svg .lzs{stroke:var(--crit)}
-svg .fz{fill:var(--ink);opacity:.8}
-svg .bgc{fill:var(--surface)}
-svg .ac{fill:#E8B20E}
-svg .arr{stroke:var(--crit);stroke-width:2.4}
-svg .arrh{fill:var(--crit)}
-svg .okb{fill:var(--ok-soft)} svg .lzb{fill:var(--crit-soft)}
-svg .tg{fill:#E59A9A;stroke:var(--ink);stroke-width:1.6}
-svg .md{fill:#3B6FB6} svg .ul{fill:#2E8B7A} svg .rd{fill:#E09A2D}
-/* 詳細シート */
-#sheet{position:fixed;inset:0;z-index:2147483100;background:var(--bg);display:none;flex-direction:column}
-#sheet.on{display:flex}
-#sheet .sh{background:var(--accent);color:#fff;padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) 10px calc(10px + env(safe-area-inset-left));display:flex;align-items:center;gap:8px}
-@media (prefers-color-scheme: dark){#sheet .sh{background:#123F50}}
-#sheet .sh h2{color:#fff;margin:0;font-size:16px;flex:1;line-height:1.35}
-#sheet .sh button{border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:9px;min-width:44px;min-height:40px;font-size:15px;cursor:pointer;padding:0 10px}
-#sheet .sb{overflow:auto;padding:12px calc(12px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));-webkit-overflow-scrolling:touch}
-#sheet .sb>div{max-width:760px;margin:0 auto}
-.sec{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
-.sec h4{margin:0 0 4px;font-size:13px;letter-spacing:.02em}
-.sec ul{margin:0;padding-left:1.15em}.sec li{margin:3px 0}
-.sec.how h4{color:var(--accent-strong)}
-.sec.ab{border-left:5px solid var(--warn)} .sec.ab h4{color:var(--warn)}
-.sec.mean{border-left:5px solid var(--ok)} .sec.mean h4{color:var(--ok)}
-.sec.pit{border-left:5px solid var(--crit)} .sec.pit h4{color:var(--crit)}
-.bk{font-size:13px}.bk li{margin:4px 0}.bk .pg{font-variant-numeric:tabular-nums;color:var(--accent-strong);font-weight:700}
-.en{font-size:12px;opacity:.85}
-.disc{font-size:12px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin:12px 0}
-.ref li{margin:6px 0;font-size:13px}
-.ref a{color:var(--accent-strong)}
-.vbtn{border:1px solid var(--accent);color:var(--accent-strong);background:var(--surface);border-radius:9px;padding:8px 12px;min-height:40px;cursor:pointer}
-/* 教科書の図（端末内だけ） */
-.bfig{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.bfig button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:4px;cursor:pointer;text-align:left;font-size:11.5px;color:var(--muted)}
-.bfig img{width:100%;height:120px;object-fit:contain;background:#fff;border-radius:6px;display:block;margin-bottom:3px}
-#viewer{position:fixed;inset:0;z-index:2147483200;background:#000;display:none;flex-direction:column}
-#viewer.on{display:flex}
-body:has(#viewer.on) #wcClrBtn,body:has(#viewer.on) #wcQrBtn{display:none!important}
-#viewer .vh{display:flex;gap:6px;align-items:center;padding:calc(6px + env(safe-area-inset-top)) 8px 6px;color:#fff;font-size:13px}
-#viewer .vh span{flex:1;line-height:1.35}
-#viewer .vh button{border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:8px;min-height:40px;min-width:44px;padding:0 10px;font-size:14px;cursor:pointer}
-#viewer .vb{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:flex-start;justify-content:center}
-#viewer img{max-width:100%;height:auto;background:#fff}
-#viewer img.z{max-width:none;width:220%}
-.empty{color:var(--muted);text-align:center;padding:24px 8px}
-@media (max-width:360px){.lvlist{grid-template-columns:repeat(2,1fr)}}
-</style>
-</head>
-<body>
-<header class="top">
-  <div class="brand"><h1>神経所見アトラス</h1><small>部位別・図つき</small></div>
-  <div class="sbox"><input id="q" type="search" placeholder="所見・手技・徴候名で検索（例：瞳孔、Hoffmann、下垂足）" autocomplete="off" enterkeyhint="search"><button id="qx" aria-label="検索語を消す">×</button></div>
-</header>
-<main>
-<section id="v-map" class="view on">
-  <h2>病変部位から引く</h2>
-  <p class="note">部位を押すと、その部位の障害で出る所見の組み合わせと、診察法の項目が出ます。</p>
-  <div class="lvwrap"><div class="lvlist" id="lvlist"></div><div id="lvcard"></div></div>
-</section>
-<section id="v-list" class="view">
-  <div class="chips" id="cats"></div>
-  <div id="list"></div>
-</section>
-<section id="v-fig" class="view">
-  <h2>図（自作の模式図）</h2>
-  <div id="figs"></div>
-</section>
-<section id="v-src" class="view">
-  <h2>使い方</h2>
-  <div class="card" style="font-size:13.5px">
-    <p style="margin:0 0 6px">・<b>部位</b>：病変部位（大脳〜筋）ごとに、出る所見の組み合わせを確認。</p>
-    <p style="margin:0 0 6px">・<b>所見</b>：系統（脳神経・反射・感覚など）か検索で項目を探し、診察法・異常所見・意味・注意点・図・教科書の該当ページを見る。☆で登録した項目は「☆登録」にまとまる。</p>
-    <p style="margin:0">・<b>図</b>：模式図の一覧。図から項目へ移れる。</p>
-  </div>
-  <h2>教科書の図（この端末の中だけ）</h2>
-  <div class="card" style="font-size:13.5px">
-    <p style="margin:0 0 8px">教科書の図・写真をまとめた別ファイル（sign-figs.json）を取り込むと、各項目に図が出ます。図はアプリ本体（GitHub）には含めていません。端末ごとに1回行います（iPhoneはホーム画面版とSafari版で別保存）。</p>
-    <p style="margin:0 0 8px" id="bfState">未取り込み</p>
-    <label class="vbtn" style="display:inline-flex;align-items:center">図ファイルを選ぶ<input type="file" id="bfFile" accept=".json,application/json" style="display:none"></label>
-    <button class="vbtn" id="bfClear" type="button" style="margin-left:6px">図を消去</button>
-  </div>
-  <h2>教科書の該当ページ（Dropboxの教科書PDF）</h2>
-  <p class="note">各項目の「教科書」欄は、下の神経診察・症候学の教科書PDF 20冊の全文を項目のキーワードで検索し、ヒットの多いページを選んだものです（2026-11-20作成）。ページは<b>PDFの1ページ目から数えた番号</b>で、本に印刷されたページ番号とは数ページずれます。自動抽出なので、該当しないページが混じることがあります。本文・図は転載していません（記載は要点を自分の言葉でまとめたもの）。</p>
-  <div class="card"><ul class="bk" id="booklist" style="margin:0;padding-left:1.1em"></ul></div>
-  <h2>文献（確認済みのリンク）</h2>
-  <div class="card"><ul class="ref" style="margin:0;padding-left:1.1em">
-    <li>Kattah JC, et al. HINTS to diagnose stroke in the acute vestibular syndrome: three-step bedside oculomotor examination more sensitive than early MRI diffusion-weighted imaging. Stroke 2009;40:3504-10. <a href="https://pubmed.ncbi.nlm.nih.gov/19762709/" target="_blank" rel="noopener">PubMed</a></li>
-    <li>Iguchi M, et al. Diagnostic test accuracy of jolt accentuation for headache in acute meningitis in the emergency setting. Cochrane Database Syst Rev 2020. <a href="https://doi.org/10.1002/14651858.CD012824.pub2" target="_blank" rel="noopener">Cochrane</a></li>
-    <li>Freeman R, et al. Consensus statement on the definition of orthostatic hypotension, neurally mediated syncope and the postural tachycardia syndrome. Clin Auton Res 2011;21:69-72. <a href="https://pubmed.ncbi.nlm.nih.gov/21431947/" target="_blank" rel="noopener">PubMed</a></li>
-    <li>Norcliffe-Kaufmann L, et al. Orthostatic heart rate changes in patients with autonomic failure caused by neurodegenerative synucleinopathies. Ann Neurol 2018;83:522-31. <a href="https://pubmed.ncbi.nlm.nih.gov/29405350/" target="_blank" rel="noopener">PubMed</a></li>
-    <li>Daum C, et al. The value of 'positive' clinical signs for weakness, sensory and gait disorders in conversion disorder: a systematic and narrative review. J Neurol Neurosurg Psychiatry 2014;85:180-90. <a href="https://pubmed.ncbi.nlm.nih.gov/23467417/" target="_blank" rel="noopener">PubMed</a></li>
-  </ul></div>
-  <div class="disc">診察の要点をまとめた学習・診療補助用の資料です。髄節・数値は成書の一般的な目安で、書籍により1髄節程度の違いがあります（原典との個別照合はしていません）。最終判断は診察所見と原典で行ってください。患者情報は入力・保存しません（☆登録と最近見た項目だけを端末内に保存）。</div>
-  <p class="note">版：<span id="ver"></span>　<button class="vbtn" id="upd" type="button">最新版に更新</button></p>
-</section>
-</main>
-<nav class="tabs" id="tabs">
-  <button data-v="map" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4.5"/><path d="M12 11.5v10M8 15h8"/></svg>部位</button>
-  <button data-v="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>所見</button>
-  <button data-v="fig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 15l3-3 3 3 2-2 3 3"/><circle cx="9" cy="8.5" r="1.3"/></svg>図</button>
-  <button data-v="src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6"/></svg>出典</button>
-</nav>
-<div id="viewer" role="dialog" aria-modal="true"><div class="vh"><span id="vT"></span><button id="vP" type="button">←</button><button id="vN" type="button">→</button><button id="vZ" type="button">拡大</button><button id="vX" type="button">閉じる</button></div><div class="vb" id="vB"><img id="vI" alt=""></div></div>
-<div id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">
-  <div class="sh"><button id="shBack" type="button" aria-label="戻る">←</button><h2 id="shT"></h2><button id="shFav" type="button" aria-label="☆登録">☆</button><button id="shX" type="button" aria-label="閉じる">閉じる</button></div>
-  <div class="sb" id="shB"><div id="shC"></div></div>
-</div>
-<script>
-// 神経所見アトラス：所見データ（本文は教科書の要点を自分の言葉でまとめたもの）
-// r: 系統, n: 名称, en: 英語, k: 検索・索引キーワード, how: 診察法, ab: 異常所見, mean: 意味・局在, pit: 注意点, fig: 図ID, rel: 関連
-const ITEMS = [
-// ───────── 意識・髄膜・脳幹反射
-{id:"loc-jcs",r:"意識",n:"意識レベル（JCS・GCS）",en:"Level of consciousness",k:["意識障害","JCS","GCS","Japan Coma Scale","Glasgow Coma Scale","昏睡"],
-how:["呼びかけ→肩をたたく→痛み刺激（爪床圧迫・眼窩上切痕圧迫）の順に強める","GCSは開眼E・最良言語V・最良運動Mを別々に記録（例 E3V4M6）","挿管中はVをT、眼瞼腫脹で開眼不能はCと書く"],
-ab:["JCS：Ⅰ桁＝刺激なしで覚醒、Ⅱ桁＝刺激で覚醒、Ⅲ桁＝刺激でも覚醒しない（R・I・Aを付記）","GCS M：6従命、5疼痛部位へ手、4逃避屈曲、3異常屈曲、2伸展、1なし"],
-mean:["GCS 8以下は気道確保を検討する目安","運動反応の左右差は局在所見として重要（片麻痺の検出）"],
-pit:["失語・閉じ込め症候群・心因性無反応を意識障害と取り違えない（垂直眼球運動・瞬目で意思疎通を試す）","痛み刺激は四肢末梢だと脊髄反射の逃避と区別しにくい。顔面（眼窩上）でも行う"],rel:["loc-brain","loc-meng"]},
-{id:"loc-brain",r:"意識",n:"昏睡患者の脳幹徴候（瞳孔・眼位・呼吸・肢位）",en:"Brainstem signs in coma",k:["人形の目","頭位眼球反射","眼球頭反射","oculocephalic","カロリック","温度眼振","除脳硬直","除皮質硬直","Cheyne-Stokes","チェーン・ストークス","中枢性過換気","失調性呼吸","鉤ヘルニア","脳ヘルニア"],
-how:["瞳孔径・左右差・対光反射","安静時眼位（共同偏視・斜偏位）と頭位眼球反射（人形の目：頸椎損傷がないことを確認してから）","角膜反射・咳反射・呼吸パターン・痛み刺激での肢位"],
-ab:["除皮質肢位（上肢屈曲・下肢伸展）＝大脳半球〜間脳","除脳肢位（四肢伸展・上肢回内）＝中脳〜橋上部","呼吸：Cheyne-Stokes（両側半球・間脳）、中枢性過換気（中脳〜橋上部）、持続性吸息（橋）、失調性（延髄）"],
-mean:["鉤ヘルニア：同側の散瞳（動眼神経圧迫）→意識低下→対側片麻痺。Kernohan切痕で同側片麻痺が出ることもある","代謝性昏睡では対光反射が比較的保たれ、瞳孔所見と他の脳幹所見が解離しやすい"],
-pit:["人形の目は覚醒患者では固視で抑制される（正常）。昏睡で頭位眼球反射が消失するのは脳幹障害または深い薬物中毒","散瞳薬・オピオイド（縮瞳）・抗コリン薬など薬剤の影響を確認"],fig:"pupil",rel:["loc-jcs","cn-pupil","eom-gaze"]},
-{id:"loc-meng",r:"意識",n:"髄膜刺激徴候",en:"Meningeal signs",k:["項部硬直","Kernig","ケルニッヒ","Brudzinski","ブルジンスキー","jolt accentuation","髄膜刺激"],
-how:["項部硬直：仰臥位で頭部をゆっくり前屈。顎と胸の間を何横指と記載する","Kernig徴候：股・膝を90°屈曲し膝を伸ばす。135°未満で抵抗・疼痛","Brudzinski徴候：頭部前屈で股・膝が屈曲","jolt accentuation：頭を水平に毎秒2〜3回振り頭痛が増悪するか"],
-ab:["前屈のみ抵抗があり回旋・側屈は比較的保たれる＝髄膜刺激","全方向に抵抗＝頸椎疾患・パーキンソニズム・Gegenhalten"],
-mean:["くも膜下出血・髄膜炎で陽性。発症早期・高齢・昏睡・乳児では出にくい"],
-pit:["いずれも感度は高くない。陰性でも髄膜炎は否定できず、疑えば髄液検査","高齢者は頸椎症で前屈制限があり偽陽性になりやすい"],rel:["loc-jcs"]},
-
-// ───────── 高次脳機能
-{id:"hb-orient",r:"高次脳",n:"見当識・注意・記憶のベッドサイド評価",en:"Orientation, attention, memory",k:["見当識","注意","記憶","HDS-R","長谷川式","MMSE","MoCA","数唱","逆唱","3語","遅延再生","せん妄"],
-how:["見当識：時→場所→人","注意：数唱（順唱5桁以上・逆唱3〜4桁以上が目安）、100−7、月の逆唱","記憶：3語記銘→干渉課題→遅延再生。手がかりで思い出せるか","スクリーニング：HDS-R・MMSE・MoCA"],
-ab:["注意障害が前景（逆唱不良・注意の転導）＝せん妄・急性錯乱を疑う","手がかりでも改善しない遅延再生障害＝海馬型の記憶障害"],
-mean:["せん妄は急性発症と注意障害が中核。認知症と重なることも多い","視床・脳弓・海馬・側頭葉内側の病変で健忘"],
-pit:["失語があると言語課題の点数は下がる。言語を使わない課題で確認","教育歴・難聴・視力を考慮する"],rel:["hb-aph","hb-front"]},
-{id:"hb-aph",r:"高次脳",n:"失語（流暢性・理解・復唱・呼称）",en:"Aphasia",k:["失語","Broca","ブローカ","Wernicke","ウェルニッケ","伝導失語","超皮質性","全失語","健忘失語","復唱","呼称","錯語","失文法"],
-how:["自発話の流暢性（発話量・句の長さ・プロソディ・努力性）","理解：口頭命令（1段階→3段階）、Yes/No質問","復唱：単語→文","呼称：身近な物品と部分（時計の針など）","読み・書き（書字は失語の鋭敏な指標）"],
-ab:["非流暢＋理解良好＋復唱不良＝Broca失語","流暢（錯語・新造語）＋理解不良＋復唱不良＝Wernicke失語","流暢＋理解良好＋復唱だけ不良（音韻性錯語）＝伝導失語","復唱が保たれる＝超皮質性失語（運動性・感覚性・混合性）","呼称障害のみ＝健忘失語（局在価値は低い）"],
-mean:["Broca：左下前頭回後部（弁蓋部・三角部）と周囲。Wernicke：左上側頭回後部。伝導：弓状束・縁上回","超皮質性：シルビウス裂周囲言語野は保たれ、分水嶺域など周囲の病変"],
-pit:["構音障害（運動の問題）と失語（言語の問題）を区別する。書字が保たれれば構音障害","左利きでも多くは左半球優位"],rel:["cn-dysar","hb-apra"]},
-{id:"hb-apra",r:"高次脳",n:"失行",en:"Apraxia",k:["失行","観念運動失行","観念失行","肢節運動失行","構成失行","着衣失行","パントマイム","模倣"],
-how:["口頭命令でジェスチャー（さようなら・おいで）、道具使用のパントマイム（歯ブラシ・金槌）","検者の手指の形の模倣（キツネ・鳩）","実物の道具の系列使用（マッチで火をつける・封筒に便箋を入れる）","立方体の模写・時計描画（構成）"],
-ab:["パントマイム・模倣が障害、実物使用は比較的保たれる＝観念運動失行","道具使用の系列・意味が障害＝観念失行","巧緻運動が麻痺なしに拙劣（片手）＝肢節運動失行"],
-mean:["観念運動失行・観念失行は左頭頂葉（縁上回）が中心、両手に出る","構成失行は左右どちらの頭頂葉でも（右は空間配置が崩れ、左は簡略化）","着衣失行は右頭頂葉"],
-pit:["麻痺・失調・感覚障害・理解障害では説明できないことを確認してから失行と判断"],rel:["hb-aph","hb-neg"]},
-{id:"hb-neg",r:"高次脳",n:"半側空間無視・身体失認",en:"Hemispatial neglect",k:["半側空間無視","線分二等分","線分抹消","消去現象","病態失認","身体失認","Gerstmann","ゲルストマン","手指失認","左右失認"],
-how:["線分二等分（中点が右へずれる）、線分抹消、花・時計の模写","視覚・触覚の両側同時刺激で一側が消える（消去現象）","麻痺の自覚を尋ねる（病態失認）","Gerstmann徴候：手指失認・左右失認・失書・失算"],
-ab:["左側の見落とし・描画の左欠落、頭部・眼位が右を向く","片麻痺の否認・無関心"],
-mean:["左半側空間無視・病態失認は右頭頂葉（下頭頂小葉・側頭頭頂接合部）、右前頭葉・視床でも","Gerstmann症候群は左角回"],
-pit:["同名半盲と無視は別物（半盲だけなら頭を動かして代償できる）。両方あることも多い"],rel:["cn-vf","sn-cort"]},
-{id:"hb-front",r:"高次脳",n:"前頭葉徴候・原始反射",en:"Frontal release signs",k:["前頭葉","把握反射","吸引反射","口尖らし反射","手掌頤反射","保続","FAB","Luria","拳刀掌","go/no-go","強制把握","前頭葉徴候"],
-how:["把握反射：手掌を母指と示指の間へなでる","口尖らし反射：上口唇を軽く叩く。吸引反射：口角をなでる","手掌頤反射：母指球をこすり同側オトガイ筋の収縮を見る","FAB（類似・語流暢性・Luria拳-刀-掌・葛藤指示・go/no-go・把握）"],
-ab:["把握反射・強制把握（握った手を離せない）","保続・系列動作の崩れ・抑制障害"],
-mean:["把握反射は対側前頭葉内側（補足運動野・帯状回）の病変で特異度が高い","口尖らし・手掌頤反射は単独では高齢者に正常でもみられ局在価値は低い"],
-pit:["原始反射は複数・持続的・左右差があるときに意味を持つ"],rel:["hb-orient","mt-tone"]},
-
-// ───────── 脳神経（I〜XII）
-{id:"cn-olf",r:"脳神経",n:"嗅覚（Ⅰ）",en:"Olfaction",k:["嗅覚","嗅神経","嗅覚障害","嗅覚低下","アンモニア"],
-how:["片側の鼻孔を押さえ、コーヒー・石けんなど刺激の少ない匂いで左右別に","アンモニアなど刺激臭は三叉神経を刺激するので使わない"],
-ab:["嗅覚低下・脱失（左右差に注意）"],
-mean:["鼻副鼻腔疾患・上気道感染後・頭部外傷が多い","前頭蓋底の髄膜腫（片側の嗅覚脱失）","PD・DLBでは運動症状に先行して低下"],
-pit:["鼻閉の有無を先に確認"],rel:[]},
-{id:"cn-va",r:"脳神経",n:"視力・眼底",en:"Visual acuity, fundus",k:["視力","眼底","乳頭浮腫","うっ血乳頭","視神経萎縮","視神経乳頭","眼底検査"],
-how:["片眼ずつ近見視力表、なければ指数弁→手動弁→光覚弁","屈折異常の影響はピンホールで除く","眼底：乳頭の境界・色調・静脈拍動・出血、網膜血管"],
-ab:["乳頭浮腫（両側・視力は初期保たれる）＝頭蓋内圧亢進","乳頭腫脹＋視力低下・RAPD＝視神経炎（乳頭炎）・虚血性視神経症","乳頭蒼白＝視神経萎縮"],
-mean:["球後視神経炎では眼底は正常（「患者は何も見えず、医師も何も見えない」）"],
-pit:["散瞳薬は瞳孔所見を消すので、意識障害例では使用を記録・共有する"],rel:["cn-vf","cn-pupil"]},
-{id:"cn-vf",r:"脳神経",n:"視野（対座法）",en:"Visual fields by confrontation",k:["視野","対座法","同名半盲","両耳側半盲","四分盲","上四分盲","下四分盲","黄斑回避","視野欠損","半盲"],
-how:["向かい合い片眼ずつ、4象限で指の数・動きを答えさせる","赤い物の色の褪せ（赤色減弱）で軽い視神経障害を拾う","意識障害・失語では威嚇瞬目で左右差をみる"],
-ab:["単眼の欠損＝視交叉より前（網膜・視神経）","両耳側半盲＝視交叉（下垂体腫瘍など）","同名半盲＝視交叉より後ろ（視索〜後頭葉）","上四分盲＝側頭葉（Meyerループ）、下四分盲＝頭頂葉","黄斑回避を伴う同名半盲＝後頭葉（後大脳動脈領域）"],
-mean:["視交叉より後ろの障害は、病巣と反対側の視野が欠ける","同名半盲は一致性が高いほど後方（後頭葉）"],
-pit:["半側空間無視と同名半盲の区別（hb-neg）","対座法は粗いので疑えば視野計で確認"],fig:"vf",rel:["cn-va","hb-neg"]},
-{id:"cn-pupil",r:"脳神経",n:"瞳孔・対光反射・RAPD",en:"Pupils, light reflex, RAPD",k:["瞳孔","対光反射","瞳孔不同","RAPD","相対的求心性瞳孔障害","swinging flashlight","Marcus Gunn","近見反射","対光近見解離","Argyll Robertson","Adie","緊張性瞳孔"],
-how:["明所と暗所で瞳孔径を比べる（どちらで左右差が大きいか）","直接・間接対光反射","swinging flashlight test：光を左右の眼に2〜3秒ずつ交互に当て、当てたときに散大する眼を探す","近見反射（輻輳・縮瞳）"],
-ab:["暗所で左右差が拡大＝小さい方が異常（Horner症候群）","明所で左右差が拡大＝大きい方が異常（動眼神経麻痺・緊張性瞳孔・薬剤）","光を当てると散大する側＝RAPD陽性（その側の視神経・広範な網膜障害）","対光反射なし・近見反射あり（対光近見解離）＝Argyll Robertson瞳孔、Adie瞳孔、中脳背側"],
-mean:["RAPDは片側または左右差のある視神経障害の客観的所見（白内障では通常出ない）","Adie瞳孔：片側散瞳、近見で緩徐に縮瞳、希釈ピロカルピン（0.1%程度）に過敏に縮瞳"],
-pit:["生理的瞳孔不同（1mm以下で明暗で差が変わらない）は約2割にある"],fig:"pupil",rel:["cn-horner","cn-3"]},
-{id:"cn-horner",r:"脳神経",n:"Horner症候群・眼瞼下垂",en:"Horner syndrome, ptosis",k:["Horner","ホルネル","眼瞼下垂","縮瞳","無汗","交感神経","眼瞼挙筋","重症筋無力症","眼瞼下垂の鑑別","アプラクロニジン"],
-how:["眼瞼下垂の程度（瞳孔にかかるか）・下眼瞼の挙上（逆下垂）・暗所での瞳孔不同","顔面の発汗の左右差","持続上方視で下垂が増悪するか（易疲労性）、Cogan lid twitch"],
-ab:["軽度下垂＋縮瞳（暗所で差が拡大）＋散瞳遅延＝Horner","完全下垂＋外下方偏位＋散瞳＝動眼神経麻痺","変動・易疲労性・両側非対称＝重症筋無力症","高齢・瞳孔正常・眼瞼が薄い＝腱膜性（加齢性）"],
-mean:["Horner：中枢（視床下部〜延髄外側〜頸髄）、節前（肺尖・頸部）、節後（内頸動脈解離・海綿静脈洞）","顔面全体の無汗＝節前、無汗なし＝節後が多い","急性の有痛性Hornerは内頸動脈解離を考える"],
-pit:["点眼試験（アプラクロニジンで散瞳・下垂改善）で確認できる","対側の偽性眼瞼後退（Heringの法則）で下垂側を見誤らない"],fig:"pupil",rel:["cn-pupil","cn-3","mt-fatig"]},
-{id:"cn-3",r:"脳神経",n:"動眼神経麻痺（Ⅲ）",en:"Oculomotor nerve palsy",k:["動眼神経","動眼神経麻痺","散瞳","内転障害","IC-PC","内頸動脈後交通動脈","糖尿病性動眼神経麻痺","瞳孔回避"],
-how:["眼瞼下垂、安静時の外下方偏位、内転・上転・下転の制限、瞳孔"],
-ab:["瞳孔散大を伴う＝圧迫性（動脈瘤など）を優先","瞳孔回避＋疼痛＝虚血性（糖尿病・高血圧）が多い","両側眼瞼下垂＋両側上転障害＋対側の上直筋も障害＝動眼神経核（中脳）"],
-mean:["瞳孔線維は神経の表層を走るため圧迫で早く障害される","IC-PC動脈瘤・鉤ヘルニア・海綿静脈洞病変"],
-pit:["瞳孔回避でも発症早期・不全麻痺は動脈瘤を否定できない。画像（MRA/CTA）で確認"],fig:"eom",rel:["cn-pupil","eom-dip"]},
-{id:"cn-4-6",r:"脳神経",n:"滑車神経・外転神経麻痺（Ⅳ・Ⅵ）",en:"Trochlear and abducens palsy",k:["滑車神経","外転神経","上斜筋","外直筋","Bielschowsky","ビルショウスキー","頭部傾斜","false localizing","偽局在徴候","外転障害","縦複視","横複視"],
-how:["Ⅳ：患側眼の上斜視が、健側注視・下方視・患側への頭部傾斜で増悪（Bielschowsky頭部傾斜試験）","Ⅵ：患側への外転制限、遠見で横複視が増悪"],
-ab:["Ⅳ麻痺：健側へ頭を傾ける代償頭位、縦（斜め）複視、階段を降りるとき見にくい","Ⅵ麻痺：内斜視、患側注視で横複視"],
-mean:["Ⅳ：頭部外傷が多い（神経が細長い）、先天性の代償不全","Ⅵ：虚血・頭蓋内圧亢進（偽局在徴候）・海綿静脈洞・斜台病変"],
-pit:["Ⅵ麻痺に同側顔面神経麻痺・対側片麻痺を伴えば橋（Millard-Gubler）"],fig:"eom",rel:["eom-dip","cn-3"]},
-{id:"eom-dip",r:"眼球運動",n:"眼球運動と複視の評価",en:"Ocular motility, diplopia",k:["眼球運動","複視","赤ガラス","遮閉試験","cover test","交代遮閉","外眼筋","共同運動","衝動性眼球運動","滑動性追従","saccade"],
-how:["指標をH字（9方向）に追わせ、各眼の可動域と複視の出る方向をみる","複視が単眼か両眼か（片眼を隠して消えれば両眼性）","像の離れ方が最大になる方向＝麻痺筋の作用方向。外側の像は麻痺眼の像（赤ガラスで確認）","交代遮閉試験で眼位ずれ（斜偏位）","衝動性眼球運動（2点を交互に見る）と滑動性追従"],
-ab:["単眼性複視＝眼科的（乱視・白内障）","両眼性：特定の神経支配に一致＝脳神経麻痺、一致しない・変動＝MG・甲状腺眼症・眼窩病変","衝動性眼球運動の緩徐化＝PSP（垂直）・SCA2など、測定障害＝小脳"],
-mean:["神経支配：外直筋Ⅵ、上斜筋Ⅳ、その他Ⅲ"],
-pit:["甲状腺眼症は上転・外転制限（下直筋・内直筋の肥厚）が多い","MGは瞳孔正常でどんな眼球運動障害も真似る"],fig:"eom",rel:["cn-3","cn-4-6","eom-mlf","eom-gaze"]},
-{id:"eom-mlf",r:"眼球運動",n:"MLF症候群・one-and-a-half症候群",en:"INO, one-and-a-half syndrome",k:["MLF","内側縦束","核間性眼筋麻痺","INO","one-and-a-half","一つ半症候群","PPRF","傍正中橋網様体","水平注視麻痺"],
-how:["側方視で内転側の眼の動きと、外転側の眼振を観察","輻輳で内転できるか"],
-ab:["MLF症候群：患側眼の内転障害＋対側眼の外転時眼振、輻輳は保たれる（後方型）","one-and-a-half：患側への水平注視麻痺＋患側眼の内転障害→対側眼の外転だけが残る"],
-mean:["MLFは橋〜中脳被蓋。若年両側性＝MS、高齢片側性＝脳幹梗塞","one-and-a-half：同側の外転神経核またはPPRF＋MLF（橋被蓋）"],
-pit:["軽いINOは内転速度の遅れだけ。速い衝動性眼球運動で左右を比べる","MGもINO様の所見をとる"],fig:"mlf",rel:["eom-dip","eom-gaze"]},
-{id:"eom-gaze",r:"眼球運動",n:"共同偏視・垂直注視麻痺",en:"Conjugate gaze deviation, vertical gaze palsy",k:["共同偏視","注視麻痺","垂直注視麻痺","上方注視麻痺","Parinaud","パリノー","輻輳後退眼振","中脳背側","PSP","進行性核上性麻痺","核上性","wrong-way"],
-how:["安静時の眼位、随意の注視、頭位眼球反射で動くか（核上性なら動く）"],
-ab:["大脳病変：病巣側を向く（片麻痺と反対側を見る）。発作中は病巣の反対側を見る","橋病変：病巣と反対側を向く（片麻痺側を見る）","視床出血：下方・内下方（鼻先を見る）、時に病巣と反対側（wrong-way）","Parinaud：上方注視麻痺＋対光近見解離＋輻輳後退眼振＋眼瞼後退"],
-mean:["Parinaudは中脳背側（松果体腫瘍・水頭症・中脳梗塞）","核上性垂直注視麻痺（下方優位）＋頭位眼球反射保存＝PSP"],
-pit:["共同偏視は数日で軽快することが多い"],fig:"gaze",rel:["eom-dip","loc-brain"]},
-{id:"eom-nys",r:"眼球運動",n:"眼振",en:"Nystagmus",k:["眼振","注視眼振","方向交代性","下眼瞼向き眼振","上眼瞼向き眼振","回旋性眼振","Frenzel","フレンツェル","固視抑制","Alexanderの法則","注視誘発眼振"],
-how:["正面視・左右上下30°程度の注視で観察（極端な側方視の終末位眼振は生理的）","Frenzel眼鏡（または暗所・スマートフォン撮影）で固視を除いて観察","急速相の方向で名前を付ける"],
-ab:["一方向性・水平回旋混合・固視で抑制・急速相方向を見ると増強＝末梢前庭性","注視方向で向きが変わる（方向交代性注視眼振）＝中枢性（小脳・脳幹）、薬剤","純粋な垂直・純粋な回旋＝中枢性","下眼瞼向き眼振＝小脳片葉・頭蓋頸椎移行部、上眼瞼向き＝延髄・中脳"],
-mean:["抗てんかん薬・アルコールでも注視眼振","先天性眼振は振子様・固視で増強・輻輳で減弱"],
-pit:["急性めまいでは眼振の性状と次項のHINTSを合わせて中枢性を見逃さない"],fig:"hints",rel:["vs-hints","cb-limb"]},
-{id:"vs-hints",r:"眼球運動",n:"急性めまいのHINTS（HIT・眼振・斜偏位）",en:"HINTS exam",k:["HINTS","head impulse","ヘッドインパルス","HIT","skew","斜偏位","急性前庭症候群","前庭神経炎","小脳梗塞","めまい"],
-how:["対象：持続する急性前庭症候群（自発眼振あり）","HIT：頭部を左右に素早く10〜20°回旋し、検者の鼻を固視できるか（追いつきのsaccade）","眼振：方向交代性か","交代遮閉試験で垂直方向の眼位ずれ（skew）"],
-ab:["中枢性を示唆：HITが正常、方向交代性眼振、skewあり（いずれか1つ）","末梢性を示唆：HITで一側の追いつきsaccade、一方向性眼振、skewなし"],
-mean:["「HITが正常」なのに自発眼振と強いめまいがある＝脳幹・小脳梗塞を疑う","新規の片側難聴を伴えばAICA梗塞（HINTS plus）"],
-pit:["自発眼振のない一過性・頭位性めまいには使わない（頭位検査へ）","発症早期のMRI拡散強調画像は後方循環の小梗塞を見逃しうる"],fig:"hints",rel:["eom-nys","vs-bppv","cb-gait"]},
-{id:"vs-bppv",r:"眼球運動",n:"頭位・頭位変換検査（BPPV）",en:"Positional tests (Dix-Hallpike, supine roll)",k:["BPPV","良性発作性頭位めまい","Dix-Hallpike","ディックス・ホールパイク","supine roll","頭位変換","後半規管","外側半規管","Epley","耳石"],
-how:["Dix-Hallpike：座位で頭を45°回旋→素早く仰臥位・頸部軽度後屈。下になった耳が検査側","supine roll test：仰臥位で頭を左右90°回旋"],
-ab:["後半規管型：数秒の潜時の後、上眼瞼向き＋下の耳へ向かう回旋性眼振が数十秒で減衰","外側半規管型：水平性の方向交代性眼振（地面向き／天井向き）"],
-mean:["典型的でない頭位眼振（潜時なし・減衰しない・純粋な下眼瞼向き）は中枢性頭位めまいを考える"],
-pit:["頸椎疾患・頸動脈狭窄では頸部の伸展・回旋を控える"],rel:["vs-hints","eom-nys"]},
-{id:"cn-5",r:"脳神経",n:"三叉神経（Ⅴ）・角膜反射・下顎反射",en:"Trigeminal nerve",k:["三叉神経","角膜反射","下顎反射","咬筋","顔面感覚","玉ねぎ状","onion skin","三叉神経痛","顎偏位"],
-how:["V1・V2・V3の触覚・痛覚を左右比較","角膜反射：綿糸で角膜（結膜でなく）を外側から触れる","咬筋・側頭筋の触診（噛みしめ）、開口時の顎偏位","下顎反射：軽く開口した顎に指を当てて叩く"],
-ab:["開口で麻痺側へ顎が偏位（翼突筋麻痺）","角膜反射：求心路Ⅴ・遠心路Ⅶ。刺激側で消失＝Ⅴ、どちらを刺激しても一側で瞬目なし＝Ⅶ","下顎反射亢進＝橋より上位の両側錐体路（偽性球麻痺・ALS）"],
-mean:["顔面感覚が口周囲から同心円状に外側へ広がる障害＝三叉神経脊髄路核（延髄〜上部頸髄）","顔面の感覚障害が下顎角を含む＝非器質性を考える（下顎角はC2〜3支配）"],
-pit:["角膜反射の低下は小脳橋角部腫瘍の早期徴候"],fig:"face",rel:["cn-7","sn-pattern"]},
-{id:"cn-7",r:"脳神経",n:"顔面神経麻痺（中枢性・末梢性）",en:"Facial palsy: central vs peripheral",k:["顔面神経","顔面神経麻痺","Bell麻痺","ベル麻痺","中枢性顔面麻痺","末梢性顔面麻痺","前頭筋","眼輪筋","口輪筋","Bell現象","聴覚過敏","味覚","Ramsay Hunt"],
-how:["額のしわ寄せ（前頭筋）、強い閉眼（睫毛徴候）、イーと歯を見せる、頬を膨らませる","Bell現象（閉眼時の眼球上転）","味覚（舌前2/3）、聴覚過敏、涙・唾液、耳介・外耳道の水疱"],
-ab:["末梢性（核下性）：額を含む半側顔面全体の麻痺","中枢性（核上性）：下部顔面が主で額のしわ寄せ・閉眼は比較的保たれる","感情表出（笑い）では動くのに随意で動かない＝皮質延髄路、逆に随意では動き情動で動かない＝前頭葉内側・視床など"],
-mean:["前頭筋は両側大脳から支配されるため中枢性では保たれる","聴覚過敏＝アブミ骨筋神経より近位、味覚障害＝鼓索神経より近位","耳の帯状疱疹・難聴・めまい＝Ramsay Hunt症候群","両側末梢性＝GBS・サルコイドーシス・ライム病"],
-pit:["中枢性でも閉眼がやや弱いことはある。他の大脳・脳幹症候を必ず確認","橋病変は末梢型の顔面麻痺をとる（神経核・神経根）"],fig:"face",rel:["cn-5","cn-8"]},
-{id:"cn-8",r:"脳神経",n:"聴覚（Ⅷ）・Weber/Rinne",en:"Hearing: Weber and Rinne tests",k:["聴覚","難聴","Weber","ウェーバー","Rinne","リンネ","音叉","感音難聴","伝音難聴","突発性難聴","指こすり"],
-how:["指こすり・ささやき声で左右差","Weber：512Hz音叉を額中央に当て、どちらに響くか","Rinne：乳様突起（骨導）→聞こえなくなったら外耳道前（気導）"],
-ab:["Weber：伝音難聴では患側へ、感音難聴では健側へ偏る","Rinne：伝音難聴で陰性（骨導>気導）、感音難聴・正常で陽性"],
-mean:["急性片側感音難聴＋めまい＝内耳・AICA領域梗塞も考える","片側進行性感音難聴＝聴神経鞘腫"],
-pit:["耳垢・中耳炎を先に確認"],fig:"weber",rel:["vs-hints"]},
-{id:"cn-9-10",r:"脳神経",n:"舌咽・迷走神経（Ⅸ・Ⅹ）：軟口蓋・咽頭反射・嗄声",en:"Glossopharyngeal and vagus nerves",k:["舌咽神経","迷走神経","軟口蓋","カーテン徴候","咽頭反射","嗄声","反回神経","口蓋垂","嚥下障害","球麻痺","偽性球麻痺"],
-how:["「アー」と発声させ軟口蓋の挙上と咽頭後壁の動きを観察","咽頭反射（左右別に）","声の性状・咳の強さ、水飲みテスト"],
-ab:["カーテン徴候：麻痺側の咽頭後壁が健側へ引かれる、軟口蓋は健側が挙がる","開鼻声・鼻への逆流、嗄声（反回神経）"],
-mean:["一側の球麻痺＋同側Horner＋顔面温痛覚低下＋対側体幹温痛覚低下＝延髄外側症候群（Wallenberg）","球麻痺（延髄・下位脳神経・神経筋）と偽性球麻痺（両側皮質延髄路：下顎反射亢進・強制泣き笑い）を区別"],
-pit:["咽頭反射は正常でも消失していることがあり、単独の消失は局在価値が低い。左右差に意味がある"],fig:"tongue",rel:["cn-12","cn-dysar"]},
-{id:"cn-11",r:"脳神経",n:"副神経（Ⅺ）",en:"Accessory nerve",k:["副神経","胸鎖乳突筋","僧帽筋","肩挙上","翼状肩甲"],
-how:["胸鎖乳突筋：顔を一側へ回す力に抵抗（右SCMは顔を左へ回す）","僧帽筋：肩をすくめる力、肩の下垂・翼状肩甲"],
-ab:["SCM・僧帽筋の筋力低下・萎縮"],
-mean:["頸部リンパ節生検など頸部後三角の手術後の僧帽筋麻痺","大脳病変では同側のSCM（顔を病巣の反対側へ回す筋）が弱くなる"],
-pit:["機能性筋力低下ではSCMの左右パターンが解剖と合わないことがある"],rel:["fn-hoover"]},
-{id:"cn-12",r:"脳神経",n:"舌下神経（Ⅻ）・舌の萎縮と線維束性収縮",en:"Hypoglossal nerve",k:["舌下神経","舌","舌偏位","舌萎縮","線維束性収縮","fasciculation","舌の挺出"],
-how:["口腔内で安静にした舌の萎縮・線維束性収縮（挺出させると正常でも震えるので安静時に）","挺出時の偏位、頬を内側から押させる力"],
-ab:["核下性：挺出で麻痺側へ偏位＋同側の萎縮・線維束性収縮","核上性：麻痺側（病巣の反対側）へ偏位、萎縮なし"],
-mean:["両側の舌萎縮・線維束性収縮＝ALS（球麻痺型）を強く疑う","舌下神経管・頸動脈解離（下位脳神経麻痺）"],
-pit:["顔面麻痺があると口角の偏りで舌偏位を見誤る。鼻・上唇の中心線と比べる"],fig:"tongue",rel:["cn-9-10","mt-atro"]},
-{id:"cn-dysar",r:"脳神経",n:"構音障害（ディサースリア）の型",en:"Dysarthria types",k:["構音障害","ディサースリア","断綴性","爆発性","パタカ","弛緩性","痙性","失調性","運動低下性","不明瞭言語"],
-how:["会話・音読、「パ・タ・カ」の反復（口唇・舌尖・奥舌）、長い母音の持続"],
-ab:["弛緩性：鼻声・子音の歪み（下位運動ニューロン・NMJ）","痙性：努力性・緩慢・しぼり出す声（両側上位運動ニューロン）","失調性：断綴性・爆発性・音量と抑揚の不規則（小脳）","運動低下性：小声・単調・加速（パーキンソニズム）","運動過多性：不規則な途切れ（舞踏・ジストニア）"],
-mean:["片側性上位運動ニューロン障害でも一過性の構音障害（不明瞭）は出る"],
-pit:["失語との区別：書字・理解・言語の内容が保たれていれば構音障害"],rel:["hb-aph","cn-9-10"]},
-
-// ───────── 運動
-{id:"mt-atro",r:"運動",n:"視診：筋萎縮・線維束性収縮・肥大",en:"Atrophy, fasciculation, hypertrophy",k:["筋萎縮","線維束性収縮","fasciculation","筋肥大","仮性肥大","ふくらはぎ","手内筋萎縮","骨間筋","母指球","斧状顔貌"],
-how:["脱衣して左右・近位遠位を比べる（手内筋・母指球・前腕・肩甲帯・大腿・下腿）","線維束性収縮は温かい部屋で数分観察。軽く叩くと誘発されやすい"],
-ab:["遠位優位の萎縮＝ニューロパチー、近位優位＝筋疾患・SMA","広範な線維束性収縮＋萎縮＋腱反射亢進＝ALS","下腿の仮性肥大＝Duchenne/Becker型、手指屈筋・大腿四頭筋優位の萎縮＝封入体筋炎"],
-mean:["線維束性収縮は下位運動ニューロン障害の所見。単独で萎縮・筋力低下を伴わなければ良性のことも多い"],
-pit:["廃用萎縮は全体的で軽い。分布が特定の神経・髄節に一致するかを確認"],rel:["mt-mmt","cn-12","rx-dtr"]},
-{id:"mt-tone",r:"運動",n:"筋トーヌス（痙縮・固縮・Gegenhalten・低下）",en:"Muscle tone",k:["筋トーヌス","痙縮","固縮","強剛","歯車様","鉛管様","折りたたみナイフ","Gegenhalten","パラトニア","筋緊張低下","Froment手技","増強法","手首の固縮"],
-how:["力を抜かせ、肘・手首・膝を不規則な速さで他動的に動かす","固縮の増強法：対側の手を開閉させる（Froment手技）","膝の振り子・踵落とし（下肢の痙縮・低緊張）"],
-ab:["痙縮：速く動かすほど抵抗が増し途中で抜ける（折りたたみナイフ）、上肢屈筋・下肢伸筋優位＝錐体路","固縮：速度によらず全可動域で一様な抵抗（鉛管様）、振戦が重なると歯車様＝錐体外路","Gegenhalten：動かそうとする力に比例して抵抗が増す、無意識の抵抗＝前頭葉・びまん性脳障害","低下：小脳障害（同側）、末梢神経障害、脊髄・脳卒中の急性期（ショック期）"],
-mean:["固縮の左右差はPDを示唆、頸部・体幹優位はPSP"],
-pit:["急性期の脳卒中・脊髄障害では痙縮でなく弛緩から始まる","緊張・不安で抵抗が出ることがある。会話しながら動かす"],rel:["mt-mmt","mv-park","rx-dtr"]},
-{id:"mt-mmt",r:"運動",n:"徒手筋力テスト（MMT）",en:"Manual muscle testing",k:["MMT","徒手筋力","筋力低下","近位筋","遠位筋","握力","三角筋","腸腰筋","大腿四頭筋","前脛骨筋","下垂手","下垂足"],
-how:["関節を固定し、検者の抵抗に対して最大収縮を数秒保たせる。左右・近位遠位を比較","0：収縮なし、1：収縮のみ、2：重力除去で全可動域、3：重力に抗して全可動域、4：ある程度の抵抗に抗する、5：正常"],
-ab:["錐体路型：上肢は伸筋（三角筋・上腕三頭筋・手関節伸筋・手指伸筋）、下肢は屈筋（腸腰筋・ハムストリング・前脛骨筋）が弱い","近位対称性＝筋疾患・NMJ（MG・LEMS）・CIDP","遠位対称性＝長さ依存性ニューロパチー","特定の筋群＝神経根・末梢神経（mt-root・mt-nerve）"],
-mean:["支配神経・髄節は別アプリ「MMTナビ」で詳しく引ける"],
-pit:["痛み・協力不良・機能性（give-way）を分けて記載","4は幅が広いので4−/4/4+などで記載し経時変化をみる"],rel:["mt-drift","sp-root","pn-arm","pn-leg"]},
-{id:"mt-drift",r:"運動",n:"軽微な麻痺の検出（上肢挙上試験・Mingazzini・Barré）",en:"Pronator drift, Mingazzini, Barré",k:["Barré","バレー","Mingazzini","ミンガッチーニ","回内落下","上肢挙上試験","pronator drift","第5指徴候","finger rolling","forearm rolling","軽微な片麻痺","錐体路徴候"],
-how:["上肢：両上肢を前方水平に挙上し閉眼で20〜30秒。手掌を上にすると回内が見やすい（pronator drift）。原法（Mingazzini）は手掌を下にして指を広げる","Mingazzini：仰臥位で股・膝を90°屈曲して保持","下肢Barré：腹臥位で膝を約45°屈曲して保持","forearm rolling：前腕を胸の前でぐるぐる回す（麻痺側の動きが小さく健側が回る）"],
-ab:["上肢：回内しながら下降・肘屈曲＝錐体路","上肢：回内せず下降・手指が浮く・ゆらゆら（偽性アテトーゼ）＝深部覚障害","上肢：上方へ浮く・外側へ流れる＝小脳・頭頂葉","第5指徴候：小指が外転して離れる"],
-mean:["MMTで4以上の軽い錐体路障害を最も拾いやすい"],
-pit:["名称は書籍で異なる。上肢の試験は本来Mingazziniの報告で、『上肢Barré試験』は誤用との指摘がある（下肢の腹臥位試験がBarré）。所見の内容で記載する","肩関節疾患・疼痛で落下することがある"],fig:"drift",rel:["mt-mmt","rx-path"]},
-{id:"mt-fatig",r:"運動",n:"易疲労性（重症筋無力症の診察）",en:"Fatigability",k:["易疲労性","重症筋無力症","MG","アイスパック","眼瞼下垂","持続上方視","上肢挙上持続","Cogan","日内変動","LEMS","増強現象"],
-how:["持続上方視60秒で眼瞼下垂・複視が出るか","上肢を水平に挙上して保持できる時間","アイスパック試験：閉眼した眼瞼に2分冷却し下垂が2mm以上改善するか","反復動作（数を数える・握力の反復）"],
-ab:["運動の反復・持続で悪化し休息で回復、夕方に悪化","Cogan lid twitch：下方視から正面視へ戻したとき上眼瞼が一瞬跳ね上がる","LEMS：近位筋力低下・腱反射低下・自律神経症状、反復収縮で一時的に筋力・反射が増強"],
-mean:["眼瞼下垂・複視・球症状・頸部屈筋・近位筋のパターン"],
-pit:["瞳孔は侵されない。瞳孔異常があれば他疾患を考える"],rel:["cn-horner","eom-dip","mt-mmt"]},
-{id:"mt-myot",r:"運動",n:"ミオトニア・筋の叩打",en:"Myotonia",k:["ミオトニア","筋強直","把握ミオトニア","叩打ミオトニア","筋強直性ジストロフィー","myotonia","パラミオトニア"],
-how:["強く握らせてから急に開かせる（把握ミオトニア）","母指球・舌・前腕伸筋を打腱器で叩く（叩打ミオトニア）"],
-ab:["手が開くのに数秒かかる、叩打部位が持続的にくぼむ・収縮"],
-mean:["筋強直性ジストロフィー（DM1：遠位・顔面・胸鎖乳突筋の筋力低下、前頭部禿頭、白内障）、先天性ミオトニア","反復で改善（ウォームアップ）＝ミオトニア、悪化＝パラミオトニア"],
-pit:["筋の叩打で一時的な膨隆（myoedema）は甲状腺機能低下でもみられる"],rel:["mt-atro"]},
-
-// ───────── 反射
-{id:"rx-dtr",r:"反射",n:"腱反射（深部腱反射）と髄節",en:"Deep tendon reflexes",k:["腱反射","深部腱反射","上腕二頭筋反射","腕橈骨筋反射","上腕三頭筋反射","膝蓋腱反射","アキレス腱反射","反射亢進","反射消失","Jendrassik","イェンドラシック","増強法","逆転現象","放散"],
-how:["力を抜いた肢位で、腱を打腱器の重みで叩く。左右同じ条件で比較","出にくいときはJendrassik法（両手を組んで引き合う・歯を噛みしめる）","記載：消失（−）、低下（±）、正常（+）、やや亢進（++）、亢進（+++）、著明亢進・クローヌス（++++）"],
-ab:["亢進：反射域の拡大・放散（隣接筋の収縮）・クローヌス＝錐体路","消失・低下＝下位運動ニューロン（根・末梢神経）・筋疾患の進行例・急性期脊髄ショック","逆転：二頭筋を叩くと二頭筋が出ず三頭筋が収縮＝その髄節の障害と下位の錐体路障害（頸椎症）"],
-mean:["下顎Ⅴ（橋）、二頭筋C5〜6、腕橈骨筋C5〜6、三頭筋C7（C6〜8）、膝蓋腱L3〜4（L2〜4）、アキレスS1","アキレスのみ消失＝長さ依存性ニューロパチー・S1根症・加齢"],
-pit:["左右差と、上肢と下肢の差に意味がある。全般に亢進でも病的とは限らない（緊張・甲状腺機能亢進）","高齢者のアキレス腱反射低下は単独では病的意義が低い"],fig:"reflex",rel:["rx-path","rx-hoff","rx-sup","sp-root"]},
-{id:"rx-path",r:"反射",n:"Babinski徴候・Chaddock反射",en:"Babinski sign, Chaddock reflex",k:["Babinski","バビンスキー","Chaddock","チャドック","足底反射","病的反射","母趾背屈","開扇現象","Oppenheim","Gordon"],
-how:["足底外側を踵から小趾球へ、そこで内側へ向けてゆっくりこする（強すぎない）","Chaddock：外果の下を後ろから前へこする","足を軽く押さえ、母趾の最初の動きを見る"],
-ab:["母趾のゆっくりした背屈（長母趾伸筋の収縮）＋他趾の開扇＝陽性（錐体路障害）","屈曲＝正常（足底反応屈曲）"],
-mean:["錐体路のどこが障害されても出る。急性期の大脳・脊髄障害、低血糖・発作後でも一過性に陽性"],
-pit:["くすぐったさでの逃避（足全体を引く・急速な背屈）と区別する。Chaddockは逃避が少ない","長母趾伸筋が麻痺していると陽性にならない（L5根・腓骨神経麻痺）","2歳未満は正常でも陽性"],fig:"babinski",rel:["rx-dtr","rx-hoff","rx-clonus"]},
-{id:"rx-hoff",r:"反射",n:"Hoffmann反射・Trömner反射・Wartenberg反射",en:"Hoffmann, Trömner reflexes",k:["Hoffmann","ホフマン","Trömner","トレムナー","Wartenberg","ワルテンベルグ","手指屈筋反射","上肢病的反射"],
-how:["Hoffmann：中指の末節を検者の母指で弾くように掌側へ屈曲させ、母指の屈曲を見る","Trömner：中指末節の掌側を指で弾く","Wartenberg：軽く屈曲させた指に検者の指を当てて叩く"],
-ab:["母指の内転屈曲が出る＝陽性（手指屈筋反射の亢進）"],
-mean:["手指屈筋（C8）レベルより上の錐体路障害を示唆。片側性・左右差は意味がある","頸椎症性脊髄症で上肢の陽性所見として重要"],
-pit:["両側性で軽度の陽性は健常者にもある（腱反射全般の亢進）。Babinski徴候のような病的反射とは扱いが異なる"],fig:"reflex",rel:["rx-dtr","rx-path"]},
-{id:"rx-clonus",r:"反射",n:"クローヌス",en:"Clonus",k:["クローヌス","足クローヌス","膝クローヌス","膝蓋クローヌス","足関節クローヌス"],
-how:["足クローヌス：膝を軽く曲げ、足関節を急に背屈してそのまま押さえ続ける","膝蓋クローヌス：膝蓋骨上縁をつまみ急に下方へ押す"],
-ab:["律動的な収縮が持続（持続性クローヌス）＝錐体路障害","数回で止まる（非持続性）＝亢進傾向、緊張でも出る"],
-mean:["腱反射亢進の最も強い形（++++）"],
-pit:["左右差・持続性に意味がある"],rel:["rx-dtr","rx-path"]},
-{id:"rx-sup",r:"反射",n:"表在反射（腹壁・挙睾筋・肛門）",en:"Superficial reflexes",k:["腹壁反射","挙睾筋反射","肛門反射","表在反射","球海綿体反射","肛門括約筋"],
-how:["腹壁反射：臍の上・横・下を外側から内側へ軽くこする","挙睾筋反射：大腿内側上部をこする","肛門反射：肛門周囲をこする（肛門括約筋の収縮）"],
-ab:["一側の消失＝同側の錐体路障害、または該当髄節の障害"],
-mean:["腹壁反射：上部T7〜8、中部T9〜10、下部T11〜12（書籍で1髄節程度ずれる。臍より上だけ残る＝T10付近の病変）","挙睾筋L1〜2、肛門反射S3〜5（円錐・馬尾の評価）","MSでは早期に消失することがある"],
-pit:["肥満・腹部手術後・高齢・多産では正常でも出にくい"],rel:["sp-cord","rx-dtr"]},
-
-// ───────── 感覚
-{id:"sn-basic",r:"感覚",n:"表在感覚（触覚・痛覚・温度覚）",en:"Superficial sensation",k:["表在感覚","触覚","痛覚","温度覚","温痛覚","感覚障害","感覚鈍麻","異常感覚","しびれ","アロディニア","感覚過敏"],
-how:["正常と思われる部位を基準（10/10）に、障害部位が何割かを尋ねる","境界は障害側から正常側へ向けて調べ、皮膚にペンで描く","痛覚：安全ピン・爪楊枝（使い捨て）、温度：冷たい音叉・試験管、触覚：綿・筆"],
-ab:["分布（sn-pattern）と、どの感覚が障害されるか（解離性感覚障害）を記載"],
-mean:["温痛覚は脊髄視床路（脊髄で交叉して対側を上行）、触覚の一部と深部覚は後索（同側を上行し延髄で交叉）"],
-pit:["感覚検査は主観的で疲れやすい。最後に長くやらず、病歴から狙いを定めて行う"],fig:"derm",rel:["sn-pattern","sn-deep","sp-cord"]},
-{id:"sn-deep",r:"感覚",n:"深部感覚（振動覚・位置覚）・Romberg徴候",en:"Vibration, joint position, Romberg",k:["深部感覚","振動覚","位置覚","関節位置覚","音叉","128Hz","Romberg","ロンベルグ","感覚性失調","偽性アテトーゼ","後索"],
-how:["振動覚：128Hz音叉を母趾IP関節→内果→膝→腸骨稜と近位へ。消えた時点を検者の指で比べる（秒数）","位置覚：母趾の側面をつまみ小さく上下させ、閉眼で方向を答えさせる","Romberg：足をそろえて立ち、開眼→閉眼で動揺が大きく増すか"],
-ab:["遠位優位の振動覚低下＝長さ依存性ニューロパチー（加齢でも足関節で低下）","Romberg陽性（閉眼で倒れそうになる）＝深部感覚障害（後索・後根・大径線維ニューロパチー）","閉眼で手指が勝手に動く（偽性アテトーゼ）"],
-mean:["後索障害：ビタミンB12欠乏（亜急性連合性変性症）・銅欠乏・脊髄癆・頸椎症・後根神経節障害（傍腫瘍・シェーグレン）","小脳失調は開眼でもすでに不安定で、閉眼による悪化は少ない"],
-pit:["Romberg陽性は前庭障害（急性期）でも出る","高齢者の足関節の振動覚低下は年齢相応のことがある"],rel:["sn-basic","cb-gait","sp-cord"]},
-{id:"sn-cort",r:"感覚",n:"複合感覚（2点識別・立体覚・書字覚・消去現象）",en:"Cortical sensation",k:["複合感覚","皮質性感覚","2点識別","立体覚","立体認知","書字覚","消去現象","触覚消去","頭頂葉"],
-how:["2点識別：指尖で正常は約2〜5mm","立体覚：閉眼で硬貨・鍵・クリップを手で触って当てる","書字覚：手掌に数字を書く","両側同時刺激で一側を感じなくなるか（消去）"],
-ab:["要素的感覚（触・痛・位置覚）がほぼ保たれているのに複合感覚が障害＝対側の頭頂葉"],
-mean:["視床病変では要素的感覚も強く障害される"],
-pit:["要素的感覚が高度に障害されていると評価できない"],rel:["hb-neg","sn-pattern"]},
-{id:"sn-pattern",r:"感覚",n:"感覚障害の分布パターン",en:"Patterns of sensory loss",k:["手袋靴下型","長さ依存性","髄節性","デルマトーム","皮膚分節","半身感覚障害","交代性感覚障害","手口感覚症候群","サドル型","宙づり型","解離性感覚障害","単神経障害","多発単神経炎"],
-how:["分布を図に描き、デルマトーム・末梢神経支配・正中線との関係をみる"],
-ab:["手袋靴下型（下肢から始まり膝あたりで手指へ）＝長さ依存性多発ニューロパチー","特定の神経の支配域＝単神経障害、非対称に複数＝多発単神経炎（血管炎）","デルマトーム1〜2本＝神経根","横断性のレベルあり＝脊髄","半身（顔を含む）＝対側大脳・視床（手と口周囲だけ＝手口感覚症候群）","顔は同側・体幹四肢は対側の温痛覚障害＝延髄外側","宙づり型の温痛覚障害（両肩・上肢）＋触覚保存＝脊髄中心部（空洞症）","サドル型＝円錐・馬尾"],
-mean:["近位優位・非長さ依存の感覚障害は後根神経節障害（感覚性ニューロノパチー）を疑う"],
-pit:["正中線ぴったりで分かれる・振動覚が胸骨や前額で正中で左右差＝非器質性の可能性（ただし単独で決めない）"],fig:"derm",rel:["sn-basic","sp-cord","sp-root","pn-arm","pn-leg"]},
-
-// ───────── 小脳・協調
-{id:"cb-limb",r:"小脳・協調",n:"四肢の協調運動（指鼻・踵膝・反復拮抗運動）",en:"Limb coordination",k:["協調運動","指鼻試験","指鼻指試験","踵膝試験","踵膝脛試験","反復拮抗運動","反復拮抗運動不能","dysdiadochokinesis","測定障害","測定過大","企図振戦","運動分解","rebound","跳ね返り","Stewart-Holmes","小脳失調"],
-how:["指鼻指試験：検者の指（腕を伸ばしきる距離）と患者の鼻を往復。指の位置を変える","踵膝脛試験：踵を対側の膝に乗せ、脛に沿って下ろす","反復拮抗運動：手掌・手背で大腿を交互に叩く、指タップ、足タップ","跳ね返り現象：前腕の屈曲に抵抗し急に離す（顔を守る）"],
-ab:["目標に近づくほど揺れる（企図振戦）、行き過ぎ・手前で止まる（測定障害）、動作が分解","反復拮抗運動のリズム・振幅の乱れ","手を離すと止まらず打ち返す（跳ね返り現象の陽性）"],
-mean:["小脳半球の障害は同側の四肢失調","閉眼で悪化＝感覚性失調、開眼でも同様＝小脳性"],
-pit:["筋力低下があると協調運動は評価しにくい（「麻痺に見合わない」失調かを判断）","パーキンソニズムでは反復運動で振幅が徐々に小さくなる（decrement）。小脳の乱れと区別"],rel:["cb-gait","eom-nys","cn-dysar","mv-park"]},
-{id:"cb-gait",r:"小脳・協調",n:"体幹失調・継ぎ足歩行",en:"Truncal ataxia, tandem gait",k:["体幹失調","継ぎ足歩行","tandem","つぎ足","座位保持","開脚歩行","小脳虫部","酩酊様歩行"],
-how:["座位・立位で支えなしに保持できるか、足をそろえて立てるか","継ぎ足歩行（踵とつま先をつけて一直線）"],
-ab:["四肢の協調運動は比較的保たれるのに座位・起立・歩行が不安定＝小脳虫部","開脚・不規則な酩酊様歩行"],
-mean:["アルコール性小脳変性は虫部前上部（下肢・歩行優位）","急性の起立不能・体幹失調は小脳梗塞・出血を疑う（めまいのHINTSと合わせて）"],
-pit:["継ぎ足歩行は高齢者では正常でも難しい。年齢を考慮"],rel:["cb-limb","gt-type","vs-hints"]},
-
-// ───────── 不随意運動
-{id:"mv-trem",r:"不随意運動",n:"振戦（安静時・姿勢時・動作時・企図）",en:"Tremor",k:["振戦","安静時振戦","姿勢時振戦","企図振戦","動作時振戦","本態性振戦","パーキンソン病","丸薬丸め","re-emergent","Holmes振戦","書字","渦巻き","生理的振戦"],
-how:["安静時：手を膝の上に置き、暗算・歩行で増強するか","姿勢時：両上肢を前方に挙上、指を向かい合わせ（羽ばたき肢位）","動作時：指鼻試験・コップの水・書字と渦巻き","頻度・振幅・左右差・頭部・声・下肢"],
-ab:["安静時4〜6Hz、丸薬丸め、姿勢をとると数秒後に再出現（re-emergent）＝PD","姿勢時・動作時、両側、頭部・声にも＝本態性振戦","目標に近づくほど増強＝小脳（企図振戦）","安静・姿勢・企図すべてに出る粗大な振戦＝Holmes振戦（中脳・視床・小脳路の障害後）"],
-mean:["薬剤性（バルプロ酸・リチウム・β刺激薬など）、甲状腺機能亢進、離脱で生理的振戦が増強"],
-pit:["注意をそらすと止まる・リズムが他方の手のタッピングに引き込まれる（entrainment）＝機能性振戦"],rel:["mv-park","cb-limb","fn-hoover"]},
-{id:"mv-park",r:"不随意運動",n:"パーキンソニズムの診察（動作緩慢・固縮・姿勢反射）",en:"Parkinsonism",k:["パーキンソニズム","動作緩慢","無動","寡動","固縮","姿勢反射障害","pull test","プルテスト","後方突進","指タップ","decrement","仮面様顔貌","小字症","すくみ足"],
-how:["指タップ・手の開閉・回内回外・足タップを各10回、速さと振幅の漸減（decrement）をみる","固縮：頸部・四肢（増強法を併用）","pull test：後ろに立ち予告して肩を急に引く（必ず受け止められる位置で）","表情・瞬目・声・書字（小字症）・歩行（腕振り・すくみ・方向転換）"],
-ab:["反復で振幅・速さが漸減する動作緩慢がパーキンソニズムの必須所見","pull testで3歩以上後退・支えないと倒れる＝姿勢反射障害"],
-mean:["左右差・安静時振戦・L-dopa反応＝PD。早期の転倒・垂直注視麻痺＝PSP、早期の自律神経障害・小脳症状＝MSA","薬剤性（抗精神病薬・制吐薬）は両側性が多い"],
-pit:["動作緩慢を「遅いだけ」で判断しない（うつ・筋力低下・痛みでも遅い）。漸減の有無が鍵","MDS-UPDRSは別アプリで採点できる"],rel:["mt-tone","mv-trem","gt-type","eom-gaze"]},
-{id:"mv-hyper",r:"不随意運動",n:"舞踏・バリズム・ジストニア・アテトーゼ",en:"Chorea, ballism, dystonia, athetosis",k:["舞踏運動","舞踏病","バリズム","ヘミバリズム","ジストニア","アテトーゼ","感覚トリック","Huntington","高血糖","視床下核","ミルクメイド","舌挺出保持"],
-how:["安静・会話中・歩行中に観察","舞踏：手を握らせ続ける（握ったり緩んだり＝milkmaid grip）、舌の挺出保持ができない","ジストニア：特定の動作でだけ出るか（書痙）、感覚トリック（顔に手を当てると軽くなる）"],
-ab:["舞踏：不規則・予測不能・流れるような動き","バリズム：近位の大きく投げ出す動き（片側＝ヘミバリズム）","ジストニア：持続的な筋収縮による異常姿勢・捻れ・反復運動","アテトーゼ：遠位のゆっくりくねる動き"],
-mean:["ヘミバリズム・片側舞踏：対側の視床下核・線条体（梗塞、非ケトン性高血糖）","全身の舞踏：Huntington病、薬剤（L-dopa）、自己免疫、甲状腺、妊娠"],
-pit:["ジストニアは機能性と誤解されやすい（感覚トリック・動作特異性は器質性の特徴）"],rel:["mv-myoc","mv-trem"]},
-{id:"mv-myoc",r:"不随意運動",n:"ミオクローヌス・羽ばたき振戦・チック",en:"Myoclonus, asterixis, tics",k:["ミオクローヌス","羽ばたき振戦","asterixis","陰性ミオクローヌス","チック","肝性脳症","尿毒症","CJD","クロイツフェルト","刺激過敏性","前兆衝動"],
-how:["安静・姿勢・動作・刺激（音・触覚）で誘発されるかを観察","羽ばたき振戦：上肢を前方に挙上し手関節を背屈・指を開いて保持"],
-ab:["ミオクローヌス：突然の短い電撃様の収縮。刺激・動作で誘発（皮質性）","羽ばたき振戦：手関節が瞬間的にガクッと落ちて戻る（筋活動が途切れる陰性ミオクローヌス）","チック：常同的、前兆となる衝動感、短時間なら抑えられる"],
-mean:["代謝性脳症（肝・腎・CO2貯留）、薬剤（セフェピムなど）、低酸素脳症後（Lance-Adams）、CJD、てんかん","片側の羽ばたき振戦は対側の視床・内包などの構造病変"],
-pit:["羽ばたき振戦は振戦ではない（律動性がない）"],rel:["mv-trem","loc-jcs"]},
-
-// ───────── 姿勢・歩行
-{id:"gt-type",r:"姿勢・歩行",n:"歩行パターン",en:"Gait patterns",k:["歩行","歩行障害","片麻痺歩行","分回し歩行","痙性歩行","はさみ足歩行","小刻み歩行","すくみ足","突進歩行","失調性歩行","踵打ち歩行","鶏歩","動揺性歩行","Trendelenburg","トレンデレンブルグ","正常圧水頭症","磁性歩行","前頭葉性歩行","つま先歩き","踵歩き"],
-how:["入室時から観察。歩幅・歩隔・腕振り・方向転換・すくみ","踵歩き（L4〜5・前脛骨筋）、つま先歩き（S1・下腿三頭筋）、片脚立ち、しゃがみ立ち","継ぎ足歩行、Romberg、pull test"],
-ab:["分回し歩行（上肢屈曲・下肢伸展）＝片麻痺","はさみ足・つま先が床をこする＝痙性対麻痺","小刻み・腕振り低下・前傾・すくみ・突進＝パーキンソニズム","開脚・すり足・足が床に張り付く・方向転換で細かく何歩も＝NPH・前頭葉性（腕振りは比較的保たれる）","開脚・不規則・酩酊様＝小脳性","足元を見て踵を打ちつける、閉眼で悪化＝感覚性失調","足を高く上げつま先から着く（鶏歩）＝下垂足","腰を左右に振る（動揺性）＝近位筋力低下（中殿筋）"],
-mean:["歩行は複数の系の統合なので、要素（筋力・感覚・小脳・錐体外路・前庭）に分けて確認"],
-pit:["整形外科的疼痛（跛行）、変形性関節症、視力障害も歩行を変える"],rel:["cb-gait","mv-park","sn-deep","pn-leg","gt-gowers"]},
-{id:"gt-gowers",r:"姿勢・歩行",n:"Gowers徴候・近位筋力低下の動作",en:"Gowers sign",k:["Gowers","ガワーズ","登はん性起立","近位筋","しゃがみ立ち","椅子からの立ち上がり","Trendelenburg徴候","翼状肩甲"],
-how:["床に座った位置から立ち上がる、腕を使わずに椅子から立つ、しゃがみ込み","片脚立ちで骨盤の傾き（Trendelenburg徴候）","壁を押して肩甲骨の浮き上がり（翼状肩甲）"],
-ab:["手を膝・大腿につき体をよじ登るように立つ＝Gowers徴候（殿筋・大腿四頭筋の筋力低下）","片脚立ちで遊脚側の骨盤が下がる＝立脚側の中殿筋（上殿神経・L5）"],
-mean:["近位筋の筋力低下：筋疾患（筋炎・筋ジストロフィー）、MG・LEMS、SMA、CIDP、内分泌（甲状腺・ステロイド）","翼状肩甲：内側への突出＝前鋸筋（長胸神経）、外側＝僧帽筋（副神経）・FSHD"],
-pit:["関節痛・肥満でも動作は拙劣になる"],rel:["mt-mmt","gt-type","cn-11"]},
-
-// ───────── 脊髄・神経根・末梢神経
-{id:"sp-cord",r:"脊髄・根・末梢",n:"脊髄症候群（横断・半側・前部・中心・後索・円錐/馬尾）",en:"Spinal cord syndromes",k:["脊髄","横断性脊髄障害","Brown-Séquard","ブラウン・セカール","前脊髄動脈症候群","中心性脊髄損傷","脊髄空洞症","後索障害","亜急性連合性変性症","脊髄円錐","馬尾","感覚レベル","Lhermitte","レルミット","膀胱直腸障害","脊髄ショック"],
-how:["感覚レベル（体幹で温痛覚の境界を上下から確かめる）、腹壁反射、肛門周囲の感覚・括約筋","上肢・下肢の反射の差（上肢正常・下肢亢進＝頸髄より下）","頸部前屈で背中から手足へ電撃痛（Lhermitte徴候）"],
-ab:["横断性：レベル以下の全感覚障害＋対麻痺/四肢麻痺＋膀胱直腸障害","Brown-Séquard：同側の運動麻痺・深部覚障害＋対側の温痛覚障害（病変より1〜2髄節下から）","前脊髄動脈：両側の運動麻痺＋温痛覚障害、深部覚は保たれる。急性発症","中心性：上肢優位の筋力低下（頸髄過伸展損傷）、宙づり型温痛覚障害（空洞症）","後索：深部覚障害・Romberg陽性・感覚性失調","後索＋側索：B12・銅欠乏（亜急性連合性変性症）","円錐：早期の膀胱直腸障害・サドル型感覚障害、比較的対称","馬尾：非対称の根性疼痛・下肢の弛緩性麻痺・反射消失"],
-mean:["感覚レベルは実際の病変より数髄節下に出ることがある（画像は上方まで撮る）"],
-pit:["急性期は脊髄ショックで弛緩性・反射消失のことがある","Lhermitte徴候は頸髄後索の障害（MS・B12欠乏・頸椎症・放射線）"],fig:"cord",rel:["sn-pattern","rx-sup","sp-root"]},
-{id:"sp-root",r:"脊髄・根・末梢",n:"神経根症（C5〜T1・L2〜S1）の筋力・反射・感覚",en:"Radiculopathy",k:["神経根","神経根症","頸椎症性神経根症","腰椎椎間板ヘルニア","C5","C6","C7","C8","L4","L5","S1","Spurling","スパーリング","Jackson","SLR","下肢伸展挙上","Lasègue","ラセーグ","FNST","大腿神経伸展"],
-how:["責任根を想定して、その根の代表筋・反射・感覚域を確かめる","誘発テスト：Spurling（頸部を患側に側屈・後屈して軸圧）、SLR（仰臥位で膝伸展のまま下肢挙上、30〜70°で下肢後面へ放散痛）、FNST（腹臥位で膝屈曲・股伸展、大腿前面痛）"],
-ab:["C5：三角筋・上腕二頭筋、二頭筋反射、肩外側","C6：腕橈骨筋・手関節伸筋、腕橈骨筋反射、母指","C7：上腕三頭筋・手関節屈筋・指伸筋、三頭筋反射、中指","C8：手指屈筋・手内筋、（反射なし）、小指・前腕内側","L4：大腿四頭筋・前脛骨筋、膝蓋腱反射、下腿内側","L5：長母趾伸筋・後脛骨筋・中殿筋、（内側ハムストリング反射）、下腿外側・足背","S1：下腿三頭筋・大殿筋、アキレス腱反射、足外側・足底"],
-mean:["頸椎ではC6・C7が多い、腰椎ではL5・S1が多い","SLRはL5・S1根、FNSTはL2〜4根"],
-pit:["L5根症と腓骨神経麻痺の区別：L5は内反（後脛骨筋）と外転（中殿筋）も弱い。腓骨神経麻痺では内反は保たれる","C7根症と橈骨神経麻痺の区別：C7は上腕三頭筋・手関節屈筋も弱い、橈骨神経麻痺は腕橈骨筋が弱く三頭筋は保たれる（螺旋溝）"],fig:"derm",rel:["sn-pattern","rx-dtr","mt-mmt","pn-arm","pn-leg"]},
-{id:"pn-arm",r:"脊髄・根・末梢",n:"上肢の末梢神経麻痺（正中・尺骨・橈骨）",en:"Median, ulnar, radial neuropathy",k:["正中神経","尺骨神経","橈骨神経","手根管症候群","肘部管症候群","橈骨神経麻痺","下垂手","Tinel","ティネル","Phalen","ファレン","Froment","フロマン","鷲手","短母指外転筋","第1背側骨間筋","祈祷手","前骨間神経","後骨間神経","猿手"],
-how:["正中：短母指外転筋（母指を掌面から垂直に挙げる）、母指球萎縮、示指・中指の感覚、Phalen（手関節掌屈60秒）・Tinel（手根管を叩く）","尺骨：第1背側骨間筋・小指外転筋、Froment徴候（紙を母指と示指で挟み引く→母指IP屈曲）、小指と環指尺側の感覚、肘のTinel","橈骨：手関節・手指MP伸展、腕橈骨筋、上腕三頭筋（腋窩・上腕近位の障害で弱い）、手背第1指間の感覚"],
-ab:["手根管：APB萎縮・環指の橈側だけしびれる（環指分割）＝正中神経（手根管）","肘部管：骨間筋萎縮、Froment陽性、Wartenberg徴候（小指が外転して離れる）","下垂手＋腕橈骨筋低下＋三頭筋正常＝螺旋溝での橈骨神経（土曜の夜の麻痺）","下垂指（手関節伸展は保たれ指が伸びない）・感覚正常＝後骨間神経","OKサインができない（母指IP・示指DIP屈曲不能）・感覚正常＝前骨間神経"],
-mean:["掌側の手のひら中央の感覚は手根管の手前で分岐する枝が支配するため、手根管症候群では保たれる"],
-pit:["C8〜T1根症・下神経幹（胸郭出口）は正中と尺骨の両方の筋（APB・骨間筋）が弱く、前腕内側の感覚障害"],fig:"hand",rel:["sp-root","mt-mmt","sn-pattern"]},
-{id:"pn-leg",r:"脊髄・根・末梢",n:"下肢の末梢神経麻痺（腓骨・脛骨・大腿・外側大腿皮神経）",en:"Peroneal, tibial, femoral neuropathy",k:["腓骨神経","総腓骨神経","腓骨神経麻痺","下垂足","脛骨神経","大腿神経","外側大腿皮神経","感覚異常性大腿痛","足根管","閉鎖神経","坐骨神経","腓骨頭"],
-how:["腓骨：前脛骨筋・長母趾伸筋（背屈）、腓骨筋（外反）、後脛骨筋（内反：脛骨神経）を比べる。足背・第1趾間の感覚、腓骨頭のTinel","大腿：大腿四頭筋・膝蓋腱反射・下腿内側（伏在神経）、腸腰筋（腰神経叢）","外側大腿皮神経：大腿外側の感覚のみ（運動なし）"],
-ab:["下垂足＋外反低下＋内反正常＋足背感覚低下＝総腓骨神経（腓骨頭での圧迫：脚組み・やせ・ギプス）","下垂足＋内反・股外転も低下＝L5根","膝伸展低下＋膝蓋腱反射低下＋股屈曲正常＝大腿神経（鼠径靱帯より遠位）、股屈曲も低下＝腰神経叢・L2〜4根"],
-mean:["糖尿病性腰仙部神経根神経叢ニューロパチー：大腿の強い痛みと近位筋力低下・体重減少"],
-pit:["長母趾伸筋が麻痺するとBabinski徴候は出なくなる"],fig:"derm",rel:["sp-root","gt-type","mt-mmt"]},
-
-// ───────── 自律神経
-{id:"au-oh",r:"自律神経",n:"起立性低血圧・自律神経の診察",en:"Orthostatic hypotension, autonomic exam",k:["起立性低血圧","起立試験","Schellong","シェロング","自律神経","発汗","排尿障害","神経原性起立性低血圧","心拍","臥位高血圧","残尿"],
-how:["臥位5分→起立（または能動起立）し、1・3分（遅発例は10分まで）の血圧・心拍","発汗の分布（手で皮膚の湿り・ヨード澱粉）、皮膚温・色調","排尿（残尿・頻尿・失禁）、便秘、勃起障害、臥位高血圧"],
-ab:["起立3分以内に収縮期20mmHg以上または拡張期10mmHg以上の低下＝起立性低血圧","血圧が下がっても心拍が上がらない（心拍上昇/収縮期血圧低下が0.5回/mmHg未満）＝神経原性"],
-mean:["神経原性起立性低血圧：MSA・PD・DLB・純粋自律神経不全、糖尿病・アミロイド・自己免疫性ニューロパチー","脱水・薬剤（降圧薬・α遮断薬・利尿薬・抗PD薬）では心拍は代償的に上がる"],
-pit:["β遮断薬内服中は心拍で判定できない"],rel:["mv-park"]},
-
-// ───────── 機能性
-{id:"fn-hoover",r:"機能性",n:"機能性神経障害の陽性徴候（Hoover徴候など）",en:"Positive signs of functional disorder",k:["機能性神経障害","心因性","Hoover","フーバー","股関節外転徴候","give-way","虚脱性筋力低下","引き込み","entrainment","機能性振戦","機能性歩行","非器質性"],
-how:["Hoover徴候：仰臥位で踵の下に手を置く。麻痺側の股伸展を命じたときは弱いが、健側の股屈曲を命じると麻痺側の踵が強く押しつけられる","股関節外転徴候：両側同時外転と健側単独外転で麻痺側の力が変わる","振戦の引き込み：健側で検者の指示するリズムのタッピング→患側の振戦が同じリズムに変わる・止まる"],
-ab:["随意命令では弱いが自動的な運動では力が出る、力が急に抜ける（give-way）","注意をそらすと症状が軽くなる"],
-mean:["機能性神経障害は除外診断ではなく、陽性徴候に基づいて診断する"],
-pit:["器質性疾患との併存は珍しくない（てんかんと心因性非てんかん性発作など）。陽性徴候があっても器質性の所見は別に評価する","「詐病」と同義ではない。説明の仕方が予後に影響する"],rel:["mt-mmt","mv-trem","cn-11"]}
-];
-
-// 病変部位から引く（局在早見）：部位ごとの所見の組み合わせ
-const LEVELS = [
-{id:"cortex",n:"大脳皮質",color:"#3B6FB6",signs:["顔・上肢優位の片麻痺（中大脳動脈領域）／下肢優位（前大脳動脈領域）","皮質性感覚障害（立体覚・2点識別・消去）","失語（左）・半側空間無視・病態失認（右）・失行・Gerstmann","同名半盲・四分盲","共同偏視（病巣側を向く）、てんかん発作"],items:["hb-aph","hb-neg","hb-apra","sn-cort","cn-vf","eom-gaze","mt-drift"]},
-{id:"capsule",n:"放線冠・内包",color:"#4F7CC3",signs:["顔・上肢・下肢に均等な純粋運動性片麻痺（ラクナ）","構音障害・手不器用症候群、失調性片麻痺","皮質症状（失語・無視）を欠くことが多い"],items:["mt-drift","cn-7","rx-path","cn-dysar"]},
-{id:"thalamus",n:"視床",color:"#5D89C9",signs:["対側半身の全感覚障害（深部覚優位のことも）、後に視床痛","手口感覚症候群","視床出血：下方・鼻先を見る眼位、縮瞳","視床性失語・健忘（前部・内側）"],items:["sn-pattern","eom-gaze","hb-orient"]},
-{id:"bg",n:"大脳基底核",color:"#6C8FB0",signs:["パーキンソニズム（動作緩慢・固縮・安静時振戦）","舞踏・バリズム（線条体・視床下核）・ジストニア","被殻出血：病巣側への共同偏視＋対側片麻痺"],items:["mv-park","mv-hyper","mt-tone","mv-trem"]},
-{id:"midbrain",n:"中脳",color:"#7A5BA6",signs:["同側動眼神経麻痺＋対側片麻痺（Weber）","同側動眼神経麻痺＋対側不随意運動・失調（Benedikt／Claude）","上方注視麻痺・対光近見解離・輻輳後退眼振（Parinaud：背側）","MLF症候群（吻側）"],items:["cn-3","eom-gaze","eom-mlf","cn-pupil"]},
-{id:"pons",n:"橋",color:"#8A63B0",signs:["同側外転・顔面神経麻痺＋対側片麻痺（Millard-Gubler）","水平注視麻痺（病巣側を見られない）、one-and-a-half、MLF症候群","病巣と反対側を向く共同偏視、ピンポイント瞳孔（橋出血）","閉じ込め症候群（腹側両側）"],items:["cn-4-6","cn-7","eom-mlf","eom-gaze","loc-brain"]},
-{id:"medulla",n:"延髄",color:"#9A6BBB",signs:["外側（Wallenberg）：同側の顔面温痛覚低下・Horner・球麻痺・小脳失調＋対側体幹四肢の温痛覚低下","内側（Dejerine）：同側の舌下神経麻痺＋対側片麻痺・深部覚障害","めまい・眼振（下眼瞼向き・回旋性）、吃逆"],items:["cn-9-10","cn-12","cn-horner","sn-pattern","eom-nys"]},
-{id:"cerebellum",n:"小脳",color:"#B5651D",signs:["同側の四肢失調（半球）、体幹失調・歩行障害（虫部）","注視誘発眼振・測定障害性眼球運動、下眼瞼向き眼振（片葉）","断綴性・爆発性の構音障害、筋緊張低下","急性めまい＋HIT正常＋起立不能＝小脳梗塞を疑う"],items:["cb-limb","cb-gait","eom-nys","vs-hints","cn-dysar"]},
-{id:"cord",n:"脊髄",color:"#2E8B7A",signs:["感覚レベル・対麻痺/四肢麻痺・膀胱直腸障害","Brown-Séquard・前脊髄動脈・中心性・後索の各型","病変レベルで下位運動ニューロン徴候（萎縮・反射消失）、それより下で上位運動ニューロン徴候","上肢の反射正常・下肢亢進＝頸髄より下"],items:["sp-cord","rx-sup","sn-deep","rx-hoff","rx-path"]},
-{id:"root",n:"神経根・神経叢",color:"#3E9A63",signs:["デルマトームに沿う放散痛・感覚障害","その髄節の筋力低下と反射低下","誘発テスト（Spurling・SLR・FNST）陽性","神経叢：複数根・複数神経にまたがる筋力低下（神経痛性筋萎縮症など）"],items:["sp-root","sn-pattern","rx-dtr"]},
-{id:"nerve",n:"末梢神経",color:"#5BA34D",signs:["単神経：その神経の支配筋と感覚域だけ","多発単神経炎：非対称・階段状（血管炎）","多発ニューロパチー：遠位対称・手袋靴下型・アキレス腱反射低下","GBS/CIDP：近位も含む筋力低下・全般の反射消失"],items:["pn-arm","pn-leg","sn-pattern","sn-deep","mt-atro"]},
-{id:"nmj",n:"神経筋接合部",color:"#8D9A3A",signs:["易疲労性・日内変動、眼瞼下垂・複視（瞳孔正常）","球症状・頸部屈筋・近位筋の筋力低下","感覚障害なし、反射は保たれる（MG）／低下し反復で増強（LEMS）"],items:["mt-fatig","cn-horner","eom-dip"]},
-{id:"muscle",n:"筋",color:"#A67C2E",signs:["近位対称性の筋力低下（Gowers徴候・しゃがみ立ち困難）","感覚障害なし、反射は末期まで保たれる","パターン：顔面肩甲上腕（FSHD）、遠位＋ミオトニア（DM1）、手指屈筋・大腿四頭筋（封入体筋炎）"],items:["gt-gowers","mt-mmt","mt-myot","mt-atro"]}
-];
-
-const CATS = ["意識","高次脳","脳神経","眼球運動","運動","反射","感覚","小脳・協調","不随意運動","姿勢・歩行","脊髄・根・末梢","自律神経","機能性"];
-ITEMS.push(
-{id:"mt-umn",r:"運動",n:"上位・下位運動ニューロン障害と筋疾患の見分け方",en:"UMN vs LMN vs muscle",k:["上位運動ニューロン","下位運動ニューロン","錐体路徴候","中枢性麻痺","末梢性麻痺","筋原性","神経原性","痙性麻痺","弛緩性麻痺"],
-how:["筋力低下の分布、筋萎縮・線維束性収縮、トーヌス、腱反射、病的反射、感覚障害をそろえて比べる"],
-ab:["上位運動ニューロン：錐体路型の分布、萎縮は軽い（廃用）、痙縮、腱反射亢進、Babinski陽性","下位運動ニューロン：髄節・神経の分布、萎縮・線維束性収縮、弛緩、腱反射低下・消失","筋：近位対称、萎縮は進行例、トーヌス正常〜低下、反射は末期まで保たれる、感覚正常","神経筋接合部：易疲労性・眼症状、萎縮なし、反射正常（MG）"],
-mean:["上位と下位の徴候が同じ部位に混在＝ALS（または頸椎症性脊髄症と神経根症の合併）"],
-pit:["急性期の上位運動ニューロン障害は弛緩性・反射低下から始まる"],rel:["mt-mmt","rx-dtr","rx-path","mt-atro","mt-tone"]},
-{id:"cn-swallow",r:"脳神経",n:"嚥下のベッドサイド評価",en:"Bedside swallowing assessment",k:["嚥下","嚥下障害","反復唾液嚥下","RSST","水飲みテスト","改訂水飲みテスト","誤嚥","喉頭挙上","湿性嗄声","むせ"],
-how:["意識・座位保持・口腔内（乾燥・残渣）・発声・咳","反復唾液嚥下テスト（RSST）：30秒で喉頭挙上が何回あるか（3回未満は要注意）","改訂水飲みテスト：冷水3mLを嚥下させ、むせ・呼吸変化・湿性嗄声をみる","喉頭挙上の触知（甲状軟骨が指1横指以上上がるか）"],
-ab:["むせ・湿性嗄声・嚥下後の呼吸変化＝誤嚥の疑い","むせのない誤嚥（不顕性誤嚥）もある"],
-mean:["偽性球麻痺（両側大脳）：口腔期・咽頭期の協調障害、下顎反射亢進","球麻痺（延髄・下位脳神経）：咽頭期の障害、鼻咽腔閉鎖不全、咽頭残留","PDは不顕性誤嚥が多い"],
-pit:["脳卒中急性期は経口開始前にスクリーニングを必ず行う。疑えば嚥下造影・内視鏡で確認"],rel:["cn-9-10","cn-12","cn-dysar"]},
-{id:"hb-agn",r:"高次脳",n:"視覚失認・相貌失認・純粋失読",en:"Visual agnosia, prosopagnosia, pure alexia",k:["視覚失認","物体失認","相貌失認","純粋失読","失読","失読失書","色彩失認","バリント","Balint","同時失認","視覚性運動失調"],
-how:["見ただけで物品名を言えないが、触ると言えるか（触覚で呼称できれば視覚失認）","家族・有名人の顔がわかるか（声ではわかる）","音読と書字：書けるのに自分の書いた字が読めないか","Balint：視線を目標に移せない、手を伸ばしてずれる、一度に一つしか見えない"],
-ab:["視覚性の呼称障害で、視力・視野では説明できない","純粋失読：書字は保たれ読字だけ障害、一字ずつ読む（逐字読み）"],
-mean:["物体失認・相貌失認：両側（または右）後頭側頭葉腹側（紡錘状回）","純粋失読：左後頭葉＋脳梁膨大部（左後大脳動脈領域）、右同名半盲を伴うことが多い","Balint症候群：両側頭頂後頭葉（後部皮質萎縮症・分水嶺梗塞）"],
-pit:["視力低下・視野障害・失語・認知症全般で説明できないかを先に確認"],rel:["cn-vf","hb-aph","hb-neg"]}
-);
-
-// 図はすべて自作の模式図（教科書の図の転載ではない）
-// class: ln=線, fl=淡い塗り, lz=病変（赤）, ac=強調色, tx=文字, mu=補助文字
-const EYE=(cx,cy,dx,dy,o)=>{o=o||{};const r=o.r||16,p=o.p||5;return `<g><ellipse cx="${cx}" cy="${cy}" rx="${r+6}" ry="${r-3}" class="fl ln"/><circle cx="${cx+dx}" cy="${cy+dy}" r="${r-6}" class="ln" fill="none"/><circle cx="${cx+dx}" cy="${cy+dy}" r="${p}" class="pp"/>${o.lid?`<path d="M${cx-r-6} ${cy-r-4} L${cx+r+6} ${cy-r-4} L${cx+r+6} ${cy-r+o.lid} Q${cx} ${cy-r+o.lid+4} ${cx-r-6} ${cy-r+o.lid}Z" class="lid"/>`:''}</g>`};
-const FIGS = {
-face:{t:"中枢性と末梢性の顔面神経麻痺（患者の右側が麻痺）",svg:`<svg viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg">
-${[0,1].map(i=>{const x=i?270:90;const per=i==1;return `<g>
-<ellipse cx="${x}" cy="110" rx="62" ry="80" class="fl ln"/>
-<!-- 額のしわ：画面左＝患者の右 -->
-${per?'':`<path d="M${x-42} 52 q10 -6 20 0 M${x-42} 62 q10 -6 20 0" class="ln"/>`}
-<path d="M${x+22} 52 q10 -6 20 0 M${x+22} 62 q10 -6 20 0" class="ln"/>
-${EYE(x-25,95,0,0,{r:per?13:11,p:3})}${EYE(x+25,95,0,0,{r:11,p:3})}
-<path d="M${x-4} 108 L${x-8} 130 L${x+4} 132" class="ln" fill="none"/>
-<path d="M${x-28} ${158} Q${x} ${168} ${x+28} 150" class="ln" fill="none"/>
-<text x="${x}" y="212" text-anchor="middle" class="tx">${per?'末梢性（核下性）':'中枢性（核上性）'}</text>
-<text x="${x}" y="28" text-anchor="middle" class="mu">${per?'額のしわも消える・閉眼不全':'額のしわは残る・下部顔面が主'}</text>
-</g>`}).join('')}
-<text x="180" y="228" text-anchor="middle" class="mu">画面の左＝患者の右</text></svg>`},
-
-pupil:{t:"瞳孔・眼瞼の見分け（患者の右眼が異常。向かい合って見た図で、左の眼＝患者の右眼）",svg:`<svg viewBox="0 0 360 300" xmlns="http://www.w3.org/2000/svg">
-<text x="8" y="20" class="tx">Horner症候群</text>
-${EYE(110,48,0,0,{p:3,lid:9})}${EYE(200,48,0,0,{p:6})}
-<text x="250" y="44" class="mu">縮瞳・軽い下垂</text><text x="250" y="60" class="mu">暗所で差が拡大</text>
-<text x="8" y="104" class="tx">動眼神経麻痺</text>
-${EYE(110,132,-9,6,{p:9,lid:22})}${EYE(200,132,0,0,{p:5})}
-<text x="250" y="128" class="mu">散瞳・完全下垂</text><text x="250" y="144" class="mu">外下方へ偏位</text>
-<text x="8" y="186" class="tx">RAPD（右視神経障害）swinging flashlight</text>
-<g><path d="M60 214 l-24 -10 v20z" class="ac"/>${EYE(110,214,0,0,{p:6})}${EYE(200,214,0,0,{p:6})}<text x="250" y="218" class="mu">右に光→両眼が散大</text></g>
-<g><path d="M250 268 l24 -10 v20z" class="ac"/>${EYE(110,268,0,0,{p:3})}${EYE(200,268,0,0,{p:3})}<text x="8" y="272" class="mu">左に光→</text><text x="8" y="288" class="mu">両眼が縮瞳</text></g>
-</svg>`},
-
-eom:{t:"外眼筋の作用方向（患者の右眼。患者から見た向き）",svg:`<svg viewBox="0 0 360 250" xmlns="http://www.w3.org/2000/svg">
-${EYE(180,125,0,0,{r:22,p:6})}
-<g class="ln" fill="none"><path d="M210 125 L260 125 M150 125 L100 125 M260 125 L260 50 M260 125 L260 200 M100 125 L100 50 M100 125 L100 200"/></g>
-<g class="tx"><text x="260" y="40" text-anchor="middle">上直筋（Ⅲ）</text><text x="268" y="130">外直筋</text><text x="268" y="146">（Ⅵ）</text><text x="260" y="218" text-anchor="middle">下直筋（Ⅲ）</text>
-<text x="100" y="40" text-anchor="middle">下斜筋（Ⅲ）</text><text x="92" y="130" text-anchor="end">内直筋</text><text x="92" y="146" text-anchor="end">（Ⅲ）</text><text x="100" y="218" text-anchor="middle">上斜筋（Ⅳ）</text></g>
-<text x="300" y="100" text-anchor="middle" class="mu">耳側</text><text x="60" y="100" text-anchor="middle" class="mu">鼻側</text>
-<text x="180" y="244" text-anchor="middle" class="mu">複視の像のずれが最大になる方向＝麻痺筋の作用方向</text></svg>`},
-
-mlf:{t:"MLF症候群とone-and-a-half症候群（いずれも右側の橋病変）",svg:`<svg viewBox="0 0 360 290" xmlns="http://www.w3.org/2000/svg">
-<text x="8" y="18" class="tx">右MLF症候群</text>
-<text x="8" y="44" class="mu">左を見る（正常）</text>${EYE(130,40,9,0,{r:14,p:4})}${EYE(210,40,9,0,{r:14,p:4})}
-<text x="8" y="80" class="mu">左を見る</text>${EYE(130,76,0,0,{r:14,p:4})}${EYE(210,76,9,0,{r:14,p:4})}<text x="244" y="80" class="lzt">右眼が内転しない</text>
-<text x="244" y="96" class="mu">左眼に外転時眼振</text>
-<text x="8" y="116" class="mu">輻輳</text>${EYE(130,112,7,0,{r:14,p:4})}${EYE(210,112,-7,0,{r:14,p:4})}<text x="244" y="116" class="mu">保たれる（後方型）</text>
-<text x="8" y="158" class="tx">右one-and-a-half症候群</text>
-<text x="8" y="186" class="mu">右を見る</text>${EYE(130,182,0,0,{r:14,p:4})}${EYE(210,182,0,0,{r:14,p:4})}<text x="244" y="186" class="lzt">両眼とも動かない</text>
-<text x="8" y="222" class="mu">左を見る</text>${EYE(130,218,0,0,{r:14,p:4})}${EYE(210,218,9,0,{r:14,p:4})}<text x="244" y="222" class="mu">左眼の外転だけ</text>
-<text x="8" y="252" class="mu">向かい合って見た図：画面の左の眼＝患者の右眼</text>
-<text x="8" y="272" class="mu">病変：右MLF（＋右PPRF・外転神経核）</text></svg>`},
-
-gaze:{t:"共同偏視の向き（左半球・左橋の病変）",svg:`<svg viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg">
-<text x="8" y="22" class="tx">被殻出血・大脳梗塞（左）</text>${EYE(110,48,9,0,{r:14,p:4})}${EYE(190,48,9,0,{r:14,p:4})}<text x="226" y="52" class="mu">病巣側（左）を見る</text>
-<text x="8" y="96" class="tx">橋病変（左）</text>${EYE(110,120,-9,0,{r:14,p:4})}${EYE(190,120,-9,0,{r:14,p:4})}<text x="226" y="124" class="mu">病巣の反対側を見る</text>
-<text x="8" y="168" class="tx">視床出血</text>${EYE(110,192,5,6,{r:14,p:3})}${EYE(190,192,-5,6,{r:14,p:3})}<text x="226" y="196" class="mu">下方・鼻先を見る</text>
-<text x="8" y="226" class="mu">画面の左眼＝患者の右眼（向かい合って見た図）</text></svg>`},
-
-vf:{t:"視覚路の病変と視野欠損（■＝見えない部分。各組の左＝左眼の視野）",svg:`<svg viewBox="0 0 360 400" xmlns="http://www.w3.org/2000/svg">
-<g class="ln" fill="none">
-<circle cx="120" cy="30" r="18"/><circle cx="240" cy="30" r="18"/>
-<path d="M112 46 L170 100 M128 46 L188 100 M232 46 L172 100 M248 46 L190 100"/>
-<path d="M170 100 L150 150 M190 100 L210 150"/>
-<path d="M150 150 L150 165 M210 150 L210 165"/>
-<path d="M150 165 Q110 200 128 250 M150 165 Q160 205 150 250 M210 165 Q250 200 232 250 M210 165 Q200 205 210 250"/>
-<path d="M128 250 L150 268 L172 250 M188 250 L210 268 L232 250"/>
-</g>
-<g class="mu"><text x="80" y="34" text-anchor="end">左眼</text><text x="280" y="34">右眼</text><text x="196" y="104">視交叉</text><text x="216" y="148">視索</text><text x="216" y="168">外側膝状体</text><text x="250" y="212">視放線</text><text x="250" y="226">（下方＝Meyer係蹄）</text><text x="236" y="272">後頭葉</text></g>
-<g class="lz" text-anchor="middle" font-size="12" font-weight="700">
-<circle cx="139" cy="70" r="8"/><text x="139" y="74" class="lzn">1</text>
-<circle cx="180" cy="100" r="8"/><text x="180" y="104" class="lzn">2</text>
-<circle cx="210" cy="150" r="8"/><text x="210" y="154" class="lzn">3</text>
-<circle cx="232" cy="200" r="8"/><text x="232" y="204" class="lzn">4</text>
-<circle cx="208" cy="225" r="8"/><text x="208" y="229" class="lzn">5</text>
-<circle cx="210" cy="268" r="8"/><text x="210" y="272" class="lzn">6</text></g>
-${(()=>{const R=[["1 左視神経","LL",""],["2 視交叉","LT","RT"],["3 右視索","LT0","RN0"],["4 右側頭葉","LUQ","RUQ"],["5 右頭頂葉","LLQ","RLQ"],["6 右後頭葉","LTm","RNm"]];
-const q=(cx,cy,k)=>{const r=13;let p='';
- if(k=="LL")p=`<circle cx="${cx}" cy="${cy}" r="${r}" class="fz"/>`;
- if(k=="LT"||k=="LT0")p=`<path d="M${cx} ${cy-r} A${r} ${r} 0 0 0 ${cx} ${cy+r}Z" class="fz"/>`;
- if(k=="RT")p=`<path d="M${cx} ${cy-r} A${r} ${r} 0 0 1 ${cx} ${cy+r}Z" class="fz"/>`;
- if(k=="RN0")p=`<path d="M${cx} ${cy-r} A${r} ${r} 0 0 0 ${cx} ${cy+r}Z" class="fz"/>`;
- if(k=="LUQ"||k=="RUQ")p=`<path d="M${cx} ${cy} L${cx} ${cy-r} A${r} ${r} 0 0 0 ${cx-r} ${cy}Z" class="fz"/>`;
- if(k=="LLQ"||k=="RLQ")p=`<path d="M${cx} ${cy} L${cx} ${cy+r} A${r} ${r} 0 0 1 ${cx-r} ${cy}Z" class="fz"/>`;
- if(k=="LTm"||k=="RNm")p=`<path d="M${cx} ${cy-r} A${r} ${r} 0 0 0 ${cx} ${cy+r}Z" class="fz"/><circle cx="${cx}" cy="${cy}" r="4" class="bgc"/>`;
- return `<circle cx="${cx}" cy="${cy}" r="${r}" class="ln" fill="none"/>${p}`;};
-return R.map((r,i)=>{const y=300+Math.floor(i/2)*34, x=i%2?190:8;return `<text x="${x}" y="${y+4}" class="tx" font-size="11.5">${r[0]}</text>${q(x+118,y,r[1])}${q(x+150,y,r[2]||'')}`}).join('')})()}
-</svg>`},
-
-hints:{t:"急性前庭症候群のHINTS（自発眼振のある持続性めまい）",svg:`<svg viewBox="0 0 360 250" xmlns="http://www.w3.org/2000/svg">
-<g class="ln"><rect x="8" y="8" width="344" height="34" rx="8" class="fl"/></g>
-<text x="180" y="30" text-anchor="middle" class="tx">HIT ・ 眼振の向き ・ skew（交代遮閉）</text>
-<g class="ln"><rect x="8" y="64" width="166" height="140" rx="8" class="okb"/><rect x="186" y="64" width="166" height="140" rx="8" class="lzb"/></g>
-<text x="91" y="86" text-anchor="middle" class="tx">末梢性を示唆</text>
-<g class="mu"><text x="18" y="112">・HIT：一側で追いつき</text><text x="28" y="128">saccadeが出る（異常）</text><text x="18" y="150">・一方向性の眼振</text><text x="18" y="172">・skewなし</text><text x="18" y="194">→3つそろって末梢性</text></g>
-<text x="269" y="86" text-anchor="middle" class="tx">中枢性を示唆</text>
-<g class="mu"><text x="196" y="112">・HITが正常</text><text x="196" y="134">・方向交代性の眼振</text><text x="196" y="156">・skewあり</text><text x="196" y="178">→1つでもあれば</text><text x="206" y="194">脳幹・小脳梗塞を疑う</text></g>
-<text x="180" y="226" text-anchor="middle" class="mu">新規の片側難聴＝AICA梗塞も（HINTS plus）</text>
-<text x="180" y="244" text-anchor="middle" class="mu">頭位でのみ起こる短いめまいには使わない</text></svg>`},
-
-weber:{t:"Weber試験とRinne試験の読み方（右耳の難聴の場合）",svg:`<svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg">
-<g class="ln"><rect x="8" y="8" width="344" height="30" class="fl"/><path d="M8 38 H352 M8 98 H352 M100 8 V158 M236 8 V158" fill="none"/><rect x="8" y="8" width="344" height="150" fill="none"/></g>
-<g class="tx" text-anchor="middle"><text x="168" y="28">Weber（額の中央）</text><text x="294" y="28">Rinne（右耳）</text>
-<text x="54" y="66">伝音難聴</text><text x="54" y="84" class="mu">中耳・耳垢</text><text x="168" y="66">右（患側）</text><text x="168" y="84">へ響く</text><text x="294" y="66">陰性</text><text x="294" y="84" class="mu">骨導＞気導</text>
-<text x="54" y="126">感音難聴</text><text x="54" y="144" class="mu">内耳・神経</text><text x="168" y="126">左（健側）</text><text x="168" y="144">へ響く</text><text x="294" y="126">陽性</text><text x="294" y="144" class="mu">気導＞骨導</text></g>
-<text x="180" y="186" text-anchor="middle" class="mu">512Hz音叉。正常ではWeberは中央、Rinneは陽性</text></svg>`},
-
-tongue:{t:"軟口蓋のカーテン徴候と舌の偏位（患者の右の下位脳神経麻痺、向かい合って見た図）",svg:`<svg viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg">
-<g class="ln"><ellipse cx="90" cy="95" rx="72" ry="66" class="fl"/>
-<path d="M28 112 Q34 66 60 72 Q78 76 92 58 Q118 40 148 98" fill="none" stroke-width="2.6"/>
-<path d="M92 58 Q100 70 104 84" fill="none" stroke-width="3"/><circle cx="105" cy="87" r="4"/>
-<path d="M44 140 Q90 168 136 140" fill="none"/>
-<ellipse cx="270" cy="95" rx="72" ry="66" class="fl"/>
-<path d="M244 64 Q236 126 262 156 Q296 144 292 64Z" class="tg"/></g>
-<path d="M268 64 Q264 112 260 154" class="ln" fill="none" stroke-dasharray="4 3"/>
-<text x="90" y="182" text-anchor="middle" class="tx">「アー」と発声</text>
-<text x="90" y="200" text-anchor="middle" class="mu">右の軟口蓋が挙がらない</text>
-<text x="90" y="216" text-anchor="middle" class="mu">口蓋垂は健側（左）へ</text>
-<text x="270" y="182" text-anchor="middle" class="tx">舌の挺出（核下性）</text>
-<text x="270" y="200" text-anchor="middle" class="mu">患側（右）へ偏位</text>
-<text x="270" y="216" text-anchor="middle" class="mu">右半分の萎縮</text></svg>`},
-
-drift:{t:"上肢挙上試験での落ち方の違い（閉眼で20〜30秒）",svg:`<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">
-${[["錐体路","回内して下がる・肘が曲がる",1],["深部覚障害","回内せず浮遊・指が動く",2],["小脳・頭頂葉","上や外へ流れる",3]].map((r,i)=>{const y=40+i*64;return `<g>
-<text x="8" y="${y-14}" class="tx">${r[0]}</text><text x="120" y="${y-14}" class="mu">${r[1]}</text>
-<path d="M20 ${y+10} H120" class="ln" stroke-width="7" stroke-linecap="round"/>
-${r[2]==1?`<path d="M20 ${y+10} Q80 ${y+12} 112 ${y+30}" class="lzs" stroke-width="7" stroke-linecap="round" fill="none"/>`:''}
-${r[2]==2?`<path d="M20 ${y+10} Q80 ${y+16} 116 ${y+22}" class="lzs" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M120 ${y+22} l8 -6 M121 ${y+24} l9 2 M120 ${y+26} l6 8" class="lzs" stroke-width="2"/>`:''}
-${r[2]==3?`<path d="M20 ${y+10} Q80 ${y+4} 116 ${y-6}" class="lzs" stroke-width="7" stroke-linecap="round" fill="none"/>`:''}
-<path d="M180 ${y+10} H290" class="ln" stroke-width="7" stroke-linecap="round"/><text x="300" y="${y+14}" class="mu">健側</text></g>`}).join('')}
-<text x="8" y="214" class="mu">手掌を上にすると錐体路の回内が見やすい</text></svg>`},
-
-reflex:{t:"反射と髄節レベル",svg:`<svg viewBox="0 0 360 366" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0,14)">
-${(()=>{const L=["Ⅴ","C5","C6","C7","C8","T7-8","T9-10","T11-12","L1-2","L2","L3","L4","L5","S1","S2","S3-5"];
-const R=[["下顎反射",0,0,"#8A63B0"],["上腕二頭筋反射",1,2,"#3B6FB6"],["腕橈骨筋反射",1,2,"#3B6FB6"],["上腕三頭筋反射",2,4,"#3B6FB6"],["Hoffmann/Trömner",4,4,"#3B6FB6"],["腹壁反射（上・中・下）",5,7,"#2E8B7A"],["挙睾筋反射",8,8,"#2E8B7A"],["膝蓋腱反射",9,11,"#5BA34D"],["内側ハムストリング",12,12,"#5BA34D"],["アキレス腱反射",13,14,"#5BA34D"],["肛門反射",15,15,"#A67C2E"]];
-const X=i=>152+i*13.2;let s='';
-s+=`<g class="ln" stroke-dasharray="2 3" opacity=".5">${L.map((l,i)=>`<path d="M${X(i)} 34 V322"/>`).join('')}</g>`;
-L.forEach((l,i)=>{s+=`<text x="${X(i)}" y="24" text-anchor="start" class="mu" font-size="9.5" transform="rotate(-60 ${X(i)} 24)">${l}</text>`;});
-R.forEach((r,j)=>{const y=40+j*26;s+=`<text x="4" y="${y+12}" class="tx" font-size="12">${r[0]}</text><rect x="${X(r[1])-6}" y="${y+2}" width="${(r[2]-r[1])*13.2+12}" height="14" rx="4" fill="${r[3]}"/>`;});
-return s;})()}
-<text x="4" y="344" class="mu">主な髄節。書籍により1髄節程度の幅がある</text></g></svg>`},
-
-babinski:{t:"Babinski徴候とChaddock反射のこすり方（右足）",svg:`<svg viewBox="0 0 360 260" xmlns="http://www.w3.org/2000/svg">
-<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="arrh"/></marker></defs>
-<g class="ln"><path d="M90 220 Q120 200 116 150 Q112 90 102 60 Q94 30 68 26 Q42 22 36 60 Q30 100 36 150 Q40 200 64 222 Q76 228 90 220Z" class="fl"/>
-<ellipse cx="94" cy="22" rx="11" ry="9" class="fl"/><ellipse cx="74" cy="16" rx="7" ry="6" class="fl"/><ellipse cx="58" cy="18" rx="6" ry="5" class="fl"/><ellipse cx="46" cy="24" rx="5" ry="5" class="fl"/><ellipse cx="38" cy="34" rx="5" ry="4" class="fl"/></g>
-<path d="M62 208 Q40 150 42 80 Q46 54 84 50" class="arr" fill="none" marker-end="url(#ah)"/>
-<text x="8" y="244" class="mu">足底（裏から見た図）：外側を</text><text x="8" y="258" class="mu">踵→小趾球→母趾球の方へ</text>
-<g class="ln"><path d="M200 50 L210 160 Q212 186 240 190 L330 194 Q346 194 344 180 Q340 166 316 162 L262 150 Q246 144 244 120 L240 50" class="fl"/>
-<circle cx="250" cy="158" r="6" fill="none"/></g>
-<path d="M232 176 Q256 182 300 178" class="arr" fill="none" marker-end="url(#ah)"/>
-<text x="196" y="36" class="tx">Chaddock（外側から）</text><text x="196" y="214" class="mu">外果の下を後ろ→前へ</text>
-<text x="196" y="244" class="tx">陽性：母趾がゆっくり背屈</text><text x="196" y="258" class="mu">（他趾は開扇）</text></svg>`},
-
-derm:{t:"デルマトームの目安（前面・簡略化、手のひらを前に向けた姿勢）",svg:`<svg viewBox="0 0 360 448" xmlns="http://www.w3.org/2000/svg">
-${(()=>{const C={C5:"#3B6FB6",C6:"#5D89C9",C7:"#86A9DB",C8:"#8A63B0",T1:"#B08ACD",T4:"#2E8B7A",T10:"#4FA88F",L1:"#3E9A63",L2:"#6BAF5A",L3:"#9CC45E",L4:"#C9A93A",L5:"#D9822B",S1:"#C0583A"};
-const P=(pts,c,m)=>`<polygon points="${pts.map(p=>(m?360-p[0]:p[0])+','+p[1]).join(' ')}" fill="${c}"/>`;
-const O=[[124,80],[91,160],[58,240]],M=[[135,88],[102,166],[70,244]],I=[[146,96],[114,172],[82,248]];
-let s='';
-for(const m of [0,1]){
- s+=P([O[0],O[1],M[1],M[0]],C.C5,m)+P([O[1],O[2],M[2],M[1]],C.C6,m)+P([M[0],M[1],I[1],I[0]],C.T1,m)+P([M[1],M[2],I[2],I[1]],C.C8,m);
- const hx=x=>m?360-x:x;
- s+=`<circle cx="${hx(70)}" cy="262" r="12" class="fl ln"/><circle cx="${hx(54)}" cy="254" r="6" fill="${C.C6}"/><circle cx="${hx(70)}" cy="278" r="5" fill="${C.C7}"/><circle cx="${hx(84)}" cy="274" r="5" fill="${C.C8}"/>`;
- // 下肢：大腿上部L2・下部L3、下腿の外側L5・内側L4、足背L5、足の外側S1
- s+=P([[142,250],[178,252],[176,290],[140,288]],C.L2,m)+P([[140,288],[176,290],[175,326],[138,324]],C.L3,m)
-   +P([[138,324],[156,325],[154,404],[134,402]],C.L5,m)+P([[156,325],[175,326],[173,404],[154,404]],C.L4,m)
-   +P([[134,404],[164,406],[166,420],[140,420]],C.L5,m)+P([[126,402],[134,402],[140,420],[128,420]],C.S1,m);
-}
-s+=`<g class="ln" fill="none"><circle cx="180" cy="40" r="24"/><path d="M168 62 L166 76 M192 62 L194 76"/><path d="M124 80 L236 80 M146 96 L150 244 L210 244 L214 96"/></g>`;
-s+=`<rect x="150" y="118" width="60" height="7" fill="${C.T4}"/><rect x="150" y="176" width="60" height="7" fill="${C.T10}"/><path d="M150 232 L210 232 L196 250 L164 250Z" fill="${C.L1}"/>`;
-s+=`<g class="tx" font-size="10.5"><text x="154" y="114">T4 乳頭</text><text x="154" y="172">T10 臍</text><text x="154" y="228">L1 鼠径</text></g>`;
-const LG=[["C5","肩・上腕の外側"],["C6","前腕外側・母指"],["C7","中指"],["C8","前腕内側・小指"],["T1","上腕内側"],["L2","大腿前面上部"],["L3","大腿下部・膝"],["L4","下腿内側"],["L5","下腿外側・足背"],["S1","足の外側・足底"]];
-LG.forEach((g,i)=>{const col=i<5?0:1,row=i%5,x=col?236:4,y=300+row*22;s+=`<rect x="${x}" y="${y-10}" width="12" height="12" rx="2" fill="${C[g[0]]}"/><text x="${x+16}" y="${y}" class="tx" font-size="11">${g[0]} ${g[1]}</text>`;});
-s+=`<text x="4" y="440" class="mu" font-size="10.5">S2〜5：殿部・肛門周囲。境界は重なり個人差あり</text>`;
-return s;})()}
-</svg>`},
-
-cord:{t:"脊髄の横断面と症候群（■＝障害部位、右側病変の例）",svg:`<svg viewBox="0 0 360 330" xmlns="http://www.w3.org/2000/svg">
-${(()=>{const S=(cx,cy,sc,mark,lab,sub)=>{const k=sc;
-const o=`<ellipse cx="${cx}" cy="${cy}" rx="${46*k}" ry="${34*k}" class="fl ln"/>`;
-const gm=`<path d="M${cx} ${cy-6*k} C${cx-10*k} ${cy-26*k} ${cx-26*k} ${cy-30*k} ${cx-20*k} ${cy-10*k} C${cx-28*k} ${cy+4*k} ${cx-30*k} ${cy+22*k} ${cx-14*k} ${cy+20*k} C${cx-6*k} ${cy+14*k} ${cx} ${cy+10*k} ${cx} ${cy+10*k} C${cx} ${cy+10*k} ${cx+6*k} ${cy+14*k} ${cx+14*k} ${cy+20*k} C${cx+30*k} ${cy+22*k} ${cx+28*k} ${cy+4*k} ${cx+20*k} ${cy-10*k} C${cx+26*k} ${cy-30*k} ${cx+10*k} ${cy-26*k} ${cx} ${cy-6*k}Z" class="gm"/>`;
-const reg={dcR:`<path d="M${cx} ${cy-6*k} L${cx} ${cy-34*k} A${46*k} ${34*k} 0 0 1 ${cx+20*k} ${cy-31*k} L${cx+12*k} ${cy-14*k}Z" class="lz"/>`,
-dcB:`<path d="M${cx-18*k} ${cy-31*k} A${46*k} ${34*k} 0 0 1 ${cx+18*k} ${cy-31*k} L${cx+10*k} ${cy-14*k} L${cx} ${cy-6*k} L${cx-10*k} ${cy-14*k}Z" class="lz"/>`,
-cstR:`<ellipse cx="${cx+34*k}" cy="${cy-6*k}" rx="${9*k}" ry="${10*k}" class="lz"/>`,
-cstB:`<ellipse cx="${cx+34*k}" cy="${cy-6*k}" rx="${9*k}" ry="${10*k}" class="lz"/><ellipse cx="${cx-34*k}" cy="${cy-6*k}" rx="${9*k}" ry="${10*k}" class="lz"/>`,
-sttR:`<ellipse cx="${cx+30*k}" cy="${cy+16*k}" rx="${9*k}" ry="${8*k}" class="lz"/>`,
-sttB:`<ellipse cx="${cx+30*k}" cy="${cy+16*k}" rx="${9*k}" ry="${8*k}" class="lz"/><ellipse cx="${cx-30*k}" cy="${cy+16*k}" rx="${9*k}" ry="${8*k}" class="lz"/>`,
-ant:`<path d="M${cx-40*k} ${cy-2*k} Q${cx} ${cy-4*k} ${cx+40*k} ${cy-2*k} A${46*k} ${34*k} 0 0 1 ${cx-40*k} ${cy-2*k}Z" class="lz"/>`,
-cen:`<ellipse cx="${cx}" cy="${cy+4*k}" rx="${14*k}" ry="${11*k}" class="lz"/>`,
-half:`<path d="M${cx} ${cy-34*k} A${46*k} ${34*k} 0 0 1 ${cx} ${cy+34*k}Z" class="lz"/>`,
-all:`<ellipse cx="${cx}" cy="${cy}" rx="${46*k}" ry="${34*k}" class="lz"/>`};
-const m=mark.map(x=>reg[x]).join('');
-return `<g>${o}${gm}${m}<text x="${cx}" y="${cy+34*k+16}" text-anchor="middle" class="tx" font-size="12">${lab}</text>${sub?`<text x="${cx}" y="${cy+34*k+30}" text-anchor="middle" class="mu" font-size="10.5">${sub}</text>`:''}</g>`;};
-let s=S(90,64,1.2,[],"正常の配置","");
-s+=`<g class="mu" font-size="10.5"><text x="160" y="28">後索（深部覚：同側）</text><text x="160" y="62">外側皮質脊髄路（運動：同側）</text><text x="160" y="96">脊髄視床路（温痛覚：対側）</text></g>
-<path d="M98 30 L156 24 M132 58 L156 58 M126 86 L156 92" class="ln" fill="none"/>`;
-s+=S(50,180,.62,["half"],"半側","Brown-Séquard")+S(130,180,.62,["ant"],"前部","前脊髄動脈")+S(210,180,.62,["cen"],"中心部","空洞症・中心性")+S(290,180,.62,["dcB"],"後索","B12・脊髄癆");
-s+=S(90,268,.62,["dcB","cstB"],"後索＋側索","亜急性連合性変性症")+S(200,268,.62,["all"],"横断","全感覚・運動");
-return s;})()}
-</svg>`},
-
-hand:{t:"手の感覚支配（右手。掌側と背側）",svg:`<svg viewBox="0 0 360 264" xmlns="http://www.w3.org/2000/svg">
-${(()=>{const fr=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" class="${c}"/>`;
-const out=ox=>`<g class="ln" fill="none">${[[18,110,20,72],[42,40,18,94],[64,30,18,104],[86,38,18,96],[108,60,16,80]].map(r=>`<rect x="${ox+r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" rx="${r[2]/2}"/>`).join('')}<rect x="${ox+40}" y="118" width="86" height="96" rx="20"/></g>`;
-const outD=ox=>`<g class="ln" fill="none">${[[108,110,20,72],[86,40,18,94],[64,30,18,104],[42,38,18,96],[22,60,16,80]].map(r=>`<rect x="${ox+r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" rx="${r[2]/2}"/>`).join('')}<rect x="${ox+20}" y="118" width="86" height="96" rx="20"/></g>`;
-let s='';const a=10;
-// 掌側：母指〜環指橈側半分＝正中、環指尺側半分・小指＝尺骨
-s+=`<g opacity=".8">${fr(a+18,112,20,70,'md')}${fr(a+42,42,18,90,'md')}${fr(a+64,32,18,100,'md')}${fr(a+86,40,9,92,'md')}${fr(a+95,40,9,92,'ul')}${fr(a+108,62,16,76,'ul')}${fr(a+42,130,53,80,'md')}${fr(a+95,130,29,80,'ul')}</g>`+out(a);
-const b=196;
-// 背側（母指は右）：指先〜中節＝正中（示指・中指・環指橈側）、残りの橈側＝橈骨、尺側＝尺骨
-s+=`<g opacity=".8">${fr(b+108,112,20,70,'rd')}${fr(b+86,42,18,30,'md')}${fr(b+86,72,18,60,'rd')}${fr(b+64,32,18,30,'md')}${fr(b+64,62,18,70,'rd')}${fr(b+51,40,9,30,'md')}${fr(b+51,70,9,62,'rd')}${fr(b+42,40,9,92,'ul')}${fr(b+22,62,16,76,'ul')}${fr(b+22,130,29,80,'ul')}${fr(b+51,130,53,80,'rd')}</g>`+outD(b);
-s+=`<text x="${a+73}" y="232" text-anchor="middle" class="tx">掌側（母指が左）</text><text x="${b+73}" y="232" text-anchor="middle" class="tx">背側（母指が右）</text>`;
-return s;})()}
-<g font-size="11.5"><rect x="10" y="246" width="12" height="12" class="md"/><text x="26" y="256" class="mu">正中</text><rect x="70" y="246" width="12" height="12" class="ul"/><text x="86" y="256" class="mu">尺骨</text><rect x="130" y="246" width="12" height="12" class="rd"/><text x="146" y="256" class="mu">橈骨</text><text x="190" y="256" class="mu">境界は個人差がある</text></g></svg>`}
-};
-
-const BOOK={"B":["めまいの診かた・考えかたOCR","イラストで分かる神経症候","グラフィック神経学","ブラッシュアップ神経症候menu","ベッドサイドの神経の診かた","レジデントのための神経診療","不随意運動のみかた","末梢神経と筋のみかた","神経局在診断","神経症候学Note_目次しおり付き","神経症候群を学ぶ人のために","神経症状の診かた考え方第三版","神経症状の診極め方","神経診察の極意","神経診察：実際とその意義","神経診断学を学ぶ人のために","脊椎脊髄・神経筋の神経症候学の基本","脊髄臨床神経学ノート","脳神経内科診断ハンドブック","高次脳機能障害　その概念と画像診断"],"I":{"loc-brain":[[4,310,327,348],[15,278,308,321],[13,26,163,166],[1,513,516,519],[10,235,360,417],[11,106,339]],"cn-va":[[13,43,51],[4,213,280,397],[12,114],[15,42,50,319],[5,314],[14,104,108,191]],"cn-vf":[[3,21,98,101],[15,46,50,319],[4,121,212,330],[5,219,316,370],[1,404,408,543],[18,33,525,570]],"cn-4-6":[[3,23,108,116],[5,311,321,324],[4,125,219,223],[10,66,70,412],[8,132,144,148],[14,89,96]],"eom-dip":[[9,50,62,72],[4,127,222,225],[15,71,74,78],[13,56,146,169],[1,291,436,439],[5,321,325,329]],"eom-nys":[[3,24,168,176],[5,298,301,305],[10,78,412,420],[13,73,77,146],[14,86,100],[4,128,230,233]],"vs-bppv":[[5,298,301,305],[0,45,82,85],[13,74,77],[3,167,174,178],[8,185,191],[11,68,103,419]],"cn-5":[[1,261,287,396],[15,86,90,154],[8,165,194,473],[14,45,52,120],[4,84,131,236],[5,197,331]],"cn-7":[[3,158,184,213],[15,92,97,303],[11,46,78,407],[13,67],[5,329,336,341],[10,50,70,87]],"cn-8":[[1,58,292,420],[14,114,164],[15,102,299,327],[8,181,184,192],[3,160,172,175],[4,26,240,244]],"cn-9-10":[[14,52,109,122],[15,108,113,116],[8,194,197,229],[10,99,103,347],[13,39,82],[11,343,407]],"cn-dysar":[[3,61,222,229],[10,105,338,417],[14,67,118,166],[12,54,138,254],[13,28],[9,189,326]],"rx-path":[[13,124,130,173],[4,93,101,177],[14,13,37,54],[15,109,162,329],[9,156,163,298],[11,393,398]],"mv-trem":[[10,150,156,160],[14,68,126,132],[6,3,10,17],[3,195,199,304],[13,104,145],[11,180,197,207]],"mv-park":[[6,3,12],[11,179,193,203],[3,233,236,242],[4,197,456],[5,352,356,360],[14,12,39,187]],"au-oh":[[11,100,160,410],[3,264,277,281],[10,18,347,418],[4,198,254,288],[18,402,436,445],[16,22]],"loc-jcs":[[14,120,186],[3,17,308,312],[13,23,26],[11,13,329,339],[5,159,165,169],[4,292,368,424]],"hb-aph":[[1,363,380,387],[14,164,169,177],[4,260,263,266],[3,74,78,81],[8,383,397,403],[13,29,169,172]],"hb-apra":[[19,80,84,91],[17,315],[3,19,49,235],[10,19,366,413],[13,35,170],[14,166,172,192]],"hb-neg":[[3,50,85],[8,390,395,495],[1,386],[4,274,329,461],[19,126,129,133],[10,19,371,398]],"cn-olf":[[8,136,392,492],[14,110,191],[3,241],[4,120,211,452],[10,85],[15,40]],"cn-pupil":[[9,43,58,70],[3,23,107,113],[5,163,315,318],[15,53,60,278],[4,124,216,299],[13,53,165,173]],"cn-horner":[[15,58,72,311],[1,235,481,504],[4,213,216,364],[9,17,28,42],[3,107,123,126],[5,210,318,329]],"cn-3":[[4,214,220,367],[11,404,410],[15,53,58,64],[5,314,318,324],[3,109,154,315],[10,66,73,400]],"eom-mlf":[[8,151],[4,221,224,227],[3,116,119,315],[5,325],[15,67,70,105],[1,256,259,455]],"eom-gaze":[[9,14,53,58],[4,217,225,247],[15,69,185],[1,241,257,443],[14,95],[3,121]],"cn-11":[[2,202],[8,118,132,200],[10,133,180,407],[1,215,275,290],[15,120],[4,139,246]],"cn-12":[[2,150,205],[14,123,136],[4,49,140,246],[5,127],[9,78,81],[8,203]],"mt-atro":[[4,49,436,444],[14,32,123,146],[3,181,184,187],[16,33,39,220],[2,150,215,218],[15,116,141,315]],"mt-tone":[[13,89,170],[4,36,51,197],[15,134,153,300],[10,175,245,414],[3,28,223,237],[14,12,39,62]],"mt-mmt":[[16,53,215,310],[18,416,486,510],[3,15,180,184],[11,257,348,398],[5,113,118,148],[4,55,442,445]],"mt-drift":[[16,78,81,84],[13,92,95,172],[17,22,25],[5,29,51,84],[11,305,398],[3,15,32]],"mt-fatig":[[3,123,127,216],[18,453,457,460],[5,110,113,329],[14,37],[15,72,258,299],[11,342,348,405]],"rx-dtr":[[17,21,42,86],[9,148,152,159],[16,34,71,248],[15,160,201,306],[10,206,267,403],[14,46,49,192]],"rx-clonus":[[9,149,205,208],[3,16,38,209],[16,72,164],[14,44,50,136],[17,86,198,320],[1,313,468]],"rx-sup":[[11,393],[4,93,106,306],[3,264,270,279],[14,13,53],[15,163,209,304],[13,119]],"sn-basic":[[16,90,99,113],[5,40,44,59],[10,287,312,394],[14,69,72,76],[3,16,33,247],[4,110,130,205]],"sn-deep":[[5,40,47,142],[11,137,253,399],[13,132,155,158],[14,69,78,179],[10,289,292,295],[3,204,247,257]],"sn-pattern":[[5,30,42,81],[14,13,75],[16,33,95,100],[7,63],[10,303,308,421],[8,41,103,107]],"cb-limb":[[11,111,114,409],[14,12,62,65],[10,157,217,279],[1,313,467],[13,104,145,148],[5,47,309]],"cb-gait":[[15,213],[3,176,290,293],[13,71,145,149],[5,311],[9,191],[1,54,311]],"mv-hyper":[[6,2,5,18],[14,143,150,157],[3,194,203,212],[4,189,455,462],[13,105,109,172],[10,167,240,344]],"mv-myoc":[[9,209,251,262],[14,127,135,142],[13,105,108,169],[15,171,180,184],[6,7,14,17],[11,207,262,273]],"gt-type":[[3,11,170,297],[14,83,156,192],[10,18,333,342],[4,75,197,459],[6,2,12],[17,19,44,99]],"sp-cord":[[4,173,208,343],[14,13,58,76],[12,78,159,168],[10,307,312,404],[3,259,277,297],[11,257,417,420]],"sp-root":[[5,69,72,126],[18,389,395,443],[16,165,195,236],[4,207,407,413],[1,142,146],[17,112,133,231]],"pn-arm":[[16,37,121,124],[10,138,195,404],[1,70,77,81],[5,94,98,126],[8,116],[11,131,134,310]],"pn-leg":[[8,113,119],[5,34,100,133],[1,86,90,94],[16,19,61,140],[17,42,47,212],[7,43,68]],"fn-hoover":[[15,190,261,323],[11,286,295,299],[10,26,324,345],[16,278,304,308],[9,260,288,291],[3,122,297,306]],"mt-umn":[[14,15,33,37],[3,180,183,187],[18,201,213,216],[4,173,436,443],[15,123,142,162],[10,87,199,251]],"hb-agn":[[19,99,117,249],[10,19,368],[4,275,330,375],[14,170,175,192],[15,12,228,237],[3,51,85]],"hb-orient":[[11,220,233,266],[14,184,187,191],[18,100,105,123],[15,32,215,219],[3,18,44,53],[4,147,292,447]],"mt-myot":[[18,478,482,507],[5,120],[10,39,50,212],[15,141,156,259],[4,50,439,442],[2,222]],"gt-gowers":[[15,141,151,301],[5,113,148],[3,188,289],[10,133,182],[2,219],[4,439]],"loc-meng":[[11,38,41,339],[15,121,280,305],[3,16,40,142],[12,64,68,233],[4,296,429,449],[5,163,259,264]],"hb-front":[[15,91,163,304],[3,51,226,297],[9,95],[10,91,213],[14,56],[4,97,151,328]],"vs-hints":[[5,298,304],[9,62],[11,106,112,116],[12,90,126,132],[3,166,176],[8,471]],"rx-hoff":[[15,143,160],[3,16,36],[14,48],[4,96,449],[9,121,152],[12,47]],"sn-cort":[[13,132,135,143],[4,115,210,329],[3,247],[10,17,283],[16,96],[5,40]],"cn-swallow":[[5,115,342,345],[3,63,68,71],[14,118,122],[18,142,456,500],[11,240,345,363],[4,442]]}};
-
-const APPVER="2026-11-20b";
-const KEY="signnavi.v1";
-let st={fav:[],recent:[],cat:"__all",q:"",view:"map",lv:"cortex"};
-try{Object.assign(st,JSON.parse(localStorage.getItem(KEY)||"{}"));}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
-const $=s=>document.querySelector(s);
-const BYID={};ITEMS.forEach(x=>BYID[x.id]=x);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const kata=s=>s.replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));
-const norm=s=>kata(String(s).normalize("NFKC").toLowerCase()).replace(/[\s・\-ー－]/g,"");
-const BOOKNAME=b=>b.replace(/_目次しおり付き|menu|OCR/g,"").replace(/　/g," ");
-ITEMS.forEach(x=>{x._s=norm([x.n,x.en,x.r,(x.k||[]).join(" "),(x.how||[]).join(" "),(x.ab||[]).join(" "),(x.mean||[]).join(" "),(x.pit||[]).join(" ")].join(" "));x._t=norm(x.n+" "+x.en+" "+(x.k||[]).join(" "));});
-function figHTML(id,withLink){const f=FIGS[id];if(!f)return"";const its=ITEMS.filter(x=>x.fig===id);
-  return `<div class="fig"><p class="ft">${esc(f.t)}</p>${f.svg}${withLink&&its.length?`<div class="fb links">${its.map(x=>`<button class="lnk" data-open="${x.id}">${esc(x.n)}</button>`).join("")}</div>`:""}</div>`;}
-// 部位マップ
-function renderMap(){
-  $("#lvlist").innerHTML=LEVELS.map(l=>`<button style="--c:${l.color}" data-lv="${l.id}" class="${st.lv===l.id?"on":""}">${esc(l.n)}</button>`).join("");
-  const l=LEVELS.find(x=>x.id===st.lv)||LEVELS[0];
-  $("#lvcard").innerHTML=`<div class="card lvcard" style="--c:${l.color}"><h3>${esc(l.n)}の障害で出る所見</h3><ul>${l.signs.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>
-  <div class="links">${l.items.map(id=>BYID[id]?`<button class="lnk" data-open="${id}">${esc(BYID[id].n)}</button>`:"").join("")}</div></div>`;
-}
-// 所見リスト
-function hl(s,q){if(!q)return esc(s);const i=norm(s).indexOf(q);if(i<0)return esc(s);
-  // 正規化前の文字位置に近似で対応（全角・空白差はほぼない前提）
-  const raw=String(s);let j=-1;for(let k=0;k<raw.length;k++){if(norm(raw.slice(k)).startsWith(q)){j=k;break;}}
-  if(j<0)return esc(s);let e=j;while(e<raw.length&&norm(raw.slice(j,e+1)).length<q.length)e++;return esc(raw.slice(0,j))+"<mark>"+esc(raw.slice(j,e+1))+"</mark>"+esc(raw.slice(e+1));}
-function snippet(x,q){if(!q)return (x.ab&&x.ab[0])||"";
-  const all=[...(x.k||[]),...(x.how||[]),...(x.ab||[]),...(x.mean||[]),...(x.pit||[])];
-  const f=all.find(s=>norm(s).includes(q));return f||((x.ab&&x.ab[0])||"");}
-function renderCats(){
-  const cats=[["__all","すべて"],["__fav","☆登録"],["__recent","最近"],...CATS.map(c=>[c,c])];
-  $("#cats").innerHTML=cats.map(([v,t])=>`<button class="chip ${st.cat===v?"on":""}" data-cat="${v}">${esc(t)}</button>`).join("");
-}
-function renderList(){
-  const q=norm(st.q||"");let xs=ITEMS.slice();
-  if(st.cat==="__fav")xs=st.fav.map(id=>BYID[id]).filter(Boolean);
-  else if(st.cat==="__recent")xs=st.recent.map(id=>BYID[id]).filter(Boolean);
-  else if(st.cat!=="__all")xs=xs.filter(x=>x.r===st.cat);
-  if(q){xs=xs.filter(x=>x._s.includes(q));xs.sort((a,b)=>(b._t.includes(q)-a._t.includes(q)));}
-  else if(st.cat==="__all"){xs.sort((a,b)=>CATS.indexOf(a.r)-CATS.indexOf(b.r));}
-  let html="";let last="";
-  xs.forEach(x=>{if(!q&&st.cat==="__all"&&x.r!==last){html+=`<h2>${esc(x.r)}</h2>`;last=x.r;}
-    html+=`<button class="it" data-open="${x.id}"><div class="tl"><b>${st.fav.includes(x.id)?'<span class="star">★</span> ':""}${hl(x.n,q)}</b><span>${hl(snippet(x,q),q)}</span></div>${x.fig?'<span class="fg">図</span>':""}${(q||st.cat.startsWith("__"))?`<span class="cat">${esc(x.r)}</span>`:""}</button>`;});
-  if(!xs.length)html=`<div class="empty">${st.cat==="__fav"?"☆登録した項目はまだありません。項目を開いて右上の☆を押すと登録できます。":"該当する項目がありません。別の言葉（日本語・英語・略語）でも試してください。"}</div>`;
-  if(q)html=`<p class="note">「${esc(st.q)}」：${xs.length}件</p>`+html;
-  $("#list").innerHTML=html;
-}
-function renderFigs(){let h=Object.keys(FIGS).map(id=>figHTML(id,true)).join("");
-  if(typeof BF!=="undefined"&&BF.n){h+=`<h2>教科書の図（端末内）</h2>`+ITEMS.filter(x=>bfFor(x.id).length).map(x=>`<div class="fig"><p class="ft">${esc(x.n)}</p>${bfHTML(x.id).replace('<div class="sec"><h4>教科書の図</h4>','<div>')}<div class="fb links"><button class="lnk" data-open="${x.id}">この項目を開く</button></div></div>`).join("");}
-  $("#figs").innerHTML=h;}
-function renderBooks(){$("#booklist").innerHTML=BOOK.B.map(b=>`<li>${esc(BOOKNAME(b))}</li>`).join("");}
-// 詳細
-let hist=[];
-function sec(cls,t,arr){return arr&&arr.length?`<div class="sec ${cls}"><h4>${t}</h4><ul>${arr.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>`:"";}
-function openItem(id,push){const x=BYID[id];if(!x)return;
-  if(push!==false){const cur=$("#sheet").dataset.id;if($("#sheet").classList.contains("on")&&cur&&cur!==id)hist.push(cur);}
-  $("#sheet").dataset.id=id;
-  $("#shT").innerHTML=`${esc(x.n)}<br><span class="en">${esc(x.en)}　｜　${esc(x.r)}</span>`;
-  $("#shFav").textContent=st.fav.includes(id)?"★":"☆";
-  const bk=(BOOK.I[id]||[]);
-  const books=bk.length?`<div class="sec"><h4>教科書（PDFのページ）</h4><ul class="bk">${bk.map(r=>`<li>${esc(BOOKNAME(BOOK.B[r[0]]))}　<span class="pg">p.${r.slice(1).join("・")}</span></li>`).join("")}</ul><p class="note" style="margin:4px 0 0">全文検索で選んだページ。PDFの通し番号（印刷ページとは数ページずれる）。</p></div>`:"";
-  const rel=(x.rel||[]).filter(r=>BYID[r]);
-  $("#shC").innerHTML=sec("how","診察法",x.how)+(x.fig?figHTML(x.fig,false):"")+bfHTML(id)+sec("ab","異常所見",x.ab)+sec("mean","意味・局在",x.mean)+sec("pit","注意点",x.pit)
-   +(rel.length?`<div class="sec"><h4>関連</h4><div class="links">${rel.map(r=>`<button class="lnk" data-open="${r}">${esc(BYID[r].n)}</button>`).join("")}</div></div>`:"")+books
-   +`<div class="disc">要点は成書の記載を自分の言葉でまとめたもの。最終判断は診察と原典で。</div>`;
-  $("#shBack").style.visibility=hist.length?"visible":"hidden";
-  $("#sheet").classList.add("on");$("#shB").scrollTop=0;
-  ["wcClrBtn","wcQrBtn"].forEach(i=>{const e=document.getElementById(i);if(e)e.style.display="none";});
-  st.recent=[id,...st.recent.filter(r=>r!==id)].slice(0,15);save();
-}
-function closeSheet(){$("#sheet").classList.remove("on");hist=[];$("#sheet").dataset.id="";
-  ["wcClrBtn","wcQrBtn"].forEach(i=>{const e=document.getElementById(i);if(e)e.style.display="";});
-  if(st.view==="list")renderList();}
-// 画面切替
-function show(v){st.view=v;save();document.querySelectorAll(".view").forEach(e=>e.classList.toggle("on",e.id==="v-"+v));
-  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
-  if(v==="list"){renderCats();renderList();} window.scrollTo(0,0);}
-document.addEventListener("click",e=>{
-  const o=e.target.closest("[data-open]");if(o){openItem(o.dataset.open);return;}
-  const lv=e.target.closest("[data-lv]");if(lv){st.lv=lv.dataset.lv;save();renderMap();return;}
-  const c=e.target.closest("[data-cat]");if(c){st.cat=c.dataset.cat;save();renderCats();renderList();return;}
-  const t=e.target.closest("#tabs button");if(t){show(t.dataset.v);return;}
-});
-$("#shX").onclick=closeSheet;
-$("#shBack").onclick=()=>{const p=hist.pop();if(p)openItem(p,false);};
-$("#shFav").onclick=()=>{const id=$("#sheet").dataset.id;if(!id)return;st.fav=st.fav.includes(id)?st.fav.filter(x=>x!==id):[id,...st.fav];save();$("#shFav").textContent=st.fav.includes(id)?"★":"☆";};
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#sheet").classList.contains("on"))closeSheet();});
-const qi=$("#q");qi.value=st.q||"";
-qi.addEventListener("input",()=>{st.q=qi.value;save();if(st.view!=="list")show("list");else renderList();});
-qi.addEventListener("keydown",e=>{if(e.key==="Enter")qi.blur();});
-$("#qx").onclick=()=>{qi.value="";st.q="";save();renderList();};
-$("#ver").textContent=APPVER;
-$("#upd").onclick=async()=>{try{const r=await navigator.serviceWorker?.getRegistration?.("../");if(r)await r.update();}catch(e){} location.reload();};
-
-/* ---------- 教科書の図（IndexedDBに端末内保存。GitHubには置かない） ---------- */
-const BF={urls:{},meta:{},ver:"",n:0};
-function bfdb(){return new Promise((res,rej)=>{try{const r=indexedDB.open("signatlas-figs",1);r.onupgradeneeded=()=>r.result.createObjectStore("b");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}catch(e){rej(e);}});}
-async function bfGet(){const db=await bfdb();return new Promise(res=>{const q=db.transaction("b").objectStore("b").get("bundle");q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null);});}
-async function bfPut(v){const db=await bfdb();return new Promise((res,rej)=>{const tx=db.transaction("b","readwrite");v==null?tx.objectStore("b").delete("bundle"):tx.objectStore("b").put(v,"bundle");tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-function d2b(u){const [h,b]=u.split(",");const bin=atob(b);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:(h.match(/data:([^;]+)/)||[])[1]||"image/jpeg"});}
-function bfApply(b){Object.values(BF.urls).forEach(u=>{try{URL.revokeObjectURL(u);}catch(e){}});BF.urls={};BF.meta={};BF.n=0;BF.ver="";
-  if(b&&b.figs){Object.keys(b.figs).forEach(k=>{const v=b.figs[k];BF.urls[k]=URL.createObjectURL(v instanceof Blob?v:d2b(v));BF.n++;});BF.meta=b.meta||{};BF.ver=b.version||"";}
-  const e=document.getElementById("bfState");if(e)e.textContent=BF.n?`取り込み済み：${BF.n}枚（${BF.ver}）`:"未取り込み";}
-function bfFor(id){return Object.keys(BF.meta).filter(k=>BF.urls[k]&&(BF.meta[k].items||[]).includes(id));}
-function bfCap(k){const m=BF.meta[k]||{};return `${m.cap||""}（${BOOKNAME(m.book||"")}${m.page?" PDF p."+m.page:""}）`;}
-function bfHTML(id){const l=bfFor(id);if(!l.length)return"";return `<div class="sec"><h4>教科書の図</h4><div class="bfig">${l.map(k=>`<button data-bf="${k}" data-bfl="${l.join(",")}"><img src="${BF.urls[k]}" alt="" loading="lazy">${esc(bfCap(k))}</button>`).join("")}</div></div>`;}
-let vw={l:[],i:0};
-function vShow(){const k=vw.l[vw.i];$("#vI").src=BF.urls[k];$("#vI").classList.remove("z");$("#vZ").textContent="拡大";$("#vT").textContent=bfCap(k);$("#vP").disabled=vw.i<=0;$("#vN").disabled=vw.i>=vw.l.length-1;$("#vB").scrollTo(0,0);}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-bf]");if(!b)return;vw={l:b.dataset.bfl.split(","),i:0};vw.i=Math.max(0,vw.l.indexOf(b.dataset.bf));vShow();$("#viewer").classList.add("on");});
-$("#vX").onclick=()=>$("#viewer").classList.remove("on");
-$("#vP").onclick=()=>{if(vw.i>0){vw.i--;vShow();}};$("#vN").onclick=()=>{if(vw.i<vw.l.length-1){vw.i++;vShow();}};
-$("#vZ").onclick=()=>{const z=$("#vI").classList.toggle("z");$("#vZ").textContent=z?"全体":"拡大";};
-$("#bfFile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{let b;try{b=JSON.parse(r.result);}catch(x){alertMsg("ファイルの形式が違います");return;}
-  if(!b||b.kind!=="signatlas-figs"||!b.figs){alertMsg("神経所見アトラス用の図ファイルではありません");return;}
-  const st2={kind:b.kind,version:b.version,meta:b.meta,figs:{}};Object.keys(b.figs).forEach(k=>st2.figs[k]=d2b(b.figs[k]));
-  try{await bfPut(st2);}catch(x){alertMsg("この端末に保存できませんでした");return;}bfApply(st2);renderFigs();alertMsg(`図を${BF.n}枚取り込みました`);};r.readAsText(f);e.target.value="";});
-$("#bfClear").onclick=async()=>{try{await bfPut(null);}catch(x){}bfApply(null);renderFigs();alertMsg("図を消去しました");};
-function alertMsg(t){const n=document.createElement("div");n.textContent=t;n.style.cssText="position:fixed;left:12px;right:12px;bottom:calc(64px + env(safe-area-inset-bottom));background:#14506A;color:#fff;padding:10px 12px;border-radius:10px;z-index:2147483300;font-size:13px";document.body.appendChild(n);setTimeout(()=>n.remove(),3000);}
-bfGet().then(b=>{bfApply(b);renderFigs();}).catch(()=>{});
-renderMap();renderFigs();renderBooks();show(st.view||"map");
-// service worker（https/localhost のみ、claude.ai上では登録しない）
-try{if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")&&!/claude\.ai|claudeusercontent/.test(location.hostname)){
-  navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(reg=>{reg.addEventListener("updatefound",()=>{const w=reg.installing;if(!w)return;w.addEventListener("statechange",()=>{if(w.state==="installed"&&navigator.serviceWorker.controller){const n=document.createElement("div");n.textContent="新しい版を取り込みました。次に開いたときに反映されます";n.style.cssText="position:fixed;left:12px;right:12px;bottom:calc(64px + env(safe-area-inset-bottom));background:#14506A;color:#fff;padding:10px 12px;border-radius:10px;z-index:99;font-size:13px";document.body.appendChild(n);setTimeout(()=>n.remove(),5000);}});});}).catch(()=>{});}}catch(e){}
-</script>
-<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
-<style>
-#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
-#wcClrBtn svg{width:14px;height:14px}
-#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
-#wcClrDlg.on{display:flex}
-#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
-#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
-#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
-#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
-#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
-#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
-@media (prefers-color-scheme: dark){
-  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
-  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
-  #wcClrDlg .bx p{color:#A9B3B6}
-  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
-  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
-}
-[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
-@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
-@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
-</style>
-<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
-<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;margin:0;background:#f4f7fb;color:#1b2430}
+h1{font-size:18px;margin:0;padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 16px calc(16px + env(safe-area-inset-left));background:#0b5cad;color:#fff}
+h2{font-size:13px;color:#0b5cad;margin:0;padding:14px calc(16px + env(safe-area-inset-right)) 0 calc(16px + env(safe-area-inset-left));letter-spacing:.04em}
+ul{list-style:none;margin:0;padding:8px calc(12px + env(safe-area-inset-right)) 12px calc(12px + env(safe-area-inset-left))}
+li a{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #d7dee7;border-radius:12px;padding:12px;margin-bottom:10px;text-decoration:none;color:inherit;font-weight:700}
+li img{width:44px;height:44px;border-radius:10px}
+p{font-size:12px;color:#5a6675;padding:0 16px;margin:0 0 8px}
+footer{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+#msg{font-size:12px;color:#0b5cad;padding:0 16px}
+.tools{position:sticky;top:0;z-index:5;background:#f4f7fb;padding:10px calc(12px + env(safe-area-inset-right)) 6px calc(12px + env(safe-area-inset-left))}
+#q{width:100%;box-sizing:border-box;font:inherit;font-size:16px;min-height:44px;padding:8px 12px;border-radius:12px;border:1.5px solid #c9d3dd;background:#fff;color:inherit}
+#q:focus{outline:none;border-color:#0b5cad}
+li{position:relative}
+li a{padding-right:52px}
+.fv{position:absolute;right:6px;top:50%;transform:translateY(-50%);margin-top:-5px;width:42px;height:42px;border:0;background:none;font-size:22px;line-height:1;color:#b8c2cc;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fv[aria-pressed=true]{color:#e0a800}
+.hint{font-size:12px;color:#5a6675;padding:2px 16px 8px;margin:0}
+#none{display:none;padding:12px 16px;font-size:14px;color:#5a6675}
+li a small{flex:none;margin-left:auto;white-space:nowrap;font-weight:400;font-size:11.5px;color:#5a6675}
+@media (prefers-color-scheme: dark){body{background:#12171c;color:#e6ebf0}.tools{background:#12171c}#q{background:#1c232a;border-color:#34404b}li a{background:#1c232a;border-color:#2c3640}h2,#msg{color:#7fb3ea}p,.hint,#none,li a small{color:#9aa7b4}.fv{color:#55626e}}
+</style></head><body>
+<h1>病棟アプリ</h1>
+<div class="tools" data-wp-host><input id="q" type="search" placeholder="名前・キーワードで検索（例：eGFR、妊娠、DOAC、重積）" autocomplete="off" aria-label="アプリを検索"></div>
+<div id="none">該当するアプリがありません</div>
+<div id="favBox" hidden><h2>☆ お気に入り</h2><ul id="favList"></ul></div>
+<div id="recBox" hidden><h2>よく使う（最近開いた5件）</h2><ul id="recList"></ul></div>
+<p class="hint" id="favHint">各アプリの右の ☆ を押すとお気に入りに入ります。</p>
+<h2>救急・脳卒中</h2>
+<ul>
+<li><a href="er/"><img src="er/icon-192.png" alt="">ER業務支援ナビ（主訴別の初期対応・薬剤・スコア）</a></li>
+<li><a href="rpt/"><img src="rpt/icon-192.png" alt="">再開通療法 適応チェッカー（rt-PA・血栓回収）</a></li>
+<li><a href="nih/"><img src="nih/icon-192.png" alt="">NIHSS評価</a></li>
+<li><a href="atn/"><img src="atn/icon-192.png" alt="">抗血栓薬ナビ（脳卒中二次予防）</a></li>
+</ul>
+<h2>神経診察・局在</h2>
+<ul>
+<li><a href="exam/"><img src="exam/icon-192.png" alt="">神経診察チェック（カルテ定型文・局在ナビ連携）</a></li>
+<li><a href="loc/"><img src="loc/icon-192.png" alt="">神経病巣局在ナビ</a></li>
+<li data-kw="神経診察 神経所見 徴候 診察法 アトラス 部位別 図 瞳孔 眼球運動 MLF 眼振 HINTS 顔面神経 腱反射 Babinski Hoffmann 感覚 デルマトーム 小脳 振戦 歩行 脊髄 Brown-Séquard 神経根 手根管 下垂足 教科書"><a href="sign/"><img src="sign/icon-192.png" alt="">神経所見アトラス（部位別の診察法・所見の意味・図・教科書ページ）</a></li>
+<li><a href="mmt/"><img src="mmt/icon-192.png" alt="">MMTナビ（徒手筋力テスト・神経支配）</a></li>
+<li><a href="ltr/"><img src="ltr/icon-192.png" alt="">神経局在トレーニング（部位・血管支配・眼球運動/瞳孔/視野）</a></li>
+<li data-kw="末梢神経 神経根 神経叢 MMT デルマトーム 手根管 肘部管 腓骨神経 橈骨神経 下垂足 下垂手 トレーニング クイズ"><a href="pnt/"><img src="pnt/icon-192.png" alt="">末梢神経局在トレーニング（筋・感覚・反射から当てる）</a></li>
+<li><a href="csf/"><img src="csf/icon-192.png" alt="">髄液所見 鑑別トレーニング（髄液と臨床情報から診断を当てる）</a></li>
+<li><a href="ncs/"><img src="ncs/icon-192.png" alt="">NCS・針筋電図 判読トレーニング（数値から病態・診断）</a></li>
+<li data-kw="脳波 EEG 判読 トレーニング クイズ 正常亜型 wicket RMTD 14&6 棘波 鋭波 棘徐波 ヒプスアリスミア ICU LPD GPD LRDA GRDA BIRDs 三相波 burst suppression 電気的発作 NCSE ACNS アーチファクト"><a href="eeg/"><img src="eeg/icon-192.png" alt="">脳波パターン判読トレーニング（模式波形で所見名と意味）</a></li>
+</ul>
+<h2>神経疾患の治療</h2>
+<ul>
+<li><a href="aed/"><img src="aed/icon-192.png" alt="">抗てんかん薬ナビ（重積の推奨・薬の選択）</a></li>
+<li><a href="ha/"><img src="ha/icon-192.png" alt="">頭痛ナビ（急性期・予防・CGRP関連薬）</a></li>
+<li><a href="imm/"><img src="imm/icon-192.png" alt="">神経免疫治療ナビ（MG・NMOSD・CIDP）</a></li>
+<li><a href="enc/"><img src="enc/icon-192.png" alt="">自己免疫性脳炎・脳症 鑑別ナビ</a></li>
+<li><a href="dementia/"><img src="dementia/icon-192.png" alt="">認知症外来ナビ</a></li>
+<li><a href="updrs/"><img src="updrs/icon-192.png" alt="">MDS-UPDRS 評価ツール</a></li>
+<li><a href="pd/"><img src="pd/icon-192.png" alt="">PD薬剤調整ナビ（LEDD・絶食/周術期・運動合併症・悪性症候群）</a></li>
+<li><a href="preg/"><img src="preg/icon-192.png" alt="">妊娠・授乳と神経疾患薬ナビ</a></li>
+</ul>
+<h2>内科・全身管理</h2>
+<ul>
+<li><a href="dm/"><img src="dm/icon-192.png" alt="">糖尿病治療ナビ（病棟用）</a></li>
+<li><a href="htn/"><img src="htn/icon-192.png" alt="">高血圧治療ナビ（病棟用）</a></li>
+<li><a href="lipid/"><img src="lipid/icon-192.png" alt="">脂質異常症治療ナビ</a></li>
+<li><a href="inf/"><img src="inf/icon-192.png" alt="">感染症治療ナビ</a></li>
+<li><a href="ren/"><img src="ren/icon-192.png" alt="">腎機能・用量調整ナビ（CCr・eGFR、腎機能別の用量）</a></li>
+<li><a href="kampo/"><img src="kampo/icon-192.png" alt="">漢方ナビ</a></li>
+<li><a href="na/"><img src="na/icon-192.png" alt="">低Na・電解質補正ナビ（補正上限・3%食塩水・過補正の戻し方・高Na/K/Mg）</a></li>
+</ul>
+<h2>書類・制度・紹介</h2>
+<ul>
+<li><a href="nan/"><img src="nan/icon-192.png" alt="">指定難病・制度ナビ（重症度・臨個票・介護保険・身障手帳）</a></li>
+<li><a href="iken/"><img src="iken/icon-192.png" alt="">主治医意見書 自立度判定（寝たきり度・認知症自立度）</a></li>
+<li><a href="shi/"><img src="shi/icon-192.png" alt="">肢体不自由 等級判定ナビ（身障手帳 診断書1枚目の下書き）</a></li>
+<li data-kw="外注検査 研究検査 特殊検査 抗体 遺伝子 自己抗体 髄液 提出先 依頼先 検体 送付 京大 脳内検査 かずさ コスミック SRL LSI BML 岐阜 九州 日大 J-CAT"><a href="lab/"><img src="lab/icon-192.png" alt="">外注・研究検査ナビ（抗体・遺伝子の提出先と出し方）</a></li>
+<li><a href="referral/"><img src="referral/icon-192.png" alt="">脳神経クリニック紹介先検索</a></li>
+</ul>
+<h2>院内業務</h2>
+<ul>
+<li><a href="ext/"><img src="ext/icon-192.png" alt="">院内内線（データは暗号化して端末内のみ）</a></li>
+<li><a href="qc/"><img src="qc/icon-192.png" alt="">QCストーリー支援（パレート図・特性要因図・効果確認）</a></li>
+</ul>
+<h2>家族</h2>
+<ul>
+<li><a href="study/"><img src="study/icon-192.png" alt="">テスト勉強計画（息子用・データは端末内のみ）</a></li>
+</ul>
+<!-- 新しいアプリは該当する見出しの<ul>に1行追加（manifest.webmanifest の shortcuts と sw.js の APPS にも足し、VERSION を変える） -->
+<footer>
+<p>Android：このページで Chrome のメニュー →「アプリをインストール」を1回行えば、全アプリがオフラインで使えます。アイコンを長押しすると各アプリへのショートカットが出ます。</p>
+<p>iPhone：このページ、または各アプリを開いて 共有 →「ホーム画面に追加」。</p>
+<p>入力内容は端末内にのみ保存されます。患者個人情報は入力しないでください。</p>
+<div id="msg" role="status"></div>
+</footer>
 <script>
 (function(){
-  var KEYS=[{"k":"signnavi.v1","keep":["fav","recent","view","lv"]}];
-  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
-  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
-  function close(){dlg.classList.remove("on");}
-  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
-  document.getElementById("wcClrNo").addEventListener("click",close);
-  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
-  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
-  document.getElementById("wcClrYes").addEventListener("click",function(){
-    try{
-      var ls=window.localStorage,orig=ls.setItem.bind(ls);
-      var names=[];
-      KEYS.forEach(function(k){try{
-        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
-        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
-        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
-        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
-        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
-        names.push(k.k);
-      }catch(e){}});
-      /* 再読み込み前の自動保存で書き戻されないように止める */
-      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
-    }catch(e){}
-    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
-      if(el.closest&&el.closest("#wcClrDlg"))return;
-      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
-      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
-      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
-    });}catch(e){}
-    try{window.scrollTo(0,0);}catch(e){}
-    location.reload();
-  });
+  try{
+    const h=location.hostname;
+    const ok=(location.protocol==="https:"||h==="localhost"||h==="127.0.0.1")&&!/claude\.ai$|claudeusercontent|claude\.site/.test(h)&&"serviceWorker" in navigator;
+    if(!ok) return;
+    window.addEventListener("load",()=>{
+      navigator.serviceWorker.register("sw.js",{scope:"./"}).then(reg=>{
+        reg.addEventListener("updatefound",()=>{
+          const nw=reg.installing; if(!nw) return;
+          nw.addEventListener("statechange",()=>{
+            if(nw.state==="installed"&&navigator.serviceWorker.controller) document.getElementById("msg").textContent="新しい版を取り込みました。次に開いたときに反映されます";
+          });
+        });
+      }).catch(()=>{});
+    });
+  }catch(e){}
 })();
 </script>
-<!-- wc-clear:end -->
-<script src="../share.js" defer></script>
-</body>
-</html>
+<script>
+/* 入口：お気に入り（ward-fav）・よく使う（ward-recent、各アプリの share.js が記録）・検索 */
+(function(){
+  /* 検索用キーワード（slug ごと。新しいアプリは li の data-kw="…" に書いてもよい） */
+  var KW={
+    er:"救急 ER 主訴 初期対応 スコア 持続静注 ガンマ",rpt:"rt-PA tPA アルテプラーゼ テネクテプラーゼ 血栓回収 再開通 適応 脳梗塞 DAWN DEFUSE",nih:"NIHSS 脳卒中 重症度 スケール",
+    atn:"抗血栓 抗血小板 抗凝固 DAPT DOAC ワルファリン 周術期 休薬 中和 出血 二次予防",exam:"神経診察 カルテ 定型文 所見",loc:"局在 病巣 部位",mmt:"MMT 徒手筋力 筋力 神経支配 筋電図",
+    ltr:"局在 トレーニング クイズ 練習 血管支配 閉塞血管 ラクナ BAD 分水嶺 Wallenberg 眼球運動 MLF INO 瞳孔 Horner 視野 半盲",csf:"髄液 腰椎穿刺 ルンバール 髄膜炎 脳炎 細菌性 結核 クリプトコックス ADA 乳酸 OCB 蛋白細胞解離 キサントクロミー トレーニング クイズ",ncs:"神経伝導検査 NCS 針筋電図 EMG 筋電図 判読 トレーニング クイズ CIDP GBS AIDP AMAN MMN ALS 反復刺激 MG LEMS 伝導ブロック",aed:"てんかん 重積 抗てんかん薬 脳波 NCSE レベチラセタム ラコサミド",ha:"頭痛 片頭痛 群発 CGRP トリプタン 予防",
+    imm:"神経免疫 MG 重症筋無力症 NMOSD 視神経脊髄炎 CIDP 分子標的 髄膜炎菌 ワクチン ステロイド",enc:"自己免疫性脳炎 脳症 抗体 Graus irAE",dementia:"認知症 アルツハイマー 抗アミロイド レカネマブ ドナネマブ",
+    updrs:"パーキンソン UPDRS 評価 PD",pd:"パーキンソン PD LEDD L-dopa レボドパ 換算 周術期 絶食 ロチゴチン ニュープロ wearing-off ジスキネジア 幻覚 悪性症候群 DAWS",preg:"妊娠 授乳 産後 胎児 母乳",dm:"糖尿病 血糖 インスリン SGLT2 GLP-1 腎",htn:"高血圧 降圧 血圧",lipid:"脂質 コレステロール LDL スタチン",
+    inf:"感染症 抗菌薬 抗生剤 サンフォード 腎機能 eGFR 用量",kampo:"漢方 生薬",ren:"腎機能 腎 CCr クレアチニンクリアランス eGFR Cockcroft-Gault 用量調整 透析 DOAC レベチラセタム アシクロビル プレガバリン",na:"低ナトリウム 低Na 高Na ナトリウム 電解質 補正 3% 高張食塩水 SIADH 浸透圧性脱髄 ODS 橋中心髄鞘崩壊 カリウム 高K 低K マグネシウム 低Mg トルバプタン サムスカ ロケルマ",nan:"指定難病 難病 制度 臨個票 介護保険 身障手帳 訪問看護",iken:"主治医意見書 自立度 寝たきり 認知症 介護",
+    shi:"身体障害者手帳 肢体不自由 等級 診断書",referral:"紹介 逆紹介 クリニック 地図",ext:"内線 電話 PHS",qc:"QC 改善 パレート 特性要因図"
+  };
+  function norm(t){t=String(t||"").normalize("NFKC").toLowerCase();return t.replace(/[\u30a1-\u30f6]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60);}).replace(/\s+/g," ");}
+  function slug(a){var m=/^([^\/]+)\//.exec(a.getAttribute("href")||"");return m?m[1]:null;}
+  function get(k,d){try{var v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}}
+  function put(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  var lis=Array.prototype.filter.call(document.querySelectorAll("body>ul>li"),function(li){return li.querySelector("a")&&slug(li.querySelector("a"));});
+  var map={};
+  lis.forEach(function(li){var a=li.querySelector("a"),s=slug(a);map[s]=li;
+    li.dataset.s=s;li.dataset.txt=norm(a.textContent+" "+s+" "+(KW[s]||"")+" "+(li.getAttribute("data-kw")||""));
+    var b=document.createElement("button");b.type="button";b.className="fv";b.textContent="★";b.setAttribute("aria-label","お気に入り");
+    b.addEventListener("click",function(e){e.preventDefault();toggle(s);});li.appendChild(b);
+  });
+  function toggle(s){var f=get("ward-fav",[]);if(!Array.isArray(f))f=[];var i=f.indexOf(s);if(i>=0)f.splice(i,1);else f.push(s);put("ward-fav",f);draw();}
+  function clone(s,extra){var li=map[s];if(!li)return null;var c=li.cloneNode(true);var a=c.querySelector("a");
+    if(extra){var sm=document.createElement("small");sm.textContent=extra;a.appendChild(sm);}
+    c.querySelector(".fv").addEventListener("click",function(e){e.preventDefault();toggle(s);});return c;}
+  function ago(t){var m=Math.floor((Date.now()-t)/60000);if(m<1)return"たった今";if(m<60)return m+"分前";var h=Math.floor(m/60);if(h<24)return h+"時間前";return Math.floor(h/24)+"日前";}
+  function draw(){
+    var f=get("ward-fav",[]);if(!Array.isArray(f))f=[];f=f.filter(function(s){return map[s];});
+    var r=get("ward-recent",[]);if(!Array.isArray(r))r=[];r=r.filter(function(x){return x&&map[x.s];}).slice(0,5);
+    var fl=document.getElementById("favList"),rl=document.getElementById("recList");fl.innerHTML="";rl.innerHTML="";
+    f.forEach(function(s){var c=clone(s);if(c)fl.appendChild(c);});
+    r.forEach(function(x){var c=clone(x.s,ago(x.t));if(c)rl.appendChild(c);});
+    Array.prototype.forEach.call(document.querySelectorAll(".fv"),function(b){var s=b.closest("li").dataset.s;b.setAttribute("aria-pressed",String(f.indexOf(s)>=0));});
+    filter();
+  }
+  var q=document.getElementById("q");
+  function filter(){
+    var t=norm(q.value).trim(),ws=t?t.split(" "):[];
+    document.getElementById("favBox").hidden=!!t||!document.getElementById("favList").children.length;
+    document.getElementById("recBox").hidden=!!t||!document.getElementById("recList").children.length;
+    document.getElementById("favHint").hidden=!!t||!!document.getElementById("favList").children.length;
+    var any=false;
+    lis.forEach(function(li){var ok=ws.every(function(w){return li.dataset.txt.indexOf(w)>=0;});li.hidden=!ok;if(ok)any=true;});
+    Array.prototype.forEach.call(document.querySelectorAll("body>ul"),function(ul){
+      var vis=Array.prototype.some.call(ul.children,function(li){return !li.hidden;});ul.hidden=!vis;
+      var h=ul.previousElementSibling;if(h&&h.tagName==="H2")h.hidden=!vis;});
+    document.getElementById("none").style.display=any?"none":"block";
+  }
+  q.addEventListener("input",filter);
+  window.addEventListener("pageshow",draw);
+  window.addEventListener("storage",function(e){if(e.key==="ward-fav"||e.key==="ward-recent")draw();});
+  draw();
+})();
+</script>
+<script src="profile.js" defer></script>
+<script src="share.js" defer></script>
+</body></html>
