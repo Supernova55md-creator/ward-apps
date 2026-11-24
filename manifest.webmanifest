@@ -425,6 +425,18 @@
       ]
     },
     {
+      "name": "神経疾患 説明用紙",
+      "short_name": "説明用紙",
+      "url": "setsumei/",
+      "icons": [
+        {
+          "src": "setsumei/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "脳神経クリニック紹介先検索",
       "short_name": "神経紹介先",
       "url": "referral/",

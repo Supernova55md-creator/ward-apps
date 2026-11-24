@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<!--WARD_HEAD-->
+<title>神経疾患 説明用紙</title>
+<style>
+:root{--c:#2f6b5e;--c2:#e6f1ee;--bg:#f4f6f5;--fg:#1d2422;--mut:#5d6965;--line:#d5ddda;--card:#fff;--warn:#b3261e}
+@media (prefers-color-scheme:dark){:root{--c:#5fb3a0;--c2:#1f3330;--bg:#121615;--fg:#e4ebe8;--mut:#9aa8a3;--line:#33403c;--card:#1a201e}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:"Yu Gothic UI","Yu Gothic","Meiryo","Hiragino Sans","Noto Sans CJK JP",sans-serif;font-size:15px}
+button,input,select,textarea{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--c);color:#fff;display:flex;align-items:center;gap:10px;padding:8px 14px;padding-top:calc(8px + env(safe-area-inset-top))}
+header.top h1{font-size:17px;margin:0;font-weight:700;white-space:nowrap}
+header.top .ver{font-size:11px;opacity:.8}
+header.top .sp{flex:1}
+.hbtn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.hbtn.main{background:#fff;color:var(--c);font-weight:700;border-color:#fff}
+.hbtn:disabled{opacity:.45;cursor:default}
+.wrap{display:grid;grid-template-columns:330px 1fr;gap:0;min-height:calc(100vh - 50px)}
+aside{border-right:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;height:calc(100vh - 50px);position:sticky;top:50px}
+.srch{padding:10px;border-bottom:1px solid var(--line)}
+.srch input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:3px 9px;font-size:12.5px;cursor:pointer}
+.chip.on{background:var(--c);border-color:var(--c);color:#fff}
+.list{overflow:auto;flex:1;padding:4px 0}
+.item{display:flex;align-items:center;gap:6px;padding:8px 10px 8px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:hover{background:var(--c2)}
+.item.sel{background:var(--c2);box-shadow:inset 4px 0 0 var(--c)}
+.item .nm{flex:1;line-height:1.35}
+.item .ct{font-size:11px;color:var(--mut)}
+.item .add{border:1px solid var(--line);background:var(--card);border-radius:6px;font-size:12px;padding:2px 7px;cursor:pointer}
+.item .add.in{background:var(--c);color:#fff;border-color:var(--c)}
+.cnt{font-size:12px;color:var(--mut);padding:6px 12px}
+main{padding:14px 18px 60px;min-width:0}
+details.opt{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:12px}
+details.opt>summary{padding:10px 14px;cursor:pointer;font-weight:700}
+.optb{padding:4px 14px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px 16px}
+.optb label.f{display:flex;flex-direction:column;font-size:12.5px;color:var(--mut);gap:3px}
+.optb label.f input,.optb label.f select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-size:14px}
+.optb .ck{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px;align-items:center}
+.optb .full{grid-column:1/-1}
+.optb textarea{width:100%;min-height:70px;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-size:14px}
+.secs{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px}
+.tool{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.btn{border:1px solid var(--c);background:var(--card);color:var(--c);border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:600}
+.btn.p{background:var(--c);color:#fff}
+.btn.on{background:#c77700;border-color:#c77700;color:#fff}
+.seg{display:inline-flex}.seg .btn{border-radius:0}.seg .btn:first-child{border-radius:8px 0 0 8px}.seg .btn:last-child{border-radius:0 8px 8px 0;border-left:0}.seg .btn.on2{background:var(--c);color:#fff}
+.note{font-size:12.5px;color:var(--mut)}
+.paperwrap{overflow:auto;padding:6px 0}
+/* ===== 用紙 ===== */
+.sheet{background:#fff;color:#111;width:210mm;min-height:297mm;margin:0 auto 18px;padding:15mm 15mm 14mm;box-shadow:0 2px 10px rgba(0,0,0,.18);font-family:"Yu Gothic","YuGothic","Meiryo","Hiragino Sans","Noto Sans CJK JP",sans-serif;font-size:10.5pt;line-height:1.65;position:relative}
+.sheet.lg{font-size:12.5pt;line-height:1.6}
+.sheet[contenteditable=true]{outline:3px dashed #c77700;outline-offset:-6px}
+.sh-top{display:flex;align-items:flex-end;gap:10px;border-bottom:1px solid #999;padding-bottom:2px}
+.sh-fac{flex:1;font-size:.85em;color:#444;text-align:right}
+.sh-badge{font-size:.85em;font-weight:700;border:1.5px solid #2f6b5e;color:#2f6b5e;padding:1px 8px;border-radius:3px;white-space:nowrap}
+.sh-badge:empty{display:none}
+.sheet.copy-k .sh-badge{border-color:#333;color:#fff;background:#333}
+.sh-sign:empty{display:none}
+.sh-sign table{width:100%;border-collapse:collapse;margin-top:4px}
+.sh-sign td{border:1px solid #888;padding:9px 8px 5px;vertical-align:bottom}
+.sh-sign td.lb{width:9.5em;font-size:.85em;color:#333;background:#f3f3f3;padding:5px 8px}
+.sh-sign .st{font-size:.9em}
+.sh-title{font-size:1.75em;font-weight:700;text-align:center;margin:10px 0 0;letter-spacing:.04em}
+.sh-sub{text-align:center;font-size:.9em;color:#444;margin-bottom:8px}
+.sh-meta{width:100%;border-collapse:collapse;margin:6px 0 10px;font-size:.95em}
+.sh-meta td{border:1px solid #888;padding:5px 8px;vertical-align:bottom}
+.sh-meta .lb{font-size:.8em;color:#555;display:block;line-height:1.2}
+.sheet h2{font-size:1.12em;margin:12px 0 4px;padding:2px 0 2px 8px;border-left:5px solid #2f6b5e;background:#eef5f3;break-after:avoid;page-break-after:avoid}
+.sheet p{margin:0 0 4px;text-indent:1em}
+.sheet ul{margin:0 0 4px;padding-left:1.4em}
+.sheet li{margin:1px 0}
+.sh-box{border:1.5px solid #2f6b5e;border-radius:4px;padding:6px 10px;margin:12px 0 6px;break-inside:avoid;page-break-inside:avoid}
+.sh-box .bt{font-weight:700;color:#2f6b5e;margin-bottom:2px}
+.sh-memo{white-space:pre-wrap}
+.sh-rx{line-height:2.2}.sh-rx .ul{display:inline-block;border-bottom:1px solid #333;width:60%;height:1.2em;vertical-align:bottom}.sh-rx .ul.s{width:4em}
+.sh-lines{height:5.4em;background:repeating-linear-gradient(to bottom,transparent 0,transparent 1.75em,#bbb 1.75em,#bbb calc(1.75em + 1px))}
+.sh-urg{border:2px solid #b3261e;border-radius:4px;padding:6px 10px;margin:12px 0 6px;break-inside:avoid;page-break-inside:avoid}
+.sh-urg .bt{font-weight:700;color:#b3261e}
+.sh-tel{margin-top:4px;font-size:.95em}
+.sh-sign{margin-top:12px;border-top:1px solid #888;padding-top:6px;font-size:.95em;break-inside:avoid;page-break-inside:avoid}
+.sh-sign .row{display:flex;gap:12px;align-items:flex-end;margin-top:12px}
+.sh-sign .ul{flex:1;border-bottom:1px solid #333;height:1.4em}
+.sh-ref{margin-top:10px;font-size:.78em;color:#444;break-inside:avoid}
+.sh-ref ul{padding-left:1.2em}
+.sh-foot{margin-top:12px;font-size:.78em;color:#555;border-top:1px solid #bbb;padding-top:4px}
+#printArea{display:none}
+@page{size:A4 portrait;margin:13mm 14mm 12mm}
+@media print{
+ html,body{background:#fff}
+ body>*:not(#printArea){display:none!important}
+ #printArea{display:block}
+ .sheet{box-shadow:none;margin:0;padding:0;min-height:auto;width:auto;break-after:page;page-break-after:always}
+ .sheet:last-child{break-after:auto;page-break-after:auto}
+ .sheet[contenteditable]{outline:none}
+}
+@media (max-width:900px){
+ .wrap{grid-template-columns:1fr}
+ aside{position:static;height:auto;max-height:46vh;border-right:0;border-bottom:1px solid var(--line)}
+ main{padding:10px}
+ .sheet{transform-origin:top left}
+}
+@media (max-width:600px){header.top .ver{display:none}header.top h1{font-size:15px}.hbtn{padding:5px 8px;font-size:13px}}
+.disc{font-size:12px;color:var(--mut);margin:16px auto 0;max-width:210mm;line-height:1.6}
+.refscr{max-width:210mm;margin:0 auto;font-size:12.5px;color:var(--mut)}
+.refscr a{color:var(--c)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+.toast.on{opacity:.95}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--fg);max-width:560px;width:92vw}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+.cart li{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)}
+.cart li span{flex:1}
+.cart ul{list-style:none;padding:0;margin:8px 0}
+</style>
+</head>
+<body>
+<header class="top">
+ <h1>神経疾患 説明用紙</h1><span class="ver" id="ver"></span>
+ <span class="sp"></span>
+ <button class="hbtn" id="cartBtn" disabled>印刷リスト（0）</button>
+ <button class="hbtn main" id="printBtn">印刷</button>
+</header>
+<div class="wrap">
+<aside>
+ <div class="srch">
+  <input id="q" type="search" placeholder="病名・検査・治療で検索（例：てんかん、髄液、IVIg）" autocomplete="off">
+  <div class="chips" id="chips"></div>
+ </div>
+ <div class="cnt" id="cnt"></div>
+ <div class="list" id="list"></div>
+</aside>
+<main>
+ <details class="opt" id="optBox" open>
+  <summary>印刷の設定</summary>
+  <div class="optb">
+   <label class="f">施設名・診療科（この端末に保存）<input id="fac" placeholder="例：〇〇病院 脳神経内科"></label>
+   <label class="f">連絡先（この端末に保存）<input id="tel" placeholder="例：代表 03-xxxx-xxxx（夜間は救急外来）"></label>
+   <label class="f">患者氏名（保存しません・空欄なら手書き）<input id="pname" autocomplete="off"></label>
+   <label class="f">説明日<input id="pdate" type="date"></label>
+   <label class="f">説明医師（保存しません・空欄なら手書き）<input id="pdoc" autocomplete="off"></label>
+   <label class="f">印刷する用紙（この端末に保存）<select id="copies"><option value="both">2部：カルテ保存用＋患者配布用</option><option value="pt">患者配布用のみ</option><option value="k">カルテ保存用のみ</option></select></label>
+   <label class="f">文字の大きさ<select id="fsize"><option value="n">標準</option><option value="lg">大きめ（高齢の方向け）</option></select></label>
+   <div class="ck full">
+    <label><input type="checkbox" id="oMemo" checked> 担当医からの説明欄</label>
+    <label><input type="checkbox" id="oSign"> 患者配布用にも署名欄を付ける</label>
+    <label><input type="checkbox" id="oRef"> 参考（ガイドライン等）を印刷</label>
+   </div>
+   <div class="full"><div class="note" style="margin-bottom:4px">載せる項目</div><div class="secs" id="secs"></div></div>
+   <label class="f full" id="rxWrap">処方の内容（「薬の説明」の用紙に印刷・保存しません。空欄なら手書き欄）<input id="rx" autocomplete="off" placeholder="例：レベチラセタム（イーケプラ）500mg錠　1回1錠　1日2回（朝・夕食後）"></label>
+   <label class="f full">担当医からの説明（この患者さんの場合。空欄なら手書き用の罫線になります・保存しません）<textarea id="memo" placeholder="例：今回の脳梗塞は心房細動が原因と考えられます。エリキュース 5mg 1日2回を始めます。"></textarea></label>
+  </div>
+ </details>
+ <div class="tool">
+  <span class="seg"><button class="btn on2" id="pvPt">患者配布用</button><button class="btn" id="pvK">カルテ保存用</button></span>
+  <button class="btn" id="editBtn">本文を直接編集</button>
+  <button class="btn" id="addBtn">この内容で印刷リストに追加</button>
+  <button class="btn" id="resetBtn">元の文面に戻す</button>
+  <span class="note" id="editNote"></span>
+ </div>
+ <div class="note" style="margin:-4px 0 8px">印刷すると、設定に従って「カルテ保存用」（説明医師・同席者・患者さんの署名欄つき）と「患者配布用」が続けて出ます。片面印刷にしてください（両面印刷だと2部目が1部目の裏に入ることがあります）。
+ </div>
+ <div class="paperwrap"><div id="paper"></div></div>
+ <div class="refscr" id="refscr"></div>
+ <div class="disc">この用紙は、一般的な病気・検査・治療の内容をわかりやすくまとめた説明資料です。同意書ではありません。患者さんごとの状態に合わせ、担当医が加筆・修正してお使いください。薬の名前は「一般名（商品名）」で記載しています。記載内容の最終確認は、各ガイドライン・添付文書で行ってください。入力した患者氏名・説明内容はこの端末にも保存されません（施設名・連絡先・文字の大きさのみ保存）。</div>
+</main>
+</div>
+<div id="printArea"></div>
+<dialog id="cartDlg"><form method="dialog">
+ <b>印刷リスト</b>
+ <div class="note">追加した時点の内容（氏名・追加説明・編集を含む）で印刷します。「印刷する用紙」の設定に従い、1項目ごとにカルテ保存用・患者配布用を改ページして出します。</div>
+ <div class="cart"><ul id="cartList"></ul></div>
+ <div style="display:flex;gap:8px;justify-content:flex-end">
+  <button class="btn" value="clear" id="cartClear">リストを空にする</button>
+  <button class="btn" value="close">閉じる</button>
+  <button class="btn p" value="print" id="cartPrint">まとめて印刷</button>
+ </div>
+</form></dialog>
+<div class="toast" id="toast"></div>
+<script>
+/*DATA*/
+</script>
+<script>
+(function(){
+"use strict";
+var VERSION="2026-11-24a";
+var K="pis-v1-";
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(K+k);if(v===null)localStorage.removeItem(K+k);else localStorage.setItem(K+k,v);}catch(e){return null;}}
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function hira(s){return String(s||"").toLowerCase().replace(/[ァ-ヶ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60);}).replace(/[\s・（）()「」]/g,"");}
+var catName={};CATS.forEach(function(c){catName[c[0]]=c[1];});
+var pv="pt",cur=null,cat="all",editing=false,secOff={},cart=[];
+$("ver").textContent="版 "+VERSION+"（"+DATA.length+"項目）";
+
+// 設定の読み込み
+$("fac").value=ls("fac")||"";
+$("tel").value=ls("tel")||"";
+$("fsize").value=ls("fsize")||"n";
+$("copies").value=ls("copies")||"both";
+$("copies").addEventListener("change",function(){ls("copies",this.value);});
+(function(){var d=new Date();$("pdate").value=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);})();
+["fac","tel","fsize"].forEach(function(id){$(id).addEventListener("input",function(){ls(id,this.value);render();});});
+["pname","pdate","pdoc","memo","rx","oMemo","oSign","oRef"].forEach(function(id){$(id).addEventListener("input",render);$(id).addEventListener("change",render);});
+
+// 分類
+var chips=$("chips");
+CATS.forEach(function(c){var b=document.createElement("button");b.className="chip"+(c[0]==="all"?" on":"");b.textContent=c[1];b.dataset.c=c[0];
+ b.onclick=function(){cat=c[0];Array.prototype.forEach.call(chips.children,function(x){x.classList.toggle("on",x===b);});list();};chips.appendChild(b);});
+$("q").addEventListener("input",list);
+
+function list(){
+ var q=hira($("q").value),el=$("list"),n=0;el.innerHTML="";
+ DATA.forEach(function(d){
+  if(cat!=="all"&&d.cat!==cat)return;
+  if(q){var hay=hira(d.t+" "+d.y+" "+d.k+" "+(catName[d.cat]||""));if(hay.indexOf(q)<0)return;}
+  n++;
+  var it=document.createElement("div");it.className="item"+(cur&&cur.id===d.id?" sel":"");it.dataset.id=d.id;
+  it.innerHTML='<div class="nm">'+esc(d.t)+'<div class="ct">'+esc(catName[d.cat])+'</div></div>';
+  var a=document.createElement("button");a.className="add";a.textContent="＋リスト";a.title="この用紙を今の設定で印刷リストに追加";
+  a.onclick=function(ev){ev.stopPropagation();select(d.id,true);addCart();};
+  it.appendChild(a);
+  it.onclick=function(){select(d.id);};
+  el.appendChild(it);
+ });
+ $("cnt").textContent=n+" 件";
+ if(!n)el.innerHTML='<div class="note" style="padding:12px">該当する項目がありません。</div>';
+}
+
+function select(id,keep){
+ var d=null;DATA.forEach(function(x){if(x.id===id)d=x;});if(!d)return;
+ if(editing&&!keep&&!confirm("編集中の内容は破棄されます。切り替えますか？"))return;
+ cur=d;secOff={};setEdit(false);
+ var sc=$("secs");sc.innerHTML="";
+ d.s.forEach(function(s,i){var l=document.createElement("label");l.innerHTML='<input type="checkbox" checked> '+esc(s[0]);
+  l.firstChild.onchange=function(){secOff[i]=!this.checked;render();};sc.appendChild(l);});
+ if(d.u&&d.u.length){var l2=document.createElement("label");l2.innerHTML='<input type="checkbox" checked> すぐに受診してほしい症状';l2.firstChild.onchange=function(){secOff.u=!this.checked;render();};sc.appendChild(l2);}
+ Array.prototype.forEach.call($("list").children,function(x){x.classList.toggle("sel",x.dataset&&x.dataset.id===id);});
+ try{history.replaceState(null,"","#"+id);}catch(e){}
+ render();
+}
+
+function fmtDate(v){if(!v)return "　　年　　月　　日";var p=v.split("-");return p[0]+"年"+(+p[1])+"月"+(+p[2])+"日";}
+function block(b){
+ if(typeof b==="string")return "<p>"+esc(b)+"</p>";
+ return "<ul>"+b.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+"</ul>";
+}
+function sheetHTML(d){
+ var fac=$("fac").value.trim(),tel=$("tel").value.trim(),pn=$("pname").value.trim(),doc=$("pdoc").value.trim(),memo=$("memo").value;
+ var isX=d.cat==="exam",isT=d.cat==="treat";
+ var h='<div class="sheet'+($("fsize").value==="lg"?" lg":"")+'" data-id="'+d.id+'">';
+ h+='<div class="sh-top"><span class="sh-badge">患者配布用</span><div class="sh-fac">'+(fac?esc(fac):"&nbsp;")+'</div></div>';
+ h+='<div class="sh-title">'+esc(d.t)+(isX?"を受ける方へ":(/へ$/.test(d.t)||/について/.test(d.t)||d.cat==="life")?"":"について")+'</div>';
+ h+='<div class="sh-sub">患者さん・ご家族への説明</div>';
+ h+='<table class="sh-meta"><tr><td style="width:44%"><span class="lb">患者氏名</span>'+(pn?esc(pn):"&nbsp;")+'<span style="float:right">様</span></td><td style="width:26%"><span class="lb">説明日</span>'+esc(fmtDate($("pdate").value))+'</td><td><span class="lb">説明医師</span>'+(doc?esc(doc):"&nbsp;")+'</td></tr></table>';
+ if(d.cat==="drug"){var rx=$("rx").value.trim();h+='<div class="sh-box"><div class="bt">あなたのお薬（処方の内容）</div>'+(rx?'<div class="sh-memo">'+esc(rx)+'</div>':'<div class="sh-rx">薬の名前・規格：<span class="ul"></span><br>1回 <span class="ul s"></span>　1日 <span class="ul s"></span> 回（朝・昼・夕・寝る前・頭痛のとき・その他：<span class="ul s"></span>）</div>')+'</div>';}
+ d.s.forEach(function(s,i){if(secOff[i])return;h+="<h2>"+esc(s[0])+"</h2>"+block(s[1]);});
+ if($("oMemo").checked){
+  h+='<div class="sh-box"><div class="bt">担当医からの説明（あなたの場合）</div>'+(memo.trim()?'<div class="sh-memo">'+esc(memo)+'</div>':'<div class="sh-lines"></div>')+'</div>';
+ }
+ if(d.u&&d.u.length&&!secOff.u){
+  h+='<div class="sh-urg"><div class="bt">次のようなときは、すぐに受診・連絡してください</div>'+block(d.u)+(tel?'<div class="sh-tel">連絡先：'+esc(tel)+'</div>':'')+'</div>';
+ }else if(tel){h+='<div class="sh-tel">連絡先：'+esc(tel)+'</div>';}
+ h+='<div class="sh-sign">'+($("oSign").checked?PT_SIGN:"")+'</div>';
+ if($("oRef").checked&&d.g&&d.g.length){
+  h+='<div class="sh-ref">参考：<ul>'+d.g.map(function(k){var g=GL[k];return g?"<li>"+esc(g.t)+(g.u?"　"+esc(g.u):"")+"</li>":"";}).join("")+'</ul></div>';
+ }
+ h+='<div class="sh-foot">この説明書は一般的な内容をまとめたものです。病状や治療方針は患者さんごとに異なりますので、担当医の説明を優先してください。わからないことは、遠慮なくおたずねください。（説明用紙 版'+VERSION+'）</div>';
+ h+='</div>';
+ return h;
+}
+function render(){
+ if(!cur){$("paper").innerHTML='<div class="note" style="padding:30px;text-align:center">左の一覧から、病名・検査・治療を選んでください。</div>';$("refscr").innerHTML="";return;}
+ if(editing)return;
+ $("paper").innerHTML=pv==="k"?makeCopy(sheetHTML(cur),"k"):sheetHTML(cur);
+ var r="";if(cur.g&&cur.g.length){r="根拠："+cur.g.map(function(k){var g=GL[k];if(!g)return "";return g.u?'<a href="'+esc(g.u)+'" target="_blank" rel="noopener">'+esc(g.t)+'</a>':esc(g.t);}).join("／");}
+ if(cur.cat==="drug"){r=(cur.v?'<b style="color:#2f6b5e">用量：PMDA添付文書と照合済み（2026年11月）</b>':'<b style="color:#b3261e">用量：未照合（成書・一般的な目安）。印刷前に最新の添付文書で確認してください</b>')+'<br>'+r;}
+ else{var rel=related(cur);if(rel.length)r='<div style="margin-bottom:6px">関連する薬の説明：'+rel.map(function(x){return '<a href="#" data-go="'+x.id+'">'+esc(x.t.replace(/（.*$/,''))+'</a>';}).join('　')+'</div>'+r;}
+ $("refscr").innerHTML=r;
+ fit();
+}
+function brands(d){var m=d.t.match(/（(.+)）/);var out=[];var inner=m?m[1]:"";(inner+"、"+d.t.replace(/（.*$/,"")).split(/[、・：,]/).forEach(function(x){x=x.replace(/[（）]/g,"").trim();if(x.length>=3&&!/^(など|本態性振戦の薬|筋肉のこわばり|立ちくらみ|ALSの薬|スタチン|トリプタン|CGRP関連抗体薬|起立性低血圧)/.test(x))out.push(x);});return out;}
+var BR=null;function related(d){if(!BR){BR=[];DATA.forEach(function(x){if(x.cat==="drug")BR.push({id:x.id,t:x.t,b:brands(x)});});}
+ var txt=JSON.stringify(d.s);return BR.filter(function(x){return x.b.some(function(b){return txt.indexOf(b)>=0;});});}
+document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("[data-go]");if(a){e.preventDefault();select(a.getAttribute("data-go"));var it=document.querySelector('.item[data-id="'+a.getAttribute("data-go")+'"]');if(it)it.scrollIntoView({block:"nearest"});}});
+function fit(){
+ var s=document.querySelector("#paper .sheet");if(!s)return;
+ var w=$("paper").parentNode.clientWidth,pw=s.offsetWidth;
+ if(window.innerWidth<=900&&pw>w){var k=w/pw;s.style.transform="scale("+k+")";s.parentNode.style.height=(s.offsetHeight*k+10)+"px";}
+ else{s.style.transform="";s.parentNode.style.height="";}
+}
+window.addEventListener("resize",fit);
+
+function setEdit(on){
+ editing=on;var s=document.querySelector("#paper .sheet");
+ if(s){if(on)s.setAttribute("contenteditable","true");else s.removeAttribute("contenteditable");}
+ $("editBtn").classList.toggle("on",on);$("editBtn").textContent=on?"編集を終える":"本文を直接編集";
+ $("editNote").textContent=on?"用紙上の文字を直接書き換えられます（設定の変更は反映されません。保存されません）":"";
+}
+function setPv(v){if(editing&&!confirm("編集中の内容は破棄されます。表示を切り替えますか？"))return;setEdit(false);pv=v;$("pvPt").classList.toggle("on2",v==="pt");$("pvK").classList.toggle("on2",v==="k");$("editBtn").disabled=(v==="k");render();}
+$("pvPt").onclick=function(){setPv("pt");};$("pvK").onclick=function(){setPv("k");};
+$("editBtn").onclick=function(){if(!cur)return;if(editing){setEdit(false);}else setEdit(true);};
+$("resetBtn").onclick=function(){if(!cur)return;if(editing&&!confirm("編集した内容を元に戻しますか？"))return;setEdit(false);render();};
+
+var PT_SIGN='<div class="st">上記について説明を受けました。</div><table><tr><td class="lb">説明を受けた方（署名）</td><td></td><td class="lb" style="width:5em">続柄</td><td style="width:7em"></td></tr></table>';
+var K_DATE='　　　　年　　月　　日';var K_SIGN='<div class="st">上記の内容について、本説明書を用いて説明しました。</div><table>'+
+ '<tr><td class="lb">説明日</td><td>'+K_DATE+'</td><td class="lb" style="width:7em">説明医師（署名）</td><td></td></tr>'+
+ '<tr><td class="lb">同席者（職種・氏名）</td><td colspan="3"></td></tr></table>'+
+ '<div class="st" style="margin-top:6px">上記の内容について説明を受け、本説明書（患者配布用）を受け取りました。</div><table>'+
+ '<tr><td class="lb">患者さん（署名）</td><td colspan="3"></td></tr>'+
+ '<tr><td class="lb">ご家族・代理人（署名）</td><td></td><td class="lb" style="width:5em">続柄</td><td style="width:7em"></td></tr></table>';
+function makeCopy(html,kind){
+ var w=document.createElement("div");w.innerHTML=html;var s=w.firstElementChild;if(!s)return "";
+ s.removeAttribute("contenteditable");s.style.transform="";
+ var b=s.querySelector(".sh-badge"),g=s.querySelector(".sh-sign");
+ if(kind==="k"){K_DATE=esc(fmtDate($("pdate").value));var KS=K_SIGN.replace(/<tr><td class="lb">説明日<\/td><td>.*?<\/td>/,'<tr><td class="lb">説明日</td><td>'+K_DATE+'</td>');s.classList.add("copy-k");if(b)b.textContent="カルテ保存用";if(g)g.innerHTML=KS;else s.insertAdjacentHTML("beforeend",'<div class="sh-sign">'+KS+'</div>');var f=s.querySelector(".sh-foot");if(f&&g===null){}}
+ else{s.classList.remove("copy-k");if(b)b.textContent="患者配布用";if(g)g.innerHTML=$("oSign").checked?PT_SIGN:"";}
+ // 署名欄はフッターの直前に置く
+ var sg=s.querySelector(".sh-sign"),ft=s.querySelector(".sh-foot");if(sg&&ft&&sg.nextElementSibling!==ft){var rf=s.querySelector(".sh-ref");s.insertBefore(sg,rf||ft);}
+ return s.outerHTML;
+}
+function copies(html){var c=$("copies").value;if(c==="pt")return makeCopy(html,"pt");if(c==="k")return makeCopy(html,"k");return makeCopy(html,"k")+makeCopy(html,"pt");}
+function curSheet(){if(pv==="k"&&cur)return sheetHTML(cur);var s=document.querySelector("#paper .sheet");if(!s)return "";var c=s.cloneNode(true);c.removeAttribute("contenteditable");c.style.transform="";return c.outerHTML;}
+window.pisToast=function(t){toast(t);};
+function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},1800);}
+function addCart(){if(!cur)return;cart.push({t:cur.t,h:curSheet()});updCart();toast("印刷リストに追加しました（"+cart.length+"件）");}
+function updCart(){$("cartBtn").textContent="印刷リスト（"+cart.length+"）";$("cartBtn").disabled=!cart.length;
+ var ul=$("cartList");ul.innerHTML="";cart.forEach(function(c,i){var li=document.createElement("li");li.innerHTML="<span>"+(i+1)+". "+esc(c.t)+"</span>";
+  var b=document.createElement("button");b.className="btn";b.type="button";b.textContent="削除";b.onclick=function(){cart.splice(i,1);updCart();if(!cart.length)$("cartDlg").close();};li.appendChild(b);ul.appendChild(li);});}
+$("addBtn").onclick=addCart;
+$("cartBtn").onclick=function(){updCart();$("cartDlg").showModal();};
+$("cartDlg").addEventListener("close",function(){var v=this.returnValue;if(v==="clear"){cart=[];updCart();}else if(v==="print"){doPrint(cart.map(function(c){return copies(c.h);}).join(""));}});
+
+var filled=false;
+function doPrint(html){if(!html)return;$("printArea").innerHTML=html;filled=true;setTimeout(function(){window.print();},50);}
+$("printBtn").onclick=function(){if(!cur){toast("項目を選んでください");return;}doPrint(copies(curSheet()));};
+window.addEventListener("beforeprint",function(){if(!filled)$("printArea").innerHTML=copies(curSheet());});
+window.addEventListener("afterprint",function(){filled=false;$("printArea").innerHTML="";});
+
+list();
+var h=(location.hash||"").slice(1);
+if(h)select(h);else render();
+})();
+</script>
+<!--WARD_BODY-->
+</body>
+</html>
