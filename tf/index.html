@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#a4541a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="経管栄養">
+<title>経管栄養 漸増指示</title>
+<style>
+:root{
+  /* 経管栄養＝琥珀 */
+  --accent:#a4541a; --accent-ink:#fff; --accent-soft:#f8ebe0;
+  --bg:#f3f6f7; --surface:#fff; --ink:#18232a; --muted:#5b6b73; --line:#d8e2e6;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --info:#2b5b9a; --info-soft:#e7eef8;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --num:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#f0a46a; --accent-ink:#2e1505; --accent-soft:#3a2416;
+  --bg:#11171a; --surface:#1a2226; --ink:#e9f0f3; --muted:#a3b3ba; --line:#2f3d43;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:19px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:13px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.18)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+.view{display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:16px;margin:0 0 10px;line-height:1.4}
+h3{font-size:14px;margin:12px 0 6px}
+.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.q{margin:0 0 12px}
+.q:last-child{margin-bottom:0}
+.q>.lb{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 12px;font-size:14px;line-height:1.3;cursor:pointer;user-select:none;min-height:36px}
+.chip span small{font-size:11.5px;opacity:.85}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chip input:focus-visible + span{outline:3px solid var(--info);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=number]{font:inherit;font-size:17px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
+input.bignum{font-size:24px;font-weight:700;max-width:170px}
+.narow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cls:empty{display:none}
+.cls{font-size:13px;font-weight:700;border-radius:6px;padding:2px 8px;background:var(--accent-soft);color:var(--accent)}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;padding:5px 0;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.chk small{color:var(--muted);font-size:12px}
+details.more{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-top:4px}
+details.more summary{font-size:14px;font-weight:700;color:var(--accent);cursor:pointer}
+details.more[open] summary{margin-bottom:8px}
+.hidden{display:none!important}
+.verdict{border-radius:12px;padding:14px;border:1.5px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.verdict.ok{background:var(--ok-soft);border-color:var(--ok)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.crit{background:var(--crit-soft);border-color:var(--crit)}
+.verdict.info{background:var(--info-soft);border-color:var(--info)}
+.pill{align-self:flex-start;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:#fff;background:var(--muted)}
+.verdict.ok .pill{background:var(--ok)}.verdict.warn .pill{background:var(--warn)}.verdict.crit .pill{background:var(--crit)}.verdict.info .pill{background:var(--info)}
+@media (prefers-color-scheme: dark){.pill{color:#111}}
+.big{font-size:18px;font-weight:700;line-height:1.45}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.item{border-left:4px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 11px}
+.item.do{border-left-color:var(--ok)}.item.avoid{border-left-color:var(--crit)}.item.caution{border-left-color:var(--warn)}.item.note{border-left-color:var(--info)}
+.item .t{font-weight:700;font-size:15px}
+.item .d{font-size:14px;margin-top:2px}
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:4px 0 2px}
+.nums .bx{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.nums .k{font-size:12px;color:var(--muted)}
+.nums .v{font-size:16.5px;font-weight:700;line-height:1.3;font-variant-numeric:tabular-nums}
+.nums .v small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:0 6px;margin-left:4px;vertical-align:1px}
+.tag.v{background:var(--ok-soft);color:var(--ok)}.tag.u{background:var(--warn-soft);color:var(--warn)}.tag.x{background:var(--info-soft);color:var(--info)}
+.src{font-size:11.5px;color:var(--muted);margin-top:4px}
+table.tl{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.tl th,table.tl td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+table.tl th{font-size:12px;color:var(--muted);font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px;position:sticky;top:var(--hh,110px);z-index:4}
+.seg button{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:7px;padding:8px 2px;background:transparent;color:var(--muted);cursor:pointer;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.ref{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.ref div{border-left:3px solid var(--accent);padding-left:8px}
+.ref small{display:block;color:var(--muted);font-size:12px}
+.fine{font-size:12px;color:var(--muted);line-height:1.7}
+.fine p{margin:0 0 6px}
+.btn{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:999px;padding:7px 14px;cursor:pointer;min-height:38px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+a{color:var(--info)}
+ul.pl{margin:4px 0 0;padding-left:1.2em;font-size:14px}
+ul.pl li{margin:2px 0}
+
+select,input[type=text],input[type=date],textarea{font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%}
+textarea{line-height:1.5;resize:vertical}
+#out{font-family:var(--font);font-size:14px;margin-top:8px;background:var(--surface)}
+.rowbtn{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);padding:9px 22px;font-size:15px}
+.mini{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:7px;min-width:32px;min-height:32px;padding:0 6px;cursor:pointer}
+table#sch{font-size:13.5px}
+table#sch td,table#sch th{padding:6px 3px}
+td.pm{width:36px}
+td.pm .mini{display:block;margin:0 0 4px auto}
+table.tl td small{color:var(--muted);font-size:11.5px}
+table.tl td b{font-size:15.5px}
+@media print{header.top,nav.tabs{position:static}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>経管栄養 漸増指示</h1><small>体重から目標量 → 2日ごとの増量表 → カルテに貼れる指示文</small></div>
+  <nav class="tabs" role="tablist" aria-label="画面">
+    <button type="button" role="tab" data-v="mk" aria-selected="true">指示を<br>作る</button>
+    <button type="button" role="tab" data-v="rfs" aria-selected="false">リフィー<br>ディング</button>
+    <button type="button" role="tab" data-v="set" aria-selected="false">製剤・<br>定型文</button>
+    <button type="button" role="tab" data-v="ref" aria-selected="false">出典</button>
+  </nav>
+</header>
+
+<main>
+<!-- ===================== 指示を作る ===================== -->
+<div id="v-mk" class="view">
+  <section class="card">
+    <h2>1. 体格と目標量</h2>
+    <div class="grid">
+      <label class="f">身長（cm）<input type="number" id="ht" inputmode="decimal" step="0.1" placeholder="例 160" data-s></label>
+      <label class="f">体重（kg）<input type="number" id="wt" data-wp="weight" inputmode="decimal" step="0.1" placeholder="例 50" data-s></label>
+    </div>
+    <p class="hint" id="bodyInfo"></p>
+    <div class="q" style="margin-top:10px"><span class="lb">計算に使う体重</span><div class="chips">
+      <label class="chip"><input type="radio" name="wb" value="act" checked data-s><span>実体重</span></label>
+      <label class="chip"><input type="radio" name="wb" value="ibw" data-s><span>標準体重<small>（BMI 22）</small></span></label>
+      <label class="chip"><input type="radio" name="wb" value="adj" data-s><span>調整体重<small>（肥満時）</small></span></label>
+    </div><p class="hint" id="wbHint"></p></div>
+    <div class="q"><span class="lb">エネルギー（kcal/kg/日）</span><div class="chips">
+      <label class="chip"><input type="radio" name="kk" value="20" data-s><span>20</span></label>
+      <label class="chip"><input type="radio" name="kk" value="25" checked data-s><span>25</span></label>
+      <label class="chip"><input type="radio" name="kk" value="30" data-s><span>30</span></label>
+      <label class="chip"><input type="radio" name="kk" value="35" data-s><span>35</span></label>
+      <label class="chip"><input type="radio" name="kk" value="hb" data-s><span>H-B式</span></label>
+    </div>
+    <div id="hbBox" class="hidden" style="margin-top:8px">
+      <div class="grid">
+        <label class="f">年齢（歳）<input type="number" id="age" inputmode="numeric" placeholder="例 75" data-s></label>
+        <label class="f">活動係数<input type="number" id="af" inputmode="decimal" step="0.05" value="1.2" data-s></label>
+        <label class="f">ストレス係数<input type="number" id="sf" inputmode="decimal" step="0.05" value="1.0" data-s></label>
+      </div>
+      <div class="chips" style="margin-top:6px">
+        <label class="chip"><input type="radio" name="sex" value="m" data-wp="sex" data-wp-v="m" checked data-s><span>男性</span></label>
+        <label class="chip"><input type="radio" name="sex" value="f" data-wp="sex" data-wp-v="f" data-s><span>女性</span></label>
+      </div>
+      <p class="hint">活動係数：寝たきり1.0〜1.1、ベッド上安静1.2、離床・リハ1.3。ストレス係数：なし1.0、軽度感染・術後1.1〜1.2（目安・未照合）。Harris-Benedict式は実体重で計算。</p>
+    </div></div>
+    <div class="grid">
+      <label class="f">たんぱく（g/kg/日）<input type="number" id="pk" inputmode="decimal" step="0.1" value="1.0" data-s></label>
+      <label class="f">水分（mL/kg/日）<input type="number" id="wk" inputmode="decimal" step="1" value="30" data-s></label>
+      <label class="f">目標kcalを直接指定<input type="number" id="kcalMan" inputmode="numeric" placeholder="空欄なら計算値" data-s></label>
+    </div>
+    <div class="nums" id="tgtNums"></div>
+  </section>
+
+  <section class="card">
+    <h2>2. 製剤と投与方法</h2>
+    <label class="f">製剤<select id="prod" data-s></select></label>
+    <p class="hint" id="prodInfo"></p>
+    <div class="q" style="margin-top:10px"><span class="lb">経路</span><div class="chips">
+      <label class="chip"><input type="radio" name="rt" value="経鼻胃管" checked data-s><span>経鼻胃管</span></label>
+      <label class="chip"><input type="radio" name="rt" value="胃瘻" data-s><span>胃瘻</span></label>
+      <label class="chip"><input type="radio" name="rt" value="経鼻空腸管" data-s><span>経鼻空腸管</span></label>
+      <label class="chip"><input type="radio" name="rt" value="腸瘻" data-s><span>腸瘻</span></label>
+    </div></div>
+    <div class="q"><span class="lb">1日の回数</span><div class="chips">
+      <label class="chip"><input type="radio" name="tm" value="2" data-s><span>2回</span></label>
+      <label class="chip"><input type="radio" name="tm" value="3" checked data-s><span>3回</span></label>
+      <label class="chip"><input type="radio" name="tm" value="4" data-s><span>4回</span></label>
+    </div>
+    <label class="f" style="margin-top:6px">時刻（指示文に入る）<input type="text" id="tlab" value="7時・12時・18時" data-s></label></div>
+    <div id="rateBox" class="q"><span class="lb">投与速度（ポンプ・滴下）</span>
+      <div class="grid">
+        <label class="f">開始時（mL/h）<input type="number" id="r0" inputmode="numeric" step="10" value="100" data-s></label>
+        <label class="f">最終（mL/h）<input type="number" id="r1" inputmode="numeric" step="10" value="200" data-s></label>
+      </div>
+      <label class="chk"><input type="checkbox" id="rateOn" checked data-s><span>指示文に速度を入れる</span></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3. 漸増の組み方</h2>
+    <div class="grid">
+      <label class="f">開始日<input type="date" id="d0" data-s></label>
+      <label class="f">増量の間隔<select id="iv" data-s><option value="1">1日ごと</option><option value="2" selected>2日ごと</option><option value="3">3日ごと</option></select></label>
+      <label class="f">段階数（目標を含む）<select id="nlv" data-s><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></label>
+    </div>
+    <div class="q" style="margin-top:10px"><span class="lb">開始量</span><div class="chips">
+      <label class="chip"><input type="radio" name="st" value="q" data-s><span>目標の1/4</span></label>
+      <label class="chip"><input type="radio" name="st" value="t" checked data-s><span>目標の1/3</span></label>
+      <label class="chip"><input type="radio" name="st" value="h" data-s><span>目標の1/2</span></label>
+      <label class="chip"><input type="radio" name="st" value="k10" data-s><span>10 kcal/kg<small>（RFS高）</small></span></label>
+      <label class="chip"><input type="radio" name="st" value="k5" data-s><span>5 kcal/kg<small>（RFS最高）</small></span></label>
+      <label class="chip"><input type="radio" name="st" value="c" data-s><span>kcalで指定</span></label>
+    </div>
+    <label class="f hidden" id="stcBox" style="margin-top:6px">開始量（kcal/日）<input type="number" id="stc" inputmode="numeric" placeholder="例 400" data-s></label>
+    <p class="hint" id="stHint"></p></div>
+    <div class="q"><span class="lb">1回量の刻み</span><div class="chips" id="unitChips">
+      <label class="chip"><input type="radio" name="un" value="25" data-s><span>25 mL</span></label>
+      <label class="chip"><input type="radio" name="un" value="50" checked data-s><span>50 mL</span></label>
+      <label class="chip"><input type="radio" name="un" value="half" data-s><span>半包装</span></label>
+      <label class="chip"><input type="radio" name="un" value="pack" data-s><span>1包装</span></label>
+    </div></div>
+    <div class="q"><span class="lb">白湯（追加水）</span><div class="chips">
+      <label class="chip"><input type="radio" name="wm" value="auto" checked data-s><span>不足分を各段階で</span></label>
+      <label class="chip"><input type="radio" name="wm" value="fix" data-s><span>固定量</span></label>
+      <label class="chip"><input type="radio" name="wm" value="none" data-s><span>書かない</span></label>
+    </div>
+    <div class="grid" style="margin-top:6px">
+      <label class="f" id="wfixBox">固定量（mL/回）<input type="number" id="wfix" inputmode="numeric" step="10" value="100" data-s></label>
+      <label class="f" id="wcapBox">上限（mL/回）<input type="number" id="wcap" inputmode="numeric" step="10" value="200" data-s></label>
+    </div></div>
+  </section>
+
+  <section class="card">
+    <h2>4. 増量スケジュール</h2>
+    <div id="verdict" class="verdict info"><span class="pill" id="vPill">漸増</span><div class="big" id="vBig">身長・体重を入れてください</div><div class="hint" id="vSub"></div></div>
+    <div id="manNote" class="hint hidden" style="margin-top:6px">1回量を手で調整中です。<button type="button" class="btn" id="manReset" style="min-height:30px;padding:3px 10px;font-size:12.5px">自動に戻す</button></div>
+    <div style="overflow-x:auto;margin-top:8px"><table class="tl" id="sch"></table></div>
+    <p class="hint">±で各段階の1回量を変えられます（他の入力を変えると自動計算に戻ります）。</p>
+  </section>
+
+  <section class="card">
+    <h2>5. 指示文に入れる注意</h2>
+    <div id="noteList"></div>
+    <label class="chk"><input type="checkbox" id="rfsOn" data-s><span>リフィーディング対策を入れる <small id="rfsAuto"></small></span></label>
+    <label class="f" style="margin-top:6px">追記（自由記載）<textarea id="extra" rows="2" data-s placeholder="例 STで嚥下評価中。経口開始時は医師に確認"></textarea></label>
+  </section>
+
+  <section class="card" id="outCard">
+    <h2>6. カルテ用の指示文</h2>
+    <div class="rowbtn">
+      <button type="button" class="btn pri" id="copyBtn">コピー</button>
+      <label class="chk" style="padding:0"><input type="checkbox" id="compact" data-s><span>短く（表だけ）</span></label>
+    </div>
+    <textarea id="out" rows="18" spellcheck="false"></textarea>
+    <p class="hint">貼り付け前にこの欄で直接書き直せます（入力を変えると作り直されます）。</p>
+  </section>
+  <p class="fine">診療判断の補助です。最終判断は診察と原典・各製剤の電子添文で行ってください。製剤の水分量は、記載のないものは kcal/mL からの目安です。</p>
+</div>
+
+<!-- ===================== リフィーディング ===================== -->
+<div id="v-rfs" class="view hidden">
+  <section class="card">
+    <h2>リフィーディング症候群のリスク（NICE CG32）</h2>
+    <p class="hint">当てはまるものだけ押す。結果は「指示を作る」の開始量と注意に反映されます。</p>
+    <h3>大項目（1つで高リスク）</h3>
+    <label class="chk"><input type="checkbox" class="rf" data-k="M" id="rf1" data-s><span>BMI 16未満</span></label>
+    <label class="chk"><input type="checkbox" class="rf" data-k="M" id="rf2" data-s><span>3〜6か月で15%を超える体重減少</span></label>
+    <label class="chk"><input type="checkbox" class="rf" data-k="M" id="rf3" data-s><span>10日を超えてほとんど食べていない</span></label>
+    <label class="chk"><input type="checkbox" class="rf" data-k="M" id="rf4" data-s><span>栄養開始前から K・P・Mg が低い</span></label>
+    <h3>小項目（2つで高リスク）</h3>
+    <label class="chk"><input type="checkbox" class="rf" data-k="m" id="rf5" data-s><span>BMI 18.5未満</span></label>
+    <label class="chk"><input type="checkbox" class="rf" data-k="m" id="rf6" data-s><span>3〜6か月で10%を超える体重減少</span></label>
+    <label class="chk"><input type="checkbox" class="rf" data-k="m" id="rf7" data-s><span>5日を超えてほとんど食べていない</span></label>
+    <label class="chk"><input type="checkbox" class="rf" data-k="m" id="rf8" data-s><span>アルコール多飲、またはインスリン・化学療法・制酸薬・利尿薬の使用</span></label>
+    <h3>最高リスク（開始 5 kcal/kg）</h3>
+    <label class="chk"><input type="checkbox" class="rf" data-k="X" id="rf9" data-s><span>BMI 14未満</span></label>
+    <label class="chk"><input type="checkbox" class="rf" data-k="X" id="rf10" data-s><span>15日を超えてほとんど食べていない</span></label>
+    <div class="rowbtn" style="margin-top:8px"><button type="button" class="btn" id="rfNone">該当なし</button><button type="button" class="btn" id="rfBmi">BMIから自動で押す</button></div>
+  </section>
+  <section class="card">
+    <div id="rfVerdict" class="verdict ok"><span class="pill" id="rfPill">低リスク</span><div class="big" id="rfBig"></div></div>
+    <h3>高リスクのときの進め方</h3>
+    <ul class="pl">
+      <li>開始は 10 kcal/kg/日以下（最高リスクは 5 kcal/kg/日）、4〜7日かけて目標量へ <span class="tag v">NICE</span></li>
+      <li>ASPEN 2020：最初の24時間は 10〜20 kcal/kg（糖として100〜150 g）、1〜2日ごとに目標の約1/3ずつ増やす <span class="tag v">ASPEN</span></li>
+      <li>チアミン 100 mg/日を栄養開始前から、少なくとも5〜7日（ASPEN）。NICEは 200〜300 mg/日を10日間＋総合ビタミン <span class="tag v">原典</span></li>
+      <li>P・K・Mg・血糖：開始前、最初の3日間は毎日（ASPENは高リスクで12時間ごと）、以後も1週間は適宜</li>
+      <li>P・K・Mg が急に下がったら：熱量を約半分に戻し、電解質が落ち着いてから再び増やす <span class="tag v">ASPEN</span></li>
+      <li>心不全・浮腫・不整脈に注意し、水分とNaを入れすぎない</li>
+    </ul>
+    <p class="hint">チアミン製剤は院内採用品で指示してください（商品名は未照合のため載せていません）。</p>
+  </section>
+</div>
+
+<!-- ===================== 製剤・定型文 ===================== -->
+<div id="v-set" class="view hidden">
+  <section class="card">
+    <h2>院内で登録した製剤</h2>
+    <div id="prodList" class="list"></div>
+  </section>
+  <section class="card">
+    <h2>院内の製剤を追加</h2>
+    <p class="hint">食品の濃厚流動食など、院内採用品を1包装あたりの値で登録します（この端末にだけ保存）。</p>
+    <div class="grid">
+      <label class="f" style="grid-column:1/-1">名前<input type="text" id="npName" placeholder="例 〇〇1.5"></label>
+      <label class="f">容量（mL または g）<input type="number" id="npMl" inputmode="decimal" placeholder="200"></label>
+      <label class="f">熱量（kcal）<input type="number" id="npKcal" inputmode="decimal" placeholder="300"></label>
+      <label class="f">たんぱく（g）<input type="number" id="npProt" inputmode="decimal" placeholder="空欄可"></label>
+      <label class="f">水分（mL）<input type="number" id="npWater" inputmode="decimal" placeholder="空欄なら目安"></label>
+      <label class="f">単位<input type="text" id="npUnit" value="本"></label>
+    </div>
+    <label class="chk"><input type="checkbox" id="npSemi"><span>半固形（速度を書かない）</span></label>
+    <div class="rowbtn"><button type="button" class="btn pri" id="npAdd">追加</button></div>
+  </section>
+  <section class="card">
+    <h2>注意の定型文</h2>
+    <p class="hint">「指示を作る」の5に出る文です。チェックの既定（最初から入れるか）も変えられます。</p>
+    <div id="tplList" class="list"></div>
+    <div class="rowbtn"><button type="button" class="btn" id="tplAdd">定型文を追加</button><button type="button" class="btn" id="tplReset">初期値に戻す</button></div>
+  </section>
+</div>
+
+<!-- ===================== 出典 ===================== -->
+<div id="v-ref" class="view hidden">
+  <section class="card">
+    <h2>計算のしかた</h2>
+    <ul class="pl">
+      <li>目標エネルギー＝kcal/kg × 体重（実体重／標準体重〈BMI 22〉／調整体重〈標準体重＋0.25×(実体重−標準体重)〉）、または Harris-Benedict式 × 活動係数 × ストレス係数</li>
+      <li>1回量＝1日量 ÷ 回数を、選んだ刻み（25・50 mL、半包装、1包装）に丸める。開始量から目標量まで等間隔に段階を作り、同じ量の段階はまとめる</li>
+      <li>白湯（不足分）＝目標水分 −（製剤量 × 水分率）を回数で割り、10 mL 単位に切り下げ、上限で頭打ち。足りない分は「点滴等で」と書く</li>
+      <li>製剤の水分率：電子添文・メーカー資料の値があるものはそれを、無いものは 1 − 0.15 × kcal/mL を目安にする（未照合）</li>
+      <li>kcal/kg・水分 30 mL/kg・たんぱく 1.0 g/kg は一般的な目安で、病態（腎不全・心不全・褥瘡など）で調整する</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h2>製剤の値</h2>
+    <div style="overflow-x:auto"><table class="tl" id="prodRef" style="font-size:13px"></table></div>
+    <p class="hint">メーカーの製品ページ・電子添文、病院のDI・NST資料、販売店の掲載値（「販売店」）で確認した値。水分の「目安」は 1 − 0.15 × kcal/mL で計算（未照合）。エレンタールの「水分」は溶かす水の量に左右されるため目安。ペプチーノのたんぱく量は未確認。ラコールNF配合経腸用半固形剤は販売中止（後継はイノソリッド）。採用品・規格は院内で確認してください。</p>
+  </section>
+  <section class="card">
+    <h2>出典</h2>
+    <div class="ref">
+      <div>da Silva JSV, et al. ASPEN Consensus Recommendations for Refeeding Syndrome. Nutr Clin Pract. 2020;35:178-195.<small><a href="https://pubmed.ncbi.nlm.nih.gov/32115791/" target="_blank" rel="noopener">PubMed 32115791</a></small></div>
+      <div>NICE. Nutrition support for adults: oral nutrition support, enteral tube feeding and parenteral nutrition (CG32).<small><a href="https://www.nice.org.uk/guidance/cg32" target="_blank" rel="noopener">nice.org.uk/guidance/cg32</a></small></div>
+      <div>Harris JA, Benedict FG. A Biometric Study of Human Basal Metabolism. PNAS. 1918;4:370-373.<small><a href="https://pubmed.ncbi.nlm.nih.gov/16576330/" target="_blank" rel="noopener">PubMed 16576330</a></small></div>
+      <div>ラコールNF配合経腸用液 電子添文（PMDA）<small><a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/130589_3259118S1024_1_06" target="_blank" rel="noopener">PMDA</a></small></div>
+      <div>ツインラインNF配合経腸用液 電子添文（開始は1日400 mL を約50 mL/時、3〜7日で標準量）<small><a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/130589_3259117S1020_1_04" target="_blank" rel="noopener">PMDA</a></small></div>
+      <div>エンシュア・リキッド 電子添文（経管では100〜150 mL/時）<small><a href="https://www.abbott.co.jp/content/dam/corp/abbott/ja-jp/our-products/ani/171201-ens-tenbun.pdf" target="_blank" rel="noopener">アボット</a></small></div>
+      <div>エレンタール配合内用剤 電子添文（80 g を約300 mL＝1 kcal/mL、初期は1日量の約1/8を0.5 kcal/mLで開始し4〜10日で標準量）<small><a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/111890_3259103B1036_2_06" target="_blank" rel="noopener">PMDA</a></small></div>
+      <div>イノラス配合経腸用液・エネーボ配合経腸用液 電子添文<small><a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/130589_3259120S1021_1_04" target="_blank" rel="noopener">イノラス（PMDA）</a>・<a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/100159_3259119S1029_1_08" target="_blank" rel="noopener">エネーボ（PMDA）</a></small></div>
+      <div>明治 製品情報（リーナレンLP・MP、メイバランス、インスロー）<small><a href="https://www.meiji.co.jp/meiji-nutrition-info/products/mhn/renalen/" target="_blank" rel="noopener">リーナレン</a>・<a href="https://www.meiji.co.jp/products/enteral_formula/4902705026957.html" target="_blank" rel="noopener">メイバランス1.0Z</a>・<a href="https://www.meiji.co.jp/products/enteral_formula/4902705025035.html" target="_blank" rel="noopener">HP1.0</a>・<a href="https://www.meiji.co.jp/products/enteral_formula/4902705027046.html" target="_blank" rel="noopener">1.5Z</a>・<a href="https://www.meiji.co.jp/products/enteral_formula/4902705027596.html" target="_blank" rel="noopener">HP1.5Z</a>・<a href="https://www.meiji.co.jp/products/enteral_formula/49720198.html" target="_blank" rel="noopener">インスロー</a></small></div>
+      <div>ネスレ 製品情報（アイソカルサポート、ペプタメン）<small><a href="https://www.eiyounet.nestlehealthscience.jp/products/product-line/qa/isocal_support" target="_blank" rel="noopener">アイソカルサポートQ&amp;A</a>・<a href="https://www.nestlehealthscience.jp/sites/default/files/2024-08/peptamen-standard.pdf" target="_blank" rel="noopener">ペプタメン スタンダード</a>・<a href="https://www.eiyounet.nestlehealthscience.jp/products/product-line/qa" target="_blank" rel="noopener">ペプタメンQ&amp;A</a></small></div>
+      <div>大塚製薬工場 ハイネイーゲル<small><a href="https://www.otsukakj.jp/en/healthcare/medicalfoods/hineegel" target="_blank" rel="noopener">otsukakj.jp</a></small></div>
+      <div>テルモ（ニュートリー） ペプチーノ 製品資料<small><a href="https://www.nutri.co.jp/products/docs/64_0095_PTR005_peptino.pdf" target="_blank" rel="noopener">nutri.co.jp</a></small></div>
+      <div>愛媛大学医学部附属病院 DIニュース（採用栄養剤一覧、イノソリッドへの切り替え）<small><a href="https://www.hsp.ehime-u.ac.jp/medicine/wp-content/uploads/202008-2DINEWS.pdf" target="_blank" rel="noopener">2020年8月</a>・<a href="https://www.hsp.ehime-u.ac.jp/medicine/wp-content/uploads/202505-2DInews.pdf" target="_blank" rel="noopener">2025年5月</a></small></div>
+    </div>
+  </section>
+  <section class="card fine">
+    <p>アプリの版：<b id="ver"></b>　<button type="button" class="btn" id="forceUpdate">最新版に更新</button></p>
+    <p>入力はこの端末にだけ保存します。患者の氏名・IDは入れないでください。</p>
+
+    <p>診療判断の補助であり、最終判断は診察と原典で行ってください。</p>
+  </section>
+</div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const MODE="pwa";
+const VER="2026-11-24a";
+const $=id=>document.getElementById(id);
+const KEY="tf-nav-v1", SKEY=(MODE==="pwa"?"tf-nav-set-v1":"tf-karte-set-v1");
+const PRODS=[
+  // cat: 群分け、src: 値の出どころ（出典タブの表に出す）
+  {id:"isoS",cat:"fav",name:"アイソカルサポート（1.5 kcal/mL）",ml:200,kcal:300,prot:11.4,water:153,unit:"本",type:"半消化態・食品",src:"ネスレ"},
+  {id:"isoS15",cat:"std",name:"アイソカルサポート 1.5 Bag",ml:200,kcal:300,prot:11.4,water:153,unit:"袋",type:"半消化態・食品",src:"ネスレ・販売店"},
+  {id:"renMP",cat:"fav",name:"リーナレンMP（たんぱく3.5 g/100 kcal）",ml:125,kcal:200,prot:7.0,water:94.4,unit:"本",type:"腎疾患用・食品",src:"明治"},
+  {id:"renLP",cat:"fav",name:"リーナレンLP（たんぱく1.0 g/100 kcal）",ml:125,kcal:200,prot:2.0,water:94.8,unit:"本",type:"腎疾患用・食品",src:"明治"},
+  {id:"racol",cat:"rx",name:"ラコールNF配合経腸用液",ml:200,kcal:200,prot:8.76,water:170,unit:"袋",type:"半消化態・医薬品",src:"PMDA・大塚"},
+  {id:"ensure",cat:"rx",name:"エンシュア・リキッド",ml:250,kcal:250,prot:8.8,water:null,unit:"缶",type:"半消化態・医薬品",src:"病院DI"},
+  {id:"ensureH",cat:"rx",name:"エンシュア・H（1.5 kcal/mL）",ml:250,kcal:375,prot:13.2,water:null,unit:"缶",type:"半消化態・医薬品",src:"病院DI"},
+  {id:"enevo",cat:"rx",name:"エネーボ配合経腸用液（1.2 kcal/mL）",ml:250,kcal:300,prot:13.5,water:null,unit:"缶",type:"半消化態・医薬品",src:"PMDA・病院DI"},
+  {id:"inolas",cat:"rx",name:"イノラス配合経腸用液（1.6 kcal/mL）",ml:187.5,kcal:300,prot:12,water:null,unit:"袋",type:"半消化態・医薬品",src:"PMDA・病院DI"},
+  {id:"twin",cat:"rxd",name:"ツインラインNF配合経腸用液（A液＋B液）",ml:400,kcal:400,prot:16.2,water:null,unit:"組",type:"消化態・医薬品",src:"PMDA"},
+  {id:"elental",cat:"rxd",name:"エレンタール配合内用剤（80 g を約300 mLに溶解）",ml:300,kcal:300,prot:13.14,water:null,unit:"袋",type:"成分栄養・医薬品",src:"PMDA・病院DI"},
+  {id:"mb10",cat:"std",name:"メイバランス1.0 Zパック200K",ml:200,kcal:200,prot:8.0,water:168.6,unit:"本",type:"半消化態・食品",src:"明治"},
+  {id:"mbhp10",cat:"std",name:"メイバランスHP1.0（高たんぱく）",ml:200,kcal:200,prot:10.0,water:168.2,unit:"本",type:"半消化態・食品",src:"明治"},
+  {id:"mb15",cat:"std",name:"メイバランス1.5 Zパック300K",ml:200,kcal:300,prot:12.0,water:152.7,unit:"本",type:"半消化態・食品",src:"明治"},
+  {id:"mbhp15",cat:"std",name:"メイバランスHP1.5 Zパック300K（高たんぱく）",ml:200,kcal:300,prot:15.0,water:152.1,unit:"本",type:"半消化態・食品",src:"明治"},
+  {id:"term20",cat:"std",name:"テルミール2.0α（2.0 kcal/mL）",ml:200,kcal:400,prot:14.5,water:null,unit:"本",type:"半消化態・食品",src:"販売店"},
+  {id:"inslow",cat:"dis",name:"インスロー（糖尿病・耐糖能異常）",ml:200,kcal:200,prot:10.0,water:169,unit:"本",type:"糖質調整・食品",src:"明治"},
+  {id:"peptS",cat:"dig",name:"ペプタメン スタンダード（1.5 kcal/mL）",ml:200,kcal:300,prot:10.5,water:153,unit:"本",type:"消化態・食品",src:"ネスレ"},
+  {id:"peptAF",cat:"dig",name:"ペプタメン AF（1.5 kcal/mL・高たんぱく）",ml:200,kcal:300,prot:18.9,water:null,unit:"本",type:"消化態・食品",src:"ネスレ（6.3 g/100 kcal から計算）"},
+  {id:"peptino",cat:"dig",name:"ペプチーノ（無脂肪）",ml:200,kcal:200,prot:null,water:null,unit:"本",type:"消化態・食品",src:"テルモ"},
+  {id:"hineegel",cat:"semi",name:"ハイネイーゲル（液体で注入・胃内でゲル化）",ml:375,kcal:300,prot:12.0,water:330,unit:"袋",type:"粘度可変・食品",src:"大塚製薬工場"},
+  {id:"inosolid",cat:"semi",name:"イノソリッド配合経腸用半固形剤",ml:300,kcal:300,prot:13.5,water:null,unit:"袋",semi:true,g:true,type:"半固形・医薬品",src:"病院DI"},
+  {id:"pgsoft",cat:"semi",name:"PGソフトEJ 400kcal",ml:267,kcal:400,prot:16.0,water:175,unit:"本",semi:true,g:true,type:"半固形・食品",src:"販売店"},
+  {id:"g10",cat:"gen",name:"1.0 kcal/mL の製剤（汎用）",ml:100,kcal:100,prot:null,water:null,unit:"",generic:true},
+  {id:"g15",cat:"gen",name:"1.5 kcal/mL の製剤（汎用）",ml:100,kcal:150,prot:null,water:null,unit:"",generic:true},
+  {id:"g20",cat:"gen",name:"2.0 kcal/mL の製剤（汎用）",ml:100,kcal:200,prot:null,water:null,unit:"",generic:true}
+];
+const CATS=[["fav","よく使う"],["cus","院内登録"],["std","半消化態（食品）"],["dis","病態別（糖尿病）"],["dig","消化態（食品）"],["semi","半固形・粘度可変"],["rx","医薬品（半消化態）"],["rxd","医薬品（消化態・成分栄養）"],["gen","汎用（濃度だけ）"]];
+const TPL0=[
+  {t:"投与中と終了後30〜60分は頭部を30°以上挙上",on:true},
+  {t:"投与前にチューブの位置（固定位置のマーク・胃泡音など）を確認",on:true},
+  {t:"嘔吐・腹部膨満・咳込み（誤嚥の疑い）があれば投与を止めて医師に連絡",on:true},
+  {t:"下痢（水様便が1日3回以上）が続くときは1段階前の量に戻して医師に連絡",on:true},
+  {t:"予定どおり増量できないときは同じ量を続け、医師に連絡",on:true},
+  {t:"内服薬の注入後は白湯20 mLでフラッシュ",on:false},
+  {t:"血糖測定：毎食前（糖尿病・高血糖時）",on:false},
+  {t:"体重測定：週1回",on:true}
+];
+let SET={prods:[],tpl:null,prod:"isoS"};
+function loadSet(){try{const o=JSON.parse(localStorage.getItem(SKEY)||"null");if(o)SET=Object.assign(SET,o);}catch(e){}if(!SET.tpl)SET.tpl=JSON.parse(JSON.stringify(TPL0));}
+function saveSet(){try{localStorage.setItem(SKEY,JSON.stringify(SET))}catch(e){}}
+function allProds(){return PRODS.concat(SET.prods||[]);}
+function prodById(id){return allProds().find(p=>p.id===id)||PRODS[0];}
+function catOf(p){return p.custom?"cus":p.cat||"std";}
+let tab="mk", manual=null, noteOn={}, outDirty=false;
+
+const num=id=>{const v=parseFloat(($(id).value||"").replace(/[^\d.\-]/g,""));return isFinite(v)?v:null;};
+const rv=n=>{const e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:null;};
+const fmt=(x,d=0)=>x==null||!isFinite(x)?"—":Number(x).toLocaleString("ja-JP",{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtMl=x=>{const r=Math.round(x*10)/10;return (r%1===0?r.toFixed(0):r.toFixed(1));};
+const WD="日月火水木金土";
+function dstr(d){return (d.getMonth()+1)+"/"+d.getDate()+"("+WD[d.getDay()]+")";}
+function addDays(d,n){const x=new Date(d.getTime());x.setDate(x.getDate()+n);return x;}
+function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+
+function waterFrac(p){const d=p.kcal/p.ml;return p.water!=null?p.water/p.ml:Math.max(0.5,1-0.15*d);}
+function rfsLevel(){
+  const c=k=>Array.from(document.querySelectorAll('.rf[data-k="'+k+'"]')).filter(e=>e.checked).length;
+  if(c("X"))return 3; if(c("M")||c("m")>=2)return 2; if(c("m")===1)return 1; return 0;
+}
+
+function calc(){
+  const ht=num("ht"),wt=num("wt");
+  const R={ok:false};
+  const p=prodById($("prod").value);R.p=p;
+  const dens=p.kcal/p.ml;R.dens=dens;
+  const times=parseInt(rv("tm")||"3",10);R.times=times;
+  if(!wt||wt<20||wt>250)return R;
+  R.wt=wt;R.ht=ht;
+  let ibw=null,bmi=null,adj=null;
+  if(ht&&ht>100&&ht<230){const m=ht/100;bmi=wt/m/m;ibw=22*m*m;adj=wt>ibw?ibw+0.25*(wt-ibw):wt;}
+  R.bmi=bmi;R.ibw=ibw;R.adj=adj;
+  let wb=rv("wb");if((wb==="ibw"||wb==="adj")&&!ibw)wb="act";R.wb=wb;
+  const wu=wb==="ibw"?ibw:wb==="adj"?adj:wt;R.wu=wu;
+  const kk=rv("kk");let kcal;R.kk=kk;
+  if(kk==="hb"){
+    const age=num("age"),af=num("af")||1,sf=num("sf")||1,sex=rv("sex");
+    if(!age||!ht)return Object.assign(R,{need:"H-B式には身長と年齢が必要です"});
+    const bee=sex==="f"?655.1+9.563*wt+1.850*ht-4.676*age:66.47+13.75*wt+5.003*ht-6.755*age;
+    R.bee=bee;R.af=af;R.sf=sf;kcal=bee*af*sf;
+  }else kcal=parseFloat(kk)*wu;
+  const man=num("kcalMan");R.kcalCalc=kcal;if(man&&man>100){kcal=man;R.man=true;}
+  R.kcal=kcal;R.prot=(num("pk")||0)*wu;R.water=(num("wk")||0)*wu;
+  // 刻み
+  const un=rv("un");let unit=un==="pack"?p.ml:un==="half"?p.ml/2:parseFloat(un);R.unit=unit;R.un=un;
+  const rnd=v=>Math.max(unit,Math.round(v/unit)*unit);
+  const goalDose=rnd(kcal/dens/times);
+  const st=rv("st");R.st=st;
+  let sk=st==="q"?kcal/4:st==="t"?kcal/3:st==="h"?kcal/2:st==="k10"?10*wt:st==="k5"?5*wt:(num("stc")||kcal/3);
+  R.startKcal=sk;
+  const startDose=Math.min(goalDose,rnd(sk/dens/times));
+  const n=parseInt($("nlv").value,10);
+  let doses=[];
+  if(manual&&manual.length){doses=manual.slice();}
+  else if(startDose>=goalDose||n<2)doses=[goalDose];
+  else{for(let i=0;i<n;i++){const v=i===n-1?goalDose:rnd(startDose+(goalDose-startDose)*i/(n-1));if(!doses.length||v>doses[doses.length-1])doses.push(v);}if(doses[doses.length-1]!==goalDose)doses.push(goalDose);}
+  R.doses=doses;
+  const iv=parseInt($("iv").value,10);R.iv=iv;
+  const r0=num("r0")||100,r1=num("r1")||r0;
+  const wm=rv("wm"),wfix=num("wfix")||0,wcap=num("wcap")||9999,wf=waterFrac(p);R.wm=wm;R.wf=wf;
+  const d0=$("d0").value?new Date($("d0").value+"T00:00:00"):new Date();
+  R.rows=doses.map((dose,i)=>{
+    const L=doses.length;
+    const day=dose*times, kc=day*dens, pr=p.prot!=null?day*p.prot/p.ml:null, fw=day*wf;
+    let flush=null,rest=null;
+    if(wm==="auto"){flush=Math.max(0,Math.floor(((R.water-fw)/times)/10)*10);flush=Math.min(flush,wcap);}
+    else if(wm==="fix")flush=wfix;
+    if(flush!=null)rest=R.water-fw-flush*times;
+    const rate=p.semi?null:Math.round((L>1?r0+(r1-r0)*i/(L-1):r1)/10)*10;
+    const dA=i*iv+1,dB=(i+1)*iv;
+    return {i,dose,day,kc,pr,fw,flush,rest,rate,dA,dB,last:i===L-1,dateA:addDays(d0,dA-1),dateB:addDays(d0,dB-1)};
+  });
+  R.reach=R.rows[R.rows.length-1].dA;R.goal=R.rows[R.rows.length-1];
+  R.ok=true;return R;
+}
+
+function packStr(p,dose){
+  if(p.generic||!p.unit)return "";
+  const k=dose/p.ml;const s=Math.abs(k-Math.round(k))<1e-6?String(Math.round(k)):(Math.abs(k*2-Math.round(k*2))<1e-6?String(Math.round(k*2)/2):k.toFixed(2));
+  return s+p.unit;
+}
+function doseStr(p,dose){const u=p.g?" g":" mL";const ps=packStr(p,dose);return fmtMl(dose)+u+(ps?"（"+ps+"）":"");}
+
+function render(){
+  const R=calc();const p=R.p;
+  // 製剤情報
+  $("prodInfo").textContent=(p.type?"［"+p.type+"］":"")+p.name+"："+fmtMl(p.ml)+(p.g?" g":" mL")+"＝"+fmt(p.kcal)+" kcal（"+(R.dens).toFixed(2)+" kcal/"+(p.g?"g":"mL")+"）"+(p.prot!=null?"、たんぱく "+p.prot+" g":"")+"、水分 "+(p.water!=null?"約"+p.water+" mL":"目安 "+Math.round(waterFrac(p)*100)+"%")+(p.semi?"。半固形のため速度は書きません":"");
+  $("rateBox").classList.toggle("hidden",!!p.semi);
+  $("hbBox").classList.toggle("hidden",rv("kk")!=="hb");
+  $("stcBox").classList.toggle("hidden",rv("st")!=="c");
+  const wm=rv("wm");$("wfixBox").classList.toggle("hidden",wm!=="fix");$("wcapBox").classList.toggle("hidden",wm!=="auto");
+  // RFS
+  const lv=rfsLevel();
+  const rfT=["低リスク","低〜中リスク（小項目1つ）","高リスク","最高リスク"],rfC=["ok","info","warn","crit"];
+  $("rfVerdict").className="verdict "+rfC[lv];$("rfPill").textContent=rfT[lv];
+  $("rfBig").textContent=lv>=3?"開始 5 kcal/kg/日、チアミン先行、電解質を頻回に":lv===2?"開始 10 kcal/kg/日以下、チアミン先行、最初の3日は電解質を毎日":lv===1?"高リスクではないが、電解質を確認しながら":"通常の漸増でよい";
+  $("rfsAuto").textContent=lv>=2?"（リスク評価："+rfT[lv]+"）":"";
+  // 体格
+  if(R.bmi){$("bodyInfo").textContent="BMI "+R.bmi.toFixed(1)+"／標準体重 "+R.ibw.toFixed(1)+" kg／調整体重 "+R.adj.toFixed(1)+" kg";}
+  else $("bodyInfo").textContent=R.wt?"身長を入れるとBMI・標準体重を出します":"";
+  $("wbHint").textContent=R.bmi?(R.bmi>=30?"BMI 30以上：調整体重か標準体重での計算を検討":R.bmi<18.5?"やせ：実体重での計算が基本（増量は慎重に）":""):"";
+  $("stHint").textContent=lv>=3&&rv("st")!=="k5"?"リスク評価は最高リスク：5 kcal/kg を推奨":lv===2&&!/k10|k5/.test(rv("st"))?"リスク評価は高リスク：10 kcal/kg 以下を推奨":R.ok?"開始量 "+fmt(R.startKcal)+" kcal/日":"";
+  // 目標
+  const tn=$("tgtNums");
+  if(!R.ok){tn.innerHTML="";$("verdict").className="verdict info";$("vPill").textContent="漸増";$("vBig").textContent=R.need||"身長・体重を入れてください";$("vSub").textContent="";$("sch").innerHTML="";$("out").value="";sum(null);return;}
+  const g=R.goal;
+  tn.innerHTML=bx("目標エネルギー",fmt(R.kcal)+" kcal",R.man?"直接指定（計算値 "+fmt(R.kcalCalc)+"）":R.kk==="hb"?"BEE "+fmt(R.bee)+"×"+R.af+"×"+R.sf:R.kk+" kcal/kg × "+R.wu.toFixed(1)+" kg")
+    +bx("たんぱく",fmt(R.prot)+" g",(num("pk")||0)+" g/kg")
+    +bx("水分",fmt(R.water)+" mL",(num("wk")||0)+" mL/kg")
+    +bx("目標の1回量",doseStr(p,g.dose),"×"+R.times+"回＝"+fmt(g.kc)+" kcal");
+  // verdict
+  const warn=lv>=2&&!/k10|k5/.test(R.st);
+  $("verdict").className="verdict "+(warn?"warn":lv>=2?"warn":"info");
+  $("vPill").textContent=lv>=2?"RFS"+(lv>=3?"最高":"高")+"リスク":"漸増";
+  $("vBig").textContent="Day"+R.reach+"に目標 "+fmt(g.kc)+" kcal/日（"+R.rows.length+"段階・"+R.iv+"日ごと）";
+  let sub="開始 "+doseStr(p,R.rows[0].dose)+"×"+R.times+"回＝"+fmt(R.rows[0].kc)+" kcal/日";
+  if(g.pr!=null){const d=R.prot-g.pr;sub+="。目標時のたんぱく "+fmt(g.pr)+" g"+(d>5?"（目標より約"+fmt(d)+" g少ない）":"");}
+  if(Math.abs(g.kc-R.kcal)/R.kcal>0.1)sub+="。刻みの丸めで目標と"+fmt(g.kc-R.kcal)+" kcal差";
+  if(warn)sub+="。リスク評価に比べ開始量が多い";
+  if(!p.semi&&g.dose>400)sub+="。1回 "+fmtMl(g.dose)+" mL は多め：回数を増やすか高濃度製剤を検討（目安）";
+  if(p.semi&&g.dose>600)sub+="。半固形は1回600 gまでが目安";
+  $("vSub").textContent=sub;
+  $("manNote").classList.toggle("hidden",!manual);
+  // 表
+  let h="<tr><th>期間</th><th>1回量</th><th>kcal/日</th>"+(p.semi?"":"<th>mL/h</th>")+(R.wm!=="none"?"<th>白湯</th>":"")+"<th></th></tr>";
+  R.rows.forEach(r=>{
+    h+="<tr><td>Day"+r.dA+(r.last?"〜":"−"+r.dB)+"<br><small>"+dstr(r.dateA)+(r.last?"〜":"〜"+dstr(r.dateB))+"</small></td>"
+     +"<td><b>"+fmtMl(r.dose)+"</b>"+(p.g?"g":"mL")+"<br><small>×"+R.times+"回"+(packStr(p,r.dose)?"・"+packStr(p,r.dose):"")+"</small></td>"
+     +"<td>"+fmt(r.kc)+(r.pr!=null?"<br><small>P "+fmt(r.pr)+" g</small>":"")+"</td>"
+     +(p.semi?"":"<td>"+r.rate+"<br><small>"+(r.dose/r.rate).toFixed(1)+"h</small></td>")
+     +(R.wm!=="none"?"<td>"+fmt(r.flush)+(r.rest>50?"<br><small>不足"+fmt(r.rest)+"</small>":"")+"</td>":"")
+     +'<td class="pm"><button type="button" class="mini" data-pm="-1" data-i="'+r.i+'">−</button><button type="button" class="mini" data-pm="1" data-i="'+r.i+'">＋</button></td></tr>';
+  });
+  $("sch").innerHTML=h;
+  if(!outDirty)$("out").value=makeText(R,lv);
+  sum(R,lv);
+}
+function bx(k,v,s){return '<div class="bx"><div class="k">'+k+'</div><div class="v">'+v+'<small>'+s+'</small></div></div>';}
+function sum(R,lv){try{if(!window.wcSum)return;if(!R||!R.ok){wcSum.set(null);return;}wcSum.set("目標 "+fmt(R.goal.kc)+" kcal/日・Day"+R.reach+"到達（開始 "+fmt(R.rows[0].kc)+" kcal）",{tone:lv>=2?"warn":"info",pill:lv>=2?"RFS高":"漸増"});}catch(e){}}
+
+function makeText(R,lv){
+  const p=R.p,L=[],u=p.g?" g":" mL";
+  L.push("【経管栄養 漸増指示】");
+  const compact=$("compact").checked;
+  if(!compact){
+    L.push("体重 "+R.wt.toFixed(1)+" kg"+(R.ht?"／身長 "+fmt(R.ht,0)+" cm（BMI "+R.bmi.toFixed(1)+"）":""));
+    const base=R.man?"指定":R.kk==="hb"?"H-B式 "+fmt(R.bee)+"×"+R.af+"×"+R.sf:R.kk+" kcal/kg×"+(R.wb==="ibw"?"標準体重":R.wb==="adj"?"調整体重":"実体重")+" "+R.wu.toFixed(1)+" kg";
+    L.push("目標：エネルギー "+fmt(R.kcal)+" kcal/日（"+base+"）、たんぱく "+fmt(R.prot)+" g/日、水分 "+fmt(R.water)+" mL/日");
+  }
+  L.push("製剤："+p.name+(p.generic?"":"（1"+p.unit+" "+fmtMl(p.ml)+u+"＝"+fmt(p.kcal)+" kcal）"));
+  L.push("経路："+rv("rt")+"　1日"+R.times+"回"+($("tlab").value.trim()?"（"+$("tlab").value.trim()+"）":""));
+  L.push("増量："+R.iv+"日ごと。症状がなければ次の段階へ");
+  L.push("");
+  R.rows.forEach(r=>{
+    let s=dstr(r.dateA)+(r.last?"〜":"〜"+dstr(r.dateB))+" ［Day"+r.dA+(r.last?"〜":"−"+r.dB)+"］ 1回 "+doseStr(p,r.dose)+"×"+R.times+"回＝"+fmt(r.kc)+" kcal/日";
+    if(!p.semi&&$("rateOn").checked)s+="、"+r.rate+" mL/h";
+    if(R.wm!=="none"&&r.flush>0)s+="、白湯 1回 "+fmt(r.flush)+" mL";
+    if(r.last)s+="（目標量、以後継続）";
+    L.push(s);
+  });
+  const g=R.goal;
+  if(!compact){
+    L.push("");
+    let s="目標到達時："+fmt(g.kc)+" kcal/日";
+    if(g.pr!=null)s+="、たんぱく "+fmt(g.pr)+" g/日";
+    s+="、水分 製剤約"+fmt(g.fw)+(R.wm!=="none"&&g.flush>0?"＋白湯 "+fmt(g.flush*R.times):"")+" mL/日";
+    L.push(s);
+    const rests=R.rows.filter(r=>r.rest!=null&&r.rest>50);
+    if(R.wm!=="none"&&rests.length)L.push("水分の不足分（"+rests.map(r=>"Day"+r.dA+" 約"+fmt(r.rest)+" mL").join("、")+"）は点滴等で補う");
+  }
+  const notes=SET.tpl.filter((t,i)=>noteOn[i]);
+  const ex=$("extra").value.trim();
+  if(notes.length||ex){L.push("");L.push("【注意】");notes.forEach(t=>L.push("・"+t.t));if(ex)ex.split(/\n/).forEach(x=>x.trim()&&L.push("・"+x.trim()));}
+  if($("rfsOn").checked){
+    L.push("");L.push("【リフィーディング対策】"+(lv>=2?"（"+(lv>=3?"最高":"高")+"リスク）":""));
+    L.push("・ビタミンB1（チアミン）100 mg/日を栄養開始前から投与し、少なくとも5〜7日続ける");
+    L.push("・P・K・Mg・血糖：開始前、Day1・2・3は毎日、その後Day5・7");
+    L.push("・P・K・Mg が急に下がったら増量を止め、熱量を約半分に戻して医師に連絡");
+    L.push("・浮腫・呼吸苦・頻脈など心不全徴候に注意");
+  }
+  return L.join("\n");
+}
+
+// --- 製剤選択・登録 ---
+function fillProd(){
+  const sel=$("prod"),cur=sel.value||SET.prod;
+  sel.innerHTML="";
+  CATS.forEach(([k,lab])=>{const ps=allProds().filter(p=>catOf(p)===k);if(!ps.length)return;const g=document.createElement("optgroup");g.label=lab;ps.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;g.appendChild(o);});sel.appendChild(g);});
+  sel.value=allProds().some(p=>p.id===cur)?cur:"isoS";
+  const line=p=>fmtMl(p.ml)+(p.g?" g":" mL")+"・"+fmt(p.kcal)+" kcal"+(p.prot!=null?"・たんぱく "+p.prot+" g":"")+"・水分 "+(p.water!=null?p.water+" mL":"目安")+(p.semi?"・半固形":"");
+  $("prodList").innerHTML=allProds().filter(p=>p.custom).map(p=>'<div class="item note"><div class="t">'+esc(p.name)+' <button type="button" class="mini" data-del="'+p.id+'">削除</button></div><div class="d">'+line(p)+'</div></div>').join("")||'<p class="hint">まだありません。</p>';
+  $("prodRef").innerHTML='<tr><th>製剤</th><th>1包装</th><th>kcal</th><th>たんぱく</th><th>水分</th><th>値の出どころ</th></tr>'+PRODS.filter(p=>!p.generic).map(p=>'<tr><td>'+esc(p.name)+'<br><small>'+esc(p.type||"")+'</small></td><td>'+fmtMl(p.ml)+(p.g?" g":" mL")+'</td><td>'+fmt(p.kcal)+'</td><td>'+(p.prot!=null?p.prot+" g":"—")+'</td><td>'+(p.water!=null?p.water:"目安")+'</td><td><small>'+esc(p.src||"")+'</small></td></tr>').join("");
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+$("npAdd").addEventListener("click",()=>{
+  const name=$("npName").value.trim(),ml=parseFloat($("npMl").value),kcal=parseFloat($("npKcal").value);
+  if(!name||!(ml>0)||!(kcal>0)){toast("名前・容量・熱量を入れてください");return;}
+  const pr=parseFloat($("npProt").value),wa=parseFloat($("npWater").value);
+  const p={id:"c"+Date.now(),name,ml,kcal,prot:isFinite(pr)?pr:null,water:isFinite(wa)?wa:null,unit:$("npUnit").value.trim()||"本",semi:$("npSemi").checked,custom:true};
+  SET.prods.push(p);saveSet();fillProd();["npName","npMl","npKcal","npProt","npWater"].forEach(i=>$(i).value="");toast("追加しました");render();
+});
+$("prodList").addEventListener("click",e=>{const b=e.target.closest("[data-del]");if(!b)return;if(!confirm("この製剤を削除しますか？"))return;SET.prods=SET.prods.filter(p=>p.id!==b.dataset.del);saveSet();fillProd();render();});
+// --- 定型文 ---
+function fillTpl(){
+  $("noteList").innerHTML=SET.tpl.map((t,i)=>'<label class="chk"><input type="checkbox" data-note="'+i+'"'+(noteOn[i]?" checked":"")+'><span>'+esc(t.t)+'</span></label>').join("");
+  $("tplList").innerHTML=SET.tpl.map((t,i)=>'<div class="item"><textarea data-tt="'+i+'" rows="2">'+esc(t.t)+'</textarea><div class="rowbtn"><label class="chk" style="padding:0"><input type="checkbox" data-td="'+i+'"'+(t.on?" checked":"")+'><span>最初から入れる</span></label><button type="button" class="mini" data-tx="'+i+'">削除</button></div></div>').join("");
+}
+$("noteList").addEventListener("change",e=>{const c=e.target.closest("[data-note]");if(!c)return;noteOn[c.dataset.note]=c.checked;outDirty=false;render();save();});
+$("tplList").addEventListener("input",e=>{const t=e.target.closest("[data-tt]");if(t){SET.tpl[t.dataset.tt].t=t.value;saveSet();}});
+$("tplList").addEventListener("change",e=>{const t=e.target.closest("[data-tt]");if(t){fillTpl();render();return;}const d=e.target.closest("[data-td]");if(d){SET.tpl[d.dataset.td].on=d.checked;saveSet();}});
+$("tplList").addEventListener("click",e=>{const x=e.target.closest("[data-tx]");if(!x)return;const i=+x.dataset.tx;SET.tpl.splice(i,1);const n={};Object.keys(noteOn).forEach(k=>{k=+k;if(k<i)n[k]=noteOn[k];else if(k>i)n[k-1]=noteOn[k];});noteOn=n;saveSet();fillTpl();render();save();});
+$("tplAdd").addEventListener("click",()=>{SET.tpl.push({t:"新しい定型文",on:false});saveSet();fillTpl();});
+$("tplReset").addEventListener("click",()=>{if(!confirm("定型文を初期値に戻しますか？"))return;SET.tpl=JSON.parse(JSON.stringify(TPL0));defNotes();saveSet();fillTpl();render();save();});
+function defNotes(){noteOn={};SET.tpl.forEach((t,i)=>{if(t.on)noteOn[i]=true;});}
+// --- ±調整 ---
+$("sch").addEventListener("click",e=>{
+  const b=e.target.closest("[data-pm]");if(!b)return;
+  const R=calc();if(!R.ok)return;
+  const d=R.doses.slice(),i=+b.dataset.i,v=d[i]+(+b.dataset.pm)*R.unit;
+  if(v<R.unit)return;d[i]=v;manual=d;outDirty=false;render();
+});
+$("manReset").addEventListener("click",()=>{manual=null;outDirty=false;render();});
+// --- RFS ---
+$("rfNone").addEventListener("click",()=>{document.querySelectorAll(".rf").forEach(e=>e.checked=false);$("rfsOn").checked=false;manual=null;outDirty=false;render();save();});
+$("rfBmi").addEventListener("click",()=>{const R=calc();if(!R.bmi){toast("身長・体重を先に入れてください");return;}$("rf1").checked=R.bmi<16;$("rf5").checked=R.bmi<18.5;$("rf9").checked=R.bmi<14;onRfs();});
+function onRfs(){const lv=rfsLevel();if(lv>=2){$("rfsOn").checked=true;const st=lv>=3?"k5":"k10";document.querySelector('input[name="st"][value="'+st+'"]').checked=true;if(parseInt($("nlv").value,10)<4)$("nlv").value="4";toast(lv>=3?"開始 5 kcal/kg・4段階にしました":"開始 10 kcal/kg・4段階にしました");}manual=null;outDirty=false;render();save();}
+document.querySelectorAll(".rf").forEach(e=>e.addEventListener("change",onRfs));
+// --- 製剤で刻みの既定 ---
+$("prod").addEventListener("change",()=>{const p=prodById($("prod").value);SET.prod=p.id;saveSet();if(p.semi){document.querySelector('input[name="un"][value="pack"]').checked=true;}else if(rv("un")==="pack"&&p.ml<=250){document.querySelector('input[name="un"][value="50"]').checked=true;}});
+// --- 開始量で段階数の既定 ---
+document.querySelectorAll('input[name="st"]').forEach(e=>e.addEventListener("change",()=>{const m={q:"4",t:"3",h:"2",k10:"4",k5:"5"};if(m[e.value])$("nlv").value=m[e.value];}));
+// --- コピー ---
+$("copyBtn").addEventListener("click",()=>{
+  const t=$("out").value;
+  const done=()=>toast("コピーしました。カルテに貼り付けてください");
+  const fb=()=>{const ta=$("out");ta.focus();ta.select();try{ta.setSelectionRange(0,t.length);}catch(e){}let ok=false;try{ok=document.execCommand("copy");}catch(e){}ok?done():toast("自動でコピーできません。選択した状態でCtrl+Cしてください");};
+  try{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,fb);else fb();}catch(e){fb();}
+});
+$("out").addEventListener("input",()=>{outDirty=true;});
+// --- 保存（PWAのみ入力を保存） ---
+function save(){
+  if(MODE!=="pwa")return;
+  const o={tab,manual,noteOn,v:{}};
+  document.querySelectorAll("[data-s]").forEach(e=>{
+    if(e.type==="radio"){if(e.checked)o.v["r:"+e.name]=e.value;}
+    else if(e.type==="checkbox")o.v["c:"+e.id]=e.checked;
+    else o.v["i:"+e.id]=e.value;
+  });
+  try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}
+}
+function load(){
+  defNotes();
+  if(MODE!=="pwa")return;
+  let o=null;try{o=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+  if(!o)return;
+  tab=o.tab||tab;manual=o.manual||null;if(o.noteOn)noteOn=o.noteOn;
+  const v=o.v||{};
+  document.querySelectorAll("[data-s]").forEach(e=>{
+    if(e.type==="radio"){if(v["r:"+e.name]===e.value)e.checked=true;}
+    else if(e.type==="checkbox"){if("c:"+e.id in v)e.checked=!!v["c:"+e.id];}
+    else if("i:"+e.id in v)e.value=v["i:"+e.id];
+  });
+}
+function setTab(t){
+  tab=t;
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===t?"true":"false"));
+  ["mk","rfs","set","ref"].forEach(x=>$("v-"+x).classList.toggle("hidden",x!==t));
+}
+document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-v]");if(b){setTab(b.dataset.v);save();window.scrollTo({top:0});}});
+const NOAUTO=["out"];
+function onInput(e){
+  const t=e.target;if(!t.closest("main")||NOAUTO.indexOf(t.id)>=0)return;
+  if(t.closest("#v-set")||t.dataset.note!=null||t.classList.contains("rf"))return;
+  if(t.hasAttribute("data-s")){manual=null;outDirty=false;render();save();}
+}
+document.addEventListener("input",onInput);document.addEventListener("change",onInput);
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),3200)}
+$("ver").textContent=VER+(MODE==="pwa"?"":"（カルテ端末用）");
+loadSet();fillProd();load();fillTpl();
+if(!$("d0").value)$("d0").value=todayStr();
+setTab(tab);render();
+document.addEventListener("DOMContentLoaded",()=>{try{if(window.WardProfile)WardProfile.onChange(()=>{manual=null;outDirty=false;render();});}catch(e){}render();});
+window.addEventListener("load",()=>render());
+document.getElementById("forceUpdate").addEventListener("click",async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(()=>location.reload(),800);});
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=["#verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["tf-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
+<script src="../share.js" defer></script>
+</body>
+</html>

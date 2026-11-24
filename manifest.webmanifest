@@ -365,6 +365,18 @@
       ]
     },
     {
+      "name": "経管栄養 漸増指示",
+      "short_name": "経管栄養",
+      "url": "tf/",
+      "icons": [
+        {
+          "src": "tf/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "指定難病・制度ナビ",
       "short_name": "難病・制度ナビ",
       "url": "nan/",
