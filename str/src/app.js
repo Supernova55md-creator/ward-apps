@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-var APP_VER="ver1_2026-11-25b";
+var APP_VER="ver1_2026-11-25c";
 var KEY="str-v1";
 var $=function(id){return document.getElementById(id);};
 var st={st:{},hist:[],cnt:0,ok:0,streak:0,set:{cats:Object.keys(CATS),lv:3,img:false,hide:false,weak:true},cur:null};
@@ -132,7 +132,7 @@ function renderStats(){
   });
   h+='</table></div>';
   var wrong=QS.filter(function(q){var r=st.st[q.id];return r&&r[2]===0;});
-  h+='<div class="card"><h2>前回まちがえた問題</h2>'+(wrong.length?wrong.map(function(q){return'<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding:6px 0"><span style="font-size:14px;flex:1">'+esc(q.q)+'</span><button type="button" class="btn sm" data-go="'+q.id+'">解く</button></div>';}).join(""):'<p class="empty">ありません。</p>')+'</div>';
+  h+='<div class="card"><h2>前回間違えた問題</h2>'+(wrong.length?wrong.map(function(q){return'<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding:6px 0"><span style="font-size:14px;flex:1">'+esc(q.q)+'</span><button type="button" class="btn sm" data-go="'+q.id+'">解く</button></div>';}).join(""):'<p class="empty">ありません。</p>')+'</div>';
   h+='<div class="card"><button type="button" class="btn" id="resetSt">成績を消す</button><p class="hint">成績（回答数・正答率・各問題の結果）を消します。</p></div>';
   $("sArea").innerHTML=h;
   Array.prototype.forEach.call(document.querySelectorAll("#sArea [data-go]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-go"));show("v-q");renderQ();};});
