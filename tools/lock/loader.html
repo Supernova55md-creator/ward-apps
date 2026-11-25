@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>MMTナビ（図入り・個人用）</title>
+<style>
+body{margin:0;font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;background:#F5F4F8;color:#1E1B2B;display:flex;min-height:100vh;align-items:center;justify-content:center}
+.box{background:#fff;border:1px solid #E1DDEA;border-radius:14px;padding:22px 20px;width:min(360px,92vw);box-shadow:0 4px 18px rgba(0,0,0,.08)}
+h1{font-size:18px;margin:0 0 4px;color:#4B3478}
+p{font-size:13px;color:#5E5A6E;margin:0 0 14px;line-height:1.6}
+input{font:inherit;font-size:16px;width:100%;box-sizing:border-box;padding:10px;border:1px solid #CFC8DD;border-radius:9px}
+button{font:inherit;font-size:15px;font-weight:700;margin-top:10px;width:100%;padding:10px;border:0;border-radius:9px;background:#6B4FA0;color:#fff;cursor:pointer}
+button:disabled{opacity:.5}
+#msg{font-size:13px;margin-top:10px;min-height:1.4em;color:#B42318}
+</style></head><body>
+<form class="box" id="f" autocomplete="off">
+<h1>MMTナビ（図入り）</h1>
+<p>個人用のファイルです。パスワードを入れると開きます。</p>
+<input type="password" id="pw" placeholder="パスワード" autofocus>
+<button id="go">開く</button>
+<div id="msg" role="status"></div>
+</form>
+<script>
+const LOCK={"v":1,"kdf":"PBKDF2-SHA256","iter":600000,"salt":"__SALT__","iv":"__IV__","ct":"__CT__"};
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+document.getElementById("f").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const pwEl=document.getElementById("pw"),msg=document.getElementById("msg"),go=document.getElementById("go");
+  if(!window.crypto||!crypto.subtle){msg.textContent="このブラウザでは開けません（暗号機能が使えません）。";return;}
+  go.disabled=true;msg.style.color="#5E5A6E";msg.textContent="確認しています…";
+  try{
+    const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pwEl.value),"PBKDF2",false,["deriveKey"]);
+    const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:b64(LOCK.salt),iterations:LOCK.iter,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+    let pt;
+    try{pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(LOCK.iv)},key,b64(LOCK.ct));}
+    catch(x){msg.style.color="#B42318";msg.textContent="パスワードが違います。";go.disabled=false;pwEl.select();return;}
+    pwEl.value="";
+    const html=await new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+    document.open();document.write(html);document.close();
+  }catch(x){msg.style.color="#B42318";msg.textContent="開けませんでした："+(x&&x.message||x);go.disabled=false;}
+});
+</script>
+</body></html>
