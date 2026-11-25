@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-var APP_VER="ver1_2026-11-25a";
+var APP_VER="ver1_2026-11-25b";
 var KEY="str-v1";
 var $=function(id){return document.getElementById(id);};
 var st={st:{},hist:[],cnt:0,ok:0,streak:0,set:{cats:Object.keys(CATS),lv:3,img:false,hide:false,weak:true},cur:null};
@@ -148,7 +148,7 @@ function renderRefs(){
   var gl=["GL","RT","EV"],tr=Object.keys(REFS).filter(function(k){return gl.indexOf(k)<0;});
   var h='<div class="card"><h2>指針・ガイドライン</h2><ul class="src">'+gl.map(li).join("")+'</ul></div>';
   h+='<div class="card"><h2>臨床試験・海外ガイドライン</h2><ul class="src">'+tr.map(li).join("")+'</ul></div>';
-  h+='<div class="card"><h2>照合の状況</h2><p class="note">静注血栓溶解の適応外・慎重投与項目、用量、投与後の管理（神経評価・血圧測定の頻度、24時間の抗血栓療法の制限）、DOAC・ワルファリン・ダビガトランの扱い、発症時刻の定義は、rt-PA適正治療指針 第三版の本文と照合しました。血栓回収の推奨度（ASPECTS別・時間別・脳底動脈・M2）は、ガイドライン改訂2025の内容を反映した既存の「再開通療法 適応チェッカー」と同じ整理です。臨床試験の数値は各論文の要旨と照合しました。脳出血・くも膜下出血の手術適応（小脳出血3 cm、被殻出血31 mL）、脳梗塞急性期の降圧基準（220/120）、嚥下・DVT予防（CLOTS）・けいれん予防投与・分水嶺梗塞・分枝粥腫病・出血性変化の分類・ABC/2法の記載は、ガイドラインと一般的な知識による要約で、原典の頁と一つずつ照合したものではありません（未照合）。推奨度の細部は原典で確認してください。</p>';
+  h+='<div class="card"><h2>照合の状況</h2><p class="note">静注血栓溶解の適応外・慎重投与項目、用量、投与後の管理（神経評価・血圧測定の頻度、24時間の抗血栓療法の制限）、DOAC・ワルファリン・ダビガトランの扱い、発症時刻の定義は、rt-PA適正治療指針 第三版の本文と照合しました。血栓回収の推奨度（ASPECTS別・時間別・脳底動脈・M2）は、ガイドライン改訂2025の内容を反映した既存の「再開通療法 適応チェッカー」と同じ整理です。臨床試験の数値は各論文の要旨（または学会・誌面の要約）と照合しました。「最新の重要試験」は2022〜2026年の試験で、国内未承認の薬（テネクテプラーゼ、チロフィバン、アスンデキシアン）や承認外の使い方（動注血栓溶解）を含みます。国内の適応とは分けて読んでください。脳出血・くも膜下出血の手術適応（小脳出血3 cm、被殻出血31 mL）、脳梗塞急性期の降圧基準（220/120）、嚥下・DVT予防（CLOTS）・けいれん予防投与・分水嶺梗塞・分枝粥腫病・出血性変化の分類・ABC/2法の記載は、ガイドラインと一般的な知識による要約で、原典の頁と一つずつ照合したものではありません（未照合）。推奨度の細部は原典で確認してください。</p>';
   h+='<p class="note">図はすべて自作の模式図です。本や論文の画像は使っていません。Dropboxの脳卒中関連書籍は、この版ではrt-PA適正治療指針（第三版）を参照しました。</p>';
   h+='<div class="row" style="margin-top:10px;font-size:12px;color:var(--muted)">アプリの版：<b>'+APP_VER+'</b><button type="button" class="btn sm" id="forceUpdate">最新版に更新</button></div>';
   h+='<p class="hint">収録：'+QS.length+'問（画像つき '+QS.filter(function(q){return q.img;}).length+'問）</p></div>';
