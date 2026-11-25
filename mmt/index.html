@@ -262,7 +262,7 @@ body.ovl #wcClrBtn,body.ovl2 #wcClrBtn,body.ovl #wcQrBtn,body.ovl2 #wcQrBtn{disp
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-const APP_VERSION="2026-11-14a";
+const APP_VERSION="ver1_2026-11-25a";
 /* 分布パターンの判定。g(id,side) はグレード数値（未入力は null）。本書の臨床的事項・コラムに基づく */
 const PATTERNS=(function(){
   const S=[["R","右"],["L","左"]];
@@ -355,7 +355,9 @@ async function idbPut(v){const db=await idb();return new Promise((res,rej)=>{con
 function d2blob(u){const [h,b]=u.split(",");const bin=atob(b);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:(h.match(/data:([^;]+)/)||[])[1]||"image/jpeg"});}
 function applyBundle(b){Object.values(FIG.urls).forEach(u=>{try{URL.revokeObjectURL(u);}catch(e){}});FIG.urls={};FIG.labels={};FIG.n=0;FIG.ver="";
   if(!b||!b.figs)return;Object.keys(b.figs).forEach(k=>{const v=b.figs[k];FIG.urls[k]=URL.createObjectURL(v instanceof Blob?v:d2blob(v));FIG.n++;});FIG.labels=b.labels||{};FIG.ver=b.version||"";}
-async function loadFigs(){try{const b=await idbGet();applyBundle(b);}catch(e){}renderTree();renderGen();}
+async function loadFigs(){/* パスワード付き版（図内蔵）では window.__MMT_FIGS__ が入っている */
+  if(window.__MMT_FIGS__){try{applyBundle(window.__MMT_FIGS__);FIG.embedded=true;}catch(e){}renderTree();renderGen();return;}
+  try{const b=await idbGet();applyBundle(b);}catch(e){}renderTree();renderGen();}
 async function importFigs(text){let b;try{b=JSON.parse(text);}catch(e){toast("ファイルの形式が違います");return;}
   if(!b||b.kind!=="mmtnavi-figs"||!b.figs){toast("MMTナビ用の図ファイルではありません");return;}
   const st2={kind:b.kind,version:b.version,labels:b.labels,figs:{}};Object.keys(b.figs).forEach(k=>st2.figs[k]=d2blob(b.figs[k]));
@@ -575,7 +577,8 @@ function renderGen(){
   const nb=M.filter(m=>m.normalMayBreak);
   h+=`<div class="card"><h2>健常者でも break され得る筋</h2><p class="hint" style="margin-top:0">本書の方法でも健常者の一部で break される。5にこだわらず左右差と他筋との比較で判断する。</p>${sameLinks(nb)}</div>`;
   if(D.columns&&D.columns.length){h+=`<div class="card"><h2>コラムの要点</h2>`;D.columns.forEach(c=>{h+=`<details class="emg"><summary>${esc(c.title)}</summary><ul class="pts">${c.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul><p class="src">本書 p.${c.bookPage}</p></details>`;});h+=`</div>`;}
-  h+=`<div class="card"><h2>図の読み込み（この端末だけ）</h2><p style="margin:0 0 6px;font-size:14px">${FIG.n?`読み込み済み：<b>${FIG.n}枚</b>（版 ${esc(FIG.ver)}）`:"未読み込み"}</p>
+  if(FIG.embedded) h+=`<div class="card"><h2>図（内蔵）</h2><p style="margin:0 0 6px;font-size:14px">このファイルには図が<b>${FIG.n}枚</b>入っている（パスワード付きの個人用。版 ${esc(FIG.ver)}）。</p><h3>神経図・デルマトーム</h3>${figBtns(Object.values(D.sfig).flat())}</div>`;
+  else h+=`<div class="card"><h2>図の読み込み（この端末だけ）</h2><p style="margin:0 0 6px;font-size:14px">${FIG.n?`読み込み済み：<b>${FIG.n}枚</b>（版 ${esc(FIG.ver)}）`:"未読み込み"}</p>
    <p class="hint" style="margin-top:0">MRC『末梢神経と筋のみかた』の写真・神経図・デルマトームを、別ファイル（mmt-figs.json）から端末内に取り込む。図はアプリ本体（GitHub）には含めていない。端末ごとに1回行う。iPhoneはホーム画面版とSafari版で別保存。</p>
    <div class="row-btn"><label class="btn primary" style="display:inline-flex;align-items:center">図ファイルを選ぶ<input type="file" id="figFile" accept=".json,application/json" style="display:none"></label>${FIG.n?'<button class="btn sm danger" id="figClear">図を消去</button>':""}</div>
    ${FIG.n?`<h3>神経図・デルマトーム</h3>${figBtns(Object.values(D.sfig).flat())}`:""}</div>`;
