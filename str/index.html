@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>脳卒中トレーニング</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#9D174D">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="脳卒中トレ">
+<style>
+:root{
+  --bg:#F7F3F5; --surface:#FFFFFF; --ink:#24181D; --muted:#6B5A61; --line:#E6D9DF;
+  --accent:#9D174D; --accent-strong:#7A1039; --accent-soft:#FBE7EF; --on-accent:#FFFFFF;
+  --ok:#2E7D4F; --ok-soft:#E3F3E9; --ng:#B42318; --ng-soft:#FDE8E6; --warn-soft:#FFF4DB;
+  --font:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#171214; --surface:#211A1D; --ink:#F0E8EB; --muted:#B39FA7; --line:#3A2E33;
+    --accent:#F0729F; --accent-strong:#F7A8C4; --accent-soft:#3A1E29; --on-accent:#2A0714;
+    --ok:#5CC48A; --ok-soft:#163323; --ng:#F27A6E; --ng-soft:#3B1C1A; --warn-soft:#3A3017; color-scheme:dark}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+.app{max-width:680px;margin:0 auto;padding:0 calc(14px + env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;border:5px solid var(--accent);flex:none}
+.brand h1{font-size:19px;font-weight:900}
+.brand small{color:var(--muted);font-size:11px;margin-left:auto;text-align:right;line-height:1.3}
+.summary{display:flex;gap:14px;margin-top:6px;font-size:12.5px;color:var(--muted);padding:0 2px}
+.summary b{color:var(--ink);font-size:14px}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:6px}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sm{min-height:36px;padding:5px 11px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.set>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details.set>summary::-webkit-details-marker{display:none}
+details.set>summary::after{content:"＋";margin-left:auto;color:var(--muted);font-weight:400}
+details.set[open]>summary::after{content:"－"}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input{margin:0;accent-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px}
+input[type=search]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;min-height:44px}
+.sw{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--accent)}
+.qhead{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.lv{letter-spacing:1px;color:var(--accent)}
+.regtag{margin-left:auto;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:1px 10px;font-weight:700}
+.stem{font-size:15.5px;margin:0 0 6px}
+.ask{font-weight:700;margin:12px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;font-size:15.5px;line-height:1.45;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:11px;padding:11px 12px;min-height:48px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.opt .why{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ng{border-color:var(--ng);background:var(--ng-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.result{border-radius:10px;padding:9px 12px;font-weight:700;margin:12px 0 10px}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.ng{background:var(--ng-soft);color:var(--ng)}
+.exp{font-size:15px;margin:0 0 8px}
+ul.kp{margin:6px 0 8px;padding-left:20px;font-size:14.5px}
+ul.kp li{margin:3px 0}
+.refs{font-size:12.5px;color:var(--muted)}
+.refs a{color:var(--accent-strong);margin-right:8px;white-space:nowrap}
+.fig{margin:10px 0 2px;background:#000;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fig svg{display:block;width:100%;height:auto}
+.fig .cap{font-size:11.5px;color:#cfc4c8;background:#111;margin:0;padding:4px 8px;line-height:1.4}
+.zoombtn{font-size:12px;color:var(--accent-strong);background:none;border:0;padding:4px 0;cursor:pointer}
+#zoom{position:fixed;inset:0;z-index:2147483002;background:#000;display:none;flex-direction:column}
+#zoom.on{display:flex}
+#zoom .zb{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:center;padding:calc(48px + env(safe-area-inset-top)) 8px 8px}
+#zoom .zb svg{width:100%;max-width:1000px;height:auto}
+#zoom button{position:absolute;top:calc(8px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));font:inherit;font-size:15px;font-weight:700;background:#fff;color:#111;border:0;border-radius:999px;padding:8px 16px;min-height:40px;cursor:pointer}
+body.zoomon #wcClrBtn,body.zoomon #wcQrBtn{display:none!important}
+.next{margin-top:12px;display:flex;gap:8px}
+details.site{border-top:1px solid var(--line)}
+details.site:first-of-type{border-top:0}
+details.site>summary{cursor:pointer;padding:9px 0;list-style:none}
+details.site>summary::-webkit-details-marker{display:none}
+details.site>summary b{display:block;font-size:14.5px}
+details.site>summary span{display:block;font-size:12.5px;color:var(--muted)}
+.mk{font-size:12px;font-weight:700;margin-left:6px}
+.mk.ok{color:var(--ok)}.mk.ng{color:var(--ng)}
+table.st{width:100%;border-collapse:collapse;font-size:14.5px}
+table.st td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+table.st td.num{text-align:right;white-space:nowrap;width:1%}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{color:var(--muted);font-size:14px}
+ul.src{margin:0;padding-left:18px;font-size:13.5px}
+ul.src li{margin:5px 0;line-height:1.45}
+ul.src a{color:var(--accent-strong);word-break:break-all}
+.note{font-size:12.5px;color:var(--muted);background:var(--warn-soft);border-radius:9px;padding:8px 10px;margin-top:8px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+nav.tabs .in{display:flex;max-width:680px;width:100%}
+nav.tabs button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:9px 0 10px;min-height:56px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;display:none;max-width:90%}
+.toast.on{display:block}
+.foot{font-size:11.5px;color:var(--muted);margin:16px 2px 0}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><h1>脳卒中トレーニング</h1><small>症例と画像で<br>判断を練習</small></div>
+  <div class="summary"><span>回答 <b id="sN">0</b></span><span>正答率 <b id="sR">—</b></span><span>連続正解 <b id="sS">0</b></span></div>
+</header>
+
+<section class="view active" id="v-q" aria-label="出題">
+  <details class="card set" id="setBox">
+    <summary>出題範囲・設定 <span class="hint" id="setSum" style="margin:0 0 0 4px"></span></summary>
+    <div class="chips" id="catChips"></div>
+    <div class="row"><button class="btn sm" id="catAll" type="button">すべて</button><button class="btn sm" id="catNone" type="button">すべて外す</button></div>
+    <div class="row" style="margin-top:10px">
+      <label for="lvSel" style="font-size:14px">難易度</label>
+      <select id="lvSel"><option value="1">基本のみ</option><option value="2">標準まで</option><option value="3" selected>応用まで（すべて）</option></select>
+    </div>
+    <label class="sw"><input type="checkbox" id="imgOpt">画像のある問題だけ</label>
+    <label class="sw"><input type="checkbox" id="hideOpt">選択肢を隠して、先に自分で考える</label>
+    <label class="sw"><input type="checkbox" id="weakOpt" checked>間違えた問題・まだ解いていない問題を優先</label>
+    <p class="hint" id="setHint"></p>
+  </details>
+  <div id="qArea"></div>
+</section>
+
+<section class="view" id="v-a" aria-label="一覧">
+  <div class="card">
+    <h2>問題一覧</h2>
+    <input type="search" id="aQ" placeholder="キーワードで絞り込み（例：DOAC、ASPECTS）" aria-label="絞り込み">
+    <p class="hint">開くと問題・正解・解説が見られます。「この問題を解く」で出題画面に移ります。</p>
+  </div>
+  <div id="aList"></div>
+</section>
+
+<section class="view" id="v-s" aria-label="成績"><div id="sArea"></div></section>
+<section class="view" id="v-r" aria-label="出典"><div id="rArea"></div></section>
+
+<p class="foot">自分用の学習ツールです。画像はすべて自作の模式図で、実際の画像ではありません。症例は典型例をまとめたもので、診療の判断は診察・画像と原典（ガイドライン・指針・添付文書）で行ってください。成績はこの端末内にのみ保存されます。</p>
+</div>
+
+<div id="zoom" role="dialog" aria-modal="true" aria-label="図の拡大"><button type="button" id="zoomX">閉じる</button><div class="zb" id="zoomB"></div></div>
+
+<nav class="tabs" role="tablist" aria-label="画面切替"><div class="in">
+  <button role="tab" aria-selected="true" data-v="v-q" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg>出題</button>
+  <button role="tab" aria-selected="false" data-v="v-a" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg>一覧</button>
+  <button role="tab" aria-selected="false" data-v="v-s" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>成績</button>
+  <button role="tab" aria-selected="false" data-v="v-r" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 13h7M9 17h7"/></svg>出典</button>
+</div></nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== 模式図（すべて自作のSVG。実際の画像ではない） =====
+   座標系：1パネル 240×270。画像の左＝患者の右（放射線学的表示）。
+   半球の図形は「画像の右側（患者の左）」の座標で定義し、患者の右は鏡像にする。 */
+var IMG = (function () {
+  var CX = 120, CY = 138, RX = 92, RY = 116;
+  var PAL = {
+    ct:    { bg: "#000", skull: "#efefef", br: "#8b8b8b", deep: "#a3a3a3", wm: "#848484", csf: "#262626", early: "#6c6c6c", old: "#3e3e3e", blood: "#ececec", vessel: "#d6d6d6", ic: "#7c7c7c" },
+    cta:   { bg: "#000", skull: "#efefef", br: "#8f8f8f", deep: "#989898", wm: "#888", csf: "#2a2a2a", early: "#6c6c6c", old: "#3e3e3e", blood: "#ececec", vessel: "#f4f4f4", ic: "#808080" },
+    dwi:   { bg: "#000", skull: "#1c1c1c", br: "#4e4e4e", deep: "#5f5f5f", wm: "#4a4a4a", csf: "#121212", lesion: "#f5f5f5", ic: "#4a4a4a" },
+    flair: { bg: "#000", skull: "#202020", br: "#6a6a6a", deep: "#7b7b7b", wm: "#666", csf: "#111", lesion: "#dadada", ic: "#666" },
+    ctp:   { bg: "#000", skull: "#3a3a3a", br: "#2c2c2c", deep: "#303030", wm: "#2a2a2a", csf: "#0c0c0c", core: "#ff2d95", pen: "#2bd46b", ic: "#2a2a2a" }
+  };
+  function P(r) { return Math.round(r * 10) / 10; }
+  function ell(s, th) { var t = th * Math.PI / 180; return [CX + RX * s * Math.cos(t), CY + RY * s * Math.sin(t)]; }
+  /* 皮質のくさび（画像の右側＝患者の左） */
+  function wedge(a1, a2, s1, s2) {
+    var d = "", n = 14, i, p;
+    for (i = 0; i <= n; i++) { p = ell(s2, a1 + (a2 - a1) * i / n); d += (i ? "L" : "M") + P(p[0]) + "," + P(p[1]); }
+    for (i = n; i >= 0; i--) { p = ell(s1, a1 + (a2 - a1) * i / n); d += "L" + P(p[0]) + "," + P(p[1]); }
+    return d + "Z";
+  }
+  /* ASPECTS 領域（患者の左側の座標） */
+  var REG = {
+    C: "M130,101 Q138,97 144,104 Q146,114 141,122 Q134,124 131,117 Q129,108 130,101Z",
+    L: "M152,112 Q171,123 170,160 Q160,168 154,152 Q149,132 152,112Z",
+    IC: "M144,123 L149,117 L153,136 L158,166 L151,170 L146,141 Z",
+    I: "M173,110 Q182,140 173,172 L178,172 Q188,140 178,110 Z",
+    M1: wedge(-62, -22, 0.76, 0.985), M2: wedge(-22, 28, 0.76, 0.985), M3: wedge(28, 62, 0.76, 0.985),
+    M4: wedge(-62, -20, 0.42, 0.985), M5: wedge(-20, 25, 0.42, 0.985), M6: wedge(25, 62, 0.42, 0.985),
+    ACA_g: wedge(-90, -62, 0.5, 0.985), PCA_g: wedge(62, 90, 0.5, 0.985),
+    ACA_s: wedge(-90, -62, 0.2, 0.985), PCA_s: wedge(62, 90, 0.3, 0.985),
+    TH: "M122,146 Q140,141 145,157 Q142,172 126,172 Q122,160 122,146Z"
+  };
+  var LAB = { C: [137, 112], L: [161, 142], IC: [150, 128], I: [181, 152], M1: ell(0.87, -42), M2: ell(0.87, 3), M3: ell(0.87, 45), M4: ell(0.72, -41), M5: ell(0.72, 2), M6: ell(0.72, 43) };
+  function mir(svg) { return '<g transform="translate(240,0) scale(-1,1)">' + svg + "</g>"; }
+  function side(s, svg) { return s === "R" ? mir(svg) : svg; }
+  function both(svg) { return svg + mir(svg); }
+  function head(c, mod) {
+    var h = '<rect x="0" y="0" width="240" height="270" fill="' + c.bg + '"/>';
+    if (mod === "ct" || mod === "cta") h += '<ellipse cx="' + CX + '" cy="' + CY + '" rx="' + (RX + 6) + '" ry="' + (RY + 6) + '" fill="none" stroke="' + c.skull + '" stroke-width="7"/>';
+    else h += '<ellipse cx="' + CX + '" cy="' + CY + '" rx="' + (RX + 7) + '" ry="' + (RY + 7) + '" fill="none" stroke="' + c.skull + '" stroke-width="5"/>';
+    return h;
+  }
+  function brainBase(c) {
+    return '<ellipse cx="' + CX + '" cy="' + CY + '" rx="' + RX + '" ry="' + RY + '" fill="' + c.br + '"/>' +
+      '<path d="M120,22 L120,58 M120,216 L120,254" stroke="' + c.csf + '" stroke-width="2.4"/>';
+  }
+  /* 脳溝（皮質の目安） */
+  function sulci(c) {
+    var s = "", a = [-72, -46, -24, -2, 20, 42, 66];
+    a.forEach(function (t) { var p = ell(0.985, t), q = ell(0.945, t); s += '<path d="M' + P(p[0]) + "," + P(p[1]) + " L" + P(q[0]) + "," + P(q[1]) + '" stroke="' + c.csf + '" stroke-width="1.6"/>'; });
+    return both(s);
+  }
+  /* 基底核レベル */
+  function sliceBG(c, o) {
+    var dx = o.shift || 0, sq = o.squeeze || "";
+    var vent = function (sd) {
+      var comp = (sq === sd) ? 0.45 : 1;
+      var fh = "M121,90 Q" + (121 + 13 * comp) + ",93 " + (121 + 14 * comp) + ",107 Q" + (121 + 13 * comp) + ",121 " + (121 + 5 * comp) + ",128 L121,128 Z";
+      var at = "M124,184 Q" + (124 + 16 * comp) + ",186 " + (124 + 18 * comp) + ",198 Q" + (124 + 12 * comp) + ",205 124,201 Z";
+      return '<path d="' + fh + '" fill="' + (o.ivh ? c.blood : c.csf) + '"/><path d="' + at + '" fill="' + (o.ivh ? c.blood : c.csf) + '"/>';
+    };
+    var hemi = '<path d="' + REG.C + '" fill="' + c.deep + '"/><path d="' + REG.L + '" fill="' + c.deep + '"/><path d="' + REG.IC + '" fill="' + c.ic + '"/>' +
+      '<path d="' + REG.TH + '" fill="' + c.deep + '"/><path d="' + REG.I + '" fill="' + c.deep + '"/>' +
+      '<path d="M182,106 Q192,140 182,176" fill="none" stroke="' + c.csf + '" stroke-width="2.6"/><path d="M186,124 L208,116" stroke="' + c.csf + '" stroke-width="2"/>';
+    var g = '<g transform="translate(' + dx + ',0)">' + vent("L") + mir(vent("R")) +
+      '<rect x="118.5" y="140" width="3" height="26" rx="1.5" fill="' + (o.ivh ? c.blood : c.csf) + '"/></g>';
+    return hemi + mir(hemi) + g;
+  }
+  /* 放線冠レベル */
+  function sliceSup(c, o) {
+    var dx = o.shift || 0;
+    var v = '<path d="M121,98 Q133,104 134,140 Q133,176 121,186 Z" fill="' + (o.ivh ? c.blood : c.csf) + '"/>';
+    return '<g transform="translate(' + dx + ',0)">' + v + mir(v) + "</g>";
+  }
+  /* 鞍上部（中脳）レベル */
+  function sliceMid(c, o) {
+    var sah = o.sah, f = sah ? c.blood : c.csf;
+    var h = '<path d="M120,104 L136,114 L132,132 L108,132 L104,114 Z" fill="' + f + '"/>';
+    var sy = '<path d="M134,116 Q160,110 196,98" fill="none" stroke="' + f + '" stroke-width="' + (sah ? 5 : 2.6) + '" stroke-linecap="round"/>';
+    h += sy + mir(sy);
+    h += '<path d="M120,168 Q100,168 98,150 Q100,134 110,136 L120,146 L130,136 Q140,134 142,150 Q140,168 120,168Z" fill="' + c.deep + '"/>';
+    var amb = '<path d="M141,138 Q150,152 140,172" fill="none" stroke="' + f + '" stroke-width="' + (sah ? 4 : 2) + '"/>';
+    h += amb + mir(amb) + '<path d="M108,176 Q120,184 132,176" fill="none" stroke="' + f + '" stroke-width="' + (sah ? 5 : 2.4) + '"/>';
+    if (o.hdmca) { var m = '<path d="M136,117 Q158,112 184,104" fill="none" stroke="' + c.blood + '" stroke-width="3.2" stroke-linecap="round"/>'; h += side(o.hdmca, m); }
+    h += '<path d="M44,150 Q60,190 80,214 M196,150 Q180,190 160,214" stroke="' + c.csf + '" stroke-width="1.5" fill="none" opacity=".6"/>';
+    return h;
+  }
+  /* 後頭蓋窩レベル */
+  function slicePF(c, o) {
+    var h = '<rect x="0" y="0" width="240" height="270" fill="' + c.bg + '"/>';
+    h += '<ellipse cx="120" cy="150" rx="' + (RX + 4) + '" ry="' + (RY - 4) + '" fill="none" stroke="' + c.skull + '" stroke-width="7"/>';
+    h += '<ellipse cx="120" cy="150" rx="' + (RX - 4) + '" ry="' + (RY - 12) + '" fill="' + c.br + '"/>';
+    var pet = '<path d="M150,52 L196,118" stroke="' + c.skull + '" stroke-width="8" stroke-linecap="round"/>';
+    h += pet + mir(pet);
+    h += '<path d="M120,50 L120,86" stroke="' + c.skull + '" stroke-width="5"/>';
+    h += '<ellipse cx="120" cy="112" rx="24" ry="18" fill="' + c.deep + '"/>';
+    h += '<path d="M110,138 Q120,130 130,138 Q126,148 120,150 Q114,148 110,138Z" fill="' + (o.v4 === "cmp" ? c.br : c.csf) + '"/>';
+    h += '<path d="M120,152 L120,248" stroke="' + c.csf + '" stroke-width="1.6"/>';
+    var fol = ""; [0, 1, 2, 3].forEach(function (i) { fol += '<path d="M' + (138 + i * 3) + "," + (176 + i * 14) + " Q" + (170 + i * 2) + "," + (168 + i * 14) + " " + (196 - i * 6) + "," + (186 + i * 12) + '" fill="none" stroke="' + c.csf + '" stroke-width="1.2" opacity=".8"/>'; });
+    h += fol + mir(fol);
+    return h;
+  }
+  function blob(b, c) {
+    var col = b.f === "blood" ? c.blood : b.f === "old" ? c.old : b.f === "early" ? c.early : b.f === "core" ? c.core : b.f === "pen" ? c.pen : c.lesion;
+    var s = '<ellipse cx="' + b.x + '" cy="' + b.y + '" rx="' + b.rx + '" ry="' + (b.ry || b.rx) + '" fill="' + col + '"' + (b.rot ? ' transform="rotate(' + b.rot + " " + b.x + " " + b.y + ')"' : "") + (b.op ? ' opacity="' + b.op + '"' : "") + "/>";
+    return side(b.side || "L", s);
+  }
+  function regFill(o, c) {
+    var col = o.f === "early" ? c.early : o.f === "old" ? c.old : o.f === "core" ? c.core : o.f === "pen" ? c.pen : o.f === "blood" ? c.blood : c.lesion;
+    var s = o.r.map(function (k) { return '<path d="' + REG[k] + '" fill="' + col + '"' + (o.op ? ' opacity="' + o.op + '"' : "") + "/>"; }).join("");
+    return side(o.side || "L", s);
+  }
+  function labels(keys, sd, col) {
+    return keys.map(function (k) {
+      var p = LAB[k]; var x = sd === "R" ? 240 - p[0] : p[0];
+      return '<text x="' + P(x) + '" y="' + P(p[1] + 3) + '" font-size="8.5" font-weight="700" text-anchor="middle" fill="' + (col || "#ffd34d") + '" stroke="#000" stroke-width="2.2" paint-order="stroke">' + k + "</text>";
+    }).join("");
+  }
+  /* 1枚の軸位断 */
+  function axial(sp, after) {
+    var mod = sp.mod || "ct", c = PAL[mod], sl = sp.sl || "bg", o = sp.o || {};
+    var h;
+    if (sl === "pf") h = slicePF(c, o);
+    else {
+      h = head(c, mod) + brainBase(c) + sulci(c);
+      if (sl === "bg") h += sliceBG(c, o);
+      else if (sl === "sup") h += sliceSup(c, o);
+      else if (sl === "mid") h += sliceMid(c, o);
+    }
+    (sp.reg || []).forEach(function (r) { h += regFill(r, c); });
+    if (sl === "bg" || sl === "sup") {
+      /* 脳室など領域の上に重ねる構造（梗塞の塗りで脳室が消えないように） */
+      if (sl === "bg") { var dx = o.shift || 0; if ((sp.reg || []).length) h += '<g transform="translate(' + dx + ',0)">' + sliceBGvent(c, o) + "</g>"; }
+      if (sl === "sup" && (sp.reg || []).length) h += sliceSup(c, o);
+    }
+    (sp.blob || []).forEach(function (b) { h += blob(b, c); });
+    if (o.delta) {
+      h += '<path d="M120,226 L102,254 L138,254 Z" fill="#f2f2f2"/><path d="M120,236 L110,250 L130,250 Z" fill="#5a5a5a"/>';
+    }
+    if (o.cal) o.cal.forEach(function (k) {
+      h += '<line x1="' + k[0] + '" y1="' + k[1] + '" x2="' + k[2] + '" y2="' + k[3] + '" stroke="#ffd34d" stroke-width="1.4" stroke-dasharray="3 2"/>' +
+        '<text x="' + k[4] + '" y="' + k[5] + '" font-size="10" font-weight="700" fill="#ffd34d" stroke="#000" stroke-width="2" paint-order="stroke">' + k[6] + "</text>";
+    });
+    if (after && sp.lab) sp.lab.forEach(function (l) { h += labels(l.k, l.side || "L", l.col); });
+    if (after && sp.mark) sp.mark.forEach(function (m) {
+      var x = m.side === "R" ? 240 - m.x : m.x;
+      h += '<circle cx="' + x + '" cy="' + m.y + '" r="' + (m.r || 14) + '" fill="none" stroke="#ffd34d" stroke-width="2" stroke-dasharray="4 3"/>';
+      var ty = m.y + (m.r || 14) + 11; if (ty > 262) ty = m.y - (m.r || 14) - 5;
+      if (m.t) h += '<text x="' + x + '" y="' + ty + '" font-size="9" font-weight="700" text-anchor="middle" fill="#ffd34d" stroke="#000" stroke-width="2" paint-order="stroke">' + m.t + "</text>";
+    });
+    if (mod === "ctp" && sp.vol) {
+      h += '<rect x="6" y="226" width="228" height="40" rx="5" fill="#111" stroke="#444"/>' +
+        '<rect x="12" y="233" width="10" height="10" fill="' + c.core + '"/><text x="26" y="242" font-size="9.5" fill="#eee">rCBF&lt;30%：' + sp.vol[0] + ' mL</text>' +
+        '<rect x="122" y="233" width="10" height="10" fill="' + c.pen + '"/><text x="136" y="242" font-size="9.5" fill="#eee">Tmax&gt;6秒：' + sp.vol[1] + ' mL</text>' +
+        '<text x="12" y="259" font-size="9.5" fill="#eee">ミスマッチ体積 ' + (sp.vol[1] - sp.vol[0]) + ' mL ／ 比 ' + (sp.vol[1] / sp.vol[0]).toFixed(1) + "</text>";
+    }
+    return h;
+  }
+  function sliceBGvent(c, o) {
+    var sq = o.squeeze || "";
+    var vent = function (sd) {
+      var comp = (sq === sd) ? 0.45 : 1;
+      var fh = "M121,90 Q" + (121 + 13 * comp) + ",93 " + (121 + 14 * comp) + ",107 Q" + (121 + 13 * comp) + ",121 " + (121 + 5 * comp) + ",128 L121,128 Z";
+      var at = "M124,184 Q" + (124 + 16 * comp) + ",186 " + (124 + 18 * comp) + ",198 Q" + (124 + 12 * comp) + ",205 124,201 Z";
+      return '<path d="' + fh + '" fill="' + (o.ivh ? c.blood : c.csf) + '"/><path d="' + at + '" fill="' + (o.ivh ? c.blood : c.csf) + '"/>';
+    };
+    return vent("L") + mir(vent("R"));
+  }
+  /* MRA（ウィリス動脈輪の軸位MIP） */
+  function mra(sp) {
+    var oc = sp.occ || [], st = sp.sten || [];
+    var W = '<rect x="0" y="0" width="240" height="270" fill="#000"/>';
+    var seg = {
+      BA: "M120,218 L120,160", VAr: "M104,262 Q106,238 117,220", VAl: "M136,262 Q134,238 123,220",
+      P1r: "M120,160 Q108,156 100,154", P2r: "M100,154 Q78,162 74,190 Q72,212 82,232", P1l: "M120,160 Q132,156 140,154", P2l: "M140,154 Q162,162 166,190 Q168,212 158,232",
+      PCr: "M100,154 L98,132", PCl: "M140,154 L142,132",
+      ICAr: "M88,160 Q84,146 94,138 L98,132", ICAl: "M152,160 Q156,146 146,138 L142,132",
+      M1r: "M98,132 Q76,128 58,126", M1l: "M142,132 Q164,128 182,126",
+      M2r: "M58,126 Q44,112 30,96 M58,126 Q44,142 32,160", M2l: "M182,126 Q196,112 210,96 M182,126 Q196,142 208,160",
+      A1r: "M98,132 Q106,120 115,114", A1l: "M142,132 Q134,120 125,114", ACo: "M115,114 L125,114",
+      A2r: "M116,114 Q114,90 116,52", A2l: "M124,114 Q126,90 124,52"
+    };
+    var wid = { BA: 5.5, VAr: 4.5, VAl: 4.5, ICAr: 6, ICAl: 6, M1r: 4.6, M1l: 4.6, M2r: 3, M2l: 3, A1r: 3.4, A1l: 3.4, A2r: 3.2, A2l: 3.2, ACo: 2, P1r: 3.4, P1l: 3.4, P2r: 3, P2l: 3, PCr: 1.8, PCl: 1.8 };
+    Object.keys(seg).forEach(function (k) {
+      if (oc.indexOf(k) >= 0) return;
+      W += '<path d="' + seg[k] + '" fill="none" stroke="#f2f2f2" stroke-width="' + wid[k] + '" stroke-linecap="round" stroke-linejoin="round"/>';
+    });
+    if (sp.stub) sp.stub.forEach(function (s) { W += '<path d="' + s + '" fill="none" stroke="#f2f2f2" stroke-width="4.6" stroke-linecap="round"/>'; });
+    st.forEach(function (s) { W += '<circle cx="' + s[0] + '" cy="' + s[1] + '" r="4.5" fill="#000"/><path d="' + s[2] + '" stroke="#f2f2f2" stroke-width="1.4" fill="none"/>'; });
+    return W;
+  }
+  /* 頸動脈造影（側面）とNASCET計測 */
+  function angio(sp) {
+    var h = '<rect x="0" y="0" width="240" height="270" fill="#e9e9e9"/>';
+    var v = "#202020";
+    h += '<path d="M92,262 L92,170 Q92,150 104,138" fill="none" stroke="' + v + '" stroke-width="20" stroke-linecap="round"/>';
+    h += '<path d="M104,138 Q112,126 112,110 L112,104 Q112,96 113,88 L114,22" fill="none" stroke="' + v + '" stroke-width="13" stroke-linecap="round"/>';
+    h += '<ellipse cx="112" cy="104" rx="10" ry="9" fill="#e9e9e9"/><path d="M110,96 L110,112" stroke="' + v + '" stroke-width="3.6"/>';
+    h += '<path d="M90,152 Q80,130 64,112 Q56,96 58,70" fill="none" stroke="' + v + '" stroke-width="9" stroke-linecap="round"/>';
+    h += '<path d="M72,118 Q52,118 44,102" fill="none" stroke="' + v + '" stroke-width="4"/>';
+    h += '<line x1="150" y1="104" x2="122" y2="104" stroke="#c0392b" stroke-width="1.4"/><text x="146" y="98" font-size="10.5" fill="#c0392b" font-weight="700">a＝' + sp.a + ' mm</text><text x="146" y="118" font-size="9" fill="#c0392b">最狭窄部の径</text>';
+    h += '<line x1="150" y1="40" x2="124" y2="40" stroke="#1f5fa8" stroke-width="1.4"/><text x="146" y="34" font-size="10.5" fill="#1f5fa8" font-weight="700">b＝' + sp.b + ' mm</text><text x="146" y="54" font-size="9" fill="#1f5fa8">遠位の正常ICA径</text>';
+    h += '<text x="18" y="252" font-size="11" fill="#333">CCA</text><text x="120" y="70" font-size="11" fill="#333">ICA</text><text x="26" y="66" font-size="11" fill="#333">ECA</text>';
+    return h;
+  }
+  function panel(sp, after) {
+    if (sp.kind === "mra") return mra(sp);
+    if (sp.kind === "angio") return angio(sp);
+    return axial(sp, after);
+  }
+  function render(spec, after) {
+    /* 複数パネルは縦に並べる（スマホで1枚ずつ大きく見えるように） */
+    var ps = spec.panels || [spec], n = ps.length, gap = 6, H = 270 * n + gap * (n - 1);
+    var s = '<svg viewBox="0 0 240 ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + (spec.alt || "模式図") + '" font-family="-apple-system,Hiragino Sans,Noto Sans JP,sans-serif">';
+    ps.forEach(function (p, i) {
+      var y = i * (270 + gap), id = "cp" + Math.random().toString(36).slice(2, 8);
+      s += '<g transform="translate(0,' + y + ')"><clipPath id="' + id + '"><rect x="0" y="0" width="240" height="270" rx="6"/></clipPath><g clip-path="url(#' + id + ')">' + panel(p, after);
+      var dark = p.kind !== "angio";
+      s += '<text x="8" y="16" font-size="10.5" font-weight="700" fill="' + (dark ? "#fff" : "#111") + '" stroke="' + (dark ? "#000" : "#e9e9e9") + '" stroke-width="2.5" paint-order="stroke">' + (p.t || "") + "</text>";
+      if (p.kind !== "angio") s += '<text x="8" y="142" font-size="10" fill="#9fd3ff" font-weight="700">R</text><text x="226" y="142" font-size="10" fill="#9fd3ff" font-weight="700">L</text>';
+      s += "</g></g>";
+    });
+    return s + "</svg>";
+  }
+  return { render: render, REG: REG };
+})();
+
+</script>
+<script>
+/* ===== 出題データ =====
+   o: 選択肢 [本文, その選択肢についての一言]。先頭が正解（画面では並べ替える）。
+   r: 出典キー（REFS）。img: 模式図の指定（IMG.render）。 */
+var CATS = {
+  hy: "超急性期の評価",
+  iv: "静注血栓溶解（rt-PA）",
+  ev: "血栓回収",
+  im: "画像判読",
+  ic: "脳出血",
+  sa: "くも膜下出血",
+  pv: "病型・二次予防",
+  mg: "急性期管理・合併症",
+  sp: "TIA・特殊な原因"
+};
+
+var REFS = {
+  GL: ["日本脳卒中学会 脳卒中ガイドライン委員会編. 脳卒中治療ガイドライン2021［改訂2025］. 協和企画, 2025（改訂項目のPDF）", "https://www.jsts.gr.jp/img/guideline2021_kaitei2025_kaiteikoumoku.pdf", "GL2021［改訂2025］"],
+  RT: ["日本脳卒中学会 脳卒中医療向上・社会保険委員会. 静注血栓溶解（rt-PA）療法 適正治療指針 第三版（2019年3月、2023年9月追補）", "https://dementia-japan.org/wp-content/uploads/2024/05/rt_pa.pdf", "rt-PA適正治療指針 第三版"],
+  EV: ["日本脳卒中学会・日本脳神経外科学会・日本脳神経血管内治療学会. 経皮経管的脳血栓回収用機器 適正使用指針 第5版（日本脳卒中学会ウェブサイトに掲載）", null, "血栓回収 適正使用指針 第5版"],
+  ninds: ["NINDS rt-PA Stroke Study Group. Tissue plasminogen activator for acute ischemic stroke. N Engl J Med 1995;333:1581-1587.", "7477192", "NINDS"],
+  jact: ["Yamaguchi T, et al. Alteplase at 0.6 mg/kg for acute ischemic stroke within 3 hours of onset: J-ACT. Stroke 2006;37:1810-1815.", "16763187", "J-ACT"],
+  ecass3: ["Hacke W, et al. Thrombolysis with alteplase 3 to 4.5 hours after acute ischemic stroke (ECASS III). N Engl J Med 2008;359:1317-1329.", "18815396", "ECASS III"],
+  emb: ["Emberson J, et al. Effect of treatment delay, age, and stroke severity on the effects of intravenous thrombolysis with alteplase. Lancet 2014;384:1929-1935.", "25106063", "Emberson メタ解析"],
+  wake: ["Thomalla G, et al. MRI-guided thrombolysis for stroke with unknown time of onset (WAKE-UP). N Engl J Med 2018;379:611-622.", "29766770", "WAKE-UP"],
+  prisms: ["Khatri P, et al. Effect of alteplase vs aspirin on functional outcome for patients with acute ischemic stroke and minor nondisabling neurologic deficits (PRISMS). JAMA 2018;320:156-166.", "29998337", "PRISMS"],
+  aramis: ["Chen HS, et al. Dual antiplatelet therapy vs alteplase for patients with minor nondisabling acute ischemic stroke (ARAMIS). JAMA 2023;329:2135-2144.", "37367978", "ARAMIS"],
+  tflavor: ["T-FLAVOR（日本、テネクテプラーゼ0.25 mg/kg vs アルテプラーゼ0.6 mg/kg、主幹動脈閉塞）. 2026.", "42223935", "T-FLAVOR"],
+  hermes: ["Goyal M, et al. Endovascular thrombectomy after large-vessel ischaemic stroke: a meta-analysis of individual patient data from five randomised trials (HERMES). Lancet 2016;387:1723-1731.", "26898852", "HERMES"],
+  dawn: ["Nogueira RG, et al. Thrombectomy 6 to 24 hours after stroke with a mismatch between deficit and infarct (DAWN). N Engl J Med 2018;378:11-21.", "29129157", "DAWN"],
+  defuse3: ["Albers GW, et al. Thrombectomy for stroke at 6 to 16 hours with selection by perfusion imaging (DEFUSE 3). N Engl J Med 2018;378:708-718.", "29364767", "DEFUSE 3"],
+  limit: ["Yoshimura S, et al. Endovascular therapy for acute stroke with a large ischemic region (RESCUE-Japan LIMIT). N Engl J Med 2022;386:1303-1313.", "35138767", "RESCUE-Japan LIMIT"],
+  select2: ["Sarraj A, et al. Trial of endovascular thrombectomy for large ischemic strokes (SELECT2). N Engl J Med 2023;388:1259-1271.", "36762865", "SELECT2"],
+  angel: ["Huo X, et al. Trial of endovascular therapy for acute ischemic stroke with large infarct (ANGEL-ASPECT). N Engl J Med 2023;388:1272-1283.", "36762852", "ANGEL-ASPECT"],
+  laste: ["Costalat V, et al. Trial of thrombectomy for stroke with a large infarct of unrestricted size (LASTE). N Engl J Med 2024;390:1677-1689.", "38718358", "LASTE"],
+  attention: ["Tao C, et al. Trial of endovascular treatment of acute basilar-artery occlusion (ATTENTION). N Engl J Med 2022;387:1361-1372.", "36239644", "ATTENTION"],
+  baoche: ["Jovin TG, et al. Trial of thrombectomy 6 to 24 hours after stroke due to basilar-artery occlusion (BAOCHE). N Engl J Med 2022;387:1373-1384.", "36239645", "BAOCHE"],
+  escmevo: ["Goyal M, et al. Endovascular treatment of stroke due to medium-vessel occlusion (ESCAPE-MeVO). N Engl J Med 2025;392:1385-1395.", "39908448", "ESCAPE-MeVO"],
+  distal: ["Psychogios M, et al. Endovascular treatment for stroke due to occlusion of medium or distal vessels (DISTAL). N Engl J Med 2025;392:1374-1384.", "doi:10.1056/NEJMoa2408954", "DISTAL"],
+  chance: ["Wang Y, et al. Clopidogrel with aspirin in acute minor stroke or transient ischemic attack (CHANCE). N Engl J Med 2013;369:11-19.", "23803136", "CHANCE"],
+  point: ["Johnston SC, et al. Clopidogrel and aspirin in acute ischemic stroke and high-risk TIA (POINT). N Engl J Med 2018;379:215-225.", "29766750", "POINT"],
+  inspires: ["Gao Y, et al. Dual antiplatelet treatment up to 72 hours after ischemic stroke (INSPIRES). N Engl J Med 2023;389:2413-2424.", "38157499", "INSPIRES"],
+  cspscom: ["Toyoda K, et al. Dual antiplatelet therapy using cilostazol for secondary prevention in patients with high-risk ischaemic stroke in Japan (CSPS.com). Lancet Neurol 2019;18:539-548.", "31122494", "CSPS.com"],
+  elan: ["Fischer U, et al. Early versus later anticoagulation for stroke with atrial fibrillation (ELAN). N Engl J Med 2023;388:2411-2421.", "37222476", "ELAN"],
+  optimas: ["Werring DJ, et al. Optimal timing of anticoagulation after acute ischaemic stroke with atrial fibrillation (OPTIMAS). Lancet 2024;404:1731-1741.", "39491870", "OPTIMAS"],
+  nascet: ["North American Symptomatic Carotid Endarterectomy Trial Collaborators. Beneficial effect of carotid endarterectomy in symptomatic patients with high-grade carotid stenosis. N Engl J Med 1991;325:445-453.", "1852179", "NASCET"],
+  sammpris: ["Chimowitz MI, et al. Stenting versus aggressive medical therapy for intracranial arterial stenosis (SAMMPRIS). N Engl J Med 2011;365:993-1003.", "21899409", "SAMMPRIS"],
+  treatcad: ["Engelter ST, et al. Aspirin versus anticoagulation in cervical artery dissection (TREAT-CAD). Lancet Neurol 2021;20:341-350.", "33765420", "TREAT-CAD"],
+  abcd2: ["Johnston SC, et al. Validation and refinement of scores to predict very early stroke risk after transient ischaemic attack (ABCD2). Lancet 2007;369:283-292.", "17258668", "ABCD2"],
+  interact2: ["Anderson CS, et al. Rapid blood-pressure lowering in patients with acute intracerebral hemorrhage (INTERACT2). N Engl J Med 2013;368:2355-2365.", "23713578", "INTERACT2"],
+  interact3: ["Ma L, et al. The third Intensive Care Bundle with Blood Pressure Reduction in Acute Cerebral Haemorrhage Trial (INTERACT3). Lancet 2023;402:27-40.", "37245517", "INTERACT3"],
+  annexa: ["Connolly SJ, et al. Andexanet for factor Xa inhibitor-associated acute intracerebral hemorrhage (ANNEXA-I). N Engl J Med 2024;390:1745-1755.", "38749032", "ANNEXA-I"],
+  reverse: ["Pollack CV Jr, et al. Idarucizumab for dabigatran reversal — full cohort analysis (RE-VERSE AD). N Engl J Med 2017;377:431-441.", "doi:10.1056/NEJMoa1707278", "RE-VERSE AD"],
+  vahedi: ["Vahedi K, et al. Early decompressive surgery in malignant infarction of the middle cerebral artery: a pooled analysis of three randomised controlled trials. Lancet Neurol 2007;6:215-222.", "17303527", "DECIMAL・DESTINY・HAMLET統合解析"],
+  sah: ["Hoh BL, et al. 2023 Guideline for the management of patients with aneurysmal subarachnoid hemorrhage (AHA/ASA). Stroke 2023;54:e314-e370.", "37212182", "AHA/ASA aSAH 2023"]
+};
+
+var QS = [
+/* ───────── 超急性期の評価 ───────── */
+{id:"hy1",c:"hy",lv:1,
+ s:"68歳男性。前夜23時の就寝時は普段どおりだった。朝6時に起床したときから右片麻痺と失語があり、家族が6時15分に発見して救急要請した。",
+ q:"静注血栓溶解の時間を数える起点はどれか。",
+ o:[["23時（最終健常確認時刻）","発症時刻が不明なときは、無症状が最後に確認された時刻を起点にする"],
+    ["6時（起床時刻＝症状に気づいた時刻）","発見時刻は発症時刻ではない"],
+    ["6時15分（家族が発見した時刻）","発見時刻は発症時刻ではない"],
+    ["救急隊が接触した時刻","病院前の時刻は起点にならない"]],
+ e:"指針の定義では、発症時刻は「本人または目撃者が報告した時刻」、不明なら「最終健常確認時刻」で、発見された時刻ではない。この例は23時から7時間を超えており、通常の4.5時間の枠外。ただし発見から4.5時間以内に開始でき、MRIでDWI-FLAIRミスマッチ（DWIの病変がFLAIRで不明瞭）があれば、静注血栓溶解を考慮できる（推奨度C、WAKE-UPの根拠）。主幹動脈閉塞があれば血栓回収の時間窓（24時間以内）も並行して検討する。",
+ k:["起点＝最終健常確認時刻（夜中にトイレで起きて普段どおりだったなら、その時刻）","起床時発症でもDWI-FLAIRミスマッチがあれば静注血栓溶解を考慮"],
+ r:["RT","wake","GL"]},
+{id:"hy2",c:"hy",lv:1,
+ s:"74歳女性。2型糖尿病でスルホニル尿素薬を内服。昼食を抜いた午後に右片麻痺と構音障害で搬送。来院時血圧168/90 mmHg、簡易血糖38 mg/dL。",
+ q:"最初に行うことはどれか。",
+ o:[["ブドウ糖を静注して血糖を補正し、神経症候を再評価する","低血糖は代表的なstroke mimic"],
+    ["ただちにアルテプラーゼを開始する","補正前の血糖50 mg/dL未満は適応外項目"],
+    ["血糖は無視してCTAを先に撮る","画像は並行して進めてよいが、低血糖の補正が先"],
+    ["低血糖は適応外なので、補正しても静注血栓溶解は行えない","補正後も症状が続き脳梗塞と診断できれば適応外にはしない"]],
+ e:"指針の適応外項目は「血糖補正後も50 mg/dL未満、または400 mg/dL超」。補正後も症状が続き脳梗塞と診断できる場合は適応外としない。ただし低血糖では補正後も症状がしばらく残ることがあり、特に慎重に判断する。治療開始前に血糖と血小板数は必ず測る（血小板は、肝硬変・血液疾患の既往がなければ結果を待たずに開始してよい）。",
+ k:["治療前に必ず血糖を測る","適応外は「補正後も」50未満／400超"],
+ r:["RT"]},
+{id:"hy3",c:"hy",lv:2,
+ s:"62歳男性。発症1時間で来院時NIHSS 12（左片麻痺・半側空間無視）。CTで出血なし、ASPECTS 9。CTAで右M1閉塞。到着から20分でNIHSS 5まで改善してきた。発症前mRS 0。",
+ q:"対応として最も適切なのはどれか。",
+ o:[["静注血栓溶解の適応を検討しつつ、血栓回収の準備を止めない","主幹動脈閉塞が残る限り再増悪しうる"],
+    ["改善しているので抗血小板薬だけで経過をみる","閉塞が残る軽症化は再増悪のリスクが高い"],
+    ["TIAとして外来でDAPTを開始する","画像で閉塞があり症状も残っており、TIAとして扱わない"],
+    ["症候の急速な軽症化は適応外項目なので、再開通療法は行わない","急速な軽症化は「慎重投与」であり、適応外ではない"]],
+ e:"「症候の急速な軽症化」は適応外ではなく慎重投与項目。主幹動脈閉塞が残る場合は側副血行で一時的に良くなっていることがあり、再増悪しうる。前方循環の軽症例（NIHSS 6未満）でも、6時間以内の血栓回収は考慮しても良い（推奨度C）。改善の程度・閉塞部位・残る障害の重さで判断する。",
+ k:["急速な軽症化＝慎重投与（適応外ではない）","閉塞が残る軽症化は再増悪に注意"],
+ r:["RT","GL"]},
+{id:"hy4",c:"hy",lv:2,
+ s:"70歳女性。てんかんの既往なし。家族の前で突然倒れ、1分ほど全身性のけいれん。その後、左片麻痺が残る。発症から70分、CTで出血なし。CTAで右M1閉塞。",
+ q:"最も適切な判断はどれか。",
+ o:[["脳梗塞として再開通療法を検討する（けいれんは慎重投与項目）","血管画像で責任病変があれば、Todd麻痺と決めつけない"],
+    ["けいれん後なのでTodd麻痺として経過観察する","M1閉塞が確認されている"],
+    ["けいれんがあれば静注血栓溶解は禁忌である","「既往歴などからてんかんの可能性が高い」場合だけ適応外"],
+    ["まず抗てんかん薬を負荷し、24時間後に再評価する","再開通療法の時間を失う"]],
+ e:"指針では「痙攣」は慎重投与項目で、既往歴などからてんかんの可能性が高い場合に限り適応外。発症時のけいれんは脳梗塞でも起こる。CTA・MRAで閉塞を確認できれば、脳梗塞として扱う根拠になる。",
+ k:["けいれん＝慎重投与（てんかんの可能性が高いときだけ適応外）","迷ったら血管画像で閉塞の有無を確認"],
+ r:["RT"]},
+{id:"hy5",c:"hy",lv:2,
+ s:"NIHSSの評価中。右上下肢は完全麻痺（MMT 0）で、指鼻試験・踵膝試験ができない。",
+ q:"項目7「運動失調」の採点はどれか。",
+ o:[["0点","麻痺で行えない場合は失調なしとして0点"],["1点","1肢に失調がある場合"],["2点","2肢に失調がある場合"],["UN（評価不能）","切断・関節固定などの場合だけUN"]],
+ e:"NIHSSの運動失調は、筋力低下では説明できない失調だけを数える。完全麻痺で試験ができない場合や、理解できない場合は0点。採点できないのは切断や関節固定の場合だけ（UNとし理由を記載）。",
+ k:["失調は「麻痺に見合わない」ものだけを数える"],
+ r:[]},
+{id:"hy6",c:"hy",lv:1,
+ s:"脳梗塞疑いで救急搬送の予告があった。",
+ q:"静注血栓溶解の開始時間の目標として、ガイドラインが勧めるのはどれか。",
+ o:[["来院後できるだけ早く、遅くとも1時間以内","来院から投与開始までの時間（door-to-needle）"],["発症から6時間以内であれば急がなくてよい","アルテプラーゼの枠は原則4.5時間で、早いほど効果が大きい"],["来院後2時間以内","目標としては長すぎる"],["MRI・MRA・CTPをすべて撮り終えてから","静注血栓溶解の開始に血管評価は必須ではない"]],
+ e:"GLは、来院後できるだけ早く（遅くとも1時間以内に）開始することを勧める（推奨度A）。治療開始が早いほど効果は大きい（Emberson）。指針は、静注血栓溶解の開始に血管評価は必須ではないが、血栓回収を考える場合は開始直後までにCTA・MRAで主幹動脈閉塞を診断する、としている。来院前からの準備（第一報で院内に連絡）も推奨。",
+ k:["来院〜開始は60分以内（できれば短く）","血管評価は静注開始を遅らせない範囲で並行"],
+ r:["GL","RT","emb"]},
+
+/* ───────── 静注血栓溶解 ───────── */
+{id:"iv1",c:"iv",lv:1,
+ s:"体重70 kgの患者にアルテプラーゼ（アクチバシン、グルトパ）を投与する。",
+ q:"正しい投与法はどれか。",
+ o:[["総量42 mg：4.2 mgを1〜2分で急速静注、残り37.8 mgを1時間で持続静注","0.6 mg/kg、10%を急速投与・残りを1時間"],["総量63 mg：6.3 mgを急速静注、残りを1時間","0.9 mg/kgは海外用量。国内は0.6 mg/kg"],["総量42 mg：全量を1時間で持続静注","10%の急速投与がある"],["総量42 mg：半量を急速静注、残りを30分","投与法が違う"]],
+ e:"国内の用量は0.6 mg/kg（34.8万国際単位/kg）。その10%を1〜2分かけて急速投与し、残りを1時間で持続静注する。最大60 mg。国内用量はJ-ACTが根拠。",
+ k:["0.6 mg/kg、最大60 mg","10%を急速静注 → 残り90%を60分"],
+ r:["RT","jact"]},
+{id:"iv2",c:"iv",lv:1,
+ s:"体重110 kgの男性。アルテプラーゼの適応あり。",
+ q:"投与量はどれか。",
+ o:[["総量60 mg（6 mgを急速静注、54 mgを1時間）","最大量60 mgで頭打ち"],["総量66 mg","上限を超えている"],["総量99 mg","0.9 mg/kgで計算している"],["総量48 mg","根拠のない減量"]],
+ e:"0.6×110＝66 mgだが、最大投与量は60 mg（3,480万国際単位）。その10%（6 mg）を急速投与し、54 mgを1時間で投与する。",
+ k:["100 kgを超えたら60 mgで固定"],
+ r:["RT"]},
+{id:"iv3",c:"iv",lv:1,
+ s:"発症2時間。CTで出血なし、そのほかの適応外項目なし。血圧198/104 mmHg。",
+ q:"対応として正しいのはどれか。",
+ o:[["静注降圧薬（例：ニカルジピン〈ペルジピン〉）で185/110 mmHg未満にしてから開始する","降圧で解決できる適応外項目"],["185 mmHgを超えているので静注血栓溶解は行えない","降圧後も185/110以上が続く場合に適応外"],["血圧はそのままで開始し、投与後に下げる","投与前に185/110未満にする"],["収縮期140 mmHg未満まで下げてから開始する","過度な降圧は不要"]],
+ e:"適応外項目は「降圧療法後も収縮期185 mmHg以上、拡張期110 mmHg以上」。迅速な降圧で解決できる項目で、静注降圧薬で185/110未満を維持できない場合に適応外となる。投与開始後24時間は180/105 mmHg以下に保つ。",
+ k:["投与前：185/110未満","投与後24時間：180/105以下"],
+ r:["RT"]},
+{id:"iv4",c:"iv",lv:1,
+ s:"アルテプラーゼ持続静注の開始40分後、激しい頭痛と嘔吐が出現し、NIHSSが4点悪化した。血圧204/110 mmHg。",
+ q:"まず行うことはどれか。",
+ o:[["ただちに投与を中止し、緊急CTを撮る","頭蓋内出血を疑う"],["投与を続けたまま経過をみる","症状増悪時は投与を止める"],["投与速度を半分に落とす","中止が原則"],["降圧だけを行い、投与は続ける","まず中止して出血を確認"]],
+ e:"指針の投与後管理：激しい頭痛、悪心・嘔吐、急激な血圧上昇、神経症候の悪化があれば、脳出血・出血性梗塞を疑って緊急CTを行い、投与中ならただちに中止する。神経評価は少なくとも投与開始から8時間は30分ごと、8〜24時間は1時間ごと。血圧は2時間まで15分ごと、2〜8時間は30分ごと、8〜24時間は1時間ごとに測り、180/105 mmHgを超えないようにする。",
+ k:["悪化＝中止して緊急CT","症候性頭蓋内出血の多くは治療後36時間以内"],
+ r:["RT"]},
+{id:"iv5",c:"iv",lv:2,
+ s:"82歳女性。心房細動でアピキサバン（エリキュース）5 mg 1日2回を内服。最終服用は来院の3時間前。発症1.5時間、NIHSS 16、CTで出血なし、CTAで左M1閉塞。PT-INR 1.1。",
+ q:"最も適切なのはどれか。",
+ o:[["静注血栓溶解は行わず、血栓回収を行う","DOAC最終服用4時間以内は凝固マーカーにかかわらず適応外"],["PT-INRが正常なので静注血栓溶解を行う","服薬直後は凝固マーカーが正常でも効果が残る"],["アンデキサネット アルファで中和してから静注血栓溶解","中和して静注血栓溶解を行うことは推奨されない"],["81歳以上なので再開通療法はすべて行わない","年齢は慎重投与で、血栓回収は年齢だけで除外しない"]],
+ e:"第三版では、DOAC最終服用後4時間以内が確認できれば凝固マーカーにかかわらず静注血栓溶解の適応外。国内アンケートで、服用後4時間以内の治療は無症候性脳出血が多かった。主幹動脈閉塞があれば血栓回収で対応する。ダビガトランだけは例外で、イダルシズマブで中和したうえで静注血栓溶解を考慮しても良い（C1）。",
+ k:["DOAC服用4時間以内＝静注血栓溶解は適応外","主幹動脈閉塞なら血栓回収へ"],
+ r:["RT","GL"]},
+{id:"iv6",c:"iv",lv:2,
+ s:"76歳男性。ダビガトラン（プラザキサ）110 mg 1日2回を内服、最終服用は2時間前。発症1時間、NIHSS 9、主幹動脈閉塞なし。aPTT 48秒。",
+ q:"指針に沿った選択肢はどれか。",
+ o:[["イダルシズマブ（プリズバインド）5 gで中和したのち、静注血栓溶解を考慮しても良い","ダビガトランだけに許される例外（C1）"],["プロトロンビン複合体で中和して静注血栓溶解","中和薬で是正してからの静注血栓溶解は推奨されない（ダビガトランは別）"],["aPTTが延長しているので、どんな方法でも静注血栓溶解はできない","イダルシズマブ使用後は適応外項目とならない"],["ヘパリンに置き換えて24時間後に静注血栓溶解","時間窓を過ぎる"]],
+ e:"指針の推奨14：ダビガトラン服用患者で、凝固マーカーや最終服用時間で適応外とみなされた場合も、イダルシズマブを用いた後に静注血栓溶解を行うことを考慮しても良い【C1，低】。一方、ワルファリンにプロトロンビン複合体、ヘパリンにプロタミンを使って指標を是正してから行うことは推奨されない（凝固能を高め脳梗塞を悪化させうる）。",
+ k:["ダビガトラン＋イダルシズマブ → 静注血栓溶解を考慮可","PCC・プロタミンでの是正後は推奨されない"],
+ r:["RT","reverse"]},
+{id:"iv7",c:"iv",lv:2,
+ s:"80歳女性。ワルファリン（ワーファリン）内服中、PT-INR 2.3。発症2時間、NIHSS 18、CTAで右ICA終末部閉塞。",
+ q:"最も適切なのはどれか。",
+ o:[["静注血栓溶解は行わず、血栓回収を検討する","PT-INR 1.7超は静注血栓溶解の適応外"],["プロトロンビン複合体（ケイセントラ）でINRを是正してから静注血栓溶解","是正後の再開通治療は推奨されない"],["ビタミンKを静注して1時間後に静注血栓溶解","同上"],["INRが3未満なので静注血栓溶解を行う","国内の基準は1.7"]],
+ e:"PT-INR 1.7超は静注血栓溶解の適応外。プロトロンビン複合体で指標を是正した後に再開通治療（静注血栓溶解または機械的血栓回収）を行うことは推奨されない。血栓回収は抗凝固療法中も選択肢になる（機器によっては添付文書でINR 3.0超などを禁忌としているので確認）。",
+ k:["INR＞1.7＝静注血栓溶解は適応外","中和して再開通治療に持ち込まない"],
+ r:["RT"]},
+{id:"iv8",c:"iv",lv:2,
+ s:"発症1.5時間の脳梗塞。肝硬変・血液疾患の既往なし。CTで出血なし、適応外項目なし。採血は提出したが血算の結果がまだ出ていない。",
+ q:"正しい対応はどれか。",
+ o:[["結果を待たずに開始してよい。10万/mm³以下と判明したら速やかに中止する","肝硬変・血液疾患の既往がない場合の扱い"],["血小板数が出るまで開始してはならない","既往がなければ待たなくてよい"],["凝固系の結果もすべて揃うまで待つ","抗凝固薬内服がなければ待たない"],["血小板輸血を先に行う","根拠がない"]],
+ e:"治療開始前に血糖と血小板数は必ず測定するが、肝硬変・血液疾患の病歴がない患者では、血小板数の確認前に開始することは容認される。開始後に10万/mm³以下と判明したら速やかに中止する。凝固マーカーは抗凝固薬内服中や凝固異常症の場合に確認する。",
+ k:["血糖は必須・血小板は既往がなければ結果を待たない"],
+ r:["RT"]},
+{id:"iv9",c:"iv",lv:2,
+ s:"88歳女性。発症前mRS 0で一人暮らし。発症2時間、NIHSS 10、CTで出血なし、ASPECTS 9、適応外項目なし。",
+ q:"年齢の扱いとして正しいのはどれか。",
+ o:[["81歳以上は慎重投与。年齢だけで除外せず、ほかの条件とあわせて判断する","年齢は適応外項目ではない"],["80歳を超えると適応外","81歳以上は慎重投与"],["85歳以上は用量を0.3 mg/kgに減らす","減量の規定はない"],["高齢者は血栓回収だけを行う","主幹動脈閉塞がなければ血栓回収の対象ではない"]],
+ e:"指針で年齢81歳以上は慎重投与項目。アルテプラーゼの個票メタ解析（Emberson）では、80歳を超える患者でも治療開始が早いほど効果があり、年齢・重症度によらず効果が示された。",
+ k:["81歳以上＝慎重投与","早く始めるほど効果が大きい"],
+ r:["RT","emb"]},
+{id:"iv10",c:"iv",lv:2,
+ s:"58歳男性。発症2時間。右手のしびれと軽い構音障害だけで、日常生活の動作に支障はない（NIHSS 2、非障害性）。主幹動脈閉塞なし。",
+ q:"ガイドラインの考え方に最も近いのはどれか。",
+ o:[["アルテプラーゼの代わりに、DAPT（アスピリン〈バイアスピリン〉＋クロピドグレル〈プラビックス〉）を考慮しても良い","PRISMSでIVTの上乗せなし、ARAMISでDAPTが非劣性"],["NIHSSにかかわらず全例でアルテプラーゼを投与すべき","非障害性の軽症では上乗せ効果が示されていない"],["軽症なので抗血栓薬は不要","再発予防の治療は必要"],["血栓回収を行う","主幹動脈閉塞がない"]],
+ e:"「軽症」は指針の慎重投与項目。非障害性の軽症（NIHSS 0〜5で日常生活に支障がない）では、PRISMSでアルテプラーゼの上乗せ効果は示されず、症候性頭蓋内出血が増えた。ARAMISではDAPTがアルテプラーゼに非劣性だった。GLは非障害性軽症でDAPTを考慮しても良い（推奨度C）とする。一方、失語・半盲・巧緻運動障害など「障害性」の軽症は静注血栓溶解の対象になりうる。",
+ k:["軽症は「障害性か」で分ける","非障害性軽症→DAPTも選択肢"],
+ r:["GL","prisms","aramis","RT"]},
+{id:"iv11",c:"iv",lv:3,
+ s:"アルテプラーゼ投与後10時間。経過は良好で頭部画像は未再検。看護師から「深部静脈血栓症予防と再発予防のため、アスピリンとヘパリンを開始してよいか」と聞かれた。",
+ q:"指針に沿った返答はどれか。",
+ o:[["抗血小板薬・抗凝固薬は24時間後の画像で出血がないことを確認してから。DVT予防のヘパリン（1万単位以下）は出血リスクを考えて使用可","投与後24時間は抗血栓療法を制限"],["すぐにアスピリンを開始してよい","24時間以内の抗血小板薬は原則避ける"],["72時間は一切の抗血栓薬・ヘパリンを使えない","DVT予防のヘパリンは使用可能"],["抗血栓薬は退院まで開始しない","24時間後に画像で確認して開始する"]],
+ e:"原則としてアルテプラーゼ投与後24時間以内は、抗凝固薬・抗血小板薬・血栓溶解薬を投与しない。ただし血管造影時や深部静脈血栓症予防目的のヘパリン（1万単位以下）は、頭蓋内出血の危険を考慮したうえで使用可能。再発予防の抗血栓薬を始める前にCTまたはMRIを行うことが勧められる。経鼻胃管・膀胱カテーテル・動脈ラインの挿入も投与直後を避け、なるべく遅らせる。",
+ k:["投与後24時間は抗血栓療法を制限","開始前に画像で出血を確認"],
+ r:["RT"]},
+{id:"iv12",c:"iv",lv:3,
+ s:"74歳男性。アルツハイマー病でレカネマブ（レケンビ）を投与中。発症1時間、NIHSS 8。CTで出血なし。",
+ q:"静注血栓溶解の判断で、まず確認すべきことはどれか。",
+ o:[["MRIでARIA（脳浮腫・微小出血など）の有無を確認する。ARIAがあれば適応外、なければ慎重投与","2023年9月の追補"],["抗Aβ抗体薬は無関係なので通常どおり投与","rt-PA後の多発脳出血の報告がある"],["抗Aβ抗体薬投与中は一律に禁忌","ARIAなしは慎重投与"],["アミロイドPETを撮ってから決める","時間を失う"]],
+ e:"レカネマブ投与中にアルテプラーゼ投与後、多発脳内出血で死亡した報告を受け、指針は2023年9月に追補された。抗Aβ抗体薬（レカネマブ〈レケンビ〉、ドナネマブ〈ケサンラ〉）投与中でMRI上ARIAがあれば適応外、ARIAがなければ慎重投与。投与中かどうかを病歴で必ず聞く。",
+ k:["抗Aβ抗体薬の投与歴を必ず聴取","ARIAあり＝適応外"],
+ r:["RT"]},
+{id:"iv13",c:"iv",lv:3,
+ s:"研修医から「テネクテプラーゼのほうが単回静注で簡便なので、うちでも使えないか」と質問された（2026年11月時点）。",
+ q:"正しい説明はどれか。",
+ o:[["国内では未承認。国内で使う静注血栓溶解薬はアルテプラーゼ（アクチバシン、グルトパ）0.6 mg/kg","T-FLAVORなど国内試験の報告はあるが承認前"],["国内でも0.25 mg/kgで承認されている","未承認"],["アルテプラーゼより出血が多いので使われない","承認されていないのが理由"],["4.5時間を超えた例にだけ使える","未承認"]],
+ e:"テネクテプラーゼは2026年11月時点で国内未承認。国内のT-FLAVOR（主幹動脈閉塞例、テネクテプラーゼ0.25 mg/kg vs アルテプラーゼ0.6 mg/kg）では血栓回収前の再灌流が多かったが、90日の機能転帰に有意差はなかった。指針は「アルテプラーゼ以外のrt-PA製剤の投与は、わが国において十分な科学的根拠がない」としている。",
+ k:["国内の静注薬はアルテプラーゼ0.6 mg/kgのみ"],
+ r:["RT","tflavor"]},
+
+/* ───────── 血栓回収 ───────── */
+{id:"ev1",c:"ev",lv:1,
+ s:"66歳女性。発症90分、NIHSS 17（失語・右片麻痺）。発症前mRS 0。CTで出血なし、ASPECTS 8。CTAで左M1閉塞。静注血栓溶解の適応外項目なし。",
+ q:"最も適切な治療方針はどれか。",
+ o:[["アルテプラーゼを開始し、効果を待たずに血栓回収を行う","静注血栓溶解の効果確認のために血栓回収を遅らせない"],["アルテプラーゼだけ行い、1時間後の改善をみて血栓回収を決める","遅らせると転帰が悪くなる"],["血栓回収だけを行い、アルテプラーゼは使わない","適応があればアルテプラーゼを先に投与"],["抗血小板薬とエダラボンで保存的に治療","主幹動脈閉塞は再開通療法の適応"]],
+ e:"ICA・M1閉塞、発症6時間以内、発症前mRS 0〜1、NIHSS 6以上、ASPECTS 6以上は、静注血栓溶解を含む内科治療に追加して血栓回収を行うよう勧められる（推奨度A、HERMES）。静注血栓溶解を行った場合も、効果確認のために血栓回収の開始を遅らせてはならない（再灌流が1時間遅れると転帰良好が約2割減る）。",
+ k:["静注できる人は静注しつつ回収へ","効果を待たない"],
+ r:["GL","RT","hermes","EV"]},
+{id:"ev2",c:"ev",lv:2,
+ img:{panels:[{t:"CT灌流画像",mod:"ctp",sl:"bg",reg:[{r:["M1","M2","M3","I"],f:"pen"},{r:["L"],f:"core"}],vol:[14,112]},{t:"MRA",kind:"mra",occ:["M1l","M2l"],stub:["M142,132 Q150,131 156,130"]}],alt:"CT灌流画像で小さいコアと大きな低灌流域、MRAで左M1閉塞"},
+ s:"71歳男性。最終健常確認から10時間（起床時発症）。NIHSS 15、発症前mRS 0。ASPECTS 8。図はCT灌流画像とMRA。",
+ q:"最も適切な方針はどれか。",
+ o:[["血栓回収を行う（救済可能領域が十分にある）","DEFUSE 3・DAWNの選択基準に合う"],["発症6時間を超えているので保存的治療","画像で救済可能領域を確認できれば24時間以内まで"],["アルテプラーゼを投与する","最終健常確認から4.5時間を超え、DWI-FLAIRミスマッチの確認もない"],["24時間後のMRIを待って決める","時間とともに救済可能領域は失われる"]],
+ e:"コア（rCBF<30%）14 mL、低灌流（Tmax>6秒）112 mL、ミスマッチ比8.0・体積98 mLで、DEFUSE 3の基準（コア<70 mL、比≥1.8、ミスマッチ体積≥15 mL）を満たす。ICA・M1閉塞で6時間を超える場合も、救済可能領域が十分と判定されれば24時間以内の血栓回収が勧められる（推奨度A）。",
+ k:["6〜24時間は画像で救済可能領域を確認","DEFUSE 3：コア<70 mL・比≥1.8・体積≥15 mL"],
+ r:["GL","defuse3","dawn","EV"]},
+{id:"ev3",c:"ev",lv:2,
+ s:"72歳男性。発症5時間。NIHSS 20、発症前mRS 0。DWIでASPECTS 4、MRAで右ICA終末部閉塞。",
+ q:"現在の国内ガイドラインに沿った判断はどれか。",
+ o:[["血栓回収は妥当（推奨度B）。頭蓋内出血は増えることを説明する","RESCUE-Japan LIMITなど複数のRCT"],["ASPECTS 6未満なので血栓回収は行わない","以前の基準。現在はASPECTS 3〜5も対象"],["静注血栓溶解だけを行う","広汎な早期虚血性変化は静注血栓溶解の適応外になりうる"],["外減圧術を先に行う","まず再開通療法を検討"]],
+ e:"ASPECTS 3〜5の広範囲虚血でも、24時間以内のICA・M1閉塞に対する血栓回収は妥当（推奨度B）。RESCUE-Japan LIMIT（mRS 0〜3：31% vs 13%）、SELECT2、ANGEL-ASPECTで有効性が示された。一方、頭蓋内出血全体は増える（LIMITで58% vs 31%）。",
+ k:["ASPECTS 3〜5、24時間以内＝推奨度B","出血は増える"],
+ r:["GL","limit","select2","angel"]},
+{id:"ev4",c:"ev",lv:3,
+ s:"65歳女性。発症4時間。NIHSS 22。CTでASPECTS 1、CTAで左M1閉塞。発症前mRS 0。家族は「できることはしてほしい」と希望。",
+ q:"現在のエビデンスに基づく説明として最も適切なのはどれか。",
+ o:[["6.5時間以内なら血栓回収を考慮しても良い（推奨度C）。死亡は減るが、多くは要介助のまま残る","LASTE：mRS中央値4 vs 6"],["ASPECTS 3未満は血栓回収で転帰良好（mRS 0〜2）が半数を超える","生存しても多くが要介助"],["ASPECTS 3未満は血栓回収の適応外と明記されている","改訂2025で推奨度Cとして加わった"],["血栓回収で死亡は増える","LASTEでは死亡は減った（36% vs 56%）"]],
+ e:"GL改訂2025では、ASPECTS 3未満でも6.5時間以内なら血栓回収を考慮しても良い（推奨度C）。LASTE（ASPECTS 0〜5、コアの大きさ制限なし）では、90日死亡が36.1% vs 55.5%と減り、mRS中央値は4 vs 6だった。生存しても要介助が多いことを、家族と共有して決める。",
+ k:["ASPECTS 0〜2：6.5時間以内で推奨度C","目標は「死亡を減らす」ことが中心"],
+ r:["GL","laste"]},
+{id:"ev5",c:"ev",lv:2,
+ s:"60歳男性。めまいの後に意識障害が進行。発症9時間、NIHSS 24、発症前mRS 0。CTAで脳底動脈閉塞、PC-ASPECTS 8。",
+ q:"最も適切なのはどれか。",
+ o:[["血栓回収は妥当（推奨度B、24時間以内）","ATTENTION・BAOCHE"],["後方循環に血栓回収のエビデンスはない","2022年に2つのRCTで有効性が示された"],["6時間を超えたので適応外","BAOCHEは6〜24時間"],["静注血栓溶解だけを行う","4.5時間を超えており、主幹動脈閉塞には回収が中心"]],
+ e:"脳底動脈閉塞で、発症前mRS 0〜2、NIHSS 10以上、PC-ASPECTS 6以上なら、24時間以内の血栓回収は妥当（推奨度B）。ATTENTION（12時間以内、mRS 0〜3：46% vs 23%）とBAOCHE（6〜24時間、46% vs 24%）が根拠。",
+ k:["脳底動脈：NIHSS≥10、PC-ASPECTS≥6、24時間以内でB"],
+ r:["GL","attention","baoche"]},
+{id:"ev6",c:"ev",lv:3,
+ s:"69歳女性。発症3時間。左上肢の軽い麻痺と構音障害、NIHSS 5。CTAで右M3閉塞（中〜遠位血管閉塞）。静注血栓溶解の適応外項目なし。",
+ q:"2025年の2つのRCTを踏まえた方針はどれか。",
+ o:[["静注血栓溶解を行う。中〜遠位血管閉塞への血栓回収の上乗せ効果は示されていない","ESCAPE-MeVO・DISTALとも有意差なし"],["静注血栓溶解をせずに血栓回収を行う","上乗せ効果が示されていない"],["中〜遠位血管閉塞は血栓回収の推奨度Aである","推奨度Aは ICA・M1"],["軽症なので治療しない","障害性の症状があり、静注血栓溶解の対象"]],
+ e:"ESCAPE-MeVO（主にMCA分枝、12時間以内）では90日のmRS 0〜1は41.6% vs 43.1%で上乗せなく、死亡はEVT群で多かった。DISTAL（非優位・共優位M2、M3、ACA、PCAなど）でもmRSシフトに差はなかった。中〜遠位血管閉塞はまず静注血栓溶解を検討する。",
+ k:["MeVOへの日常的な血栓回収は支持されない（2025年RCT）"],
+ r:["escmevo","distal","GL"]},
+{id:"ev7",c:"ev",lv:2,
+ s:"血栓回収でTICI 3の再開通が得られた。帰室時の血圧は176/88 mmHg。",
+ q:"帰室後の血圧管理として、GLに沿うのはどれか。",
+ o:[["収縮期180 mmHg以下に速やかに保ち、140 mmHg以下の過度な降圧は避ける","強化降圧はRCTで転帰を悪化させた"],["再開通したので収縮期120 mmHg未満を目標に下げる","過度な降圧は避ける"],["脳灌流を保つため降圧しない","180超は速やかに下げる"],["収縮期220 mmHgを超えるまで降圧しない","それは再開通療法をしない急性期脳梗塞の基準"]],
+ e:"GLは、血栓回収前の降圧は必ずしも必要ないが、回収後は速やかに降圧することが妥当（推奨度B）、回収中・回収後の過度の降圧（140 mmHg以下）は避けるとする。指針でも血栓回収後の血圧管理はアルテプラーゼ投与後（180/105以下）に準じる。",
+ k:["回収後：≤180、ただし140以下には下げすぎない"],
+ r:["GL","RT"]},
+
+/* ───────── 画像判読 ───────── */
+{id:"im1",c:"im",lv:1,
+ img:{t:"単純CT",sl:"mid",o:{hdmca:"L"},mark:[{x:160,y:112,r:20,t:"hyperdense MCA sign"}],alt:"鞍上部レベルの単純CTで左中大脳動脈に沿う線状の高吸収"},
+ s:"発症50分、失語と右片麻痺。単純CTの鞍上部レベル。画像の左は患者の右。",
+ q:"この所見の意味として正しいのはどれか。",
+ o:[["左中大脳動脈M1の血栓（hyperdense MCA sign）","閉塞を示唆する早期所見"],["右中大脳動脈の血栓","画像の右側は患者の左"],["くも膜下出血","くも膜下腔に広がる高吸収とは違う"],["正常な血管の石灰化","左右差のある線状の高吸収は血栓を考える"]],
+ e:"シルビウス裂に沿って中大脳動脈が線状に高吸収を示すhyperdense MCA signは、血栓による閉塞を示す早期所見。CTは放射線学的表示（画像の左が患者の右）なので、画像右側の所見は左MCA。主幹動脈閉塞を疑い、CTAなどで閉塞部位を確認し血栓回収を検討する。",
+ k:["画像の左＝患者の右","hyperdense MCA sign＝M1の血栓"],
+ r:["RT"]},
+{id:"im2",c:"im",lv:2,
+ img:{panels:[{t:"単純CT 基底核レベル",sl:"bg",reg:[{r:["L","I","M2"],f:"early"}],lab:[{k:["C","L","IC","I","M1","M2","M3"]}]},{t:"単純CT 放線冠レベル",sl:"sup",reg:[{r:["M5"],f:"early"}],lab:[{k:["M4","M5","M6"]}]}],alt:"左のレンズ核・島皮質・M2・M5に早期虚血性変化"},
+ s:"発症2時間、右片麻痺。単純CTで、左中大脳動脈領域の淡い低吸収（灰白質と白質の境界の不明瞭化）を、図の暗い部分に示す。",
+ q:"ASPECTSは何点か。",
+ o:[["6点","10点からレンズ核・島・M2・M5の4点を引く"],["7点","M5を見落としている"],["8点","島・M5を見落としている"],["4点","尾状核・内包は保たれている"]],
+ e:"ASPECTSは中大脳動脈領域を10か所（基底核レベル：尾状核C・レンズ核L・内包IC・島I・M1〜M3、その頭側のレンズ核が見えなくなる最初の断面：M4〜M6）に分け、早期虚血性変化のある領域を10点から1点ずつ引く。ここではL・I・M2・M5で6点。ASPECTS 7が中大脳動脈領域の約1/3に相当するとされる。",
+ k:["2断面・10領域の減点法","島（insular ribbon sign）とレンズ核は早期に変化が出やすい"],
+ r:["RT"]},
+{id:"im3",c:"im",lv:3,
+ img:{panels:[{t:"DWI 基底核レベル",mod:"dwi",sl:"bg",reg:[{r:["L","IC","I","M1","M2"],f:"les"}],lab:[{k:["C","L","IC","I","M1","M2","M3"]}]},{t:"DWI 放線冠レベル",mod:"dwi",sl:"sup",reg:[{r:["M4","M5"],f:"les"}],lab:[{k:["M4","M5","M6"]}]}],alt:"左のレンズ核・内包・島・M1・M2・M4・M5に拡散制限"},
+ s:"発症6時間、NIHSS 21、発症前mRS 0。MRAで左M1閉塞。DWI。",
+ q:"DWI-ASPECTSと、血栓回収のGL推奨度の組み合わせで正しいのはどれか。",
+ o:[["3点・推奨度B（24時間以内）","L・IC・I・M1・M2・M4・M5の7か所が高信号"],["3点・推奨なし","ASPECTS 3〜5は推奨度B"],["5点・推奨度A","数え間違い"],["2点・推奨度C（6.5時間以内）","数え間違い"]],
+ e:"高信号はL・IC・I・M1・M2・M4・M5の7か所で、10−7＝3点。ASPECTS 3〜5の広範囲虚血で24時間以内なら血栓回収は妥当（推奨度B）。DWI-ASPECTSはCTより低めに出やすい点にも注意する（LIMITは主にDWIで評価）。",
+ k:["DWIでも同じ10領域で数える","ASPECTS 3〜5→B、0〜2→C（6.5時間以内）"],
+ r:["GL","limit"]},
+{id:"im4",c:"im",lv:2,
+ img:{panels:[{t:"DWI",mod:"dwi",sl:"bg",reg:[{r:["M2","I"],f:"les"}]},{t:"FLAIR",mod:"flair",sl:"bg"}],alt:"DWIで左中大脳動脈領域に高信号、FLAIRでは変化がない"},
+ s:"起床時に右片麻痺と失語で発見（最終健常確認は8時間前、発見から1時間）。MRI。主幹動脈閉塞なし。適応外項目なし。",
+ q:"所見の解釈と方針で正しいのはどれか。",
+ o:[["DWI-FLAIRミスマッチあり。発症4.5時間以内の可能性が高く、静注血栓溶解を考慮しても良い","WAKE-UP"],["FLAIRで病変がないので、DWIは偽陽性","FLAIRの変化は数時間遅れて出る"],["最終健常確認から8時間なので静注血栓溶解は行えない","発見から4.5時間以内でミスマッチがあれば考慮可"],["DWIとFLAIRの両方に病変があるので考慮可","ミスマッチは「FLAIRで不明瞭」"]],
+ e:"DWIの虚血性変化がFLAIRで明瞭でない（DWI-FLAIRミスマッチ）場合、発症4.5時間以内の可能性が高い。WAKE-UPでは、ミスマッチ陽性で発見から4.5時間以内に開始したアルテプラーゼ群でmRS 0〜1が多かった（53.3% vs 41.8%）。指針は慎重投与項目として扱う（推奨度C）。",
+ k:["DWI陽性＋FLAIR陰性＝発症早期のしるし","発見から4.5時間以内に開始"],
+ r:["RT","wake","GL"]},
+{id:"im5",c:"im",lv:2,
+ img:{t:"DWI 放線冠レベル",mod:"dwi",sl:"sup",blob:[{x:142,y:110,rx:3.5},{x:144,y:124,rx:4},{x:145,y:139,rx:3.5},{x:144,y:154,rx:4},{x:141,y:168,rx:3.5}],mark:[{x:146,y:139,r:34,t:"内側分水嶺"}],alt:"左の側脳室外側の深部白質に数珠状の小梗塞"},
+ s:"67歳男性。数日前から右手の脱力を繰り返し、今朝から持続。血圧が下がると悪化する。DWI。",
+ q:"最も考えるべき機序と次の検査はどれか。",
+ o:[["血行力学的機序（内側分水嶺梗塞）。左内頸動脈の高度狭窄・閉塞を頸動脈エコー・MRA・CTAで調べる","側脳室外側の深部白質に数珠状"],["ラクナ梗塞。追加検査は不要","単一の穿通枝ではない"],["心原性脳塞栓症。経食道心エコーだけ行う","分布が一側の分水嶺に並ぶ"],["多発性硬化症。髄液検査を行う","臨床経過と分布が合わない"]],
+ e:"側脳室の外側に沿って深部白質に数珠状に並ぶ小梗塞は、内側（深部）分水嶺梗塞の典型で、同側の内頸動脈や中大脳動脈の高度狭窄・閉塞による灌流低下が背景にあることが多い。血圧低下や脱水で増悪するので、過度の降圧・脱水を避け、頸部・頭蓋内血管を評価する。",
+ k:["数珠状の深部白質病変＝内側分水嶺","過度の降圧・脱水を避ける"],
+ r:["GL"]},
+{id:"im6",c:"im",lv:2,
+ img:{t:"DWI 放線冠レベル",mod:"dwi",sl:"sup",blob:[{x:178,y:92,rx:5},{side:"R",x:182,y:150,rx:6},{x:160,y:196,rx:4.5},{side:"R",x:150,y:60,rx:4},{x:192,y:130,rx:3.5}],alt:"両側の複数の血管領域の皮質に散在する小梗塞"},
+ s:"72歳女性。突然の失語。心電図は洞調律。DWIでは両側の前方・後方の複数の血管領域に、皮質を中心とした小梗塞が散在する。",
+ q:"まず強く疑い、検索すべき病態はどれか。",
+ o:[["心臓など近位の塞栓源（発作性心房細動など）と、担癌に伴う凝固亢進（Trousseau症候群）","両側・複数血管領域＝塞栓源が中枢側"],["一側の内頸動脈狭窄","一側の病変では両側に散らない"],["高血圧性の穿通枝病変","皮質中心で複数領域"],["片頭痛","画像所見と合わない"]],
+ e:"両側の複数の血管領域に及ぶ多発梗塞は、心臓または大動脈弓など中枢側の塞栓源を示唆する。洞調律でも長時間心電図モニター・心エコー（経食道を含む）で塞栓源を探し、D-ダイマー高値などがあれば悪性腫瘍に伴う凝固亢進（Trousseau症候群）を検索する。",
+ k:["両側・複数血管領域＝中枢側の塞栓源","洞調律でも発作性心房細動を探す"],
+ r:["GL"]},
+{id:"im7",c:"im",lv:3,
+ img:{panels:[{t:"DWI 基底核レベル",mod:"dwi",sl:"bg",blob:[{x:151,y:122,rx:3.5,ry:9,rot:-8}]},{t:"DWI 放線冠レベル",mod:"dwi",sl:"sup",blob:[{x:146,y:128,rx:5,ry:11}]}],alt:"左レンズ核線条体動脈領域で、基底核から放線冠へ連続する縦長の拡散制限"},
+ s:"66歳男性。高血圧・糖尿病。右の軽い片麻痺で入院し、入院2日目に麻痺が進行した。DWIでは、左の外側線条体動脈の領域で、基底核レベルから放線冠まで複数のスライスに連続する病変。主幹動脈に狭窄なし。",
+ q:"最も考えられる病態はどれか。",
+ o:[["分枝粥腫病（BAD）","穿通枝の起始部の粥腫で、複数スライスに及ぶ縦長の病変"],["ラクナ梗塞（リポヒアリノーシス）","一般に15 mm未満で、進行しにくい"],["心原性脳塞栓症","単一穿通枝の縦長病変は典型でない"],["出血性梗塞","DWIの高信号は虚血"]],
+ e:"分枝粥腫病（branch atheromatous disease）は、親動脈から穿通枝が分岐する部分の粥腫で穿通枝全体が閉塞する病態。外側線条体動脈領域では複数スライスに連続する縦長の病変、橋傍正中枝では橋の腹側表面に達する病変が特徴。入院後に運動麻痺が進行しやすい。治療法は確立しておらず、国内では抗血小板薬の併用やアルガトロバンが用いられるが、エビデンスは限られる。",
+ k:["縦長・複数スライス・入院後に進行","ラクナと分ける"],
+ r:["GL"]},
+{id:"im8",c:"im",lv:1,
+ img:{t:"単純CT",sl:"bg",reg:[{side:"R",r:["C","L","IC","I","M1","M2","M3"],f:"old"}],o:{shift:9,squeeze:"R"},alt:"右中大脳動脈領域の広い低吸収と正中構造の左への偏位"},
+ s:"52歳男性。発症28時間。右中大脳動脈領域の梗塞で入院中、意識レベルが低下し、瞳孔不同が出てきた。単純CT。",
+ q:"最も適切な対応はどれか。",
+ o:[["脳神経外科に連絡し、外減圧術（発症48時間以内）を検討する","60歳以下の悪性中大脳動脈梗塞で死亡を減らし転帰も改善"],["グリセロールだけで経過をみる","浸透圧療法で救命は期待しにくい"],["静注血栓溶解を行う","28時間経過、広範な梗塞"],["予後不良なので緩和ケアのみ","年齢・発症時間から外減圧術の適応がある"]],
+ e:"正中構造の偏位と脳室の圧排を伴う悪性中大脳動脈梗塞。DECIMAL・DESTINY・HAMLETの統合解析（60歳以下、発症48時間以内の手術）で、外減圧術は死亡を大きく減らし、転帰（mRS≤3）も改善した。61歳以上でも死亡は減るが、重い障害が残りやすく、本人・家族の価値観とあわせて決める。",
+ k:["≤60歳・48時間以内の外減圧術","高齢者は死亡は減るが障害が残りやすい"],
+ r:["vahedi","GL"]},
+{id:"im9",c:"im",lv:2,
+ img:{t:"単純CT",sl:"bg",reg:[{r:["M2","I","M1"],f:"old"}],blob:[{x:178,y:128,rx:18,ry:22,f:"blood"}],o:{shift:-5,squeeze:"L"},alt:"左中大脳動脈領域の梗塞の内部に、腫瘤効果を伴う濃い血腫"},
+ s:"78歳女性。心原性脳塞栓症の発症3日目。DOAC開始を予定していたが頭痛と意識レベルの低下。単純CT。",
+ q:"所見と方針で正しいのはどれか。",
+ o:[["実質性血腫（梗塞の30%を超え腫瘤効果あり＝PH2）。抗凝固薬の開始を延期し、血圧管理と脳外科への相談","PH2は症候性で予後不良"],["点状の出血性梗塞（HI1）。予定どおりDOACを開始","腫瘤効果を伴う濃い血腫"],["再梗塞。ただちにヘパリンを開始","高吸収は出血"],["造影剤の残存。経過観察","臨床的にも悪化している"]],
+ e:"出血性変化はECASSの分類で、点状〜融合する出血性梗塞（HI1・HI2）と、実質性血腫（PH1：梗塞の30%以下で軽い腫瘤効果、PH2：30%を超え明らかな腫瘤効果）に分ける。PH2は症候性で予後が悪い。抗凝固薬の開始は延期し、降圧・頭蓋内圧管理・外科治療の適否を検討する。",
+ k:["HI1・HI2・PH1・PH2を区別","PH2では抗凝固を延期"],
+ r:["GL"]},
+{id:"im10",c:"im",lv:1,
+ img:{kind:"mra",t:"MRA",occ:["M1r","M2r"],stub:["M98,132 Q90,131 84,130"],alt:"右中大脳動脈M1が途中から描出されない"},
+ s:"発症2時間、左片麻痺と左半側空間無視。頭部MRA（模式図、軸位）。画像の左は患者の右。",
+ q:"閉塞部位はどれか。",
+ o:[["右中大脳動脈M1","右M1の近位で途絶し、遠位が描出されない"],["左中大脳動脈M1","画像の右側は患者の左"],["右内頸動脈","内頸動脈終末部とA1は描出されている"],["脳底動脈","脳底動脈・後大脳動脈は描出されている"]],
+ e:"右内頸動脈終末部とA1は描出されているが、右M1は起始部の直後で途絶し、M2以遠が描出されない。症状（左片麻痺・左半側空間無視）とも合う。ICA・M1閉塞は血栓回収の推奨度Aの対象。",
+ k:["MRAも放射線学的表示（画像左＝患者右）","症状と閉塞側が合うか確かめる"],
+ r:["GL"]},
+
+/* ───────── 脳出血 ───────── */
+{id:"ic1",c:"ic",lv:1,
+ img:{t:"単純CT",sl:"bg",blob:[{x:163,y:140,rx:12,ry:19,rot:-12,f:"blood"}],alt:"左被殻に高吸収の血腫"},
+ s:"63歳男性。高血圧を放置。会話中に右片麻痺と失語。来院時血圧212/118 mmHg。単純CT。抗血栓薬の内服なし。",
+ q:"急性期の血圧管理として最も適切なのはどれか。",
+ o:[["できるだけ早く収縮期140 mmHg未満を目標に下げ、維持する（下げすぎにも注意）","INTERACT2・INTERACT3"],["収縮期180 mmHg未満なら降圧しない","目標は140未満"],["脳灌流を保つため220 mmHgまで許容","脳梗塞（再開通療法なし）の基準と混同"],["収縮期100 mmHg以下まで下げる","過度な降圧は避ける"]],
+ e:"左被殻出血。脳出血急性期は早期に収縮期140 mmHg未満へ下げることが勧められる（GL）。INTERACT2（6時間以内、目標140未満）は主要評価項目で有意差はなかったが、mRSの順序解析で改善。INTERACT3では、早期の厳格降圧に高血糖・発熱・抗凝固の是正を組み合わせたケアバンドルで機能転帰が改善した。降圧薬の例：ニカルジピン（ペルジピン）持続静注。",
+ k:["脳出血：早期に収縮期140未満","血糖・体温・抗凝固の是正もまとめて行う"],
+ r:["GL","interact2","interact3"]},
+{id:"ic2",c:"ic",lv:2,
+ s:"79歳男性。機械弁はなく、心房細動でワルファリン（ワーファリン）を内服。左視床出血、PT-INR 3.1。",
+ q:"抗凝固の是正として最も適切なのはどれか。",
+ o:[["プロトロンビン複合体（ケイセントラ）とビタミンK（メナテトレノン〈ケイツーN〉）静注を速やかに投与","PCCで速やかにINRを是正し、ビタミンKで持続させる"],["新鮮凍結血漿だけを投与","PCCより是正が遅く、容量負荷も多い"],["ビタミンKだけを内服","効果発現が遅い"],["イダルシズマブを投与","ダビガトランの中和薬"]],
+ e:"ワルファリン関連脳出血では、プロトロンビン複合体（ケイセントラ）でINRを速やかに是正し、効果の持続のためビタミンK静注を併用する。新鮮凍結血漿より速く、容量負荷も少ない。是正後のINRを確認する。",
+ k:["ワルファリン：PCC＋ビタミンK静注"],
+ r:["GL","interact3"]},
+{id:"ic3",c:"ic",lv:2,
+ s:"81歳女性。心房細動でアピキサバン（エリキュース）を内服、最終服用は3時間前。右被殻出血、発症2時間。",
+ q:"中和の選択肢として、国内で承認されている薬はどれか。",
+ o:[["アンデキサネット アルファ（オンデキサ）","抗Xa薬の中和薬"],["イダルシズマブ（プリズバインド）","ダビガトラン専用"],["プロタミン","ヘパリンの中和薬"],["ビタミンK","ワルファリンにのみ有効"]],
+ e:"抗Xa薬（アピキサバン〈エリキュース〉、リバーロキサバン〈イグザレルト〉、エドキサバン〈リクシアナ〉）による脳出血の中和薬はアンデキサネット アルファ（オンデキサ）。ANNEXA-I（服用15時間以内の脳出血）では、通常治療（多くはPCC）より血腫の止血効果が良好だったが、脳梗塞などの血栓性イベントは増えた。用量は抗Xa薬の種類・量・最終服用からの時間で決まるので、添付文書で確認する。",
+ k:["抗Xa薬→アンデキサネット","止血は良いが血栓症が増える"],
+ r:["annexa","GL"]},
+{id:"ic4",c:"ic",lv:2,
+ s:"74歳男性。ダビガトラン（プラザキサ）内服中の皮質下出血。",
+ q:"中和として正しいのはどれか。",
+ o:[["イダルシズマブ（プリズバインド）5 g（2.5 g×2）を静注","ダビガトランに特異的な中和抗体"],["アンデキサネット アルファ","抗Xa薬の中和薬"],["ビタミンK静注","効かない"],["プロタミン","ヘパリンの中和薬"]],
+ e:"イダルシズマブはダビガトランに結合するヒト化抗体断片。RE-VERSE AD（全コホート）で、投与後速やかに抗凝固作用を打ち消した。重い腎機能障害などで血中濃度が高い例では、効果が切れたあと再上昇することがある。",
+ k:["ダビガトラン→イダルシズマブ5 g"],
+ r:["reverse","GL"]},
+{id:"ic5",c:"ic",lv:2,
+ img:{t:"単純CT 後頭蓋窩",sl:"pf",blob:[{x:150,y:184,rx:22,ry:19,f:"blood"}],o:{v4:"cmp",cal:[[128,184,172,184,132,206,"約4 cm"]]},alt:"左小脳半球の径約4 cmの血腫と第4脳室の圧排"},
+ s:"70歳女性。突然の回転性めまい・嘔吐・歩行不能。数時間で傾眠になった。単純CTで左小脳半球に最大径約4 cmの血腫、第4脳室は圧排されている。",
+ q:"最も適切な方針はどれか。",
+ o:[["脳神経外科に連絡し、血腫除去術（必要に応じて脳室ドレナージ）を検討する","最大径3 cm以上で症候が悪化、脳幹圧迫・水頭症"],["降圧と止血だけで経過観察","意識が悪化している"],["脳室ドレナージだけを行う","後頭蓋窩の圧迫が残り、上行性ヘルニアの懸念もある"],["抗てんかん薬を予防投与する","優先すべき対応ではない"]],
+ e:"GLでは、小脳出血で最大径3 cm以上かつ神経症候が増悪している場合、または脳幹を圧迫し脳室閉塞による水頭症を来している場合に、手術を考慮する。意識障害の進行は手術を急ぐ理由になる。",
+ k:["小脳出血：3 cm以上＋増悪、または脳幹圧迫・水頭症→手術"],
+ r:["GL"]},
+{id:"ic6",c:"ic",lv:2,
+ img:{t:"単純CT",sl:"bg",blob:[{x:160,y:142,rx:16,ry:20,rot:-8,f:"blood"}],o:{cal:[[144,142,176,142,146,136,"B 3 cm"],[160,122,160,162,166,170,"A 4 cm"]]},alt:"左被殻の血腫に長径と短径の計測線"},
+ s:"左被殻出血。最大断面で長径A＝4 cm、それと直交する径B＝3 cm。5 mm厚のCTで血腫が6スライスにわたる（C＝3 cm）。",
+ q:"ABC/2法による血腫量はどれか。",
+ o:[["18 mL","4×3×3÷2"],["36 mL","2で割っていない"],["12 mL","Cを2 cmで計算している"],["9 mL","さらに半分にしている"]],
+ e:"ABC/2法は、A（最大径）×B（直交する径）×C（血腫が写るスライス数×スライス厚）を2で割る簡便法。ここでは4×3×3÷2＝18 cm³＝18 mL。血腫量は転帰の予測や手術適応の検討（被殻出血ではおおむね31 mL以上で手術を考慮）に用いる。",
+ k:["A×B×C÷2（cm³＝mL）"],
+ r:["GL"]},
+{id:"ic7",c:"ic",lv:2,
+ img:{t:"単純CT",sl:"bg",blob:[{x:133,y:158,rx:10,ry:13,f:"blood"}],o:{ivh:1},alt:"左視床出血と脳室内への穿破"},
+ s:"77歳男性。左視床出血で入院。翌日、意識レベルが低下。単純CTでは血腫が脳室内に穿破し、脳室が拡大している。",
+ q:"検討すべき処置はどれか。",
+ o:[["急性水頭症に対する脳室ドレナージ","視床出血の脳室穿破で起こりやすい"],["開頭血腫除去術","深部の視床出血では一般に勧められない"],["静注血栓溶解","出血で禁忌"],["抗凝固療法","出血"]],
+ e:"視床出血は脳室内に穿破しやすく、急性水頭症で意識が低下することがある。GLは、脳室拡大の強い例で脳室ドレナージを考慮するとしている。視床出血そのものに対する開頭血腫除去は勧められない。",
+ k:["視床出血＋脳室穿破→水頭症に注意"],
+ r:["GL"]},
+
+/* ───────── くも膜下出血 ───────── */
+{id:"sa1",c:"sa",lv:1,
+ img:{t:"単純CT",sl:"mid",o:{sah:1},alt:"鞍上槽・シルビウス裂・迂回槽に広がる高吸収"},
+ s:"52歳女性。「突然バットで殴られたような」頭痛で発症し嘔吐。意識は清明（WFNS grade I）。単純CT。",
+ q:"この後の対応で最も適切なのはどれか。",
+ o:[["鎮痛・鎮静・降圧で再出血を予防し、CTA等で動脈瘤を確認して、早期に再出血予防の処置（クリッピングまたはコイル塞栓）を行う","再出血は発症早期に多い"],["腰椎穿刺で確定してから治療方針を決める","CTで診断がついており、腰椎穿刺は不要"],["数日おいて血管攣縮期が過ぎてから治療する","再出血の危険を放置する"],["アスピリンを開始する","出血"]],
+ e:"鞍上槽（五角形）・シルビウス裂・迂回槽に広がる高吸収は、動脈瘤破裂によるくも膜下出血の典型。再出血は発症早期（とくに24時間以内）に多く、転帰を大きく悪くする。鎮痛・鎮静・降圧で再出血を防ぎ、できるだけ早期に動脈瘤の処置を行う。",
+ k:["鞍上槽のペンタゴン＝SAH","早期の再出血予防処置"],
+ r:["sah","GL"]},
+{id:"sa2",c:"sa",lv:1,
+ s:"44歳男性。6時間前に突然の激しい頭痛（人生最悪）が出現し、今も続く。神経所見なし。来院時の単純CTで明らかな出血を指摘できない。",
+ q:"次に行うべきことはどれか。",
+ o:[["CTで否定できないので、MRI（FLAIR・T2*）や腰椎穿刺で確認し、血管の評価も行う","軽症のSAHを見逃さない"],["CTが陰性なので片頭痛として帰宅","突然発症の最悪の頭痛は否定が必要"],["鎮痛薬を処方して1週間後に再診","警告出血の見逃しになる"],["脳波を行う","頭痛の鑑別には役立たない"]],
+ e:"突然発症の激しい頭痛は、CTで出血が明らかでなくてもくも膜下出血を否定しきれない（出血量が少ない、時間がたっている場合など）。MRI（FLAIR・T2*）や腰椎穿刺（キサントクロミー）で確認し、CTA・MRAで動脈瘤や可逆性脳血管攣縮症候群なども評価する。",
+ k:["雷鳴頭痛＋CT陰性でも追加検査"],
+ r:["sah"]},
+{id:"sa3",c:"sa",lv:2,
+ s:"コイル塞栓術後day 6のくも膜下出血。遅発性脳虚血（DCI）の予防・治療を検討している。",
+ q:"現在の国内の状況に照らして正しいのはどれか。",
+ o:[["クラゾセンタン（ピヴラッツ）やファスジル（エリル）が使われる。triple H療法は行うべきではない（改訂2025）","ニモジピンは国内未承認"],["予防にtriple H療法（高血圧・循環血液量増加・血液希釈）を行う","改訂2025で行うべきでないと明記"],["ニモジピンを内服させる","国内では承認されていない"],["循環血液量を減らすため水分制限をする","低容量は虚血を悪化させる"]],
+ e:"国内ではクラゾセンタン（ピヴラッツ、2022年承認）が攣縮予防の新たな選択肢となり、ファスジル（エリル）・オザグレル（カタクロット、キサンボン）も使われる。GL改訂2025では、歴史的に行われてきたtriple H療法は科学的根拠がなく行うべきでないと明記された。正常な循環血液量（euvolemia）を保つ。",
+ k:["triple Hはやめる","euvolemiaを保つ"],
+ r:["GL","sah"]},
+{id:"sa4",c:"sa",lv:2,
+ s:"くも膜下出血後day 5。血清Na 126 mEq/L、尿中Na高値、尿量が多く、体重と血圧が下がってきた。",
+ q:"最も適切な対応はどれか。",
+ o:[["中枢性塩類喪失を考え、水分制限はせずに食塩・生理食塩液を補い、必要ならフルドロコルチゾンを用いる","体液量の減少は遅発性脳虚血の危険を高める"],["SIADHとして厳しい水分制限","SAHでは低容量が虚血を悪化させる"],["利尿薬で除水する","体液量がさらに減る"],["経過観察","症候性の低Na・体液量減少は治療が必要"]],
+ e:"くも膜下出血後の低ナトリウム血症は、体液量が減る中枢性塩類喪失が多い。SIADHと同じ水分制限は体液量を減らし、遅発性脳虚血を悪化させるおそれがある。食塩・生理食塩液（必要に応じ高張食塩液）で補い、フルドロコルチゾンを用いることがある。",
+ k:["SAHの低Na：水分制限しない"],
+ r:["sah"]},
+
+/* ───────── 病型・二次予防 ───────── */
+{id:"pv1",c:"pv",lv:1,
+ s:"64歳男性。発症8時間の右手の軽い麻痺（NIHSS 2）。DWIで左放線冠に小梗塞。心房細動なし、頸動脈・頭蓋内に高度狭窄なし。静注血栓溶解の適応外の時間。",
+ q:"急性期の抗血栓療法として最も根拠があるのはどれか。",
+ o:[["アスピリン（バイアスピリン）＋クロピドグレル（プラビックス）のDAPTを早期に始め、約3週間で単剤に","CHANCE・POINT"],["アスピリン単剤を3か月","DAPTのほうが早期再発を減らす"],["DAPTを1年以上続ける","長期は出血が増える"],["DOACを開始","心房細動がない"]],
+ e:"軽症脳梗塞・高リスクTIAで、発症早期にDAPTを始めると90日以内の脳卒中が減る（CHANCE：8.2% vs 11.7%）。POINTでは虚血イベントは減ったが大出血は増え、効果は早期に集中した。そのため短期（おおむね3週間程度）で単剤に切り替えるのが一般的。GLも心原性を除く脳梗塞・TIAの亜急性期までのDAPTを勧める。国内のクロピドグレルの添付文書では、虚血性脳血管障害に初回負荷量の規定はない（試験ではCHANCE 300 mg、POINT 600 mgを使用）。",
+ k:["軽症・高リスクTIA：早期DAPT→3週間程度で単剤"],
+ r:["chance","point","GL"]},
+{id:"pv2",c:"pv",lv:2,
+ s:"70歳女性。軽症脳梗塞（NIHSS 4）で、発症から48時間後に受診。中大脳動脈に50%を超える狭窄があり、アテローム血栓性と考えられる。",
+ q:"DAPTについての説明で正しいのはどれか。",
+ o:[["アテローム性が推定される軽症例では、発症72時間以内のDAPT開始でも新規脳卒中が減った（INSPIRES）","24時間を過ぎても選択肢になる"],["24時間を過ぎるとDAPTの効果はない","INSPIRESは72時間以内"],["頭蓋内狭窄にはステント留置が第一選択","SAMMPRISで内科治療が優った"],["DAPTより抗凝固薬が勧められる","非心原性"]],
+ e:"INSPIRESは、アテローム性が推定される軽症脳梗塞（NIHSS≤5）・高リスクTIAで、発症72時間以内にクロピドグレル＋アスピリンを始めると、アスピリン単独より90日の新規脳卒中が減った（中等度〜重度出血はわずかに増加）。症候性頭蓋内狭窄には、ステントより積極的内科治療（SAMMPRIS）が基本。",
+ k:["アテローム性なら72時間以内のDAPTも"],
+ r:["inspires","sammpris","GL"]},
+{id:"pv3",c:"pv",lv:2,
+ s:"78歳女性。心房細動による心原性脳塞栓症、NIHSS 8（中等症）、梗塞は中大脳動脈領域の一部（中等度の大きさ）。出血性変化なし。",
+ q:"DOAC開始時期について、最近のRCTに基づく考え方はどれか。",
+ o:[["出血性変化がなければ早期（ELANでは軽症〜中等症は48時間以内、OPTIMASでは4日以内）の開始は遅い開始と比べて同等以上","大きな出血の増加は示されなかった"],["一律に発症14日後まで待つ","根拠は乏しく再発リスクが残る"],["まずヘパリンでつなぎ、3か月後にDOAC","ヘパリンブリッジは出血を増やす"],["抗血小板薬を併用して開始する","併用は出血を増やす"]],
+ e:"ELAN（軽症・中等症は48時間以内、重症は6〜7日）では、早期開始で30日の複合イベントが2.9% vs 4.1%と少なく、症候性頭蓋内出血は両群0.2%。OPTIMAS（4日以内 vs 7〜14日）でも早期開始は非劣性だった。重症例・出血性変化があれば個別に判断する。国内GLの記載とあわせて判断する。DOACの例：アピキサバン（エリキュース）、エドキサバン（リクシアナ）、リバーロキサバン（イグザレルト）、ダビガトラン（プラザキサ）。",
+ k:["軽症〜中等症は数日以内の開始を検討","出血性変化・重症度で調整"],
+ r:["elan","optimas","GL"]},
+{id:"pv4",c:"pv",lv:2,
+ img:{kind:"angio",t:"頸動脈造影（側面）",a:"1.2",b:"4.0",alt:"内頸動脈起始部の狭窄。最狭窄部1.2 mm、遠位正常部4.0 mm"},
+ s:"68歳男性。1週間前に右手の脱力が20分（TIA）。左頸動脈造影。",
+ q:"NASCET法の狭窄率と方針の組み合わせはどれか。",
+ o:[["70%・頸動脈内膜剝離術（CEA）を早期に検討（高リスクならCAS）","(1−1.2/4.0)×100＝70%"],["30%・内科治療のみ","計算が違う"],["70%・無症候性なので経過観察","TIAは症候性"],["50%・手術の適応はない","計算が違う"]],
+ e:"NASCET法は（1−最狭窄部径／遠位の正常内頸動脈径）×100。ここでは(1−1.2/4.0)×100＝70%。NASCETでは、症候性70〜99%狭窄でCEAが同側脳卒中を大きく減らした。発症後早期（2週間以内が目安）の治療が効果的。手術リスクが高い例では頸動脈ステント留置術（CAS）を検討する。",
+ k:["NASCET＝1−a/b","症候性70%以上→CEA/CASを早期に"],
+ r:["nascet","GL"]},
+{id:"pv5",c:"pv",lv:3,
+ s:"72歳男性。糖尿病・高血圧があり、半年前に非心原性脳梗塞。MRAで頭蓋内動脈に狭窄あり。アスピリン単剤を内服中。出血の既往なし。",
+ q:"国内のRCT（CSPS.com）に基づく選択肢はどれか。",
+ o:[["シロスタゾール（プレタール）をアスピリンまたはクロピドグレルに追加する長期併用","再発が減り、重い出血は増えなかった"],["アスピリン＋クロピドグレルを長期に続ける","長期のこの組み合わせは出血が増える"],["抗凝固薬に変更","非心原性"],["頭蓋内ステント留置","内科治療が基本"]],
+ e:"CSPS.comは、再発リスクの高い非心原性脳梗塞（頭蓋外・頭蓋内動脈の狭窄や複数の血管危険因子）で、発症8〜180日後からシロスタゾール（プレタール）をアスピリンまたはクロピドグレルに加える長期併用が、単剤より脳梗塞の再発を減らし、重い出血は増やさなかった。頻脈・頭痛の副作用があり、心不全には禁忌。",
+ k:["日本人の高リスク非心原性：シロスタゾール併用"],
+ r:["cspscom","GL"]},
+
+/* ───────── 急性期管理・合併症 ───────── */
+{id:"mg1",c:"mg",lv:1,
+ s:"76歳男性。発症12時間の脳梗塞で再開通療法の適応なし。血圧190/100 mmHg、大動脈解離・急性冠症候群・心不全なし。",
+ q:"血圧の扱いとして正しいのはどれか。",
+ o:[["収縮期220 mmHgまたは拡張期120 mmHgを超えなければ、原則としてすぐに降圧しない","急性期は脳血流が血圧に依存"],["ただちに140/90 mmHg未満に下げる","過度の降圧は虚血を悪化させうる"],["185/110 mmHg未満に下げる","それは静注血栓溶解前の基準"],["収縮期160 mmHgまで下げる","根拠がない"]],
+ e:"再開通療法を行わない脳梗塞急性期は、自動調節能が障害され脳血流が血圧に依存するため、収縮期220 mmHgまたは拡張期120 mmHgを超える高血圧が続く場合や、大動脈解離・急性心筋梗塞・心不全・腎不全などを合併する場合に慎重に降圧する。静注血栓溶解では投与前185/110未満・投与後180/105以下、血栓回収後は180以下（140以下は避ける）と、治療によって基準が違う。",
+ k:["治療ごとに血圧の基準が違う","再開通療法なし：220/120を超えたら"],
+ r:["GL","RT"]},
+{id:"mg2",c:"mg",lv:1,
+ s:"82歳女性。左中大脳動脈領域の脳梗塞で入院2日目。構音障害があり、家族が「お茶を飲ませたい」と言っている。",
+ q:"経口摂取の前に行うべきことはどれか。",
+ o:[["嚥下のスクリーニング（改訂水飲みテストなど）を行い、必要なら言語聴覚士の評価へ","誤嚥性肺炎の予防"],["意識が清明なら評価なしで常食","構音障害は嚥下障害を伴いやすい"],["1週間は一律に絶食","不要な絶食は低栄養につながる"],["経鼻胃管を全例に入れる","評価して必要な人に"]],
+ e:"脳卒中急性期は嚥下障害が多く、誤嚥性肺炎は転帰を悪くする。経口摂取の前に嚥下スクリーニング（改訂水飲みテスト、反復唾液嚥下テストなど）を行い、異常があれば言語聴覚士の評価や嚥下造影・内視鏡で食形態を決める。",
+ k:["食べる前に嚥下スクリーニング"],
+ r:["GL"]},
+{id:"mg3",c:"mg",lv:2,
+ s:"74歳男性。左片麻痺で歩行できない脳梗塞患者。深部静脈血栓症の予防を検討している。",
+ q:"ガイドラインの考え方に最も近いのはどれか。",
+ o:[["間欠的空気圧迫法を考える。段階的弾性ストッキングは勧められない","CLOTS試験の結果に基づく"],["段階的弾性ストッキングを全例に装着","DVTは減らず皮膚障害が増えた"],["全例でDOACを予防量で開始","出血の危険"],["予防は不要","麻痺で動けない患者はDVTのリスクが高い"]],
+ e:"歩行できない脳卒中患者では、間欠的空気圧迫法がDVTを減らした（CLOTS 3）。段階的弾性ストッキングはDVTを減らさず皮膚損傷を増やした（CLOTS 1）。国内GLも同様の方向で、ストッキングは勧めていない。",
+ k:["IPCは有効、弾性ストッキングは×"],
+ r:["GL"]},
+{id:"mg4",c:"mg",lv:2,
+ s:"68歳女性。皮質を含む中大脳動脈領域の脳梗塞。けいれんは起きていない。家族から「てんかんを予防する薬は飲まなくてよいか」と聞かれた。",
+ q:"正しい説明はどれか。",
+ o:[["けいれんが起きていなければ、抗てんかん薬の予防投与は勧められない","予防効果が示されていない"],["皮質の梗塞では全例でレベチラセタムを予防投与する","根拠がない"],["バルプロ酸を3か月予防投与","根拠がない"],["脳波で棘波がなくても予防投与する","根拠がない"]],
+ e:"脳卒中後に抗てんかん薬を予防的に投与する有効性は示されていない。発作が起きた場合に、早期発作か遅発発作か（再発しやすい）を踏まえて治療を判断する。",
+ k:["予防投与はしない"],
+ r:["GL"]},
+
+/* ───────── TIA・特殊な原因 ───────── */
+{id:"sp1",c:"sp",lv:1,
+ s:"67歳男性。右手の脱力と構音障害が20分続いて完全に回復した。来院時血圧152/88 mmHg。糖尿病あり。",
+ q:"ABCD2スコアはどれか。",
+ o:[["6点","年齢1＋血圧1＋片側の脱力2＋持続10〜59分1＋糖尿病1"],["5点","どれかを数え落としている"],["4点","片側の脱力は2点"],["7点","持続60分以上で2点"]],
+ e:"ABCD2：Age 60歳以上1点、Blood pressure 140/90以上1点、Clinical 片側の脱力2点（脱力を伴わない言語障害1点）、Duration 60分以上2点・10〜59分1点、Diabetes 1点。合計0〜7点で、点数が高いほど2日・7日・90日の脳卒中リスクが高い。ABCD2 4点以上はPOINTの高リスクTIAの基準でもある。スコアだけでなく、DWI陽性や責任血管の狭窄・心房細動の有無で入院を判断する。",
+ k:["A1・B1・C2/1・D2/1・D1"],
+ r:["abcd2","point"]},
+{id:"sp2",c:"sp",lv:2,
+ s:"45歳男性。ゴルフの後から右後頸部痛が続き、2日後にめまいと右のWallenberg症候群。MRIで右延髄外側梗塞、右椎骨動脈解離（頭蓋外）。くも膜下出血なし。",
+ q:"再発予防の抗血栓療法として正しいのはどれか。",
+ o:[["抗血小板薬または抗凝固薬で治療する（どちらが優れるかは確立していない）","TREAT-CADでアスピリンの非劣性は示されなかった"],["解離なので抗血栓薬は使わない","SAHを伴わない頭蓋外の解離では抗血栓療法を行う"],["全例にステント留置","一般には内科治療"],["抗凝固薬は禁忌","選択肢の一つ"]],
+ e:"頭蓋外の頸部動脈解離による脳梗塞・TIAでは、抗血小板薬または抗凝固薬で再発を予防する。TREAT-CADでは、アスピリンのビタミンK拮抗薬に対する非劣性は示されなかった。一方、くも膜下出血を伴う頭蓋内（椎骨動脈など）解離では、再出血の危険から抗血栓薬は避け、出血予防の治療を優先する。",
+ k:["頭蓋外解離：抗血栓療法","SAHを伴う頭蓋内解離：抗血栓薬は避ける"],
+ r:["treatcad","GL"]},
+{id:"sp3",c:"sp",lv:2,
+ img:{panels:[{t:"造影CT",mod:"cta",sl:"sup",o:{delta:1},mark:[{x:120,y:244,r:20,t:"empty delta sign"}]},{t:"単純CT",sl:"sup",blob:[{x:136,y:96,rx:10,ry:13,f:"blood",op:.85},{side:"R",x:138,y:102,rx:8,ry:10,f:"early"}]}],alt:"上矢状静脈洞の内部が造影されないempty delta signと、傍矢状部の出血性病変"},
+ s:"32歳女性。経口避妊薬を内服。1週間前から増悪する頭痛、昨日けいれん発作。CTで上矢状静脈洞の造影欠損と、傍矢状部の出血性病変。",
+ q:"治療として最も適切なのはどれか。",
+ o:[["出血性病変があっても、ヘパリンによる抗凝固療法を始める","静脈還流を回復させることが出血の進行も防ぐ"],["出血があるので抗凝固薬は禁忌","脳静脈血栓症では出血があっても抗凝固を行う"],["アルテプラーゼの静注","脳静脈血栓症の標準治療ではない"],["抗血小板薬だけを使う","抗凝固療法が基本"]],
+ e:"脳静脈・静脈洞血栓症は、静脈うっ滞による出血性梗塞を伴っても、ヘパリンによる抗凝固療法が基本（GL）。その後、経口抗凝固薬に移行する。経口避妊薬は中止し、凝固異常・悪性腫瘍・感染などの誘因を検索する。造影CTで静脈洞の内部が造影されず周囲が造影される三角形がempty delta sign。",
+ k:["CVT：出血があっても抗凝固","empty delta sign"],
+ r:["GL"]}
+];
+
+</script>
+<script>
+(function(){
+"use strict";
+var APP_VER="ver1_2026-11-25a";
+var KEY="str-v1";
+var $=function(id){return document.getElementById(id);};
+var st={st:{},hist:[],cnt:0,ok:0,streak:0,set:{cats:Object.keys(CATS),lv:3,img:false,hide:false,weak:true},cur:null};
+try{var sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv){for(var k in sv)st[k]=sv[k];if(!st.set||!st.set.cats)st.set={cats:Object.keys(CATS),lv:3,img:false,hide:false,weak:true};}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+var QMAP={};QS.forEach(function(q){QMAP[q.id]=q;});
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function refLink(k){var r=REFS[k];if(!r)return"";var u=r[1];if(!u)return'<span>'+esc(r[2])+'</span>';
+  if(!/^https?:/.test(u))u=u.indexOf("doi:")===0?"https://doi.org/"+u.slice(4):"https://pubmed.ncbi.nlm.nih.gov/"+u+"/";
+  return'<a href="'+u+'" target="_blank" rel="noopener">'+esc(r[2])+'</a>';}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ── 設定 ── */
+function pool(){var s=st.set;return QS.filter(function(q){return s.cats.indexOf(q.c)>=0&&q.lv<=s.lv&&(!s.img||q.img);});}
+function renderSet(){
+  var s=st.set;
+  $("catChips").innerHTML=Object.keys(CATS).map(function(c){var n=QS.filter(function(q){return q.c===c;}).length;var on=s.cats.indexOf(c)>=0;
+    return'<label class="chip'+(on?" on":"")+'"><input type="checkbox" data-c="'+c+'"'+(on?" checked":"")+'>'+CATS[c]+' <span style="color:var(--muted);font-size:12px">'+n+'</span></label>';}).join("");
+  Array.prototype.forEach.call(document.querySelectorAll("#catChips input"),function(i){i.onchange=function(){
+    var c=i.getAttribute("data-c");var a=st.set.cats.filter(function(x){return x!==c;});if(i.checked)a.push(c);st.set.cats=a;st.cur=null;save();renderSet();renderQ();};});
+  $("lvSel").value=String(s.lv);$("imgOpt").checked=!!s.img;$("hideOpt").checked=!!s.hide;$("weakOpt").checked=s.weak!==false;
+  var p=pool();$("setSum").textContent="（"+p.length+"問）";
+  $("setHint").textContent=p.length?"":"条件に合う問題がありません。範囲を広げてください。";
+}
+$("lvSel").onchange=function(){st.set.lv=+this.value;st.cur=null;save();renderSet();renderQ();};
+$("imgOpt").onchange=function(){st.set.img=this.checked;st.cur=null;save();renderSet();renderQ();};
+$("hideOpt").onchange=function(){st.set.hide=this.checked;save();renderQ();};
+$("weakOpt").onchange=function(){st.set.weak=this.checked;save();};
+$("catAll").onclick=function(){st.set.cats=Object.keys(CATS);st.cur=null;save();renderSet();renderQ();};
+$("catNone").onclick=function(){st.set.cats=[];st.cur=null;save();renderSet();renderQ();};
+
+/* ── 出題の選び方 ── */
+function pick(){
+  var p=pool();if(!p.length)return null;
+  var last=st.hist.slice(-Math.min(6,Math.max(0,p.length-1)));
+  var cand=p.filter(function(q){return last.indexOf(q.id)<0;});if(!cand.length)cand=p;
+  if(st.set.weak!==false){
+    var w=cand.map(function(q){var r=st.st[q.id];var wt=!r?4:(r[0]-r[1]>0?3+(r[0]-r[1]):1/(1+r[0]));return wt;});
+    var tot=w.reduce(function(a,b){return a+b;},0),x=Math.random()*tot;
+    for(var i=0;i<cand.length;i++){x-=w[i];if(x<=0)return cand[i];}
+    return cand[cand.length-1];
+  }
+  return cand[Math.floor(Math.random()*cand.length)];
+}
+function newQ(id){var q=id?QMAP[id]:pick();if(!q){st.cur=null;return;}
+  st.cur={id:q.id,ord:shuffle(q.o.map(function(_,i){return i;})),ans:null,show:!st.set.hide};save();}
+
+function figHTML(q,after){
+  if(!q.img)return"";
+  return'<div class="fig">'+IMG.render(q.img,after)+'<p class="cap">模式図（自作）。画像の左＝患者の右'+(after&&hasMarks(q.img)?"。黄色は解答後の注記":"")+'</p></div><button type="button" class="zoombtn" id="zoomOpen">図を拡大する</button>';
+}
+function hasMarks(sp){var ps=sp.panels||[sp];return ps.some(function(p){return p.lab||p.mark;});}
+
+function renderQ(){
+  var a=$("qArea");
+  if(!st.cur||!QMAP[st.cur.id])newQ();
+  if(!st.cur){a.innerHTML='<div class="card empty">出題できる問題がありません。「出題範囲・設定」で範囲を選んでください。</div>';return;}
+  var q=QMAP[st.cur.id],c=st.cur,done=c.ans!==null;
+  var r=st.st[q.id];
+  var h='<div class="card"><div class="qhead"><span class="lv">'+"★★★".slice(0,q.lv)+"☆☆☆".slice(0,3-q.lv)+'</span>'+(r?'<span>この問題 '+r[1]+'/'+r[0]+'</span>':'<span>はじめて</span>')+'<span class="regtag">'+CATS[q.c]+'</span></div>';
+  h+='<p class="stem">'+esc(q.s)+'</p>'+figHTML(q,done);
+  h+='<p class="ask">'+esc(q.q)+'</p>';
+  if(!c.show&&!done){h+='<button type="button" class="btn primary" id="showOpt">選択肢を見る</button>';}
+  else{
+    h+='<div class="opts">'+c.ord.map(function(oi,n){var o=q.o[oi];var cls="";
+      if(done){if(oi===0)cls=" ok";else if(oi===c.ans)cls=" ng";}
+      return'<button type="button" class="opt'+cls+'" data-i="'+oi+'"'+(done?" disabled":"")+'><span class="n">'+(n+1)+'</span><span>'+esc(o[0])+(done&&(oi===0||oi===c.ans)&&o[1]?'<span class="why">'+esc(o[1])+'</span>':"")+'</span></button>';}).join("")+'</div>';
+  }
+  if(done){
+    var ok=c.ans===0;
+    h+='<div class="result '+(ok?"ok":"ng")+'">'+(ok?"正解":"不正解（正解は緑の選択肢）")+'</div>';
+    h+='<p class="exp">'+esc(q.e)+'</p>';
+    if(q.k&&q.k.length)h+='<ul class="kp">'+q.k.map(function(x){return"<li>"+esc(x)+"</li>";}).join("")+'</ul>';
+    if(q.r&&q.r.length)h+='<div class="refs">出典：'+q.r.map(refLink).join("")+'</div>';
+    h+='<div class="next"><button type="button" class="btn primary" id="nextQ">次の問題</button>'+(c.ans!==0?'<button type="button" class="btn" id="retryQ">もう一度解く</button>':"")+'</div>';
+  }
+  h+='</div>';
+  a.innerHTML=h;
+  if($("showOpt"))$("showOpt").onclick=function(){c.show=true;save();renderQ();};
+  Array.prototype.forEach.call(a.querySelectorAll(".opt:not([disabled])"),function(b){b.onclick=function(){answer(+b.getAttribute("data-i"));};});
+  if($("nextQ"))$("nextQ").onclick=function(){newQ();renderQ();window.scrollTo(0,0);};
+  if($("retryQ"))$("retryQ").onclick=function(){newQ(q.id);renderQ();};
+  if($("zoomOpen"))$("zoomOpen").onclick=function(){openZoom(q,done);};
+}
+function answer(i){
+  var c=st.cur,q=QMAP[c.id];if(c.ans!==null)return;
+  c.ans=i;var ok=i===0;
+  var r=st.st[q.id]||[0,0];r[0]++;if(ok)r[1]++;r[2]=ok?1:0;st.st[q.id]=r;
+  st.cnt++;if(ok){st.ok++;st.streak++;}else st.streak=0;
+  st.hist.push(q.id);if(st.hist.length>60)st.hist=st.hist.slice(-60);
+  save();renderTop();renderQ();
+}
+function renderTop(){$("sN").textContent=st.cnt;$("sR").textContent=st.cnt?Math.round(st.ok/st.cnt*100)+"%":"—";$("sS").textContent=st.streak;}
+
+/* ── 拡大 ── */
+function openZoom(q,after){$("zoomB").innerHTML=IMG.render(q.img,after);$("zoom").classList.add("on");document.body.classList.add("zoomon");}
+$("zoomX").onclick=function(){$("zoom").classList.remove("on");document.body.classList.remove("zoomon");};
+
+/* ── 一覧 ── */
+function renderList(){
+  var f=($("aQ").value||"").trim().toLowerCase();
+  var h="";
+  Object.keys(CATS).forEach(function(c){
+    var qs=QS.filter(function(q){if(q.c!==c)return false;if(!f)return true;
+      var t=(q.s+q.q+q.e+q.o.map(function(o){return o.join(" ");}).join(" ")+(q.k||[]).join(" ")).toLowerCase();return t.indexOf(f)>=0;});
+    if(!qs.length)return;
+    h+='<div class="card"><h2>'+CATS[c]+' <span style="font-weight:400;color:var(--muted);font-size:13px">'+qs.length+'問</span></h2>';
+    qs.forEach(function(q){var r=st.st[q.id];
+      h+='<details class="site"><summary><b>'+esc(q.q)+(r?'<span class="mk '+(r[2]?"ok":"ng")+'">'+(r[2]?"前回○":"前回×")+'</span>':"")+'</b><span>'+esc(q.s.slice(0,60))+(q.s.length>60?"…":"")+(q.img?"（画像あり）":"")+'</span></summary>'+
+        '<div style="padding:0 0 10px"><p class="stem">'+esc(q.s)+'</p>'+(q.img?'<div class="fig">'+IMG.render(q.img,true)+'</div>':"")+
+        '<p style="margin:8px 0 4px"><b>正解：</b>'+esc(q.o[0][0])+'</p><p class="exp">'+esc(q.e)+'</p>'+
+        (q.r&&q.r.length?'<div class="refs">出典：'+q.r.map(refLink).join("")+'</div>':"")+
+        '<button type="button" class="btn sm" data-go="'+q.id+'" style="margin-top:8px">この問題を解く</button></div></details>';});
+    h+='</div>';
+  });
+  $("aList").innerHTML=h||'<div class="card empty">該当する問題がありません。</div>';
+  Array.prototype.forEach.call(document.querySelectorAll("[data-go]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-go"));show("v-q");renderQ();};});
+}
+$("aQ").oninput=renderList;
+
+/* ── 成績 ── */
+function renderStats(){
+  var h='<div class="card"><h2>分野別の成績</h2><table class="st">';
+  Object.keys(CATS).forEach(function(c){
+    var qs=QS.filter(function(q){return q.c===c;}),n=0,o=0,tried=0;
+    qs.forEach(function(q){var r=st.st[q.id];if(r){n+=r[0];o+=r[1];tried++;}});
+    var pct=n?Math.round(o/n*100):0;
+    h+='<tr><td>'+CATS[c]+'<div class="hint" style="margin:0">'+tried+'/'+qs.length+'問に回答</div></td><td><div class="bar"><i style="width:'+pct+'%"></i></div></td><td class="num">'+(n?pct+"%":"—")+'</td></tr>';
+  });
+  h+='</table></div>';
+  var wrong=QS.filter(function(q){var r=st.st[q.id];return r&&r[2]===0;});
+  h+='<div class="card"><h2>前回まちがえた問題</h2>'+(wrong.length?wrong.map(function(q){return'<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding:6px 0"><span style="font-size:14px;flex:1">'+esc(q.q)+'</span><button type="button" class="btn sm" data-go="'+q.id+'">解く</button></div>';}).join(""):'<p class="empty">ありません。</p>')+'</div>';
+  h+='<div class="card"><button type="button" class="btn" id="resetSt">成績を消す</button><p class="hint">成績（回答数・正答率・各問題の結果）を消します。</p></div>';
+  $("sArea").innerHTML=h;
+  Array.prototype.forEach.call(document.querySelectorAll("#sArea [data-go]"),function(b){b.onclick=function(){newQ(b.getAttribute("data-go"));show("v-q");renderQ();};});
+  $("resetSt").onclick=function(){if(!confirm("成績をすべて消しますか？"))return;st.st={};st.hist=[];st.cnt=0;st.ok=0;st.streak=0;save();renderTop();renderStats();};
+}
+
+/* ── 出典 ── */
+function renderRefs(){
+  var li=function(k){var r=REFS[k];var u=r[1];var lab="";
+    if(u&&!/^https?:/.test(u)){lab=u.indexOf("doi:")===0?u:"PMID "+u;u=u.indexOf("doi:")===0?"https://doi.org/"+u.slice(4):"https://pubmed.ncbi.nlm.nih.gov/"+u+"/";}
+    else if(u)lab="PDF";
+    return"<li>"+esc(r[0])+(u?' <a href="'+u+'" target="_blank" rel="noopener">'+lab+'</a>':"")+"</li>";};
+  var gl=["GL","RT","EV"],tr=Object.keys(REFS).filter(function(k){return gl.indexOf(k)<0;});
+  var h='<div class="card"><h2>指針・ガイドライン</h2><ul class="src">'+gl.map(li).join("")+'</ul></div>';
+  h+='<div class="card"><h2>臨床試験・海外ガイドライン</h2><ul class="src">'+tr.map(li).join("")+'</ul></div>';
+  h+='<div class="card"><h2>照合の状況</h2><p class="note">静注血栓溶解の適応外・慎重投与項目、用量、投与後の管理（神経評価・血圧測定の頻度、24時間の抗血栓療法の制限）、DOAC・ワルファリン・ダビガトランの扱い、発症時刻の定義は、rt-PA適正治療指針 第三版の本文と照合しました。血栓回収の推奨度（ASPECTS別・時間別・脳底動脈・M2）は、ガイドライン改訂2025の内容を反映した既存の「再開通療法 適応チェッカー」と同じ整理です。臨床試験の数値は各論文の要旨と照合しました。脳出血・くも膜下出血の手術適応（小脳出血3 cm、被殻出血31 mL）、脳梗塞急性期の降圧基準（220/120）、嚥下・DVT予防（CLOTS）・けいれん予防投与・分水嶺梗塞・分枝粥腫病・出血性変化の分類・ABC/2法の記載は、ガイドラインと一般的な知識による要約で、原典の頁と一つずつ照合したものではありません（未照合）。推奨度の細部は原典で確認してください。</p>';
+  h+='<p class="note">図はすべて自作の模式図です。本や論文の画像は使っていません。Dropboxの脳卒中関連書籍は、この版ではrt-PA適正治療指針（第三版）を参照しました。</p>';
+  h+='<div class="row" style="margin-top:10px;font-size:12px;color:var(--muted)">アプリの版：<b>'+APP_VER+'</b><button type="button" class="btn sm" id="forceUpdate">最新版に更新</button></div>';
+  h+='<p class="hint">収録：'+QS.length+'問（画像つき '+QS.filter(function(q){return q.img;}).length+'問）</p></div>';
+  $("rArea").innerHTML=h;
+  $("forceUpdate").onclick=async function(){
+    var b=this;b.textContent="確認しています…";
+    try{if("serviceWorker" in navigator){var r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}
+    try{await fetch(location.href,{cache:"reload"});}catch(e){b.textContent="通信できないため確認できません";return;}
+    setTimeout(function(){location.reload();},800);
+  };
+}
+
+/* ── タブ ── */
+var tabs=document.querySelectorAll("nav.tabs button");
+function show(v){
+  Array.prototype.forEach.call(document.querySelectorAll("section.view"),function(s){s.classList.toggle("active",s.id===v);});
+  Array.prototype.forEach.call(tabs,function(b){b.setAttribute("aria-selected",b.getAttribute("data-v")===v?"true":"false");});
+  if(v==="v-a")renderList();if(v==="v-s")renderStats();if(v==="v-r")renderRefs();if(v==="v-q")renderQ();
+  window.scrollTo(0,0);
+}
+Array.prototype.forEach.call(tabs,function(b){b.onclick=function(){show(b.getAttribute("data-v"));};});
+var tt;function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on");},2600);}
+window.__strToast=toast;
+
+renderSet();renderTop();renderQ();
+})();
+
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    var onClaude=/claude\.ai$|claudeusercontent|claude\.site/.test(h);
+    if(!("serviceWorker" in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller&&window.__strToast)window.__strToast("新しい版を取り込みました。次に開いたときに反映されます");
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[{"k":"str-v1","keep":["st","hist","cnt","ok","streak","set"]}];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>

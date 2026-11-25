@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>脳卒中トレーニング</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#9D174D">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="脳卒中トレ">
+<style>
+:root{
+  --bg:#F7F3F5; --surface:#FFFFFF; --ink:#24181D; --muted:#6B5A61; --line:#E6D9DF;
+  --accent:#9D174D; --accent-strong:#7A1039; --accent-soft:#FBE7EF; --on-accent:#FFFFFF;
+  --ok:#2E7D4F; --ok-soft:#E3F3E9; --ng:#B42318; --ng-soft:#FDE8E6; --warn-soft:#FFF4DB;
+  --font:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#171214; --surface:#211A1D; --ink:#F0E8EB; --muted:#B39FA7; --line:#3A2E33;
+    --accent:#F0729F; --accent-strong:#F7A8C4; --accent-soft:#3A1E29; --on-accent:#2A0714;
+    --ok:#5CC48A; --ok-soft:#163323; --ng:#F27A6E; --ng-soft:#3B1C1A; --warn-soft:#3A3017; color-scheme:dark}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+.app{max-width:680px;margin:0 auto;padding:0 calc(14px + env(safe-area-inset-right)) calc(88px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+header.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:26px;height:26px;border-radius:50%;border:5px solid var(--accent);flex:none}
+.brand h1{font-size:19px;font-weight:900}
+.brand small{color:var(--muted);font-size:11px;margin-left:auto;text-align:right;line-height:1.3}
+.summary{display:flex;gap:14px;margin-top:6px;font-size:12.5px;color:var(--muted);padding:0 2px}
+.summary b{color:var(--ink);font-size:14px}
+section.view{display:none;padding-top:12px}
+section.view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:12px}
+.card h2{font-size:16px;margin-bottom:6px}
+.btn{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sm{min-height:36px;padding:5px 11px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.set>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+details.set>summary::-webkit-details-marker{display:none}
+details.set>summary::after{content:"＋";margin-left:auto;color:var(--muted);font-weight:400}
+details.set[open]>summary::after{content:"－"}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14px;cursor:pointer;background:var(--bg);user-select:none}
+.chip input{margin:0;accent-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px}
+input[type=search]{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;min-height:44px}
+.sw{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;cursor:pointer}
+.sw input{width:22px;height:22px;accent-color:var(--accent)}
+.qhead{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.lv{letter-spacing:1px;color:var(--accent)}
+.regtag{margin-left:auto;background:var(--accent-soft);color:var(--accent-strong);border-radius:999px;padding:1px 10px;font-weight:700}
+.stem{font-size:15.5px;margin:0 0 6px}
+.ask{font-weight:700;margin:12px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:left;font-size:15.5px;line-height:1.45;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:11px;padding:11px 12px;min-height:48px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt .n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-top:1px}
+.opt .why{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ng{border-color:var(--ng);background:var(--ng-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.result{border-radius:10px;padding:9px 12px;font-weight:700;margin:12px 0 10px}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.result.ng{background:var(--ng-soft);color:var(--ng)}
+.exp{font-size:15px;margin:0 0 8px}
+ul.kp{margin:6px 0 8px;padding-left:20px;font-size:14.5px}
+ul.kp li{margin:3px 0}
+.refs{font-size:12.5px;color:var(--muted)}
+.refs a{color:var(--accent-strong);margin-right:8px;white-space:nowrap}
+.fig{margin:10px 0 2px;background:#000;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fig svg{display:block;width:100%;height:auto}
+.fig .cap{font-size:11.5px;color:#cfc4c8;background:#111;margin:0;padding:4px 8px;line-height:1.4}
+.zoombtn{font-size:12px;color:var(--accent-strong);background:none;border:0;padding:4px 0;cursor:pointer}
+#zoom{position:fixed;inset:0;z-index:2147483002;background:#000;display:none;flex-direction:column}
+#zoom.on{display:flex}
+#zoom .zb{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;align-items:center;justify-content:center;padding:calc(48px + env(safe-area-inset-top)) 8px 8px}
+#zoom .zb svg{width:100%;max-width:1000px;height:auto}
+#zoom button{position:absolute;top:calc(8px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));font:inherit;font-size:15px;font-weight:700;background:#fff;color:#111;border:0;border-radius:999px;padding:8px 16px;min-height:40px;cursor:pointer}
+body.zoomon #wcClrBtn,body.zoomon #wcQrBtn{display:none!important}
+.next{margin-top:12px;display:flex;gap:8px}
+details.site{border-top:1px solid var(--line)}
+details.site:first-of-type{border-top:0}
+details.site>summary{cursor:pointer;padding:9px 0;list-style:none}
+details.site>summary::-webkit-details-marker{display:none}
+details.site>summary b{display:block;font-size:14.5px}
+details.site>summary span{display:block;font-size:12.5px;color:var(--muted)}
+.mk{font-size:12px;font-weight:700;margin-left:6px}
+.mk.ok{color:var(--ok)}.mk.ng{color:var(--ng)}
+table.st{width:100%;border-collapse:collapse;font-size:14.5px}
+table.st td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:middle}
+table.st td.num{text-align:right;white-space:nowrap;width:1%}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.empty{color:var(--muted);font-size:14px}
+ul.src{margin:0;padding-left:18px;font-size:13.5px}
+ul.src li{margin:5px 0;line-height:1.45}
+ul.src a{color:var(--accent-strong);word-break:break-all}
+.note{font-size:12.5px;color:var(--muted);background:var(--warn-soft);border-radius:9px;padding:8px 10px;margin-top:8px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+nav.tabs .in{display:flex;max-width:680px;width:100%}
+nav.tabs button{flex:1;font:inherit;font-size:13px;background:none;border:0;color:var(--muted);padding:9px 0 10px;min-height:56px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:13px;z-index:20;display:none;max-width:90%}
+.toast.on{display:block}
+.foot{font-size:11.5px;color:var(--muted);margin:16px 2px 0}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><h1>脳卒中トレーニング</h1><small>症例と画像で<br>判断を練習</small></div>
+  <div class="summary"><span>回答 <b id="sN">0</b></span><span>正答率 <b id="sR">—</b></span><span>連続正解 <b id="sS">0</b></span></div>
+</header>
+
+<section class="view active" id="v-q" aria-label="出題">
+  <details class="card set" id="setBox">
+    <summary>出題範囲・設定 <span class="hint" id="setSum" style="margin:0 0 0 4px"></span></summary>
+    <div class="chips" id="catChips"></div>
+    <div class="row"><button class="btn sm" id="catAll" type="button">すべて</button><button class="btn sm" id="catNone" type="button">すべて外す</button></div>
+    <div class="row" style="margin-top:10px">
+      <label for="lvSel" style="font-size:14px">難易度</label>
+      <select id="lvSel"><option value="1">基本のみ</option><option value="2">標準まで</option><option value="3" selected>応用まで（すべて）</option></select>
+    </div>
+    <label class="sw"><input type="checkbox" id="imgOpt">画像のある問題だけ</label>
+    <label class="sw"><input type="checkbox" id="hideOpt">選択肢を隠して、先に自分で考える</label>
+    <label class="sw"><input type="checkbox" id="weakOpt" checked>間違えた問題・まだ解いていない問題を優先</label>
+    <p class="hint" id="setHint"></p>
+  </details>
+  <div id="qArea"></div>
+</section>
+
+<section class="view" id="v-a" aria-label="一覧">
+  <div class="card">
+    <h2>問題一覧</h2>
+    <input type="search" id="aQ" placeholder="キーワードで絞り込み（例：DOAC、ASPECTS）" aria-label="絞り込み">
+    <p class="hint">開くと問題・正解・解説が見られます。「この問題を解く」で出題画面に移ります。</p>
+  </div>
+  <div id="aList"></div>
+</section>
+
+<section class="view" id="v-s" aria-label="成績"><div id="sArea"></div></section>
+<section class="view" id="v-r" aria-label="出典"><div id="rArea"></div></section>
+
+<p class="foot">自分用の学習ツールです。画像はすべて自作の模式図で、実際の画像ではありません。症例は典型例をまとめたもので、診療の判断は診察・画像と原典（ガイドライン・指針・添付文書）で行ってください。成績はこの端末内にのみ保存されます。</p>
+</div>
+
+<div id="zoom" role="dialog" aria-modal="true" aria-label="図の拡大"><button type="button" id="zoomX">閉じる</button><div class="zb" id="zoomB"></div></div>
+
+<nav class="tabs" role="tablist" aria-label="画面切替"><div class="in">
+  <button role="tab" aria-selected="true" data-v="v-q" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.2v.1"/></svg>出題</button>
+  <button role="tab" aria-selected="false" data-v="v-a" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg>一覧</button>
+  <button role="tab" aria-selected="false" data-v="v-s" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>成績</button>
+  <button role="tab" aria-selected="false" data-v="v-r" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 13h7M9 17h7"/></svg>出典</button>
+</div></nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/*@@IMG@@*/
+</script>
+<script>
+/*@@DATA@@*/
+</script>
+<script>
+/*@@APP@@*/
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure=location.protocol==="https:"||h==="localhost"||h==="127.0.0.1";
+    var onClaude=/claude\.ai$|claudeusercontent|claude\.site/.test(h);
+    if(!("serviceWorker" in navigator)||!secure||onClaude)return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing;if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller&&window.__strToast)window.__strToast("新しい版を取り込みました。次に開いたときに反映されます");
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+/*@@CLEAR@@*/
+<script src="../share.js" defer></script>
+</body>
+</html>
