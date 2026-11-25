@@ -48,7 +48,7 @@ ward-apps/
 ├─ nih/                  … NIHSS評価
 ├─ lab/                  … 外注・研究検査ナビ（アプリ本体のみ。検査データは暗号化した lab/data.enc を端末で開く）
 ├─ setsumei/             … 神経疾患 説明用紙（病気・検査・治療・生活・薬の説明149項目をA4で印刷。カルテ保存用と患者配布用の2部、薬は処方内容の記入欄つき。本文は setsumei/src で編集し build.py で生成）
-├─ byomei/               … 病名登録アシスト（処方薬から保険病名の候補。検索・一覧・スクショ/写真の端末内文字認識〈Tesseract.js、ocr/〉・貼り付け照合。辞書は byomei/src/drugs.txt を編集し build.py で生成）
+├─ byomei/               … 病名登録アシスト（処方薬から保険病名の候補。検索・一覧・スクショ/写真の端末内文字認識〈Tesseract.js、ocr/〉・貼り付け照合。辞書は byomei/src/drugs.txt を編集し build.py で生成。カルテ端末版は karte.py が src/karte_hook.py を呼び、文字認識の部品を内蔵した単体HTML〈約7MB〉になる）
 ├─ referral/             … 脳神経クリニック紹介先検索
 ├─ pd/                   … PD薬剤調整ナビ（今の抗PD薬をタップで入れて LEDD〈Jost 2023〉、絶食・周術期の置き換え〈胃管投与・L-dopa注・ロチゴチン貼付〉、wearing-off・ジスキネジア・幻覚の対処順〈GL2018〉、悪性症候群・DAWS の初期対応）
 └─ updrs/                … MDS-UPDRS 評価ツール（各フォルダは dm/ と同じ構成）

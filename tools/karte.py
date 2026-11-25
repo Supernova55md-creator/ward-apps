@@ -11,6 +11,7 @@
   - アイコンを data URI にする（ファイル1つで完結させる）
   - service worker の登録は file:// では元のガードで動かないので、そのまま残す
   - 外部ファイルを読む箇所が残っていれば警告する（例：lab/data.enc は別に持ち込む）
+  - <slug>/src/karte_hook.py があれば hook(html, app) を呼ぶ（アプリ独自の内蔵処理。例：byomei の文字認識）
 """
 import base64, os, re, sys
 
@@ -35,6 +36,14 @@ def build(slug, outdir):
         uri = "data:image/png;base64," + base64.b64encode(open(ic, "rb").read()).decode()
         html = html.replace('href="icon-192.png"', 'href="%s"' % uri).replace('href="apple-touch-icon.png"', 'href="%s"' % uri)
         html = html.replace('src="icon-192.png"', 'src="%s"' % uri)
+
+    # アプリ独自の追加処理（例：byomei は文字認識の部品を内蔵する）：<slug>/src/karte_hook.py の hook(html, app)
+    hk = os.path.join(app, "src", "karte_hook.py")
+    if os.path.exists(hk):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("karte_hook_" + slug, hk)
+        mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+        html = mod.hook(html, app)
 
     html = html.replace("<head>", "<head>\n<!-- カルテ端末（院内共有フォルダ）用 単体版：tools/karte.py で ward-apps/%s から生成 -->" % slug, 1)
 

@@ -152,6 +152,7 @@ label.ck{display:inline-flex;gap:6px;align-items:center;font-size:13.5px}
   </div>
   <div id="ocrStat" class="lead" style="margin:8px 0 0"></div>
   <div class="prog" id="ocrProg" hidden><i></i></div>
+  <p class="lead" style="margin:8px 0 0">パソコンでは、処方の部分を切り取って（Windows：Win+Shift+S）この画面で Ctrl+V を押すか、画像をここにドラッグしても読み取れます。</p>
   <p class="lead" style="margin:8px 0 0">患者氏名・IDが写り込んだ画像でも端末外には出ませんが、できれば処方部分だけを切り取ってから読み込むと精度も上がります。</p>
 </section>
 <section class="card" id="ocrNo" hidden>
@@ -213,6 +214,7 @@ label.ck{display:inline-flex;gap:6px;align-items:center;font-size:13.5px}
 </div>
 </main>
 <div id="toast" role="status"></div>
+<!--karte-ocr-->
 <script>
 var DRUGS=__DATA__;
 </script>
@@ -408,23 +410,36 @@ function renderHits(r){
 /* ---------- 写真の読み取り（Tesseract.js、端末内） ---------- */
 var OCR_FILES=["ocr/tesseract.min.js","ocr/worker.min.js","ocr/tesseract-core-lstm.wasm.js","ocr/tesseract-core-simd-lstm.wasm.js","ocr/jpn.traineddata.gz"];
 var OCR_CACHE="ocrdata-jpn-v1";
-var canOCR=/^https?:$/.test(location.protocol)&&typeof Worker!=="undefined"&&typeof WebAssembly!=="undefined";
+var EMB=!!document.getElementById("ocr-core");
+var canOCR=(EMB||/^https?:$/.test(location.protocol))&&typeof Worker!=="undefined"&&typeof WebAssembly!=="undefined"&&typeof Blob!=="undefined";
 function ocrStat(m,p){$("ocrStat").textContent=m||"";var pg=$("ocrProg");if(p==null){pg.hidden=true;}else{pg.hidden=false;pg.firstChild.style.width=Math.round(p*100)+"%";}}
 function baseURL(f){return new URL(f,location.href).href;}
 function cacheOcr(){
-  if(!("caches" in window))return Promise.resolve(false);
+  if(EMB||!("caches" in window))return Promise.resolve(false);
   return caches.open(OCR_CACHE).then(function(c){
     return Promise.all(OCR_FILES.map(function(f){var u=baseURL(f);
       return c.match(u).then(function(hit){if(hit)return true;return fetch(u,{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error(f);return c.put(u,r);});});}));
   }).then(function(){return true;});
 }
 function loadTess(){
-  if(window.Tesseract)return Promise.resolve();
+  if(window.Tesseract||EMB)return Promise.resolve();
   return new Promise(function(ok,ng){var s=document.createElement("script");s.src=OCR_FILES[0];s.onload=ok;s.onerror=function(){ng(new Error("load"));};document.head.appendChild(s);});
 }
 var worker=null;
 function getWorker(){
   if(worker)return Promise.resolve(worker);
+  if(EMB)return loadTess().then(function(){
+    /* カルテ端末版：文字認識の部品（本体・日本語モデル）をこのファイルに内蔵。通信なしで動く */
+    var t=function(id){return document.getElementById(id).textContent;};
+    var pre="var __JPN=\""+t("ocr-jpn").replace(/\s+/g,"")+"\";\n"+
+      "(function(){var of=self.fetch;self.fetch=function(u,o){if(/traineddata/.test(String(u))){var b=atob(__JPN),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return Promise.resolve(new Response(a));}return of?of.apply(self,arguments):Promise.reject(new Error('offline'));};})();\n";
+    var src=t("ocr-core")+"\n;self.TesseractCore=TesseractCore;\n"+pre+t("ocr-worker");
+    var url=URL.createObjectURL(new Blob([src],{type:"application/javascript"}));
+    return Tesseract.createWorker("jpn",1,{
+      workerPath:url,workerBlobURL:false,corePath:"embedded.js",langPath:"https://embedded.invalid/ocr",gzip:true,cacheMethod:"none",
+      logger:function(m){if(m.status==="recognizing text")ocrStat("読み取り中…",m.progress);else if(m.status)ocrStat("準備中："+m.status,m.progress||0);}
+    });
+  }).then(function(w){worker=w;return w;});
   return loadTess().then(function(){
     return Tesseract.createWorker("jpn",1,{
       workerPath:baseURL("ocr/worker.min.js"),corePath:baseURL("ocr/"),langPath:baseURL("ocr/"),
@@ -487,6 +502,13 @@ $("q").addEventListener("keydown",function(e){if(e.key==="Enter"){var r=search(t
 $("lq").addEventListener("input",renderList);
 $("withDrug").addEventListener("change",function(){S.withDrug=this.checked;save();});
 $("withNote").addEventListener("change",function(){S.withNote=this.checked;save();});
+/* パソコン：Win+Shift+S などで切り取った画像を Ctrl+V で貼り付け、またはドラッグで読み取る */
+document.addEventListener("paste",function(e){
+  if(!canOCR)return;var it=(e.clipboardData&&e.clipboardData.items)||[];
+  for(var i=0;i<it.length;i++){if(it[i].type&&it[i].type.indexOf("image/")===0){var f=it[i].getAsFile();if(f){e.preventDefault();setTab("ocr");runOCR(f);}return;}}
+});
+$("ocrCard").addEventListener("dragover",function(e){e.preventDefault();});
+$("ocrCard").addEventListener("drop",function(e){e.preventDefault();var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&/^image\//.test(f.type))runOCR(f);});
 $("img").addEventListener("change",function(){var f=this.files&&this.files[0];this.value="";if(f)runOCR(f);});
 $("prepOcr").addEventListener("click",function(){
   ocrStat("読み取りの部品をダウンロードしています…",0.1);
@@ -521,6 +543,7 @@ document.addEventListener("click",function(e){
 
 load();
 if(!canOCR){$("ocrCard").hidden=true;$("ocrNo").hidden=false;}
+if(EMB){$("prepOcr").hidden=true;$("ocrStat").textContent="このファイルに文字認識の部品が入っています（通信なしで読み取れます）。初回の読み取りは準備に数秒かかります。";}
 $("nAll").textContent=DRUGS.length+"件";$("nVer").textContent=DRUGS.length;
 setTab(S.tab||"rx");renderSel();
 window.__byomei={match:matchText,search:search,norm:norm,state:S};
