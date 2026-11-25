@@ -437,6 +437,18 @@
       ]
     },
     {
+      "name": "病名登録アシスト",
+      "short_name": "病名アシスト",
+      "url": "byomei/",
+      "icons": [
+        {
+          "src": "byomei/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "脳神経クリニック紹介先検索",
       "short_name": "神経紹介先",
       "url": "referral/",

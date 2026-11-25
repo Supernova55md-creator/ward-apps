@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f766e">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="病名アシスト">
+<title>病名登録アシスト</title>
+<style>
+:root{
+  --accent:#0f766e; --accent-ink:#fff; --accent-soft:#e3f4f1;
+  --bg:#f4f7f6; --surface:#fff; --ink:#17211f; --muted:#5c6b68; --line:#d9e3e0;
+  --info:#2b5b9a; --info-soft:#e7eef8; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b42318; --crit-soft:#fdecea;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#4fd1c0; --accent-ink:#06231f; --accent-soft:#12312d;
+  --bg:#0f1514; --surface:#18201e; --ink:#e9f0ee; --muted:#a3b3af; --line:#2c3a37;
+  --info:#8db7f2; --info-soft:#18263a; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff8a80; --crit-soft:#3a1512;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:19px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+nav.tabs button{font:inherit;font-size:13.5px;font-weight:700;border:0;border-radius:8px;padding:7px 2px;background:rgba(255,255,255,.18);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.2)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:16px;margin:0 0 4px;line-height:1.4}
+h2 small{font-size:12px;color:var(--muted);font-weight:500}
+h3{font-size:14.5px;margin:12px 0 4px}
+.lead{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+input[type=search],input[type=text],textarea{font:inherit;font-size:16px;width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);color:var(--ink)}
+textarea{min-height:120px;font-size:14px;line-height:1.5}
+.sug{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.sug button{font:inherit;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:7px 10px;min-height:42px;cursor:pointer;font-size:14px;line-height:1.35}
+.sug button b{font-weight:700}
+.sug button span{display:block;font-size:12px;color:var(--muted)}
+.drug{border:1px solid var(--line);border-radius:11px;padding:9px 10px;margin-top:8px;background:var(--bg)}
+.drug .hd{display:flex;gap:8px;align-items:flex-start}
+.drug .nm{flex:1;font-weight:700;font-size:14.5px;line-height:1.35}
+.drug .nm span{display:block;font-weight:500;font-size:12px;color:var(--muted)}
+.drug .x{flex:none;font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:8px;min-width:40px;min-height:34px;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chip{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;min-height:34px;cursor:pointer;line-height:1.3}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.dnote{font-size:12.5px;line-height:1.5;margin-top:6px;color:var(--muted)}
+.dnote.w{color:var(--warn)}
+.alt{font:inherit;font-size:12px;border:1px dashed var(--info);background:transparent;color:var(--info);border-radius:8px;padding:3px 8px;margin-top:5px;cursor:pointer}
+.res{border:2px solid var(--accent);border-radius:12px;padding:10px 12px;background:var(--accent-soft)}
+.res .big{font-weight:800;color:var(--accent);font-size:15px}
+.res ul{margin:6px 0 0;padding-left:1.2em}
+.res li{margin:2px 0}
+.res li small{color:var(--muted)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:9px;padding:8px 14px;min-height:42px;cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5}
+label.ck{display:inline-flex;gap:6px;align-items:center;font-size:13.5px}
+.note{background:var(--info-soft);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.6}
+.note ul,.caution ul{margin:4px 0 0;padding-left:1.2em}
+.caution{background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6}
+.hit{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px;background:var(--bg)}
+.hit input{width:22px;height:22px;flex:none;margin-top:2px}
+.hit .t{flex:1;font-size:14px;line-height:1.4}
+.hit .t span{display:block;font-size:12px;color:var(--muted);word-break:break-all}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:1px}
+.tag.fz{background:var(--warn-soft);color:var(--warn)}
+.tag.ex{background:var(--accent-soft);color:var(--accent)}
+.miss{font-size:12.5px;color:var(--muted);margin:6px 0 0;padding-left:1.2em}
+.prog{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.cat{margin-top:10px}
+.cat>summary{cursor:pointer;font-weight:700;font-size:14.5px;padding:8px 0;border-top:1px solid var(--line);list-style:none}
+.cat>summary::-webkit-details-marker{display:none}
+.cat>summary::before{content:"＋ ";color:var(--accent)}
+.cat[open]>summary::before{content:"－ "}
+.row{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px dashed var(--line);font-size:13.5px;line-height:1.45}
+.row .a{flex:1}
+.row .a b{font-size:14px}
+.row .a em{font-style:normal;color:var(--muted);font-size:12px}
+.row .a .dz{display:block;color:var(--accent);font-weight:600}
+.row .a .nt{display:block;color:var(--warn);font-size:12px}
+.row button{flex:none;font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:8px;min-width:48px;min-height:34px;cursor:pointer}
+.row button[disabled]{opacity:.45}
+.src{font-size:12.5px;line-height:1.6;padding-left:1.2em;margin:0}
+.src a{color:var(--info);word-break:break-all}
+.empty{font-size:13.5px;color:var(--muted);padding:6px 0}
+[hidden]{display:none!important}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 14px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:50;max-width:90vw}
+#toast.on{opacity:.95}
+@media print{header.top nav,.bar,#toast{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>病名登録アシスト</h1><small>処方 → 保険病名の候補</small></div>
+  <nav class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="rx" aria-selected="true">処方→病名</button>
+    <button type="button" role="tab" data-tab="ocr" aria-selected="false">読み取り</button>
+    <button type="button" role="tab" data-tab="list" aria-selected="false">一覧</button>
+    <button type="button" role="tab" data-tab="src" aria-selected="false">出典</button>
+  </nav>
+</header>
+<main>
+<!-- ===== 処方→病名 ===== -->
+<div data-pane="rx">
+<section class="card">
+  <h2>薬を入れる</h2>
+  <p class="lead">商品名・一般名どちらでも。ひらがな・途中まででも探せます。処方の画面やスクショは「読み取り」タブへ。</p>
+  <input type="search" id="q" placeholder="例：アムロジピン、ミカルディス、たけきゃぶ" autocomplete="off" enterkeyhint="search">
+  <div class="sug" id="sug"></div>
+</section>
+<section class="card">
+  <div class="res" id="res"><div class="big">薬を入れると、登録する病名の候補がここに出ます</div></div>
+  <div class="bar" style="margin-top:10px">
+    <button type="button" class="btn pri" id="copyBtn">病名をコピー</button>
+    <label class="ck"><input type="checkbox" id="withDrug" checked>薬名を添える</label>
+    <label class="ck"><input type="checkbox" id="withNote" checked>注意も添える</label>
+  </div>
+  <div class="caution" id="notes" hidden></div>
+</section>
+<section class="card">
+  <h2>選んだ薬 <small id="nSel"></small></h2>
+  <p class="lead">病名の候補を押して、登録する病名を選びます（色つきが選択中）。</p>
+  <div id="selList"></div>
+  <div class="bar" style="margin-top:10px"><button type="button" class="btn" id="clrSel">選んだ薬をすべて外す</button></div>
+</section>
+</div>
+
+<!-- ===== 読み取り ===== -->
+<div data-pane="ocr" hidden>
+<section class="card" id="ocrCard">
+  <h2>写真・スクショから読み取る</h2>
+  <p class="lead">処方一覧のスクショや写真を選ぶと、この端末の中で文字を読み取り、辞書の薬と照合します。画像も読み取った文字も保存しません（送信もしません）。</p>
+  <div class="bar">
+    <label class="btn pri" for="img" style="display:inline-flex;align-items:center">画像を選ぶ</label>
+    <input type="file" id="img" accept="image/*" hidden>
+    <button type="button" class="btn" id="prepOcr">読み取りの準備（初回・約10MB）</button>
+  </div>
+  <div id="ocrStat" class="lead" style="margin:8px 0 0"></div>
+  <div class="prog" id="ocrProg" hidden><i></i></div>
+  <p class="lead" style="margin:8px 0 0">患者氏名・IDが写り込んだ画像でも端末外には出ませんが、できれば処方部分だけを切り取ってから読み込むと精度も上がります。</p>
+</section>
+<section class="card" id="ocrNo" hidden>
+  <h2>写真の読み取り</h2>
+  <p class="lead">この版（カルテ端末用の単体ファイル）では写真の読み取りは使えません。電子カルテの処方画面の文字を選んでコピーし、下に貼り付けてください。</p>
+</section>
+<section class="card">
+  <h2>文字を貼り付けて照合</h2>
+  <p class="lead">iPhoneは写真の文字を長押し（テキスト認識表示）→コピー、Androidは Googleレンズ →テキストをコピー、が一番正確です。電子カルテの処方画面からのコピーもそのまま貼れます。</p>
+  <textarea id="txt" placeholder="ここに処方の文字（読み取り結果）が入ります。直してから「照合」も可"></textarea>
+  <div class="bar" style="margin-top:8px"><button type="button" class="btn pri" id="matchBtn">照合</button><button type="button" class="btn" id="txtClr">消す</button></div>
+</section>
+<section class="card" id="hitCard" hidden>
+  <h2>見つかった薬 <small id="hitN"></small></h2>
+  <p class="lead">「あいまい」は読み取りの誤りを補正して当てたものです。違っていればチェックを外してください。</p>
+  <div id="hits"></div>
+  <div id="missBox"></div>
+  <div class="bar" style="margin-top:10px"><button type="button" class="btn pri" id="addHits">選んだ薬を追加して病名へ</button></div>
+</section>
+</div>
+
+<!-- ===== 一覧 ===== -->
+<div data-pane="list" hidden>
+<section class="card">
+  <h2>薬 → 病名の一覧 <small id="nAll"></small></h2>
+  <p class="lead">分類を開くと、薬ごとの病名の候補（先頭が既定）と注意が見られます。「追加」で処方→病名に入ります。</p>
+  <input type="search" id="lq" placeholder="一覧を絞り込む（薬名・病名）" autocomplete="off">
+  <div id="catList"></div>
+</section>
+</div>
+
+<!-- ===== 出典 ===== -->
+<div data-pane="src" hidden>
+<section class="card">
+  <h2>使い方と注意</h2>
+  <div class="note"><ul>
+    <li>候補は各薬の添付文書の「効能又は効果」を病名の形にまとめたものです。<b>記載は未照合（作成者のまとめ）を含みます。</b>登録前に添付文書・院内の病名マスターで確認してください。</li>
+    <li>病名はレセプト電算処理の標準病名マスターの表記に寄せていますが、照合はしていません。院内の病名検索で選び直してください。</li>
+    <li>投与期間の上限（PPIの胃潰瘍8週など）、用量で適応が違うもの、最適使用推進ガイドラインの要件があるものは「注意」に書いています。</li>
+    <li>「審査上認められる事例」は社会保険診療報酬支払基金の審査情報提供事例に基づくもので、適応外使用です。都道府県・保険者で扱いが違うことがあります。</li>
+    <li>疑い病名・転帰（治癒・中止）の整理は別に行ってください。</li>
+    <li>診療判断・請求の補助です。最終判断は添付文書と院内の医事課の確認で行ってください。</li>
+  </ul></div>
+  <h3>データの扱い</h3>
+  <p class="lead" style="margin:0">選んだ薬の一覧だけをこの端末に保存します（患者情報は持ちません）。画像と読み取った文字は保存しません。写真の読み取りは端末内の文字認識（Tesseract.js・日本語モデル）で行い、通信はしません（準備のための初回ダウンロードのみ）。</p>
+</section>
+<section class="card">
+  <h2>出典</h2>
+  <ol class="src">
+    <li>PMDA 医療用医薬品 情報検索（添付文書）：<a href="https://www.pmda.go.jp/PmdaSearch/iyakuSearch/" target="_blank" rel="noopener">https://www.pmda.go.jp/PmdaSearch/iyakuSearch/</a></li>
+    <li>社会保険診療報酬支払基金 審査情報提供事例：<a href="https://www.ssk.or.jp/shinsajoho/teikyojirei/index.html" target="_blank" rel="noopener">https://www.ssk.or.jp/shinsajoho/teikyojirei/index.html</a>（クエチアピン・ハロペリドール・ペロスピロン・リスペリドン「器質的疾患に伴うせん妄・精神運動興奮状態・易怒性」2011年9月）</li>
+    <li>厚生労働省 保医発1224第8号（令和3年12月24日）プラスグレル塩酸塩製剤の留意事項（脳梗塞に使う場合の要件）。2026年に後発品へ拡大：<a href="https://www.mhlw.go.jp/hourei/doc/tsuchi/T260806S0050.pdf" target="_blank" rel="noopener">https://www.mhlw.go.jp/hourei/doc/tsuchi/T260806S0050.pdf</a></li>
+    <li>ヒフデュラ配合皮下注 審査報告書（CIDP追加 2024年12月27日承認）：<a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/GeneralList/6399501A1020" target="_blank" rel="noopener">https://www.pmda.go.jp/PmdaSearch/iyakuDetail/GeneralList/6399501A1020</a></li>
+    <li>レセプト電算処理システム 傷病名マスター（社会保険診療報酬支払基金）：<a href="https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/index.html" target="_blank" rel="noopener">https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/index.html</a></li>
+    <li>文字認識：Tesseract.js（Apache License 2.0）・tessdata 日本語モデル（jpn, best_int）</li>
+  </ol>
+  <p style="margin:12px 0 0;font-size:13.5px">アプリの版：<b>__VERSION__</b>（薬 <span id="nVer"></span> 件）　<button type="button" class="btn" id="forceUpdate">最新版に更新</button></p>
+</section>
+</div>
+</main>
+<div id="toast" role="status"></div>
+<script>
+var DRUGS=__DATA__;
+</script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var KEY="byomei-v1";
+var S={tab:"rx",sel:[],withDrug:true,withNote:true};
+function load(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o){for(var k in o)S[k]=o[k];}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove("on");},2200);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+/* ---------- 正規化 ---------- */
+function norm(s){
+  s=String(s||"");
+  try{s=s.normalize("NFKC");}catch(e){}
+  s=s.replace(/[ぁ-ゖ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)+0x60);});
+  s=s.replace(/([ァ-ヺ])[一\-‐－―—ｰ]/g,"$1ー").replace(/([ァ-ヺ])[一\-‐－―—ｰ]/g,"$1ー");
+  s=s.replace(/[\s・･·\.,，、]/g,"").toUpperCase();
+  s=s.replace(/[ァィゥェォッャュョヮ]/g,function(c){return "アイウエオツヤユヨワ"["ァィゥェォッャュョヮ".indexOf(c)];});
+  return s;
+}
+var BYID={};
+var INJ=/注|静注|点滴|シリンジ|キット|バッグ|輸液/;
+DRUGS.forEach(function(d,i){
+  d.i=i;BYID[d.id]=d;
+  d.inj=/（注）|（重積）/.test(d.g)||d.b.some(function(b){return /注$|注射|静注/.test(b);});
+  var al=[];d.hint=d.a.filter(function(a){return a.charAt(0)==="~";}).map(function(a){return norm(a.slice(1));});d.a=d.a.filter(function(a){return a.charAt(0)!=="~";});
+  var g0=d.g.replace(/（[^）]*）/g,"");
+  al.push(g0);d.b.forEach(function(b){al.push(b);});d.a.forEach(function(a){al.push(a);});
+  d.al=[];d.sal=[];
+  al.forEach(function(a){var n=norm(a);if(!n)return;if(d.sal.indexOf(n)<0)d.sal.push(n);if(n.length>=3&&d.al.indexOf(n)<0)d.al.push(n);});
+  d.key=norm(d.g+d.b.join("")+d.a.join("")+d.dz.map(function(z){return z.n;}).join(""));
+});
+
+/* ---------- 検索 ---------- */
+function search(q,limit){
+  q=norm(q);if(!q)return [];
+  var r=[];
+  DRUGS.forEach(function(d){
+    var best=99;
+    d.sal.forEach(function(a){var p=a.indexOf(q);if(p===0)best=Math.min(best,0);else if(p>0)best=Math.min(best,1);});
+    if(best===99&&d.key.indexOf(q)>=0)best=2;
+    if(best<99)r.push([best,d]);
+  });
+  r.sort(function(a,b){return a[0]-b[0]||a[1].i-b[1].i;});
+  return r.slice(0,limit||10).map(function(x){return x[1];});
+}
+
+/* ---------- 選んだ薬 ---------- */
+function findSel(id){for(var i=0;i<S.sel.length;i++)if(S.sel[i].id===id)return i;return -1;}
+function addDrug(id,silent){
+  var d=BYID[id];if(!d)return false;
+  if(findSel(id)>=0){if(!silent)toast("すでに入っています");return false;}
+  S.sel.push({id:id,on:[0]});save();if(!silent)toast(d.g+" を追加");return true;
+}
+function dname(d){return d.g+(d.b.length?"（"+d.b.slice(0,2).join("・")+"）":"");}
+function renderSel(){
+  var h="";
+  S.sel=S.sel.filter(function(s){return BYID[s.id];});
+  S.sel.forEach(function(s,k){
+    var d=BYID[s.id];
+    h+='<div class="drug"><div class="hd"><div class="nm">'+esc(d.g)+'<span>'+esc(d.b.join("・"))+'｜'+esc(d.c)+'</span></div><button type="button" class="x" data-del="'+k+'" aria-label="外す">外す</button></div><div class="chips">';
+    d.dz.forEach(function(z,j){var on=s.on.indexOf(j)>=0;
+      h+='<button type="button" class="chip" data-k="'+k+'" data-j="'+j+'" aria-pressed="'+on+'" title="'+esc(z.t||"")+'">'+esc(z.n)+'</button>';});
+    h+='</div>';
+    var tx=s.on.map(function(j){return d.dz[j]&&d.dz[j].t;}).filter(Boolean);
+    if(tx.length)h+='<div class="dnote">適応：'+esc(tx.join(" ／ "))+'</div>';
+    if(d.nt)h+='<div class="dnote w">⚠ '+esc(d.nt)+'</div>';
+    if(d.sib&&d.sib.length)d.sib.forEach(function(sid){var o=BYID[sid];if(o)h+='<button type="button" class="alt" data-swap="'+k+'" data-to="'+esc(sid)+'">別の製剤に替える：'+esc(o.g)+'</button> ';});
+    h+='</div>';
+  });
+  $("selList").innerHTML=h||'<div class="empty">まだ薬がありません。上で検索するか、「読み取り」「一覧」から追加してください。</div>';
+  $("nSel").textContent=S.sel.length?S.sel.length+"剤":"";
+  renderRes();
+}
+function collect(){
+  var map={},order=[],notes=[];
+  S.sel.forEach(function(s){var d=BYID[s.id];
+    s.on.slice().sort(function(a,b){return a-b;}).forEach(function(j){var z=d.dz[j];if(!z)return;
+      if(!map[z.n]){map[z.n]=[];order.push(z.n);}
+      var g=d.g.replace(/（[^）]*）/g,"");if(map[z.n].indexOf(g)<0)map[z.n].push(g);});
+    if(d.nt)notes.push([d.g.replace(/（[^）]*）/g,""),d.nt]);
+  });
+  return {map:map,order:order,notes:notes};
+}
+function renderRes(){
+  var c=collect(),h;
+  var noDz=S.sel.filter(function(s){return !s.on.length;}).map(function(s){return BYID[s.id].g;});
+  if(!S.sel.length){h='<div class="big">薬を入れると、登録する病名の候補がここに出ます</div>';
+    try{window.wcSum&&wcSum.set(null);}catch(e){}}
+  else{
+    h='<div class="big">登録する病名 '+c.order.length+'件（'+S.sel.length+'剤から）</div><ul>';
+    c.order.forEach(function(n){h+='<li><b>'+esc(n)+'</b> <small>← '+esc(c.map[n].join("、"))+'</small></li>';});
+    h+='</ul>';
+    if(noDz.length)h+='<div class="dnote w">病名が未選択：'+esc(noDz.join("、"))+'</div>';
+    try{window.wcSum&&wcSum.set("病名 "+c.order.length+"件："+c.order.slice(0,6).join("、")+(c.order.length>6?" ほか":""),{tone:noDz.length?"warn":"ok",pill:S.sel.length+"剤"});}catch(e){}
+  }
+  $("res").innerHTML=h;
+  if(c.notes.length){$("notes").hidden=false;$("notes").innerHTML='<b>確認すること</b><ul>'+c.notes.map(function(x){return '<li><b>'+esc(x[0])+'</b>：'+esc(x[1])+'</li>';}).join("")+'</ul>';}
+  else $("notes").hidden=true;
+  $("withDrug").checked=S.withDrug;$("withNote").checked=S.withNote;
+  renderList();
+}
+function copyText(){
+  var c=collect();if(!c.order.length){toast("病名がまだありません");return;}
+  var t="【病名候補】\n"+c.order.map(function(n){return "・"+n+(S.withDrug?"（"+c.map[n].join("、")+"）":"");}).join("\n");
+  if(S.withNote&&c.notes.length)t+="\n【確認】\n"+c.notes.map(function(x){return "・"+x[0]+"："+x[1];}).join("\n");
+  var done=function(){toast("コピーしました");};
+  var fb=function(){try{var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();done();}catch(x){toast("コピーできませんでした");}};
+  try{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,fb);else fb();}catch(e){fb();}
+}
+
+/* ---------- 一覧 ---------- */
+function renderList(){
+  var q=norm($("lq").value),cats={},co=[];
+  DRUGS.forEach(function(d){if(q&&d.key.indexOf(q)<0)return;if(!cats[d.c]){cats[d.c]=[];co.push(d.c);}cats[d.c].push(d);});
+  var openAll=!!q,h="";
+  co.forEach(function(c){
+    h+='<details class="cat"'+(openAll?" open":"")+'><summary>'+esc(c)+'（'+cats[c].length+'）</summary>';
+    cats[c].forEach(function(d){var inSel=findSel(d.id)>=0;
+      h+='<div class="row"><div class="a"><b>'+esc(d.g)+'</b> <em>'+esc(d.b.join("・"))+'</em><span class="dz">'+esc(d.dz.map(function(z){return z.n;}).join("／"))+'</span>'+(d.nt?'<span class="nt">⚠ '+esc(d.nt)+'</span>':"")+'</div><button type="button" data-add="'+esc(d.id)+'"'+(inSel?" disabled":"")+'>'+(inSel?"済":"追加")+'</button></div>';});
+    h+='</details>';
+  });
+  $("catList").innerHTML=h||'<div class="empty">該当なし</div>';
+}
+
+/* ---------- 照合（読み取った文字 → 薬） ---------- */
+function approx(pat,txt,k){
+  /* pat が txt の部分文字列として編集距離 k 以内で現れるか。返り値 {d,end} か null */
+  var m=pat.length,n=txt.length,prev=new Array(m+1),cur=new Array(m+1),best=null;
+  for(var i=0;i<=m;i++)prev[i]=i;
+  for(var j=1;j<=n;j++){cur[0]=0;
+    for(i=1;i<=m;i++){var c=pat.charCodeAt(i-1)===txt.charCodeAt(j-1)?0:1;
+      cur[i]=Math.min(prev[i-1]+c,prev[i]+1,cur[i-1]+1);}
+    if(cur[m]<=k&&(!best||cur[m]<best.d))best={d:cur[m],end:j};
+    var t=prev;prev=cur;cur=t;}
+  return best;
+}
+var LOOKS=/錠|カプセル|ＣＰ|CP|散|顆粒|細粒|内用液|シロップ|注|テープ|パップ|貼付|坐剤|軟膏|クリーム|吸入|点眼|配合|MG|ΜG|ΜＧ|ML|単位|μG/i;
+function matchText(text){
+  var lines=String(text||"").split(/\r?\n/),res=[],seen={},miss=[];
+  lines.forEach(function(raw){
+    var L=norm(raw);if(L.length<3)return;
+    var inj=INJ.test(L),found=[];
+    DRUGS.forEach(function(d){d.al.forEach(function(a){var p=L.indexOf(a);
+      while(p>=0){found.push({d:d,s:p,e:p+a.length,len:a.length,fz:false});p=L.indexOf(a,p+1);}});});
+    /* 長い一致を優先し、内側の短い一致は捨てる */
+    found.sort(function(a,b){return b.len-a.len||a.s-b.s;});
+    var keep=[];
+    found.forEach(function(f){
+      var cover=keep.some(function(k){return f.s>=k.s&&f.e<=k.e&&!(f.s===k.s&&f.e===k.e);});
+      if(cover)return;
+      var same=keep.filter(function(k){return k.s===f.s&&k.e===f.e;});
+      if(same.length){same[0].alts=same[0].alts||[];if(same[0].d!==f.d&&same[0].alts.indexOf(f.d)<0)same[0].alts.push(f.d);return;}
+      keep.push(f);
+    });
+    /* 同じ文字列に複数の製剤：注射かどうかで選ぶ */
+    keep.forEach(function(k){if(!k.alts)return;var all=[k.d].concat(k.alts);
+      var pick=all.filter(function(d){return d.hint.some(function(h){return L.indexOf(h)>=0;});})[0]||all.filter(function(d){return d.inj===inj;})[0]||all[0];
+      k.alts=all.filter(function(d){return d!==pick;});k.d=pick;});
+    /* 完全一致がない行はあいまい一致 */
+    if(!keep.length&&L.length>=4){
+      var bestF=null;
+      DRUGS.forEach(function(d){d.al.forEach(function(a){
+        if(a.length<5||!/[ァ-ヺ]/.test(a))return;
+        var k=a.length>=9?2:1,r=approx(a,L,k);
+        if(r&&(!bestF||r.d<bestF.r.d||(r.d===bestF.r.d&&a.length>bestF.a.length)))bestF={d:d,a:a,r:r};});});
+      if(bestF)keep.push({d:bestF.d,fz:true,s:0,e:0});
+    }
+    if(!keep.length){if(LOOKS.test(L)&&!/^(RP|Rp)?\d*日分|1日\d回|毎食|食後|食前|就寝前/.test(L))miss.push(raw.trim());return;}
+    keep.forEach(function(k){
+      if(seen[k.d.id]){if(!k.fz)seen[k.d.id].fz=false;return;}
+      var o={id:k.d.id,line:raw.trim(),fz:k.fz,alts:(k.alts||[]).map(function(d){return d.id;})};
+      seen[k.d.id]=o;res.push(o);});
+  });
+  return {hits:res,miss:miss};
+}
+var HITS=[];
+function renderHits(r){
+  HITS=r.hits;
+  $("hitCard").hidden=false;
+  $("hitN").textContent=r.hits.length+"剤";
+  var h="";
+  r.hits.forEach(function(o,i){var d=BYID[o.id],inSel=findSel(o.id)>=0;
+    h+='<label class="hit"><input type="checkbox" data-hit="'+i+'"'+(inSel?"":" checked")+'><div class="t"><b>'+esc(d.g)+'</b>'+(o.fz?'<span class="tag fz">あいまい</span>':'')+(inSel?'<span class="tag ex">追加済み</span>':'')+'<span>'+esc(o.line)+'</span>'+(o.alts.length?'<span>同名の別製剤：'+esc(o.alts.map(function(x){return BYID[x].g;}).join("、"))+'（病名タブで替えられます）</span>':'')+'</div></label>';});
+  $("hits").innerHTML=h||'<div class="empty">辞書の薬は見つかりませんでした。</div>';
+  $("missBox").innerHTML=r.miss.length?'<div class="dnote w" style="margin-top:10px">辞書にない（または読めなかった）薬らしい行：</div><ul class="miss">'+r.miss.slice(0,20).map(function(m){return "<li>"+esc(m)+"</li>";}).join("")+'</ul><div class="dnote">「処方→病名」の検索で探すか、文字を直して再照合してください。</div>':"";
+}
+
+/* ---------- 写真の読み取り（Tesseract.js、端末内） ---------- */
+var OCR_FILES=["ocr/tesseract.min.js","ocr/worker.min.js","ocr/tesseract-core-lstm.wasm.js","ocr/tesseract-core-simd-lstm.wasm.js","ocr/jpn.traineddata.gz"];
+var OCR_CACHE="ocrdata-jpn-v1";
+var canOCR=/^https?:$/.test(location.protocol)&&typeof Worker!=="undefined"&&typeof WebAssembly!=="undefined";
+function ocrStat(m,p){$("ocrStat").textContent=m||"";var pg=$("ocrProg");if(p==null){pg.hidden=true;}else{pg.hidden=false;pg.firstChild.style.width=Math.round(p*100)+"%";}}
+function baseURL(f){return new URL(f,location.href).href;}
+function cacheOcr(){
+  if(!("caches" in window))return Promise.resolve(false);
+  return caches.open(OCR_CACHE).then(function(c){
+    return Promise.all(OCR_FILES.map(function(f){var u=baseURL(f);
+      return c.match(u).then(function(hit){if(hit)return true;return fetch(u,{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error(f);return c.put(u,r);});});}));
+  }).then(function(){return true;});
+}
+function loadTess(){
+  if(window.Tesseract)return Promise.resolve();
+  return new Promise(function(ok,ng){var s=document.createElement("script");s.src=OCR_FILES[0];s.onload=ok;s.onerror=function(){ng(new Error("load"));};document.head.appendChild(s);});
+}
+var worker=null;
+function getWorker(){
+  if(worker)return Promise.resolve(worker);
+  return loadTess().then(function(){
+    return Tesseract.createWorker("jpn",1,{
+      workerPath:baseURL("ocr/worker.min.js"),corePath:baseURL("ocr/"),langPath:baseURL("ocr/"),
+      workerBlobURL:false,gzip:true,
+      logger:function(m){if(m.status==="recognizing text")ocrStat("読み取り中…",m.progress);else if(m.status)ocrStat("準備中："+m.status,m.progress||0);}
+    });
+  }).then(function(w){worker=w;return w;});
+}
+function prepImage(file){
+  return new Promise(function(ok,ng){
+    var url=URL.createObjectURL(file),im=new Image();
+    im.onload=function(){
+      var w=im.naturalWidth,h=im.naturalHeight,sc=1;
+      if(w<1400)sc=Math.min(2.5,1400/w);
+      if(w*sc>3000)sc=3000/w;
+      var cv=document.createElement("canvas");cv.width=Math.round(w*sc);cv.height=Math.round(h*sc);
+      var cx=cv.getContext("2d");cx.imageSmoothingQuality="high";cx.drawImage(im,0,0,cv.width,cv.height);
+      try{var id=cx.getImageData(0,0,cv.width,cv.height),a=id.data,sum=0,i;
+        for(i=0;i<a.length;i+=4){var y=0.299*a[i]+0.587*a[i+1]+0.114*a[i+2];a[i]=a[i+1]=a[i+2]=y;sum+=y;}
+        /* 暗い背景（ダークモードの画面）なら反転 */
+        if(sum/(a.length/4)<110)for(i=0;i<a.length;i+=4){a[i]=a[i+1]=a[i+2]=255-a[i];}
+        cx.putImageData(id,0,0);}catch(e){}
+      URL.revokeObjectURL(url);ok(cv);
+    };
+    im.onerror=function(){URL.revokeObjectURL(url);ng(new Error("img"));};
+    im.src=url;
+  });
+}
+function runOCR(file){
+  ocrStat("画像を準備しています…",0);
+  var t0=Date.now();
+  prepImage(file).then(function(cv){return getWorker().then(function(w){return w.recognize(cv);});})
+  .then(function(r){
+    var text=(r&&r.data&&r.data.text||"").replace(/[ \t]+/g," ");
+    for(var z=0;z<2;z++)text=text.replace(/([^\x00-\x7F]) (?=[^\x00-\x7F])/g,"$1").replace(/([^\x00-\x7F]) (?=[0-9A-Za-z])/g,"$1");
+    $("txt").value=text.trim();
+    ocrStat("読み取り完了（"+((Date.now()-t0)/1000).toFixed(1)+"秒）。下の結果を確認してください。",null);
+    renderHits(matchText(text));
+    cacheOcr().catch(function(){});
+    setTimeout(function(){$("hitCard").scrollIntoView({block:"start",behavior:"smooth"});},50);
+  }).catch(function(e){
+    ocrStat(navigator.onLine===false?"読み取りの準備ができていません。通信できるときに一度「読み取りの準備」を押してください。":"読み取りに失敗しました（"+(e&&e.message||e)+"）。文字の貼り付けを使ってください。",null);
+  });
+}
+
+/* ---------- タブ ---------- */
+function setTab(t){S.tab=t;save();
+  document.querySelectorAll("nav.tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===t?"true":"false");});
+  document.querySelectorAll("[data-pane]").forEach(function(p){p.hidden=p.dataset.pane!==t;});
+  window.scrollTo(0,0);
+}
+
+/* ---------- イベント ---------- */
+$("q").addEventListener("input",function(){
+  var r=search(this.value,10);
+  $("sug").innerHTML=r.map(function(d){var inSel=findSel(d.id)>=0;
+    return '<button type="button" data-add="'+esc(d.id)+'"><b>'+esc(d.g)+'</b>'+(inSel?"（追加済み）":"")+'<span>'+esc(d.b.join("・"))+' → '+esc(d.dz.map(function(z){return z.n;}).slice(0,4).join("／"))+'</span></button>';}).join("")+(this.value&&!r.length?'<div class="empty">辞書にありません（「確認してほしい点」に追加候補として伝えてください）</div>':"");
+});
+$("q").addEventListener("keydown",function(e){if(e.key==="Enter"){var r=search(this.value,1);if(r[0]){addDrug(r[0].id);this.value="";$("sug").innerHTML="";renderSel();}}});
+$("lq").addEventListener("input",renderList);
+$("withDrug").addEventListener("change",function(){S.withDrug=this.checked;save();});
+$("withNote").addEventListener("change",function(){S.withNote=this.checked;save();});
+$("img").addEventListener("change",function(){var f=this.files&&this.files[0];this.value="";if(f)runOCR(f);});
+$("prepOcr").addEventListener("click",function(){
+  ocrStat("読み取りの部品をダウンロードしています…",0.1);
+  cacheOcr().then(function(){return getWorker();}).then(function(){ocrStat("準備できました。通信がなくても読み取れます。",null);toast("読み取りの準備ができました");})
+  .catch(function(){ocrStat("ダウンロードできませんでした。通信できるときにもう一度押してください。",null);});
+});
+$("matchBtn").addEventListener("click",function(){var t=$("txt").value;if(!t.trim()){toast("文字を貼り付けてください");return;}renderHits(matchText(t));});
+$("txtClr").addEventListener("click",function(){$("txt").value="";$("hitCard").hidden=true;});
+$("addHits").addEventListener("click",function(){
+  var n=0;document.querySelectorAll("[data-hit]").forEach(function(cb){if(cb.checked){var o=HITS[+cb.dataset.hit];
+    if(addDrug(o.id,true)){n++;if(o.alts.length){var s=S.sel[S.sel.length-1];s.alt=o.alts;}}}});
+  save();renderSel();setTab("rx");toast(n+"剤を追加しました");
+});
+$("clrSel").addEventListener("click",function(){if(!S.sel.length)return;if(!confirm("選んだ薬をすべて外しますか？"))return;S.sel=[];save();renderSel();});
+$("copyBtn").addEventListener("click",copyText);
+document.addEventListener("click",function(e){
+  var t=e.target.closest("button,[data-tab]");if(!t)return;
+  if(t.dataset.tab&&t.closest("nav.tabs")){setTab(t.dataset.tab);return;}
+  if(t.dataset.add){addDrug(t.dataset.add);$("q").value="";$("sug").innerHTML="";renderSel();return;}
+  if(t.dataset.del!=null){S.sel.splice(+t.dataset.del,1);save();renderSel();return;}
+  if(t.dataset.j!=null){var s=S.sel[+t.dataset.k],j=+t.dataset.j,p=s.on.indexOf(j);if(p>=0)s.on.splice(p,1);else s.on.push(j);save();renderSel();return;}
+  if(t.dataset.swap!=null){var k=+t.dataset.swap,to=t.dataset.to;if(findSel(to)>=0){S.sel.splice(k,1);}else{var old=S.sel[k].id;S.sel[k]={id:to,on:[0]};}save();renderSel();toast("替えました");return;}
+  if(t.id==="forceUpdate"){toast("最新版を確認しています…");
+    (function(){var p=Promise.resolve();
+      try{if("serviceWorker" in navigator)p=navigator.serviceWorker.getRegistration("../").then(function(r){if(r)return r.update();}).catch(function(){});}catch(x){}
+      p.then(function(){return fetch(location.href,{cache:"reload"});}).then(function(){setTimeout(function(){location.reload();},800);},function(){toast("通信できないため更新を確認できません");});
+    })();return;}
+});
+/* 同じ一般名の別製剤（経口と注射など）を「替える」候補に */
+(function(){var by={};DRUGS.forEach(function(d){var g=d.g.replace(/（[^）]*）/g,"");(by[g]=by[g]||[]).push(d.id);});
+  DRUGS.forEach(function(d){var g=d.g.replace(/（[^）]*）/g,"");d.sib=by[g].filter(function(x){return x!==d.id;});});})();
+
+load();
+if(!canOCR){$("ocrCard").hidden=true;$("ocrNo").hidden=false;}
+$("nAll").textContent=DRUGS.length+"件";$("nVer").textContent=DRUGS.length;
+setTab(S.tab||"rx");renderSel();
+window.__byomei={match:matchText,search:search,norm:norm,state:S};
+})();
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller){var t=document.getElementById("toast");t.textContent='新しい版を取り込みました。次に開いたときに反映されます';t.classList.add("on");setTimeout(function(){t.classList.remove("on");},3000);}
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+__WCBLOCKS__
+<script src="../share.js" defer></script>
+</body>
+</html>
