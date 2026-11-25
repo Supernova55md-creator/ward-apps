@@ -1,6 +1,6 @@
 (function(){
 "use strict";
-var APP_VER="ver1_2026-11-25c";
+var APP_VER="ver1_2026-11-25d";
 var KEY="str-v1";
 var $=function(id){return document.getElementById(id);};
 var st={st:{},hist:[],cnt:0,ok:0,streak:0,set:{cats:Object.keys(CATS),lv:3,img:false,hide:false,weak:true},cur:null};
