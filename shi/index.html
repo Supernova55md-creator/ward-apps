@@ -152,6 +152,8 @@ input[type=text]{font:inherit;font-size:16px;padding:8px 10px;border:1px solid v
 .kv dd{margin:0}
 .sub{font-size:12px;color:var(--muted)}
 .rowx{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#qDx.need{outline:3px solid var(--warn);outline-offset:4px;border-radius:12px;animation:nd 1.2s ease-in-out 3}
+@keyframes nd{50%{outline-color:transparent}}
 .phg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .phs{border:1px dashed var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
 .phs small{font-size:11.5px;color:var(--muted);line-height:1.35}
@@ -183,8 +185,12 @@ details.card>summary{color:var(--ink)}
 <div data-p="q">
   <p class="hint" id="phLink" style="margin:0">📷 裏面の写真から読み込むときは <a href="https://claude.ai/artifact/CtV8uhYqAV5nDFXvpavW76" target="_blank" rel="noopener">claude.ai版</a> を開く（オンライン・自分のアカウントのみ）。</p>
   <section class="card hidden" id="phCard">
-    <h2>📷 裏面の写真から読み込む</h2>
+    <h2>📷 裏面の写真から1枚目を作る</h2>
     <p class="note w" style="margin:0 0 10px"><b>氏名・住所・生年月日が写らないように撮る</b>（写った場合は切り取ってから選ぶ）。画像は読み取りのためにClaudeへ送られる。</p>
+    <div class="phs" style="margin-bottom:8px"><b>A3裏面を1枚で</b><small>見開き全体（左：所見・動作活動／右：ROM・MMT）を1枚に収めて撮る</small>
+      <div class="phb"><label>撮影<input type="file" accept="image/*" capture="environment" data-ph="a"></label><label>選ぶ<input type="file" accept="image/*" data-ph="a"></label></div>
+      <img id="phImg_a" class="phi hidden" alt=""></div>
+    <p class="hint" style="margin:0 0 6px">文字が小さく読みにくいときは、左右を分けて撮る：</p>
     <div class="phg">
       <div class="phs"><b>裏面 左側</b><small>神経学的所見・計測・動作活動・歩行能力</small>
         <div class="phb"><label>撮影<input type="file" accept="image/*" capture="environment" data-ph="l"></label><label>選ぶ<input type="file" accept="image/*" data-ph="l"></label></div>
@@ -932,13 +938,13 @@ document.addEventListener("input",e=>{const el=e.target;
  const tr=el.closest("tr[data-j]");if(tr&&el.dataset.f){const k=tr.dataset.j;S.J[S.jside][k]=Object.assign({},S.J[S.jside][k],{[el.dataset.f]:el.value});renderAll();return}
 });
 document.addEventListener("change",e=>{const el=e.target;
- if(el.dataset.k&&el.tagName==="SELECT"){sp(el.dataset.k,el.value);if(el.dataset.k==="dx")applyDxDefaults();renderAll();return}
+ if(el.dataset.k&&el.tagName==="SELECT"){sp(el.dataset.k,el.value);if(el.dataset.k==="dx")applyDxDefaults();renderAll();if(el.dataset.k==="dx")phAfterDx();return}
  const tr=el.closest&&el.closest("tr[data-j]");if(tr&&el.dataset.f){S.J[S.jside][tr.dataset.j]=Object.assign({},S.J[S.jside][tr.dataset.j],{[el.dataset.f]:el.value});renderAll();return}
  const arr=el.closest&&el.closest("[data-arr]");if(arr){sp(arr.dataset.arr,[...arr.querySelectorAll("input:checked")].map(i=>i.value));renderAll();return}
  if(el.name==="cause"){S.cause=el.value;renderAll();return}
  if(/^side\d/.test(el.name||"")){S.side=el.value;renderAll();return}
  if(/^gait\d/.test(el.name||"")){S.gait=el.value;renderAll();return}
- if(el.name==="qdx"){S.dx=el.value;applyDxDefaults();renderAll();return}
+ if(el.name==="qdx"){S.dx=el.value;applyDxDefaults();renderAll();phAfterDx();return}
  if(/^qk_/.test(el.name||"")){S[el.name.slice(3)]=el.value;renderAll();return}
  if(/^quq_/.test(el.name||"")){const J=S.J[el.name.slice(4)],v=el.value;J.uAll=v==="all";J.lift=v==="le5"||v==="le10"?v:"";J.fine=v==="fine";renderAll();return}
  if(el.dataset.uq){const J=S.J[el.dataset.uq],v=el.value;J.uAll=v==="all";J.lift=v==="le5"||v==="le10"?v:"";J.fine=v==="fine";renderAll();return}
@@ -966,7 +972,7 @@ function copy(t){const done=()=>toast("コピーしました");if(navigator.clip
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2600)}
 
 /* ---------- 写真から読み込み（claude.ai 版のみ。PWA では非表示） ---------- */
-let SAMPLE=null,phBusy=false,phBak=null;const PH={l:null,r:null};
+let SAMPLE=null,phBusy=false,phBak=null;const PH={a:null,l:null,r:null};let phPendingDx=false;
 function shrink(file,max){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),img=new Image();
  img.onload=()=>{const r=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement("canvas");c.width=Math.round(img.naturalWidth*r);c.height=Math.round(img.naturalHeight*r);
   c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error("画像を変換できませんでした")),"image/jpeg",0.88)};
@@ -974,7 +980,7 @@ function shrink(file,max){return new Promise((res,rej)=>{const url=URL.createObj
 function phPrompt(){
  const J=k=>'"'+k+'":{"rom":数値|null,"mmt":["×|△|○", ...]}';
  const side='{'+["sh","el","wr","hip","kn","an"].map(J).join(",")+'}';
- return ["あなたは身体障害者診断書・意見書（肢体不自由用）の裏面を読み取るアシスタントです。添付画像は裏面の左側（神経学的所見・計測・動作活動・歩行能力及び起立位の状況）と右側（関節可動域ROMと筋力テストMMT）の写真です（片方だけのこともある）。手書きの○囲み・記号・数値・可動域の図を読み取ってください。",
+ return ["あなたは身体障害者診断書・意見書（肢体不自由用）の裏面を読み取るアシスタントです。添付画像はA3裏面の見開き全体（左半分：神経学的所見・計測・動作活動・歩行能力及び起立位の状況、右半分：関節可動域ROMと筋力テストMMT）の写真か、左側・右側を分けて撮った写真です（片方だけのこともある。同じ欄が複数の画像に写っていれば、より鮮明なほうを採る）。手書きの○囲み・記号・数値・可動域の図を読み取ってください。",
  "【出力】次の形のJSONのみ。説明文やコードブロック記号は付けない。",
  '{"side":"R|L|B|null","sens":[],"mot":[],"site":[],"bb":"なし|あり|null","deform":"なし|あり|null",',
  '"grip":{"R":数値|null,"L":数値|null},"leg_len":{"R":数値|null,"L":数値|null},',
@@ -1023,24 +1029,27 @@ function phApply(o){
   (un.length?'<br><b style="color:var(--warn)">要確認</b>：'+esc(un.join("、")):"")+(o.note?"<br>メモ："+esc(o.note):"")+
   '<br>MMTは記号を ×=2・△=3・○=5 として関節ごとに平均した。所見・関節タブで写真と見比べてから使う。'+(dxObj().id?"":'<br><b>原疾患を選ぶと1枚目が完成する。</b>'));
  $("phUndo").classList.remove("hidden");
+ if(dxObj().id){setTab("rs");toast("読み取った所見から1枚目を作成しました")}
+ else{phPendingDx=true;const q=$("qDx");q.classList.add("need");try{q.closest("section").scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}toast("原疾患を選ぶと1枚目を表示します")}
 }
-async function phRun(){if(phBusy||!SAMPLE)return;const files=["l","r"].map(k=>PH[k]).filter(Boolean);if(!files.length)return;
+function phAfterDx(){if(!phPendingDx||!dxObj().id)return;phPendingDx=false;$("qDx").classList.remove("need");setTab("rs");toast("1枚目を作成しました")}
+async function phRun(){if(phBusy||!SAMPLE)return;const files=["a","l","r"].map(k=>PH[k]).filter(Boolean);if(!files.length)return;
  phBusy=true;$("phRun").disabled=true;phStat('<span class="spin"></span>読み取っています（20〜60秒）…');
- try{const imgs=await Promise.all(files.map(f=>shrink(f,2200)));
+ try{const imgs=await Promise.all(files.map((f,i)=>shrink(f,f===PH.a?3200:2200)));
   const r=SAMPLE.json?await SAMPLE.json(phPrompt(),{images:imgs,modelTier:"complex",cache:false}):(await SAMPLE(phPrompt(),{images:imgs,modelTier:"complex",cache:false})).text;
   phApply(parseLoose(r));
  }catch(err){const c=err&&err.code;
   if(c==="not_granted"){phStat("写真の読み取りが許可されていません。");$("phCard").classList.add("hidden")}
   else if(c==="rate_limited")phStat("混み合っています。少し時間をおいてからもう一度試してください。");
   else phStat("読み取りに失敗しました："+esc((err&&err.message)||"不明なエラー")+"<br>写真を撮り直すか、手で入力してください。")}
- phBusy=false;$("phRun").disabled=!(PH.l||PH.r);}
+ phBusy=false;$("phRun").disabled=!(PH.a||PH.l||PH.r);}
 function initPhoto(){
  if(!(window.claude&&typeof window.claude.use==="function"))return;
  window.claude.use("sample").then(s=>{if(!s)return;return Promise.resolve(s.limits?s.limits():{images:true}).then(l=>{if(l&&l.images){SAMPLE=s;$("phCard").classList.remove("hidden");$("phLink").classList.add("hidden")}})}).catch(()=>{});
  document.querySelectorAll("[data-ph]").forEach(inp=>inp.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const k=inp.dataset.ph;PH[k]=f;
   const im=$("phImg_"+k);try{im.src=URL.createObjectURL(f);im.classList.remove("hidden")}catch(x){}$("phRun").disabled=false;inp.value=""}));
  $("phRun").addEventListener("click",phRun);
- $("phUndo").addEventListener("click",()=>{if(!phBak)return;try{S=JSON.parse(phBak)}catch(e){return}phBak=null;fillBound();renderAll();$("phUndo").classList.add("hidden");phStat("読み込み前の値に戻した。")});
+ $("phUndo").addEventListener("click",()=>{if(!phBak)return;try{S=JSON.parse(phBak)}catch(e){return}phBak=null;phPendingDx=false;$("qDx").classList.remove("need");fillBound();renderAll();$("phUndo").classList.add("hidden");phStat("読み込み前の値に戻した。")});
 }
 function setHH(){const h=document.querySelector("header.top");if(h)document.documentElement.style.setProperty("--hh",(h.offsetHeight+6)+"px")}
 load();initStatic();fillBound();setTab(S.tab);renderAll();setHH();window.addEventListener("load",()=>renderAll());initPhoto();window.addEventListener("resize",setHH);
