@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f766e">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PD助言">
+<title>PD生活アドバイスナビ</title>
+<style>
+:root{
+  --accent:#0f766e; --accent-ink:#fff; --accent-soft:#e3f4f1;
+  --bg:#f4f7f6; --surface:#fff; --ink:#18211f; --muted:#5d6b68; --line:#dbe4e2;
+  --crit:#b42318; --crit-soft:#fdecea; --warn:#9b5d00; --warn-soft:#fff3dc; --ok:#1f7a4d; --ok-soft:#e9f6ef; --info:#1e5fa8; --info-soft:#eaf2fb;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#4fd1c0; --accent-ink:#06221f; --accent-soft:#12302c;
+  --bg:#101615; --surface:#18201f; --ink:#e9f0ee; --muted:#a3b2af; --line:#2c3836;
+  --crit:#ff8a80; --crit-soft:#3a1512; --warn:#f2b85b; --warn-soft:#3a2c0c; --ok:#6fd39c; --ok-soft:#12301f; --info:#8db7f2; --info-soft:#122a45;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 8px calc(16px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:19px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+main{max-width:760px;margin:0 auto;padding:12px calc(14px + env(safe-area-inset-right)) 12px calc(14px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+section.card h2{font-size:16.5px;margin:0 0 8px}
+section.card h3{font-size:15px;margin:12px 0 6px}
+.muted{color:var(--muted);font-size:13.5px}
+.small{font-size:13px}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:4px calc(4px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(4px + env(safe-area-inset-left));z-index:20}
+nav.bottom button{font:inherit;font-size:12.5px;font-weight:700;border:0;background:none;color:var(--muted);padding:8px 2px;border-radius:8px;min-height:48px;cursor:pointer;line-height:1.2}
+nav.bottom button[aria-selected="true"]{color:var(--accent);background:var(--accent-soft)}
+.btn{font:inherit;font-size:14.5px;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;min-height:44px;cursor:pointer}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:18px 12px;text-align:center;color:var(--muted);cursor:pointer}
+.drop.on{border-color:var(--accent);background:var(--accent-soft)}
+input[type=text],select,textarea{font:inherit;font-size:16px;border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--surface);color:var(--ink);min-height:44px}
+textarea{width:100%;min-height:80px}
+table.t{border-collapse:collapse;width:100%;font-size:13.5px}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+table.t th{font-weight:700;color:var(--muted);font-size:12.5px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--line);color:var(--ink);white-space:nowrap}
+.pill.crit{background:var(--crit);color:#fff}.pill.warn{background:var(--warn);color:#fff}.pill.ok{background:var(--ok);color:#fff}.pill.info{background:var(--info);color:#fff}
+#verdict{border-radius:12px;padding:12px 14px;border-left:6px solid var(--muted);background:var(--surface);border:1px solid var(--line)}
+#verdict.crit{border-left:6px solid var(--crit);background:var(--crit-soft)}
+#verdict.warn{border-left:6px solid var(--warn);background:var(--warn-soft)}
+#verdict.ok{border-left:6px solid var(--ok);background:var(--ok-soft)}
+#verdict.info{border-left:6px solid var(--info);background:var(--info-soft)}
+#verdict .big{font-weight:700;font-size:15.5px}
+.dom{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.dom.crit{border-left:5px solid var(--crit)}.dom.warn{border-left:5px solid var(--warn)}.dom.info{border-left:5px solid var(--info)}
+.dom label.hd{display:flex;gap:8px;align-items:flex-start;font-weight:700;cursor:pointer}
+.dom label.hd input{width:22px;height:22px;flex:none;margin-top:1px}
+.dom .why{font-size:12.5px;color:var(--muted);margin:2px 0 0 30px}
+.dom ul{margin:6px 0 0 8px;padding-left:22px;font-size:14px}
+.dom details{margin:6px 0 0 30px;font-size:13px}
+.dom details summary{cursor:pointer;color:var(--info);font-weight:700}
+.chg-up{color:var(--crit);font-weight:700}.chg-dn{color:var(--ok);font-weight:700}
+.note{font-size:13px;background:var(--info-soft);border-radius:8px;padding:8px 10px}
+.warnbox{font-size:13px;background:var(--warn-soft);border-radius:8px;padding:8px 10px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1b2428;color:#fff;padding:9px 14px;border-radius:10px;font-size:14px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1}
+pre.memo{white-space:pre-wrap;font-family:var(--font);font-size:13.5px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin:6px 0}
+.ref li{margin-bottom:6px;font-size:13.5px}
+.ref a{color:var(--info);word-break:break-all}
+.lib details{border-bottom:1px solid var(--line);padding:6px 0}
+.lib summary{cursor:pointer;font-weight:700}
+.lib ul{font-size:14px;margin:4px 0}
+/* ===== 印刷（患者配布用） ===== */
+#print{display:none}
+@media print{
+  @page{size:A4;margin:14mm 14mm 14mm 14mm}
+  body{background:#fff;color:#000;padding:0}
+  header.top,main,nav.bottom,.toast{display:none!important}
+  #print{display:block;font-family:"Yu Gothic","Meiryo","Hiragino Sans",sans-serif;font-size:11.5pt;line-height:1.55;color:#000}
+  #print.large{font-size:13.5pt}
+  #print h1{font-size:1.45em;margin:0 0 2mm;border-bottom:2px solid #000;padding-bottom:1mm}
+  #print .meta{font-size:.9em;margin-bottom:3mm}
+  #print h2{font-size:1.12em;margin:4mm 0 1mm;padding:.5mm 2mm;background:#eee;border-left:4px solid #333;break-after:avoid}
+  #print .blk{break-inside:avoid;margin-bottom:2mm}
+  #print ul{margin:.5mm 0 0;padding-left:6mm}
+  #print li{margin-bottom:.6mm}
+  #print .sos{border:2px solid #000;padding:2mm 3mm;margin-top:4mm;break-inside:avoid}
+  #print .memo{border:1px solid #000;min-height:22mm;padding:2mm 3mm;margin-top:3mm;white-space:pre-wrap;break-inside:avoid}
+  #print .foot{font-size:.8em;margin-top:3mm;color:#333}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>PD生活アドバイスナビ</h1>
+    <small>NMSQ・MDS-UPDRS（ExChartのCSV）→ 患者さんへのアドバイス用紙</small>
+  </div>
+</header>
+
+<main>
+<!-- ===== 読み込み ===== -->
+<div data-tab="load">
+  <section class="card">
+    <h2>1. CSVを読み込む</h2>
+    <div class="drop" id="drop" tabindex="0" role="button">ここにCSVをドロップ／タップして選ぶ<br><span class="small">NMSQ（PD14）・MDS-UPDRS Part Ⅰ／Ⅱ／Ⅲ。複数まとめて選べます</span></div>
+    <input type="file" id="file" accept=".csv,text/csv" multiple hidden>
+    <div class="row" style="margin-top:8px">
+      <button type="button" class="btn" id="sampleBtn">サンプルで試す</button>
+      <button type="button" class="btn" id="unloadBtn">読み込んだCSVを閉じる</button>
+    </div>
+    <div id="files" class="small" style="margin-top:8px"></div>
+    <p class="muted" style="margin:8px 0 0">CSVの中身はこの画面のメモリ上だけで扱い、端末にもサーバーにも保存しません（閉じる・再読み込みで消えます）。氏名の列は読み飛ばし、画面にも印刷にも出しません。</p>
+  </section>
+
+  <section class="card">
+    <h2>2. 患者IDを選ぶ</h2>
+    <div class="row">
+      <input type="text" id="pid" inputmode="numeric" placeholder="患者ID" list="pidList" autocomplete="off" style="flex:1;min-width:140px">
+      <datalist id="pidList"></datalist>
+      <button type="button" class="btn pri" id="goBtn">表示</button>
+    </div>
+    <div id="pidInfo" class="small" style="margin-top:8px"></div>
+    <div id="dateSel" style="margin-top:8px"></div>
+  </section>
+</div>
+
+<!-- ===== アドバイス ===== -->
+<div data-tab="adv" hidden>
+  <div id="verdict" class="info"><div class="big">CSVを読み込み、患者IDを選ぶとここに結果が出ます</div></div>
+  <section class="card" id="scoreCard" hidden>
+    <h2>評価のまとめ</h2>
+    <div id="scores"></div>
+  </section>
+  <section class="card" id="domCard" hidden>
+    <h2>用紙に載せる項目</h2>
+    <p class="muted" style="margin:0 0 4px">チェックした項目が患者さん用の用紙に入ります（重要度順。既定は「早めの相談」すべて＋合わせて6項目まで）。「医師向け」は画面だけで、印刷されません。</p>
+    <div class="row small"><button type="button" class="btn" id="allOn">全部入れる</button><button type="button" class="btn" id="allOff">全部外す</button></div>
+    <div id="doms"></div>
+  </section>
+  <section class="card" id="printCard" hidden>
+    <h2>印刷（患者さん用）</h2>
+    <label class="row small"><input type="checkbox" id="optBase" checked> 「毎日の基本」を入れる</label>
+    <label class="row small"><input type="checkbox" id="optSos" checked> 「すぐに連絡・受診してほしいとき」を入れる</label>
+    <label class="row small"><input type="checkbox" id="optLarge"> 大きい文字で印刷する</label>
+    <h3>主治医から（用紙の最後に入ります）</h3>
+    <textarea id="drNote" placeholder="例：次回までに便秘の記録をつけてきてください"></textarea>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn pri" id="printBtn">印刷する</button><button type="button" class="btn" id="prevBtn">用紙の文面を確認</button></div>
+    <div id="prevBox" hidden style="margin-top:10px"></div>
+  </section>
+  <section class="card" id="memoCard" hidden>
+    <h2>カルテ用メモ</h2>
+    <pre class="memo" id="memo"></pre>
+    <button type="button" class="btn" id="copyMemo">コピー</button>
+  </section>
+</div>
+
+<!-- ===== 早見表 ===== -->
+<div data-tab="lib" hidden>
+  <section class="card">
+    <h2>拾い上げの基準と助言の早見表</h2>
+    <p class="muted" style="margin:0 0 6px">どの回答で項目が立つか、用紙に入る文面、医師向けの対処の要点。CSVがなくても確認できます。</p>
+    <div class="lib" id="lib"></div>
+  </section>
+</div>
+
+<!-- ===== 出典 ===== -->
+<div data-tab="src" hidden>
+  <section class="card">
+    <h2>使い方</h2>
+    <ol class="small" style="padding-left:20px;margin:0">
+      <li>ExChartから PD14（NMSQ）・PD01〜03（MDS-UPDRS）を CSV で出力（「文書日時・患者ID・／項目名」の生出力でも、1行見出しに整えたCSVでも読めます。文字コードは Shift_JIS／UTF-8 を自動判定）。</li>
+      <li>読み込み → 患者IDを入れて「表示」。各票の最新の日付が選ばれ、1つ前の記録と比べます（日付は変えられます）。</li>
+      <li>「アドバイス」タブで、載せる項目を確認して印刷。カルテ用メモはコピーして貼り付け。</li>
+    </ol>
+    <h3>拾い上げの基準（既定）</h3>
+    <ul class="small" style="padding-left:20px;margin:0">
+      <li>NMSQ：「はい」の項目。</li>
+      <li>MDS-UPDRS：原則 2（軽度）以上。安全に関わる項目（幻覚 1.2、ドパミン調節異常 1.6、立ちくらみ 1.12、すくみ 2.13・3.11）は 1 以上。</li>
+      <li>赤（早めの相談）：幻覚で洞察の低下（1.2≧3）、NMSQ 30（妄想）、ドパミン調節異常 1.6≧2、日中の眠気 1.8≧3、嚥下 2.3≧3、立ちくらみ 1.12≧3、姿勢の安定性 3.12≧3 または 歩行とバランス 2.12≧3、抑うつ 1.3≧3。</li>
+      <li>前回より 1 点以上悪化した項目には「悪化」と付けます。</li>
+    </ul>
+    <p class="warnbox small">基準と文面は本アプリ独自の目安です（ガイドラインの推奨そのものではありません）。医師向けの薬剤名は一般的な選択肢で、用量・適応は未照合です。処方前に添付文書で確認してください。</p>
+  </section>
+  <section class="card">
+    <h2>出典</h2>
+    <ul class="ref" style="padding-left:20px;margin:0">
+      <li>Chaudhuri KR, et al. International multicenter pilot study of the first comprehensive self-completed nonmotor symptoms questionnaire for Parkinson's disease: the NMSQuest study. Mov Disord 2006;21:916-923. <a href="https://pubmed.ncbi.nlm.nih.gov/16547944/" target="_blank" rel="noopener">PubMed 16547944</a></li>
+      <li>Goetz CG, et al. Movement Disorder Society-sponsored revision of the Unified Parkinson's Disease Rating Scale (MDS-UPDRS): scale presentation and clinimetric testing results. Mov Disord 2008;23:2129-2170. <a href="https://pubmed.ncbi.nlm.nih.gov/19025984/" target="_blank" rel="noopener">PubMed 19025984</a></li>
+      <li>Kashihara K, et al. Official Japanese Version of the MDS-UPDRS: validation against the original English version. Mov Disord Clin Pract 2014;1:200-212. <a href="https://pubmed.ncbi.nlm.nih.gov/25328906/" target="_blank" rel="noopener">PubMed 25328906</a></li>
+      <li>Seppi K, et al. Update on treatments for nonmotor symptoms of Parkinson's disease—an evidence-based medicine review. Mov Disord 2019;34:180-198. <a href="https://pubmed.ncbi.nlm.nih.gov/30653247/" target="_blank" rel="noopener">PubMed 30653247</a></li>
+      <li>日本神経学会 監修「パーキンソン病診療ガイドライン2018」（医学書院）。<a href="https://minds.jcqhc.or.jp/summary/c00464/" target="_blank" rel="noopener">Minds</a>／公的制度の章 <a href="https://www.neurology-jp.org/guidelinem/pdgl/parkinson_2018_20.pdf" target="_blank" rel="noopener">日本神経学会PDF</a></li>
+      <li>厚生労働省 指定難病6 パーキンソン病（重症度分類：Hoehn-Yahr 3度以上かつ生活機能障害度2度以上）。<a href="https://www.mhlw.go.jp/content/10905000/001173440.pdf" target="_blank" rel="noopener">厚生労働省PDF</a></li>
+      <li>厚生労働省 こころの健康相談統一ダイヤル 0570-064-556。<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/shougaishahukushi/jisatsu/kokoro_dial.html" target="_blank" rel="noopener">厚生労働省</a></li>
+    </ul>
+    <p class="muted">薬の調整は「PD薬剤調整ナビ」（病棟ナビ内 pd/）も参照。</p>
+  </section>
+  <section class="card">
+    <p>アプリの版：<b id="ver"></b>　<button type="button" class="btn" id="forceUpdate">最新版に更新</button></p>
+    <p class="small">CSVの内容は保存しません。端末に保存するのは印刷の設定（大きい文字など）だけです。</p>
+    <p class="small">診療判断の補助であり、最終判断は診察と原典で行ってください。</p>
+  </section>
+</div>
+</main>
+
+<nav class="bottom" role="tablist">
+  <button type="button" data-go="load" aria-selected="true">読み込み</button>
+  <button type="button" data-go="adv" aria-selected="false">アドバイス</button>
+  <button type="button" data-go="lib" aria-selected="false">早見表</button>
+  <button type="button" data-go="src" aria-selected="false">使い方・出典</button>
+</nav>
+<div id="print"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const APP_VER="ver1_2026-11-26a";
+const LS="pdadv-v1";
+document.getElementById("ver").textContent=APP_VER;
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s));}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+let toastT=null;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2200);}
+
+/* ---------- 設定（端末に保存するのは印刷設定だけ） ---------- */
+let settings={large:false,base:true,sos:true};
+try{Object.assign(settings,JSON.parse(localStorage.getItem(LS)||"{}"));}catch(e){}
+function saveSettings(){try{localStorage.setItem(LS,JSON.stringify(settings));}catch(e){}}
+$("#optLarge").checked=!!settings.large;$("#optBase").checked=settings.base!==false;$("#optSos").checked=settings.sos!==false;
+["optLarge","optBase","optSos"].forEach(id=>$("#"+id).addEventListener("change",()=>{settings.large=$("#optLarge").checked;settings.base=$("#optBase").checked;settings.sos=$("#optSos").checked;saveSettings();}));
+
+/* ---------- タブ ---------- */
+function go(t){$$("[data-tab]").forEach(e=>e.hidden=e.dataset.tab!==t);$$("nav.bottom button").forEach(b=>b.setAttribute("aria-selected",b.dataset.go===t?"true":"false"));window.scrollTo(0,0);}
+$$("nav.bottom button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+
+/* ---------- 項目の定義 ---------- */
+const NMSQ_LABEL=["","日中によだれが出る","味や匂いを感じにくい","飲み込みにくい・喉に詰まる","吐き気・嘔吐・気分が悪い","排便が週3回未満・強くいきむ","便失禁がある","排便後も残便感","尿意を我慢できない","夜間の排尿で起きる","説明のつかない痛み","原因不明の体重変化","最近のことを忘れる","興味がなくなる","ないものが見える・聞こえる","集中しにくい","悲しい・憂うつ","不安・恐怖・パニック","性への関心の低下・過剰","性行為が困難","立ち上がるとふらつく・めまい","転倒する","仕事・運転・食事中に居眠り","寝付きが悪い・眠りが浅い","激しい夢・怖い夢","寝ている時に話す・動き回る","夜間・休息時の脚の不快感","足のむくみ","過度の発汗","ものが二重に見える","事実でないと否定される（妄想）"];
+const U_ITEMS=[
+ ["1.1","認知障害"],["1.2","幻覚と精神症状"],["1.3","抑うつ気分"],["1.4","不安感"],["1.5","無関心（アパシー）"],["1.6","ドパミン調節異常症候群の症状"],["1.7","睡眠の問題"],["1.8","日中の眠気"],["1.9","痛み及びその他の感覚異常"],["1.10","排尿の問題"],["1.11","便秘"],["1.12","立ちくらみ"],["1.13","疲労"],
+ ["2.1","会話"],["2.2","唾液とよだれ"],["2.3","そしゃくと嚥下"],["2.4","摂食動作"],["2.5","着替え"],["2.6","身の回りの清潔"],["2.7","書字"],["2.8","趣味、娯楽、その他の活動"],["2.9","寝返り"],["2.10","振戦"],["2.11","ベッド、車の座席、深い椅子からの立ち上がり"],["2.12","歩行とバランス"],["2.13","すくみ"],
+ ["3.1","言語"],["3.2","顔の表情"],["3.3a","固縮（頸部）"],["3.3b","固縮（右上肢）"],["3.3c","固縮（左上肢）"],["3.3d","固縮（右下肢）"],["3.3e","固縮（左下肢）"],["3.4a","指タッピング（右）"],["3.4b","指タッピング（左）"],["3.5a","手の運動（右）"],["3.5b","手の運動（左）"],["3.6a","手の回内回外運動（右）"],["3.6b","手の回内回外運動（左）"],["3.7a","つま先のタッピング（右）"],["3.7b","つま先のタッピング（左）"],["3.8a","下肢の敏速性（右）"],["3.8b","下肢の敏速性（左）"],["3.9","椅子からの立ち上がり"],["3.10","歩行"],["3.11","歩行のすくみ"],["3.12","姿勢の安定性"],["3.13","姿勢"],["3.14","運動の全般的な自発性（身体の動作緩慢）"],["3.15a","手の姿勢時振戦（右）"],["3.15b","手の姿勢時振戦（左）"],["3.16a","手の運動時振戦（右）"],["3.16b","手の運動時振戦（左）"],["3.17a","静止時振戦の振幅（右上肢）"],["3.17b","静止時振戦の振幅（左上肢）"],["3.17c","静止時振戦の振幅（右下肢）"],["3.17d","静止時振戦の振幅（左下肢）"],["3.17e","静止時振戦の振幅（口唇・下顎）"],["3.18","静止時振戦の持続性"]
+];
+function norm(s){return String(s==null?"":s).normalize("NFKC").replace(/[／/□●\s、,・()（）\[\]「」]/g,"").replace(/[ー－―]/g,"-").toLowerCase();}
+const U_BY_NORM={};U_ITEMS.forEach(([k,l])=>{U_BY_NORM[norm(l)]=k;});
+/* 別表記の吸収 */
+[["顔の表情","3.2"],["言葉","3.1"],["振戦の持続性","3.18"],["静止時振戦の振幅口唇下顎","3.17e"],["静止時振戦の振幅口唇・下顎","3.17e"]].forEach(([l,k])=>U_BY_NORM[norm(l)]=k);
+const U_NAME={};U_ITEMS.forEach(([k,l])=>U_NAME[k]=l);
+function uPart(k){return k.charAt(0);}
+
+/* ---------- 助言の定義 ----------
+  t: 項目名（用紙の見出し） / n: NMSQ 番号 / u: [[UPDRS項目, 最小点]] / crit(f): 赤の条件
+  p: 患者さん向け / dr: 医師向けの要点（印刷しない）                                     */
+const DOMS=[
+ {id:"psy",t:"見えないものが見える・思い違い（幻覚・妄想）",ord:1,n:[14,30],u:[["1.2",1]],crit:f=>f.u("1.2")>=3||f.n(30),
+  p:["見えたもの・聞こえたものは、病気や薬の影響で起こることがあります。ご本人・ご家族だけで抱えず、主治医に伝えてください。","部屋を明るくし、影や見間違えやすい物（掛けた服など）を片付けると減ることがあります。","回数が増えた、怖がっている、現実と区別がつかない、というときは次の受診を待たずに連絡してください。","薬を自己判断で急にやめないでください（急にやめると危険な状態になることがあります）。","発熱・脱水・便秘・新しく始めた薬がきっかけになることがあります。"],
+  dr:["誘因：感染・脱水・電解質・便秘・新規薬（抗コリン薬、オピオイド、睡眠薬など）を確認","抗PD薬は後から加えた・作用の弱い薬から整理（抗コリン薬→アマンタジン→MAO-B阻害薬→ドパミンアゴニスト→COMT阻害薬の順が一般的、L-ドパは最後）","クエチアピン（セロクエル、適応外・糖尿病で禁忌）、抑肝散（ツムラ抑肝散など）を使うことが多い。DLBではドネペジル（アリセプト）が適応。ピマバンセリンは国内未承認","定型抗精神病薬・リスペリドン等は避ける","認知機能の評価（MoCA-Jなど）"]},
+ {id:"icd",t:"やめられない行動（ギャンブル・買い物・食べ過ぎなど）",ord:2,n:[],u:[["1.6",1]],crit:f=>f.u("1.6")>=2,
+  p:["パーキンソン病の薬（特にドパミンアゴニスト）の影響で、ギャンブル・買い物・食べ過ぎ・性的な関心の高まり・同じ作業をやめられない、などが起こることがあります。","ご本人は気づきにくいので、ご家族も様子を見て主治医に伝えてください。","お金やカードの管理は、しばらくご家族と一緒に行うと安心です。","薬は自己判断でやめず、必ず主治医と相談して調整します。"],
+  dr:["ドパミンアゴニストの減量・中止を検討（離脱症候群 DAWS に注意し漸減）","L-ドパの過量使用（ドパミン調節異常症候群）・punding の確認","家族同席で説明、金銭管理の支援"]},
+ {id:"eds",t:"日中の眠気",ord:3,n:[22],u:[["1.8",2]],crit:f=>f.u("1.8")>=3,
+  p:["パーキンソン病の薬（特にドパミンアゴニスト）では、前触れなく眠り込むことがあります。眠気がある間は車の運転や危険な作業をしないでください。","薬を増やした後・変えた後は特に注意してください。急に眠り込んだことがあれば必ず主治医に伝えてください。","夜の睡眠を十分にとり、日中は軽い運動や外出で体を動かしましょう。","昼寝は午後の早い時間に30分程度までにしましょう。"],
+  dr:["ドパミンアゴニスト（プラミペキソール〈ビ・シフロール、ミラペックスLA〉、ロピニロール〈レキップ、レキップCR〉、ロチゴチン〈ニュープロパッチ〉）は突発的睡眠の警告あり：運転を控える指導を記録","夜間睡眠の質（夜間off・夜間頻尿・RBD・睡眠時無呼吸）を評価","鎮静作用のある併用薬の見直し"]},
+ {id:"swl",t:"飲み込み・むせ",ord:4,n:[3],u:[["2.3",2]],crit:f=>f.u("2.3")>=3,
+  p:["食事は薬がよく効いている時間にとりましょう。","背筋を伸ばし、少しあごを引いた姿勢で、一口を少なめにゆっくり食べます。","お茶や汁物でむせるときは、とろみをつけると飲み込みやすくなります。","食後すぐに横にならず、歯みがき・うがいで口の中を清潔に保ちましょう（肺炎の予防）。","食事中のむせが増えた、熱が出た、体重が減ってきたときは相談してください。"],
+  dr:["言語聴覚士（ST）の評価、嚥下造影・嚥下内視鏡","錠剤が飲みにくければ剤形変更（OD錠・散剤、貼付剤ロチゴチン〈ニュープロパッチ〉）","誤嚥性肺炎・低栄養のリスク評価、体重の推移"]},
+ {id:"fall",t:"転倒・歩行・すくみ足",ord:5,n:[21],u:[["2.12",2],["2.13",1],["3.10",2],["3.11",1],["3.12",2]],hy:3,crit:f=>f.u("3.12")>=3||f.u("2.12")>=3,
+  p:["家の中の段差・敷物・電気コードを片付け、手すりや足元の明かりをつけましょう。","向きを変えるときは、その場で回らず大きく弧を描くようにゆっくり回ります。","足が出にくいときは「いち、に」と声に出す、床の目印をまたぐ、手拍子などのリズムに合わせると歩き出しやすくなります。","両手に物を持って歩く、話しながら急いで歩く、などの「ながら動作」は避けましょう。","杖や歩行器はリハビリの専門職に合うものを選んでもらいましょう。介護保険で手すりや福祉用具を利用できることがあります。","転んで頭を打った、痛みが続くときは受診してください。"],
+  dr:["リハビリ（PT）・介護保険（住宅改修・福祉用具）","すくみ足がoff時かon時かを確認（off時はドパミン補充の調整、on時は外的cue・リハ）","起立性低血圧・薬剤（睡眠薬・降圧薬）の関与","骨粗鬆症の評価と治療（転倒骨折予防）","指定難病の重症度：Hoehn-Yahr 3度以上かつ生活機能障害度2度以上で医療費助成の対象"]},
+ {id:"oh",t:"立ちくらみ（起立時のふらつき）",ord:6,n:[20],u:[["1.12",1]],crit:f=>f.u("1.12")>=3,
+  p:["起き上がるときは、寝る→座る→立つ、と段階を分け、それぞれ少し待ってから動きましょう。","ふらっとしたら、すぐにしゃがむか座ってください。","食後・入浴後・暑い日・排便後は起こりやすくなります。食事は量を分け、熱いお湯や長風呂は避けましょう。","水分を十分にとりましょう（心臓や腎臓の病気で水分制限を指示されている方は、その指示を優先してください）。","弾性ストッキングや腹帯が役立つことがあります。","気を失った、頭を打ったときはすぐに連絡してください。"],
+  dr:["臥位・立位血圧（臥位高血圧の有無も）","降圧薬・α遮断薬（タムスロシン等）・利尿薬・ドパミン作動薬の見直し","ドロキシドパ（ドプス）、ミドドリン（メトリジン）、フルドロコルチゾン（フロリネフ、適応外）","失神・転倒の既往があれば優先度を上げる"]},
+ {id:"mood",t:"気分の落ち込み",ord:7,n:[16],u:[["1.3",2]],crit:f=>f.u("1.3")>=3,
+  p:["気分の落ち込みはパーキンソン病によく見られる症状の一つで、治療で良くなることがあります。遠慮なく伝えてください。","日中に体を動かす、人と会う・話す予定を作ることが助けになります。","薬が切れる時間帯に気分が沈む場合は、その時間を記録して伝えてください（薬の調整で改善することがあります）。","「消えてしまいたい」と感じるときは、すぐに主治医かご家族に伝えてください。夜間・休日は、こころの健康相談統一ダイヤル（0570-064-556）にも相談できます。"],
+  dr:["うつ病の評価（希死念慮の確認を含む）","SSRI/SNRI（エスシタロプラム〈レクサプロ〉、セルトラリン〈ジェイゾロフト〉、デュロキセチン〈サインバルタ〉、ベンラファキシン〈イフェクサーSR〉）","セレギリン（エフピー）は三環系・SSRI・SNRI等と併用禁忌。ラサギリン（アジレクト）・サフィナミド（エクフィナ）も併用は添付文書で確認","wearing-off に伴う気分変動ならドパミン補充の調整"]},
+ {id:"anx",t:"不安",ord:8,n:[17],u:[["1.4",2]],
+  p:["薬が切れる時間帯に不安が強くなることがあります。不安の強い時間と薬を飲んだ時間を記録して伝えてください。","ゆっくり息を吐く呼吸、軽い体操などで体の緊張をほぐしましょう。","一人で抱えず、ご家族や医療者に話してください。"],
+  dr:["off期関連の不安（wearing-off）か評価","SSRI/SNRI。ベンゾジアゼピンは転倒・認知機能低下に注意"]},
+ {id:"cog",t:"物忘れ・集中しにくさ",ord:9,n:[12,15],u:[["1.1",2]],
+  p:["予定はカレンダーやメモに、薬はお薬カレンダーやお薬ボックスで管理しましょう。","会話・趣味・運動など、頭と体を使う活動を続けましょう。","急にぼんやりする・混乱する時間が増えたときは、体調不良や薬の影響のこともあるので連絡してください。"],
+  dr:["MoCA-J・MMSE等で評価、せん妄の除外","抗コリン薬・アマンタジン・ベンゾジアゼピン等の見直し","PDDへのコリンエステラーゼ阻害薬は国内適応なし（DLBにはドネペジル〈アリセプト〉が適応）","服薬管理の支援（家族・訪問薬剤管理・一包化）"]},
+ {id:"apa",t:"意欲がわかない",ord:10,n:[13],u:[["1.5",2]],
+  p:["散歩・家事・趣味など、毎日の予定を決めて少しずつ続けましょう。","ご家族は「怠け」ではなく病気の症状の一つと考え、一緒に活動に誘ってください。","デイサービスやリハビリ、患者会への参加も役立ちます。"],
+  dr:["うつ・認知機能低下・off症状との鑑別","ドパミン補充の不足（アゴニスト減量後のアパシーなど）を確認"]},
+ {id:"slp",t:"眠り（寝付き・途中で目が覚める）",ord:11,n:[23],u:[["1.7",2]],
+  p:["起きる時刻と寝る時刻をそろえ、朝は光を浴びましょう。","夕方以降のコーヒー・緑茶、寝酒は控えましょう。","夜中に体が動かしにくい、ふるえやこむら返りで目が覚める、トイレで何度も起きる、という場合は薬の調整で良くなることがあるので相談してください。"],
+  dr:["夜間off・早朝ジストニア・夜間頻尿・RLS・うつ・RBDの鑑別","夜間off：ロチゴチン貼付（ニュープロパッチ）、就寝前のL-ドパ追加、徐放性アゴニスト","睡眠薬は転倒・せん妄に注意"]},
+ {id:"rbd",t:"寝ている間の寝言・動き（激しい夢）",ord:12,n:[24,25],u:[],
+  p:["夢に合わせて手足が動き、けがをすることがあります。ベッドの周りの家具の角やガラス製品を遠ざけ、ベッドを低くする・床に布団を敷くなどで安全にしましょう。","一緒に寝ているご家族がけがをしないよう、寝る位置を工夫してください。","回数が増えた、けがをした、という場合は相談してください（薬で軽くなることがあります）。"],
+  dr:["レム睡眠行動異常症：寝室の安全対策が第一","クロナゼパム（リボトリール、適応外：ふらつき・日中の眠気・呼吸抑制に注意）","睡眠時無呼吸の除外（PSGを検討）"]},
+ {id:"rls",t:"脚のむずむず（夜や休息時）",ord:13,n:[26],u:[],
+  p:["夕方以降のカフェイン・アルコール・喫煙を控えましょう。","寝る前の軽いストレッチ、足のマッサージ、ぬるめの入浴が楽になることがあります。","つらい場合は相談してください（体の鉄分不足が関係することがあります）。"],
+  dr:["フェリチン・鉄の評価（低値なら鉄補充を考慮）","夜間off・アカシジアとの鑑別、ドパミン作動薬による augmentation に注意","ガバペンチン エナカルビル（レグナイト）はRLSの適応"]},
+ {id:"con",t:"便秘",ord:14,n:[5,7],u:[["1.11",2]],
+  p:["水分をこまめにとりましょう（水分制限を指示されている方はその指示を優先してください）。","野菜・海藻・きのこ・果物などの食物繊維と、ヨーグルトなどの発酵食品を毎日とりましょう。","朝食の後にトイレに座る習慣をつけましょう。","散歩や体操で体を動かす、おなかを「の」の字にマッサージするのも効果的です。","便秘は薬の吸収にも影響します。3日以上出ない、おなかが張る、吐き気があるときは相談してください。"],
+  dr:["酸化マグネシウム（マグミット：腎機能低下・高齢では高Mg血症に注意）、マクロゴール4000（モビコール）、ルビプロストン（アミティーザ）、リナクロチド（リンゼス）、エロビキシバット（グーフィス）","抗コリン薬・オピオイドの見直し","便秘はL-ドパの吸収低下・効果の不安定化の一因"]},
+ {id:"fec",t:"便のもれ",ord:15,n:[6],u:[],
+  p:["硬い便がたまって、やわらかい便だけが漏れ出ることもあります（便秘が原因のことがあります）。恥ずかしがらずに相談してください。","トイレに行く時間を決め、必要ならパッドを使いましょう。"],
+  dr:["宿便・溢流性便失禁の除外（直腸診・腹部X線）","下剤の過量の確認"]},
+ {id:"uri",t:"トイレが近い・夜間のトイレ",ord:16,n:[8,9],u:[["1.10",2]],
+  p:["水分は日中にしっかりとり、夕方以降は控えめにしましょう。夕方以降のカフェイン・アルコールも控えます。","寝る前にトイレに行きましょう。","夜中のトイレは転びやすいので、通路を明るくし、必要ならポータブルトイレや尿器も検討しましょう。","排尿時の痛み・発熱・血尿があるときは受診してください。"],
+  dr:["排尿日誌（夜間多尿か蓄尿障害か）、残尿測定、前立腺の評価（男性）","β3作動薬：ミラベグロン（ベタニス）、ビベグロン（ベオーバ）","抗コリン薬（ソリフェナシン〈ベシケア〉など）は認知機能・便秘・尿閉に注意"]},
+ {id:"drl",t:"よだれ",ord:17,n:[1],u:[["2.2",2]],
+  p:["意識してつばを飲み込みましょう。ガムや飴は飲み込む回数を増やすのに役立ちます。","うつむいた姿勢だとよだれが出やすくなります。背筋を伸ばしましょう。","むせもある場合は相談してください。"],
+  dr:["嚥下障害の評価を兼ねる","抗コリン薬は認知機能・便秘・尿閉に注意","唾液腺へのボツリヌス毒素注射は海外でエビデンスあり（国内の保険適用は添付文書で確認）"]},
+ {id:"gi",t:"吐き気・胃のもたれ",ord:18,n:[4],u:[],
+  p:["食事は量を分けて回数を増やし、脂っこいものは控えましょう。","薬を始めた・増やした後に吐き気が出た場合は相談してください。","吐いてしまって薬が飲めない状態が続くときは、すぐに連絡してください。"],
+  dr:["ドンペリドン（ナウゼリン）は使用可。メトクロプラミド（プリンペラン）はパーキンソニズムを悪化させるため避ける","胃排出遅延はL-ドパの効果発現の遅れ（delayed-on）の一因"]},
+ {id:"wt",t:"体重の変化",ord:19,n:[11],u:[],
+  p:["月に1回は体重を測って記録しましょう。","食事量が減った、体重が減り続けるときは相談してください（飲み込み・便秘・気分の落ち込みが関係することもあります）。"],
+  dr:["体重減少：嚥下障害・ジスキネジア・うつ・悪性疾患","体重増加：ドパミンアゴニストに伴う過食（衝動制御障害）を確認"]},
+ {id:"pain",t:"痛み",ord:20,n:[10],u:[["1.9",2]],
+  p:["痛む時間帯と薬を飲んだ時間の関係を記録しましょう。薬が切れると痛む場合は、薬の調整で良くなることがあります。","ストレッチや体操、温めることで楽になることがあります。","肩や腰の痛みは姿勢も関係します。"],
+  dr:["off関連の痛み・ジストニア、筋骨格系、神経根性、中枢性の鑑別","off関連ならドパミン補充の調整"]},
+ {id:"fat",t:"疲れやすさ",ord:21,n:[],u:[["1.13",2]],
+  p:["休憩をはさみながら活動しましょう。","適度な運動は疲れにくい体づくりに役立ちます。","睡眠不足や気分の落ち込みが関係することもあるので、続くときは相談してください。"],
+  dr:["うつ・睡眠障害・貧血・甲状腺機能・日中の眠気との鑑別"]},
+ {id:"spk",t:"話しにくさ",ord:22,n:[],u:[["2.1",2],["3.1",2]],
+  p:["毎日、大きな声で音読や発声の練習をしましょう（「大きな声で」を意識するのがこつです）。","相手と向き合い、文を短く区切って話しましょう。","言語聴覚士（ST）のリハビリが役立ちます。"],
+  dr:["言語聴覚療法（LSVT LOUD など）","嚥下評価を併せて行う"]},
+ {id:"adl",t:"着替え・食事・字を書くなどの手先の動作",ord:23,n:[],u:[["2.4",2],["2.5",2],["2.6",2],["2.7",2],["2.8",2]],
+  p:["着替えや入浴は、薬がよく効いている時間に行いましょう。","ボタンの少ない服、マジックテープやゴムひもの靴、太い持ち手の食器・筆記具などが便利です。","作業療法士（OT）に工夫を相談できます。介護保険のサービスも検討しましょう。"],
+  dr:["作業療法（OT）、介護保険","wearing-off の有無（on時とoff時の差）を確認"]},
+ {id:"bed",t:"寝返り・立ち上がり",ord:24,n:[],u:[["2.9",2],["2.11",2],["3.9",2]],
+  p:["ベッドは手すり付きで、足が床につく高さにしましょう。柔らかすぎるマットレスや低いソファは避けます。","立ち上がるときは、浅く座り直す→足を引く→おじぎをするように前かがみ→立つ、の順で行います。","寝返りは、ひざを立ててから肩と腰を一緒に転がすように行います。"],
+  dr:["夜間の寝返り困難は夜間offの可能性（ロチゴチン貼付、就寝前L-ドパ）","介護用ベッド・福祉用具、リハビリ"]},
+ {id:"trm",t:"ふるえ",ord:25,n:[],u:[["2.10",2]],
+  p:["緊張や疲れで強くなりやすい症状です。慌てずに深呼吸しましょう。","重みのあるカップや、ふた付き・ストロー付きの容器を使うとこぼしにくくなります。","生活に困るときは、薬の調整を相談してください。"],
+  dr:["振戦優位の場合の薬剤調整、手術療法（DBS・集束超音波）の適応検討"]},
+ {id:"pos",t:"姿勢（前かがみ・体の傾き）",ord:26,n:[],u:[["3.13",2]],
+  p:["壁に背中・おしり・かかとをつけて立つ練習、胸を開くストレッチを毎日行いましょう。","腰の曲がりや首の下がりが強くなってきたときは相談してください。"],
+  dr:["腰曲がり・首下がり・Pisa症候群の評価（薬剤性〈ドパミンアゴニスト等〉を含む）","リハビリ"]},
+ {id:"edm",t:"足のむくみ",ord:27,n:[27],u:[],
+  p:["休むときは足を少し高くし、長時間座りっぱなしを避けて、ふくらはぎを動かしましょう。","薬（アマンタジン、ドパミンアゴニストなど）が原因のこともあるので相談してください。","片足だけ急に腫れて痛い、息苦しい、というときはすぐに受診してください。"],
+  dr:["アマンタジン・ドパミンアゴニスト・Ca拮抗薬の関与","心不全・腎機能・深部静脈血栓症の除外"]},
+ {id:"swt",t:"汗が多い",ord:28,n:[28],u:[],
+  p:["汗をかいたら水分をとり、着替えましょう。","汗の多い時間と薬を飲んだ時間の関係を記録して伝えてください。"],
+  dr:["off期・ジスキネジア時の発汗か評価、甲状腺機能・感染の除外"]},
+ {id:"dip",t:"ものが二重に見える",ord:29,n:[29],u:[],
+  p:["ものが二重に見えるときは、車の運転を控えてください。","疲れたとき・近くを見るときに強いかどうか、記録して伝えてください。"],
+  dr:["輻輳不全が多い。幻視との区別、眼科評価"]},
+ {id:"sex",t:"性の悩み",ord:30,n:[18,19],u:[],
+  p:["病気や薬の影響で起こることがあります。気になる場合は相談してください（話しにくい場合はメモで伝えてもかまいません）。"],
+  dr:["性欲亢進は衝動制御障害の一症状のことがある（1.6・家族の情報を確認）","勃起障害：自律神経障害・併用薬"]},
+ {id:"sml",t:"においや味がわかりにくい",ord:31,n:[2],u:[],
+  p:["ガス漏れや焦げ、食品の傷みに気づきにくくなります。ガス警報器を使い、消費期限を確認しましょう。","味がわかりにくいと塩分が増えやすいので注意しましょう。"],
+  dr:["嗅覚低下はPDの前駆症状としてよく見られる。治療対象というより安全指導"]}
+];
+const BASE=["毎日体を動かしましょう。散歩・体操・ストレッチなど、できる範囲で続けることが大切です（合計30分程度が目安）。","薬は決められた時間に飲みましょう。自己判断で減らしたり、急にやめたりしないでください。","水分と食事をしっかりとりましょう。脱水は症状を悪くします。","肉や魚などのたんぱく質をたくさんとった直後は、薬が効きにくく感じることがあります。気になるときは相談してください。","薬が効いている時間・切れる時間を記録して受診時に見せてください。"];
+const SOS=["高い熱が出て、大量の汗や、体が急に固まって動けない（薬を急にやめた後や脱水のときに起こりやすい）","吐き気・嘔吐や飲み込めないために、薬が飲めない状態が続く","転んで頭を打った、骨折したかもしれない","急に幻覚や混乱が強くなった","食事でむせた後に熱が出た、息苦しい","気を失った"];
+
+/* ---------- CSV ---------- */
+function parseCSV(text){
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else if(c==='"')q=true;
+    else if(c===','){row.push(f);f="";}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f="";}
+    else f+=c;}
+  if(f!==""||row.length){row.push(f);rows.push(row);}
+  return rows.filter(r=>r.some(c=>String(c).trim()!==""));
+}
+function decode(buf){
+  let b=new Uint8Array(buf);
+  try{return new TextDecoder("utf-8",{fatal:true}).decode(b).replace(/^﻿/,"");}catch(e){}
+  try{return new TextDecoder("shift_jis").decode(b);}catch(e){}
+  return new TextDecoder("utf-8").decode(b);
+}
+function nmsqNo(lbl){const s=String(lbl).normalize("NFKC").replace(/^[／\/\s]+/,"");const m=s.match(/^(\d{1,2})\s*[.．、)]/);if(!m)return 0;const n=+m[1];return (n>=1&&n<=30)?n:0;}
+function classify(lbl){
+  const n=norm(lbl);if(!n)return null;
+  const q=nmsqNo(lbl);if(q)return {type:"n",k:q};
+  if(U_BY_NORM[n])return {type:"u",k:U_BY_NORM[n]};
+  if(/^患者id$|^患者番号$|^id$/.test(n))return {type:"id"};
+  if(/^(文書日時|記載日|評価日|来院年月日|日付|検査日)$/.test(n))return {type:"date",pri:/文書日時|記載日|評価日/.test(n)?1:2};
+  if(/^(患者)?年齢$/.test(n))return {type:"age"};
+  if(/^(患者)?性別$/.test(n))return {type:"sex"};
+  if(/hoehn/.test(n))return {type:"hy"};
+  if(/現在の臨床状態/.test(n))return {type:"state"};
+  if(/ジスキネジアはあったか/.test(n))return {type:"dysk"};
+  if(/氏名/.test(n))return {type:"name"};
+  return null;
+}
+function parseDate(s){
+  s=String(s||"").normalize("NFKC").trim();if(!s)return null;
+  let m=s.match(/(\d{4})[\/\-年.](\d{1,2})[\/\-月.](\d{1,2})/);
+  if(m)return m[1]+"-"+m[2].padStart(2,"0")+"-"+m[3].padStart(2,"0");
+  m=s.match(/^(\d{4})(\d{2})(\d{2})$/);if(m)return m[1]+"-"+m[2]+"-"+m[3];
+  return null;
+}
+function fmtD(d){if(!d)return "日付不明";const [y,m,dd]=d.split("-");return y+"/"+(+m)+"/"+(+dd);}
+function uVal(s){s=String(s||"").normalize("NFKC").replace(/[●○◎\s]/g,"");const m=s.match(/^([0-4])(?!\d)/);return m?+m[1]:null;}
+function nVal(s){s=String(s||"").normalize("NFKC").replace(/[●○◎\s]/g,"");if(!s)return null;if(/^(はい|あり|有|yes|y|1)$/i.test(s))return 1;if(/^(いいえ|なし|無|no|n|0)$/i.test(s))return 0;if(/^はい/.test(s))return 1;if(/^いいえ/.test(s))return 0;return null;}
+function normId(s){s=String(s||"").normalize("NFKC").replace(/\s/g,"");return s.replace(/^0+(?=\d)/,"");}
+
+/* 1つのCSV → 記録の配列 */
+function parseFile(text,fname){
+  const rows=parseCSV(text);if(!rows.length)return {recs:[],kind:"不明",note:"空のファイル"};
+  /* 見出し行：既知の項目名が最も多い行（生出力では2行目、NMSQでは末尾のこともある） */
+  let best=-1,bestN=0;
+  rows.forEach((r,i)=>{let c=0;r.forEach(x=>{const k=classify(x);if(k&&(k.type==="n"||k.type==="u"))c++;});if(c>bestN){bestN=c;best=i;}});
+  if(best<0||bestN<3)return {recs:[],kind:"不明",note:"NMSQ・MDS-UPDRSの項目名が見つかりません"};
+  const H=rows[best];
+  /* 生出力：1行目にある「患者ＩＤ・文書日時」を補う */
+  const top=rows[0];
+  const width=Math.max(...rows.map(r=>r.length));
+  const cols=[];
+  for(let i=0;i<width;i++){
+    let c=classify(H[i]);
+    if(!c&&best!==0){const t=classify(top[i]);if(t&&t.type!=="n"&&t.type!=="u")c=t;}
+    cols.push(c);
+  }
+  /* 主要な列を決める（同種が複数あれば最初、日付は優先度順） */
+  let idC=cols.findIndex(c=>c&&c.type==="id");
+  let dC=-1,dP=9;cols.forEach((c,i)=>{if(c&&c.type==="date"&&c.pri<dP){dC=i;dP=c.pri;}});
+  const ageC=cols.findIndex(c=>c&&c.type==="age"),sexC=cols.findIndex(c=>c&&c.type==="sex"),hyC=cols.findIndex(c=>c&&c.type==="hy"),stC=cols.findIndex(c=>c&&c.type==="state"),dyC=cols.findIndex(c=>c&&c.type==="dysk");
+  const nCols=[],uCols=[];cols.forEach((c,i)=>{if(c&&c.type==="n")nCols.push([i,c.k]);if(c&&c.type==="u")uCols.push([i,c.k]);});
+  const parts=new Set(uCols.map(x=>uPart(x[1])));
+  const kind=nCols.length>=10?"NMSQ":(parts.size?("MDS-UPDRS Part "+[...parts].sort().map(p=>["","Ⅰ","Ⅱ","Ⅲ"][+p]).join("・")):"不明");
+  if(idC<0)return {recs:[],kind,note:"患者IDの列が見つかりません"};
+  const headerRows=new Set([0,best]);
+  const recs=[];
+  rows.forEach((r,i)=>{
+    if(i===best)return;
+    const id=normId(r[idC]);if(!id||!/\d/.test(id)||/患者/.test(id))return;
+    if(i===0&&classify(r[idC])&&classify(r[idC]).type==="id")return;
+    const rec={id,date:dC>=0?parseDate(r[dC]):null,age:ageC>=0?String(r[ageC]||"").trim():"",sex:sexC>=0?String(r[sexC]||"").trim():"",file:fname};
+    if(nCols.length>=10){
+      const v={};let any=false;nCols.forEach(([ci,k])=>{const x=nVal(r[ci]);if(x!=null){v[k]=x;any=true;}});
+      if(any)recs.push(Object.assign({form:"N",v},rec));
+    }
+    [..."123"].forEach(p=>{
+      const cs=uCols.filter(x=>uPart(x[1])===p);if(!cs.length)return;
+      const v={};let any=false;cs.forEach(([ci,k])=>{const x=uVal(r[ci]);if(x!=null){v[k]=x;any=true;}});
+      if(!any)return;
+      const o=Object.assign({form:"U"+p,v},rec);
+      if(p==="3"){const hy=hyC>=0?String(r[hyC]||"").normalize("NFKC").match(/[0-5](\.5)?/):null;o.hy=hy?+hy[0]:null;
+        o.state=stC>=0?String(r[stC]||"").replace(/[●\s]/g,""):"";o.dysk=dyC>=0?String(r[dyC]||"").replace(/[●\s]/g,""):"";}
+      recs.push(o);
+    });
+  });
+  return {recs,kind,note:recs.length+"件"};
+}
+
+/* ---------- 読み込んだデータ（メモリのみ） ---------- */
+let FILES=[];   // {name,kind,note,n}
+let RECS=[];    // 全記録
+let CUR=null;   // 選択中の患者
+function addText(text,name){
+  const r=parseFile(text,name);
+  FILES.push({name,kind:r.kind,note:r.note,n:r.recs.length});
+  /* 同じ票・ID・日付・値の重複は1つに */
+  const seen=new Set(RECS.map(x=>x.form+"|"+x.id+"|"+x.date+"|"+JSON.stringify(x.v)));
+  r.recs.forEach(x=>{const k=x.form+"|"+x.id+"|"+x.date+"|"+JSON.stringify(x.v);if(!seen.has(k)){seen.add(k);RECS.push(x);}});
+  renderFiles();
+}
+function renderFiles(){
+  $("#files").innerHTML=FILES.length?('<table class="t"><tr><th>ファイル</th><th>判定</th><th>記録</th></tr>'+FILES.map(f=>'<tr><td>'+esc(f.name)+'</td><td>'+esc(f.kind)+'</td><td>'+esc(f.note)+'</td></tr>').join("")+'</table>'):"";
+  const ids={};RECS.forEach(r=>{ids[r.id]=(ids[r.id]||0)+1;});
+  $("#pidList").innerHTML=Object.keys(ids).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).slice(0,3000).map(i=>'<option value="'+esc(i)+'">').join("");
+  $("#pidInfo").textContent=RECS.length?("読み込み済み："+Object.keys(ids).length+"人・"+RECS.length+"記録"):"";
+}
+async function readFiles(list){
+  for(const f of list){try{const buf=await f.arrayBuffer();addText(decode(buf),f.name);}catch(e){FILES.push({name:f.name,kind:"読めません",note:String(e.message||e),n:0});renderFiles();}}
+  toast("読み込みました");
+}
+const drop=$("#drop"),fileIn=$("#file");
+drop.addEventListener("click",()=>fileIn.click());
+drop.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fileIn.click();}});
+fileIn.addEventListener("change",()=>{readFiles(Array.from(fileIn.files));fileIn.value="";});
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("on");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("on");}));
+drop.addEventListener("drop",e=>{if(e.dataTransfer&&e.dataTransfer.files)readFiles(Array.from(e.dataTransfer.files));});
+$("#unloadBtn").addEventListener("click",()=>{FILES=[];RECS=[];CUR=null;INC={};$("#pid").value="";$("#dateSel").innerHTML="";renderFiles();renderAdv();toast("閉じました");});
+
+/* サンプル（架空のデータ） */
+$("#sampleBtn").addEventListener("click",()=>{
+  const nh="患者ID,記載日,年齢,性別,"+NMSQ_LABEL.slice(1).map((l,i)=>(i+1)+"．"+l).join(",");
+  const yn=a=>a.map(x=>x?"はい":"いいえ").join(",");
+  const n1=[0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0];
+  const n2=[1,0,1,0,1,0,1,1,1,0,0,1,0,1,0,1,0,0,0,1,1,1,1,1,1,0,0,0,0,0];
+  const nmsq=nh+"\n000001,2025/10/7,72,男性,"+yn(n1)+"\n000001,2026/4/7,72,男性,"+yn(n2)+"\n";
+  const lv=["0正常","1ごく普通","2軽度","3中等度","4重度"];
+  const p1h="患者ID,記載日,患者年齢,患者性別,"+U_ITEMS.filter(x=>x[0][0]==="1").map(x=>x[1]).join(",");
+  const p1=a=>a.map(x=>lv[x]).join(",");
+  const up1=p1h+"\n000001,2025/10/7,72歳6ヶ月,男性,"+p1([1,0,1,1,0,0,1,1,1,1,2,0,1])+"\n000001,2026/4/7,73歳0ヶ月,男性,"+p1([1,2,2,1,1,0,2,2,1,2,3,2,1])+"\n";
+  const p2h="患者ID,記載日,"+U_ITEMS.filter(x=>x[0][0]==="2").map(x=>x[1]).join(",");
+  const up2=p2h+"\n000001,2026/4/7,"+p1([1,1,2,1,2,1,2,1,1,1,2,2,1])+"\n";
+  const p3=U_ITEMS.filter(x=>x[0][0]==="3");
+  const p3h="患者ID,記載日,現在の臨床状態,"+p3.map(x=>x[1]).join(",")+",Hoehn and Yahr重症度";
+  const v3=p3.map(x=>({"3.10":2,"3.11":1,"3.12":2,"3.13":2,"3.1":1}[x[0]]??(x[0].startsWith("3.17")?0:1)));
+  const up3=p3h+"\n000001,2026/4/7,ON,"+p1(v3)+",3\n";
+  addText(nmsq,"サンプル_NMSQ.csv");addText(up1,"サンプル_PartⅠ.csv");addText(up2,"サンプル_PartⅡ.csv");addText(up3,"サンプル_PartⅢ.csv");
+  $("#pid").value="1";selectPatient();toast("架空の患者（ID 000001）で表示しました");
+});
+
+/* ---------- 患者の選択 ---------- */
+const FORMS=[["N","NMSQ"],["U1","Part Ⅰ"],["U2","Part Ⅱ"],["U3","Part Ⅲ"]];
+function selectPatient(){
+  const id=normId($("#pid").value);
+  if(!id){toast("患者IDを入れてください");return;}
+  const mine=RECS.filter(r=>r.id===id);
+  if(!mine.length){CUR=null;$("#dateSel").innerHTML='<p class="warnbox">このIDの記録は読み込んだCSVにありません。</p>';renderAdv();return;}
+  CUR={id,by:{},sel:{}};INC={};
+  FORMS.forEach(([f])=>{const a=mine.filter(r=>r.form===f).sort((x,y)=>String(y.date).localeCompare(String(x.date)));if(a.length){CUR.by[f]=a;CUR.sel[f]=0;}});
+  renderDateSel();renderAdv();go("adv");
+}
+function renderDateSel(){
+  if(!CUR){$("#dateSel").innerHTML="";return;}
+  const any=FORMS.filter(([f])=>CUR.by[f]);
+  const a0=any.map(([f])=>CUR.by[f][0]).find(r=>r.age||r.sex);
+  $("#dateSel").innerHTML='<p class="small" style="margin:0 0 4px">患者ID '+esc(CUR.id)+(a0?'（'+esc(a0.age)+' '+esc(a0.sex)+'）':'')+'</p><table class="t"><tr><th>票</th><th>使う記録</th><th>比較</th></tr>'+any.map(([f,l])=>{
+    const a=CUR.by[f];const i=CUR.sel[f];
+    return '<tr><td>'+l+'</td><td><select data-f="'+f+'">'+a.map((r,j)=>'<option value="'+j+'"'+(j===i?' selected':'')+'>'+fmtD(r.date)+(r.state?' '+esc(r.state):'')+'</option>').join("")+'</select></td><td class="small">'+(a[i+1]?fmtD(a[i+1].date):'なし')+'</td></tr>';}).join("")+'</table>';
+  $$("#dateSel select").forEach(s=>s.addEventListener("change",()=>{CUR.sel[s.dataset.f]=+s.value;renderDateSel();renderAdv();}));
+}
+$("#goBtn").addEventListener("click",selectPatient);
+$("#pid").addEventListener("keydown",e=>{if(e.key==="Enter")selectPatient();});
+
+/* ---------- 判定 ---------- */
+function curRec(f){if(!CUR||!CUR.by[f])return null;return CUR.by[f][CUR.sel[f]]||null;}
+function prevRec(f){if(!CUR||!CUR.by[f])return null;return CUR.by[f][CUR.sel[f]+1]||null;}
+function sumPart(r){if(!r)return null;let s=0,n=0;Object.values(r.v).forEach(x=>{s+=x;n++;});return {s,n};}
+function evaluate(){
+  const N=curRec("N"),P={1:curRec("U1"),2:curRec("U2"),3:curRec("U3")};
+  const Np=prevRec("N"),Pp={1:prevRec("U1"),2:prevRec("U2"),3:prevRec("U3")};
+  const u=k=>{const r=P[uPart(k)];return r&&r.v[k]!=null?r.v[k]:null;};
+  const up=k=>{const r=Pp[uPart(k)];return r&&r.v[k]!=null?r.v[k]:null;};
+  const n=k=>N&&N.v[k]===1;
+  const np=k=>Np&&Np.v[k]===1;
+  const f={u:k=>u(k)||0,n:k=>!!n(k)};
+  const hy=P[3]&&P[3].hy;
+  const out=[];
+  DOMS.forEach(d=>{
+    const why=[];let worse=false;
+    (d.n||[]).forEach(k=>{if(n(k)){why.push("NMSQ "+k+"「"+NMSQ_LABEL[k]+"」"+(Np&&!np(k)?"（新規）":""));if(Np&&!np(k))worse=true;}});
+    (d.u||[]).forEach(([k,min])=>{const x=u(k);if(x!=null&&x>=min){const p=up(k);let s="UPDRS "+k.replace(/[a-e]$/,"")+" "+U_NAME[k]+" "+x;if(p!=null&&x>p){s+="（前回"+p+"）";worse=true;}why.push(s);}});
+    if(d.hy&&hy!=null&&hy>=d.hy)why.push("Hoehn-Yahr "+hy);
+    if(!why.length)return;
+    const crit=d.crit?d.crit(f):false;
+    out.push({d,why,worse,tone:crit?"crit":"warn"});
+  });
+  out.sort((a,b)=>(a.tone==="crit"?0:1)-(b.tone==="crit"?0:1)||(b.worse-a.worse)||a.d.ord-b.d.ord);
+  return {N,P,Np,Pp,hy,list:out};
+}
+let INC={};  // 用紙に入れる項目（メモリのみ）
+let LAST=null;
+function renderAdv(){
+  const has=CUR&&Object.keys(CUR.by).length;
+  ["scoreCard","domCard","printCard","memoCard"].forEach(id=>$("#"+id).hidden=!has);
+  const V=$("#verdict");
+  if(!has){V.className="info";V.innerHTML='<div class="big">CSVを読み込み、患者IDを選ぶとここに結果が出ます</div>';LAST=null;return;}
+  const E=evaluate();LAST=E;
+  const nc=E.list.filter(x=>x.tone==="crit").length;
+  if(!E.list.length){V.className="ok";V.innerHTML='<span class="pill ok">該当なし</span> <span class="big">拾い上げた症状はありません（「毎日の基本」だけの用紙になります）</span>';}
+  else{V.className=nc?"crit":"warn";V.innerHTML='<span class="pill '+(nc?'crit':'warn')+'">'+(nc?'早めの相談 '+nc:'助言 '+E.list.length)+'</span> <span class="big">'+esc(E.list.slice(0,4).map(x=>x.d.t.replace(/（.*?）/g,"")).join("・")+(E.list.length>4?" ほか"+(E.list.length-4)+"項目":""))+'</span>';}
+  /* スコア */
+  const rows=[];
+  const fmtChg=(a,b)=>{if(a==null||b==null)return "";const d=a-b;return d>0?' <span class="chg-up">＋'+d+'</span>':d<0?' <span class="chg-dn">'+d+'</span>':' ±0';};
+  if(E.N){const c=Object.values(E.N.v).filter(x=>x===1).length;const cp=E.Np?Object.values(E.Np.v).filter(x=>x===1).length:null;rows.push(['NMSQ（はいの数）',fmtD(E.N.date),c+' / 30'+fmtChg(c,cp)+(E.Np?'<span class="small">（前回 '+fmtD(E.Np.date)+' '+cp+'）</span>':'')]);}
+  [1,2,3].forEach(p=>{const r=E.P[p];if(!r)return;const s=sumPart(r),sp=sumPart(E.Pp[p]);const full=[0,13,13,32][p];
+    rows.push(['MDS-UPDRS Part '+["","Ⅰ","Ⅱ","Ⅲ"][p]+(p===3&&r.state?'（'+esc(r.state)+'）':''),fmtD(r.date),s.s+' 点'+(s.n<full?'<span class="small">（'+s.n+'項目の合計）</span>':'')+fmtChg(s.s,sp&&sp.s)+(sp?'<span class="small">（前回 '+fmtD(E.Pp[p].date)+' '+sp.s+'）</span>':'')]);});
+  if(E.hy!=null)rows.push(['Hoehn-Yahr','',String(E.hy)+(E.hy>=3?' <span class="small">（指定難病：生活機能障害度2度以上なら医療費助成の対象）</span>':'')]);
+  $("#scores").innerHTML='<table class="t"><tr><th>評価</th><th>日付</th><th>結果</th></tr>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join("")+'</table>';
+  /* 項目 */
+  /* 既定：赤はすべて、ほかは合わせて6項目まで（用紙を2枚程度に収める）。医師が足し引きできる */
+  let cnt=E.list.filter(x=>x.d.id in INC&&INC[x.d.id]).length;
+  E.list.forEach(x=>{if(x.d.id in INC)return;const on=x.tone==="crit"||cnt<6;INC[x.d.id]=on;if(on)cnt++;});
+  $("#doms").innerHTML=E.list.length?E.list.map(x=>'<div class="dom '+x.tone+'"><label class="hd"><input type="checkbox" data-id="'+x.d.id+'"'+(INC[x.d.id]?' checked':'')+'><span>'+esc(x.d.t)+' '+(x.tone==="crit"?'<span class="pill crit">早めの相談</span>':'')+(x.worse?' <span class="pill warn">悪化</span>':'')+'</span></label><div class="why">'+x.why.map(esc).join("／")+'</div><ul>'+x.d.p.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul><details><summary>医師向け</summary><ul>'+x.d.dr.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></details></div>').join(""):'<p class="muted">該当する項目はありません。</p>';
+  $$("#doms input[type=checkbox]").forEach(c=>c.addEventListener("change",()=>{INC[c.dataset.id]=c.checked;buildMemo();}));
+  buildMemo();
+  if(!$("#prevBox").hidden)$("#prevBox").innerHTML=buildPrint(true);
+}
+$("#allOn").addEventListener("click",()=>{if(!LAST)return;LAST.list.forEach(x=>INC[x.d.id]=true);renderAdv();});
+$("#allOff").addEventListener("click",()=>{if(!LAST)return;LAST.list.forEach(x=>INC[x.d.id]=false);renderAdv();});
+
+/* ---------- カルテ用メモ ---------- */
+function buildMemo(){
+  const E=LAST;if(!E){$("#memo").textContent="";return;}
+  const L=[];
+  const dates=[E.N&&E.N.date,E.P[1]&&E.P[1].date,E.P[2]&&E.P[2].date,E.P[3]&&E.P[3].date].filter(Boolean).sort();
+  L.push("【PD質問票・評価のまとめ】"+(dates.length?fmtD(dates[dates.length-1]):""));
+  if(E.N){const c=Object.values(E.N.v).filter(x=>x===1).length;L.push("NMSQ "+c+"/30（"+fmtD(E.N.date)+"）"+(E.Np?"　前回 "+Object.values(E.Np.v).filter(x=>x===1).length+"/30（"+fmtD(E.Np.date)+"）":""));}
+  [1,2,3].forEach(p=>{const r=E.P[p];if(!r)return;const s=sumPart(r),sp=sumPart(E.Pp[p]);L.push("MDS-UPDRS Part "+["","Ⅰ","Ⅱ","Ⅲ"][p]+" "+s.s+"点"+(p===3&&r.state?"（"+r.state+"）":"")+"（"+fmtD(r.date)+"）"+(sp?"　前回 "+sp.s+"点（"+fmtD(E.Pp[p].date)+"）":""));});
+  if(E.hy!=null)L.push("Hoehn-Yahr "+E.hy);
+  if(E.list.length){L.push("主な問題：");E.list.forEach(x=>L.push("・"+x.d.t+(x.tone==="crit"?"【早めの対応】":"")+(x.worse?"【悪化】":"")+"："+x.why.join("、")));}
+  else L.push("主な問題：拾い上げた症状なし");
+  const inc=E.list.filter(x=>INC[x.d.id]).map(x=>x.d.t.replace(/（.*?）/g,""));
+  L.push("生活指導の用紙を渡して説明"+(inc.length?"（"+inc.join("・")+"）":"（毎日の基本）"));
+  $("#memo").textContent=L.join("\n");
+}
+$("#copyMemo").addEventListener("click",async()=>{const t=$("#memo").textContent;try{await navigator.clipboard.writeText(t);toast("コピーしました");}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("コピーしました");}catch(e2){toast("コピーできませんでした");}ta.remove();}});
+
+/* ---------- 印刷 ---------- */
+function buildPrint(preview){
+  const E=LAST;const items=E?E.list.filter(x=>INC[x.d.id]):[];
+  const dates=E?[E.N&&E.N.date,E.P[1]&&E.P[1].date,E.P[2]&&E.P[2].date,E.P[3]&&E.P[3].date].filter(Boolean).sort():[];
+  const today=new Date();const td=today.getFullYear()+"年"+(today.getMonth()+1)+"月"+today.getDate()+"日";
+  let h='<h1>パーキンソン病　毎日の過ごし方のアドバイス</h1><div class="meta">お渡しした日：'+td+(dates.length?'　（質問票・診察の日：'+fmtD(dates[dates.length-1])+'）':'')+'</div>';
+  if(items.length){h+='<p>質問票のお答えから、次のことに気をつけて過ごしましょう。</p>';items.forEach(x=>{h+='<div class="blk"><h2>'+esc(x.d.t)+(x.tone==="crit"?'　（早めに相談してください）':'')+'</h2><ul>'+x.d.p.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>';});}
+  if($("#optBase").checked)h+='<div class="blk"><h2>毎日の基本</h2><ul>'+BASE.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>';
+  if($("#optSos").checked)h+='<div class="sos"><b>次のときは、受診日を待たずにすぐ連絡・受診してください</b><ul>'+SOS.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>';
+  const note=$("#drNote").value.trim();
+  h+='<div class="memo"><b>主治医から</b>\n'+esc(note)+'</div>';
+  h+='<div class="foot">このアドバイスは質問票のお答えをもとにした一般的な内容です。治療や薬のことは主治医と相談してください。</div>';
+  if(preview)return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px">'+h.replace(/<h1>/,'<h3 style="margin:0 0 4px">').replace(/<\/h1>/,'</h3>').replace(/<h2>/g,'<b style="display:block;margin-top:8px">').replace(/<\/h2>/g,'</b>').replace(/class="memo"/,'style="border:1px solid var(--line);padding:6px;margin-top:8px;white-space:pre-wrap"').replace(/class="sos"/,'style="border:2px solid var(--crit);padding:6px;margin-top:8px"')+'</div>';
+  return h;
+}
+$("#printBtn").addEventListener("click",()=>{const p=$("#print");p.innerHTML=buildPrint(false);p.classList.toggle("large",$("#optLarge").checked);setTimeout(()=>window.print(),50);});
+$("#prevBtn").addEventListener("click",()=>{const b=$("#prevBox");b.hidden=!b.hidden;if(!b.hidden)b.innerHTML=buildPrint(true);});
+$("#drNote").addEventListener("input",()=>{if(!$("#prevBox").hidden)$("#prevBox").innerHTML=buildPrint(true);});
+["optBase","optSos"].forEach(id=>$("#"+id).addEventListener("change",()=>{if(!$("#prevBox").hidden)$("#prevBox").innerHTML=buildPrint(true);}));
+
+/* ---------- 早見表 ---------- */
+(function(){
+  const crit={psy:"1.2≧3 または NMSQ 30",icd:"1.6≧2",eds:"1.8≧3",swl:"2.3≧3",fall:"3.12≧3 または 2.12≧3",oh:"1.12≧3",mood:"1.3≧3"};
+  $("#lib").innerHTML=DOMS.map(d=>{
+    const tr=[].concat((d.n||[]).map(k=>"NMSQ "+k+"「"+NMSQ_LABEL[k]+"」"),(d.u||[]).map(([k,m])=>"UPDRS "+k.replace(/[a-e]$/,"")+" "+U_NAME[k]+" ≧"+m),d.hy?["Hoehn-Yahr ≧"+d.hy]:[]);
+    return '<details><summary>'+esc(d.t)+(crit[d.id]?' <span class="pill crit">赤あり</span>':'')+'</summary><p class="small" style="margin:4px 0">拾い上げ：'+esc(tr.join("／"))+(crit[d.id]?'<br>早めの相談：'+esc(crit[d.id]):'')+'</p><b class="small">患者さん向け</b><ul>'+d.p.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul><b class="small">医師向け（未照合を含む・処方前に添付文書を確認）</b><ul>'+d.dr.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></details>';}).join("")+
+  '<details><summary>毎日の基本（全員の用紙に入る）</summary><ul>'+BASE.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></details><details><summary>すぐに連絡・受診してほしいとき</summary><ul>'+SOS.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></details>';
+})();
+
+document.getElementById("forceUpdate").addEventListener("click",async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(()=>location.reload(),800);});
+renderAdv();
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=["#verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["pdadv-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>
