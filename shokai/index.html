@@ -51,6 +51,7 @@ textarea.paste{min-height:90px;font-size:13px;background:var(--bg)}
 .labs label{display:flex;gap:6px;align-items:center;font-size:13.5px}
 .labs .fl{color:var(--crit);font-weight:700}
 .det{font-size:13px;margin-top:6px;padding:6px 8px;border-radius:8px;background:var(--accent-soft)}
+.prevdet{margin-top:8px}.prevdet summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:700}
 .prev .item{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
 .prev .item input{margin-top:5px;flex:none;width:18px;height:18px}
 .prev .item .tx{flex:1}
@@ -91,8 +92,8 @@ nav.tabs button.on{color:var(--accent);font-weight:700;box-shadow:inset 0 3px 0 
     <h2><span class="n">1</span>退院サマリーを貼る</h2>
     <textarea class="paste" data-k="sumRaw" style="min-height:190px" placeholder="ユビーAIで作った退院サマリーを、そのまま全部貼る。病型・既往・抗血栓薬を読み取り、再発予防のお願いを付けます。"></textarea>
     <label style="display:flex;gap:6px;align-items:center;font-size:13px;margin-top:6px"><input type="checkbox" id="stripId"> 氏名・ID・生年月日の行は文面から除く</label>
-    <div class="lbl">サマリーの扱い</div>
-    <div class="chips" data-k="sumUse" data-opts="sumUse"></div>
+    <div class="lbl">文面に入れるサマリーの項目（見出しごとに抜き出して整えます）</div>
+    <div class="chips" data-k="secs" data-multi="1" data-opts="secs"></div>
     <div id="autoNote" class="det hide"></div>
   </div>
 
@@ -223,8 +224,9 @@ nav.tabs button.on{color:var(--accent);font-weight:700;box-shadow:inset 0 3px 0 
       <div><div class="lbl at-keep">以後続ける薬</div><select class="at-keep" id="keep" data-k="keep"></select></div>
     </div>
     <div class="row at-a"><div><div class="lbl">薬（処方から自動で入ります。直しても構いません）</div><input type="text" data-k="atDrug" placeholder="例：クロピドグレル（プラビックス）75 mg"></div></div>
-    <div class="lbl">お願いする項目（チェックを外すと文面から消えます。文は直せます）</div>
-    <div id="prevList" class="prev"></div>
+    <div class="lbl">お願いする項目（押して入れる・外す）</div>
+    <div id="prevChips" class="chips"></div>
+    <details class="prevdet"><summary>文を直す</summary><div id="prevList" class="prev"></div></details>
     <div class="only-gs"><div class="lbl">当科の今後</div>
     <div class="chips" data-k="fu" data-opts="fu"></div>
     <input type="text" data-k="fuTx" placeholder="例：3か月後に当科外来で頭部MRIを再検予定です" style="margin-top:6px"></div>
@@ -295,7 +297,7 @@ nav.tabs button.on{color:var(--accent);font-weight:700;box-shadow:inset 0 3px 0 
 
 <script>
 "use strict";
-const VER="ver1_2026-11-26b";
+const VER="ver1_2026-11-26c";
 const MODE=(location.protocol==="file:")?"karte":"pwa";
 const DKEY="shokai-draft-v1", SKEY="shokai-set-v1";
 const $=id=>document.getElementById(id);
@@ -303,7 +305,7 @@ const $=id=>document.getElementById(id);
 /* ---------- 選択肢 ---------- */
 const OPTS={
   mode:[["s","サマリーから（逆紹介）"],["g","逆紹介（詳しく入力）"],["h","返書（紹介元へ）"]],
-  sumUse:[["in","文面に含める"],["att","別に添付する"]],
+  secs:[["course","入院中の経過"],["dc","退院時の状態"],["exam","検査結果"],["rx","退院時処方"]],
   scene:[["out","外来受診の報告"],["adm","入院した報告"],["dc","退院時の報告"]],
   hpurpose:[["dx","精査"],["tx","治療方針のご相談"],["fu","専門外来での経過観察"],["adm","入院加療"]],
   cert:[["sure","確定"],["prob","疑い"],["neg","否定的"]],
@@ -349,7 +351,7 @@ const DRUGS=[
 ];
 
 /* ---------- 状態 ---------- */
-const DEF={mode:"s",sumRaw:"",sumUse:"in",stripId:true,dxManual:false,rfManual:false,siteManual:false,auto:null,dx:"",site:"",cause:"",rf:[],rfTx:"",imgRaw:"",img:"",labRaw:"",labSel:{},other:"",rxRaw:"",rx:"",
+const DEF={mode:"s",sumRaw:"",secs:["course","dc","rx"],stripId:true,dxManual:false,rfManual:false,siteManual:false,auto:null,dx:"",site:"",cause:"",rf:[],rfTx:"",imgRaw:"",img:"",labRaw:"",labSel:{},other:"",rxRaw:"",rx:"",
   at:"",atManual:false,daptEnd:"",keep:"",atDrug:"",atDrugAuto:true,prev:{},fu:"",fuTx:"",
   g:{purpose:["prev"],purposeTx:"",onset:"",admit:"",dc:"",sx:[],arr:"ems",tx:[],txTx:"",comp:"",dest:"home",course:"",mrs:"",nih:"",res:[],resTx:"",walk:"",food:"",kaigo:""},
   h:{scene:"out",date:"",dc:"",purpose:[],purposeTx:"",dxTx:"",cert:"sure",exam:"",rxChg:"",plan:[],planTx:"",next:"",prev:"n"}};
@@ -375,7 +377,7 @@ function drawChips(){
         if(multi){let a=getK(key)||[];a=a.includes(v)?a.filter(x=>x!==v):a.concat(v);
           if(key==="g.res"){ if(v==="none"){if(a.includes("none"))a=["none"];} else a=a.filter(x=>x!=="none"); }
           setK(key,a);}
-        else setK(key,getK(key)===v&&!["mode","sumUse"].includes(key)?"":v);
+        else setK(key,getK(key)===v&&!["mode"].includes(key)?"":v);
         onChange(key);
       });
       box.appendChild(b);
@@ -619,7 +621,16 @@ function autoAt(){
   if(ds.length){det.classList.remove("hide");det.textContent="抗血栓薬："+ds.map(drugLabel).join("、");}
   else det.classList.add("hide");
 }
+const PLBL={at:"抗血栓薬の方針",stop:"休薬は当科に相談",bp:"血圧の目標",bpst:"過降圧に注意",ldl:"脂質（LDL）",dm:"HbA1cの目標",smk:"禁煙",alc:"節酒",af:"心房細動の確認",warn:"再発時は救急車",drive:"運転を控える"};
 function drawPrev(){
+  const ch=$("prevChips");ch.innerHTML="";
+  prevItems().forEach(it=>{
+    if(it.id==="at"&&!S.at)return;
+    const st=S.prev[it.id]||{}, on=("on" in st)?st.on:it.on;
+    const b=document.createElement("button");b.type="button";b.className="chip"+(on?" on":"");b.textContent=(on?"✓ ":"")+PLBL[it.id];
+    b.addEventListener("click",()=>{S.prev[it.id]=Object.assign({},S.prev[it.id],{on:!on});save();update();});
+    ch.appendChild(b);
+  });
   const box=$("prevList");box.innerHTML="";
   prevItems().forEach(it=>{
     if(it.id==="at"&&!S.at)return;
@@ -768,6 +779,41 @@ function cleanSum(){
   if(S.stripId)ls=ls.filter(l=>!/^\s*[【\[■●]?\s*(患者(氏)?名|氏名|フリガナ|カナ氏名|患者ID|患者番号|ID|カルテ番号|生年月日)\s*[】\]]?\s*[:：]/.test(l));
   return ls.join("\n").replace(/\n{3,}/g,"\n\n").trim();
 }
+/* サマリーを見出しごとに分ける */
+const HEADKW=/診断|病名|既往|主訴|現病歴|病歴|現症|経過|処方|内服|検査|画像|転帰|退院|入院|家族歴|生活歴|ADL|方針|治療|合併症|所見|サマリー|要約/;
+const COLONHEAD=/^(診断名?|病名|主病名|既往歴?|主訴|現病歴|.{0,6}経過|.{0,4}処方|.{0,6}検査|検査所見|画像所見|転帰|退院時.{0,6}|入院時.{0,6}|家族歴|生活歴|治療方針|方針)$/;
+function secClass(h){if(/処方|内服薬/.test(h))return "rx";if(/経過/.test(h))return "course";if(/退院時|転帰/.test(h))return "dc";if(/検査|画像/.test(h)&&!/現症/.test(h))return "exam";return "other";}
+function sumSections(){
+  const ls=(S.sumRaw||"").replace(/\r/g,"").replace(/\u3000/g," ").split("\n");
+  const out=[];let cur=null;
+  for(const l of ls){
+    const m=l.match(/^\s*([【\[［■●◆◇#＃]+)?\s*([^\s】\]］:：]{1,16}?)\s*([】\]］]|[:：])\s*(.*)$/);
+    const isHead=m&&((m[1]||/[】\]］]/.test(m[3]))?HEADKW.test(m[2]):COLONHEAD.test(m[2]));
+    if(isHead){
+      cur={head:m[2],cls:secClass(m[2]),lines:[]};out.push(cur);
+      if(m[4].trim())cur.lines.push(m[4]);continue;
+    }
+    if(cur)cur.lines.push(l);
+  }
+  return out;
+}
+function fmtText(lines){
+  const res=[];
+  lines.map(l=>l.trim()).filter(Boolean).forEach(l=>{
+    l=l.replace(/^[-*]\s+/,"・");
+    const prev=res[res.length-1];
+    const newLine=!prev||/[。．！？」）)：:]$/.test(prev)||/^([・●○◇◆■□#＃※]|\d{1,2}[\/月]\d{1,2}|第\d+病日|[（(]?\d+[)）.]|\d+日目)/.test(l);
+    if(newLine)res.push(l);else res[res.length-1]=prev+l;
+  });
+  return res.join("\n");
+}
+function secText(cls){
+  const ss=sumSections().filter(x=>x.cls===cls);
+  if(!ss.length)return "";
+  const all=ss.map(x=>x.lines);
+  if(cls==="rx"){const raw=all.map(l=>l.join("\n")).join("\n");const r=parseRx(raw);return r||fmtText([].concat(...all));}
+  return ss.map(x=>fmtText(x.lines)).filter(Boolean).join("\n");
+}
 function buildS(){
   const g=S.g,out=[];
   if(SET.greet.trim())out.push(SET.greet.trim());
@@ -775,8 +821,11 @@ function buildS(){
   sec(out,"既往・危険因子",rfLine());
   const pur=g.purpose.map(v=>LBL.gpurpose[v]);if(g.purposeTx.trim())pur.push(g.purposeTx.trim());
   sec(out,"紹介目的",pur.length?"当院での急性期治療を終えましたので、"+pur.join("、")+"をお願いいたします。":"");
-  if(S.sumUse==="att")sec(out,"経過","入院中の経過・検査結果・退院時処方は、添付の退院サマリーをご参照ください。");
-  else sec(out,"入院中の経過（退院サマリー）",cleanSum());
+  const secs=S.secs||[];
+  if(secs.includes("course")){const c=secText("course");sec(out,"入院中の経過",c||(S.sumRaw.trim()?cleanSum():""));}
+  if(secs.includes("dc"))sec(out,"退院時の状態",secText("dc"));
+  if(secs.includes("exam"))sec(out,"検査結果",secText("exam"));
+  if(secs.includes("rx"))sec(out,"退院時処方",secText("rx"));
   sec(out,"お願いしたいこと",prevLines().map(x=>"・"+x).join("\n"));
   sec(out,"当科の今後",fuText());
   if(SET.close.trim())out.push(SET.close.trim());
@@ -820,6 +869,10 @@ function drawAuto(){
   if(a.site)parts.push("部位："+a.site);
   parts.push("既往："+(a.rf.length?a.rf.map(v=>LBL.rf[v]+"（"+a.rw[v]+"）").join("、"):"読み取れませんでした"));
   parts.push("抗血栓薬："+(ds.length?ds.map(d=>d.gen).join("、"):"見つかりませんでした"));
+  const ss=sumSections(), name={course:"経過",dc:"退院時の状態",exam:"検査",rx:"処方"};
+  const found=["course","dc","exam","rx"].filter(c=>ss.some(x=>x.cls===c));
+  parts.push("見出し："+(found.length?found.map(c=>name[c]+"（"+ss.filter(x=>x.cls===c).map(x=>x.head).join("・")+"）").join("、"):"見つかりませんでした"));
+  if(!found.includes("course"))parts.push("※経過の見出しが見つからないため、サマリー全体を「入院中の経過」に入れています");
   el.innerHTML="<b>サマリーから読み取りました（違う所は下で直してください）</b><br>"+parts.map(esc).join("<br>")+(S.dxManual||S.rfManual?"<br><span style='color:var(--warn)'>病型・既往は手で直した内容を優先しています。</span>":"");
   el.classList.remove("hide");
 }
