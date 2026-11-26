@@ -461,6 +461,18 @@
       ]
     },
     {
+      "name": "紹介状アシスト",
+      "short_name": "紹介状",
+      "url": "shokai/",
+      "icons": [
+        {
+          "src": "shokai/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "脳神経クリニック紹介先検索",
       "short_name": "神経紹介先",
       "url": "referral/",

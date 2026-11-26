@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#3b4fa0">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="紹介状">
+<title>紹介状アシスト</title>
+<style>
+:root{
+  /* 紹介状アシスト＝藍 */
+  --accent:#3b4fa0; --accent-ink:#fff; --accent-soft:#e8ebf7;
+  --bg:#f3f5f8; --surface:#fff; --ink:#18202a; --muted:#5a6573; --line:#d7dde6;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#9fb0f5; --accent-ink:#141a33; --accent-soft:#232a45;
+  --bg:#11151b; --surface:#1a1f27; --ink:#e8edf3; --muted:#a2adba; --line:#2e3744;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--font);-webkit-text-size-adjust:100%}
+header.top{position:sticky;top:0;z-index:20;background:var(--accent);color:var(--accent-ink);padding:calc(env(safe-area-inset-top) + 8px) calc(env(safe-area-inset-right) + 12px) 8px calc(env(safe-area-inset-left) + 12px)}
+header.top .brand{display:flex;align-items:baseline;gap:8px}
+header.top h1{margin:0;font-size:17px;white-space:nowrap}
+header.top small{opacity:.85;font-size:12px}
+main{max-width:780px;margin:0 auto;padding:10px calc(env(safe-area-inset-right) + 10px) calc(env(safe-area-inset-bottom) + 84px) calc(env(safe-area-inset-left) + 10px)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px}
+.card h2{margin:0 0 8px;font-size:15px;color:var(--accent);display:flex;align-items:center;gap:6px}
+.card h2 .n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:12px}
+.lbl{font-size:12.5px;color:var(--muted);margin:8px 0 4px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 11px;min-height:36px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+input[type=text],input[type=date],input[type=number],textarea,select{font:inherit;font-size:14.5px;width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 9px;background:var(--surface);color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+textarea.paste{min-height:90px;font-size:13px;background:var(--bg)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.hint{font-size:12px;color:var(--muted);margin:4px 0 0}
+.btn{font:inherit;font-size:14px;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:9px;padding:8px 14px;min-height:40px;cursor:pointer;font-weight:700}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.labs{display:flex;flex-direction:column;gap:2px;margin-top:6px;max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px}
+.labs label{display:flex;gap:6px;align-items:center;font-size:13.5px}
+.labs .fl{color:var(--crit);font-weight:700}
+.det{font-size:13px;margin-top:6px;padding:6px 8px;border-radius:8px;background:var(--accent-soft)}
+.prev .item{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
+.prev .item input{margin-top:5px;flex:none;width:18px;height:18px}
+.prev .item .tx{flex:1}
+.prev .item .tx textarea{min-height:44px;font-size:13.5px}
+#out{min-height:320px;font-size:14px;line-height:1.7}
+.outbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.outbar .cnt{font-size:12.5px;color:var(--muted);margin-left:auto}
+.dirty{display:none;font-size:12.5px;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:6px 8px;margin-bottom:6px}
+.dirty.on{display:block}
+.note{font-size:12.5px;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px 10px}
+.warn{font-size:13px;background:var(--warn-soft);color:var(--ink);border-left:4px solid var(--warn);border-radius:8px;padding:8px 10px;margin:8px 0}
+.hide{display:none!important}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;font:inherit;font-size:12.5px;border:0;background:none;color:var(--muted);padding:9px 4px 8px;min-height:54px;cursor:pointer}
+nav.tabs button b{display:block;font-size:15px}
+nav.tabs button.on{color:var(--accent);font-weight:700;box-shadow:inset 0 3px 0 var(--accent)}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 70px);transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;max-width:90%}
+#toast.on{opacity:.95}
+#jump{position:fixed;right:calc(env(safe-area-inset-right) + 12px);bottom:calc(env(safe-area-inset-bottom) + 66px);z-index:25;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.src li{margin:4px 0;font-size:13.5px}
+.src a{color:var(--accent)}
+@media print{nav.tabs,#jump,#toast{display:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand"><h1>紹介状アシスト</h1><small>カルテから貼って、文面を作る</small></div></header>
+<main>
+
+<!-- ====== 作成（逆紹介・返書 共通の画面） ====== -->
+<section id="tab-make">
+  <div class="card">
+    <div class="chips" data-k="mode" data-opts="mode"></div>
+    <p class="hint">貼り付けた内容と入力は、このタブを閉じると消えます（端末に残しません）。患者さんの氏名・IDは入れないでください（カルテの様式側で入ります）。</p>
+  </div>
+
+  <!-- 返書だけ -->
+  <div class="card only-h">
+    <h2><span class="n">1</span>受診の報告</h2>
+    <div class="lbl">報告の場面</div>
+    <div class="chips" data-k="h.scene" data-opts="scene"></div>
+    <div class="row">
+      <div><div class="lbl">受診日・入院日</div><input type="date" data-k="h.date"></div>
+      <div><div class="lbl">（退院時）退院日</div><input type="date" data-k="h.dc"></div>
+    </div>
+    <div class="lbl">ご紹介の目的</div>
+    <div class="chips" data-k="h.purpose" data-multi="1" data-opts="hpurpose"></div>
+    <input type="text" data-k="h.purposeTx" placeholder="その他（例：左手のふるえの精査）" style="margin-top:6px">
+  </div>
+
+  <div class="card">
+    <h2><span class="n" data-nm="2">1</span>診断</h2>
+    <div class="lbl">病型</div>
+    <div class="chips" data-k="dx" data-opts="dx"></div>
+    <div class="only-h">
+      <input type="text" data-k="h.dxTx" placeholder="脳卒中以外の診断（例：本態性振戦）" style="margin-top:6px">
+      <div class="lbl">確からしさ</div>
+      <div class="chips" data-k="h.cert" data-opts="cert"></div>
+    </div>
+    <div class="row">
+      <div><div class="lbl">部位・責任血管</div><input type="text" data-k="site" placeholder="左放線冠／左中大脳動脈閉塞 など"></div>
+      <div class="dx-oth"><div class="lbl">原因</div><input type="text" data-k="cause" placeholder="例：左椎骨動脈解離"></div>
+    </div>
+    <div class="lbl">既往・危険因子</div>
+    <div class="chips" data-k="rf" data-multi="1" data-opts="rf"></div>
+    <input type="text" data-k="rfTx" placeholder="その他の既往（例：胃潰瘍、前立腺肥大症）" style="margin-top:6px">
+  </div>
+
+  <!-- 逆紹介だけ -->
+  <div class="card only-g">
+    <h2><span class="n">2</span>紹介の目的</h2>
+    <div class="chips" data-k="g.purpose" data-multi="1" data-opts="gpurpose"></div>
+    <input type="text" data-k="g.purposeTx" placeholder="その他" style="margin-top:6px">
+  </div>
+
+  <div class="card only-g">
+    <h2><span class="n">3</span>経過</h2>
+    <div class="row">
+      <div><div class="lbl">発症日</div><input type="date" data-k="g.onset"></div>
+      <div><div class="lbl">入院日（発症日と違うとき）</div><input type="date" data-k="g.admit"></div>
+      <div><div class="lbl">退院日</div><input type="date" data-k="g.dc"></div>
+    </div>
+    <div class="lbl">症状</div>
+    <div class="chips" data-k="g.sx" data-multi="1" data-opts="sx"></div>
+    <div class="lbl">来院</div>
+    <div class="chips" data-k="g.arr" data-opts="arr"></div>
+    <div class="lbl">急性期の治療</div>
+    <div class="chips" data-k="g.tx" data-multi="1" data-opts="tx"></div>
+    <input type="text" data-k="g.txTx" placeholder="治療の補足（例：TICI 3の再開通を得ました）" style="margin-top:6px">
+    <div class="lbl">経過中の合併症</div>
+    <input type="text" data-k="g.comp" placeholder="例：誤嚥性肺炎（抗菌薬で軽快）">
+    <div class="lbl">退院先</div>
+    <div class="chips" data-k="g.dest" data-opts="dest"></div>
+    <div class="lbl">経過の補足（自由記載）</div>
+    <textarea data-k="g.course" placeholder="カルテの経過を貼って手直ししても構いません"></textarea>
+  </div>
+
+  <div class="card only-g">
+    <h2><span class="n">4</span>退院時の状態</h2>
+    <div class="row">
+      <div><div class="lbl">mRS</div><div class="chips" data-k="g.mrs" data-opts="mrs"></div></div>
+      <div><div class="lbl">NIHSS</div><input type="number" inputmode="numeric" min="0" max="42" data-k="g.nih" placeholder="点"></div>
+    </div>
+    <div class="lbl">残っている症状</div>
+    <div class="chips" data-k="g.res" data-multi="1" data-opts="res"></div>
+    <input type="text" data-k="g.resTx" placeholder="補足（例：右手の巧緻運動障害が軽度）" style="margin-top:6px">
+    <div class="row">
+      <div><div class="lbl">歩行</div><div class="chips" data-k="g.walk" data-opts="walk"></div></div>
+      <div><div class="lbl">食事</div><div class="chips" data-k="g.food" data-opts="food"></div></div>
+    </div>
+    <div class="lbl">介護保険</div>
+    <div class="chips" data-k="g.kaigo" data-opts="kaigo"></div>
+  </div>
+
+  <!-- 返書だけ：所見と方針 -->
+  <div class="card only-h">
+    <h2><span class="n">3</span>所見</h2>
+    <div class="lbl">神経所見・診察の要点</div>
+    <textarea data-k="h.exam" placeholder="例：右上肢に安静時振戦、固縮なし。歩行は正常。"></textarea>
+  </div>
+
+  <div class="card">
+    <h2><span class="n" data-nm="4">5</span>検査（カルテから貼る）</h2>
+    <div class="lbl">画像・生理検査のレポート</div>
+    <textarea class="paste" data-k="imgRaw" placeholder="MRI・CT・頸動脈エコー・心エコーなどのレポートを貼る（何件でも）。「結論」「Impression」などの段落を抜き出します。"></textarea>
+    <div class="lbl">抜き出した結果（手直しできます）</div>
+    <textarea data-k="img" placeholder="ここに直接書いても構いません"></textarea>
+    <div class="lbl">血液検査</div>
+    <textarea class="paste" data-k="labRaw" placeholder="検査結果の表を貼る。H/L の付いた値と、LDL-C・HbA1c・eGFR などの主な項目に印が付きます。日付の行があれば最新の値と推移を出します。"></textarea>
+    <div id="labList" class="labs hide"></div>
+    <div class="lbl">その他の検査（自由記載）</div>
+    <input type="text" data-k="other" placeholder="例：入院中のモニター心電図で心房細動なし">
+  </div>
+
+  <div class="card">
+    <h2><span class="n" data-nm="5">6</span>処方（カルテから貼る）</h2>
+    <textarea class="paste" data-k="rxRaw" placeholder="Do処方・退院時処方をそのまま貼る。「薬名 用量 用法」の一覧に整えます。"></textarea>
+    <div class="lbl">整えた処方（手直しできます）</div>
+    <textarea data-k="rx" style="min-height:110px"></textarea>
+    <div id="rxDet" class="det hide"></div>
+    <div class="only-h"><div class="lbl">処方の変更点</div><input type="text" data-k="h.rxChg" placeholder="例：プラミペキソールを中止し、レボドパ・カルビドパを開始しました"></div>
+  </div>
+
+  <!-- 返書だけ：方針 -->
+  <div class="card only-h">
+    <h2><span class="n">6</span>方針</h2>
+    <div class="chips" data-k="h.plan" data-multi="1" data-opts="hplan"></div>
+    <input type="text" data-k="h.planTx" placeholder="方針の補足（例：DATスキャンの結果は改めてご報告します）" style="margin-top:6px">
+    <div class="lbl">次回の受診</div>
+    <input type="text" data-k="h.next" placeholder="例：12月10日に当科外来（結果説明）">
+    <div class="lbl">脳卒中の再発予防の依頼</div>
+    <div class="chips" data-k="h.prev" data-opts="yn"></div>
+  </div>
+
+  <div class="card prevcard">
+    <h2><span class="n" data-nm="7">7</span>再発予防のお願い</h2>
+    <div class="lbl">抗血栓薬</div>
+    <div class="chips" data-k="at" data-opts="at"></div>
+    <div class="row at-a">
+      <div><div class="lbl at-dapt">2剤併用の終了日</div><input class="at-dapt" type="date" data-k="daptEnd"></div>
+      <div><div class="lbl at-keep">以後続ける薬</div><select class="at-keep" id="keep" data-k="keep"></select></div>
+    </div>
+    <div class="row at-a"><div><div class="lbl">薬（処方から自動で入ります。直しても構いません）</div><input type="text" data-k="atDrug" placeholder="例：クロピドグレル（プラビックス）75 mg"></div></div>
+    <div class="lbl">お願いする項目（チェックを外すと文面から消えます。文は直せます）</div>
+    <div id="prevList" class="prev"></div>
+    <div class="only-g"><div class="lbl">当科の今後</div>
+    <div class="chips" data-k="fu" data-opts="fu"></div>
+    <input type="text" data-k="fuTx" placeholder="例：3か月後に当科外来で頭部MRIを再検予定です" style="margin-top:6px"></div>
+  </div>
+
+  <div class="card" id="outCard">
+    <h2>文面（カルテの自由記載欄に貼る）</h2>
+    <div id="dirty" class="dirty">文面を手で直しています。上の入力を変えても文面は変わりません。<button type="button" class="btn" id="regen" style="min-height:32px;padding:4px 10px;margin-left:6px">入力から作り直す</button></div>
+    <textarea id="out" spellcheck="false"></textarea>
+    <div class="outbar">
+      <button type="button" class="btn pri" id="copy">文面をコピー</button>
+      <label style="font-size:13px"><input type="checkbox" id="abbr" checked> 略語を日本語にする</label>
+      <span class="cnt" id="cnt"></span>
+    </div>
+    <p class="hint">貼る前に、日付・薬の用量・依頼内容を必ず確かめてください。</p>
+  </div>
+</section>
+
+<!-- ====== 設定・出典 ====== -->
+<section id="tab-set" class="hide">
+  <div class="card">
+    <h2>定型文（この端末に保存）</h2>
+    <div class="lbl">冒頭のあいさつ</div>
+    <input type="text" data-s="greet">
+    <div class="lbl">返書の書き出し</div>
+    <input type="text" data-s="thanks">
+    <div class="lbl">結び</div>
+    <input type="text" data-s="close">
+    <div class="lbl">見出しの形</div>
+    <div class="chips" data-s="head" data-opts="head"></div>
+    <p class="hint">空欄にすると、その文は入りません。定型文だけを保存し、患者さんの情報は保存しません。</p>
+    <button type="button" class="btn" id="setReset">定型文を初期値に戻す</button>
+  </div>
+  <div class="card">
+    <h2>使い方</h2>
+    <ol style="margin:0;padding-left:20px;font-size:14px">
+      <li>「逆紹介（脳卒中）」か「返書」を選ぶ。</li>
+      <li>病型・経過・退院時の状態をボタンで選ぶ。</li>
+      <li>カルテから、画像レポート・検査結果・処方をそれぞれの欄に貼る。</li>
+      <li>再発予防のお願いは、病型に合わせて初期の項目が入ります。不要なものはチェックを外す。</li>
+      <li>一番下の文面を確かめて「文面をコピー」→ カルテの診療情報提供書の自由記載欄に貼る。</li>
+    </ol>
+    <p class="note" style="margin-top:8px">処方・検査値の貼り付けは、カルテからのコピーの形によって整い方が変わります。うまく整わない形があれば、その例（個人情報を消したもの）をもとに直します。</p>
+  </div>
+  <div class="card">
+    <h2>文面の目標値の根拠</h2>
+    <ul class="src" style="margin:0;padding-left:18px">
+      <li>血圧：診察室 130/80 mmHg 未満・家庭 125/75 mmHg 未満（年齢によらず）— 日本高血圧学会『高血圧管理・治療ガイドライン2025』（2025年8月）。<a href="https://minds.jcqhc.or.jp/summary/c00890/" target="_blank" rel="noopener">Minds 掲載ページ</a></li>
+      <li>LDL-C：アテローム血栓性脳梗塞（明らかなアテロームを伴う他の脳梗塞を含む）は二次予防として 100 mg/dL 未満、急性冠症候群・家族性高コレステロール血症・糖尿病・冠動脈疾患の合併では 70 mg/dL 未満 — 日本動脈硬化学会『動脈硬化性疾患予防ガイドライン2022年版』。<a href="https://www.j-athero.org/jp/jas_gl2022/" target="_blank" rel="noopener">日本動脈硬化学会</a></li>
+      <li>脳卒中全般の二次予防 — 日本脳卒中学会『脳卒中治療ガイドライン2021〔改訂2025〕』。<a href="https://www.jsts.gr.jp/guideline/" target="_blank" rel="noopener">日本脳卒中学会</a></li>
+      <li>HbA1c 7.0% 未満（合併症予防の目標）、高齢者は個別の目標 — 日本糖尿病学会『糖尿病診療ガイドライン』。<span class="hint">原典の版と頁は未照合。</span></li>
+      <li>ワルファリンの PT-INR 目標（2.0〜3.0、70歳以上は 1.6〜2.6）— 日本循環器学会/日本不整脈心電学会『2020年改訂版 不整脈薬物治療ガイドライン』。<span class="hint">原典の頁は未照合。</span></li>
+      <li>「主幹動脈の高度狭窄では急な降圧を避ける」は一般的な注意として書いたもので、ガイドラインの数値とは照合していません。</li>
+    </ul>
+    <p class="note" style="margin-top:8px">診療判断の補助です。最終的な内容は診察と原典で確かめてください。</p>
+    <p style="font-size:13px">アプリの版：<b id="ver"></b>　<button type="button" class="btn" id="forceUpdate">最新版に更新</button></p>
+  </div>
+</section>
+</main>
+
+<button type="button" class="btn pri" id="jump">文面へ ↓</button>
+<nav class="tabs">
+  <button type="button" data-tab="make" class="on"><b>✎</b>作成</button>
+  <button type="button" data-tab="set"><b>⚙</b>設定・出典</button>
+</nav>
+<div id="toast"></div>
+
+<script>
+"use strict";
+const VER="ver1_2026-11-26a";
+const MODE=(location.protocol==="file:")?"karte":"pwa";
+const DKEY="shokai-draft-v1", SKEY="shokai-set-v1";
+const $=id=>document.getElementById(id);
+
+/* ---------- 選択肢 ---------- */
+const OPTS={
+  mode:[["g","逆紹介（脳卒中）"],["h","返書（紹介元へ）"]],
+  scene:[["out","外来受診の報告"],["adm","入院した報告"],["dc","退院時の報告"]],
+  hpurpose:[["dx","精査"],["tx","治療方針のご相談"],["fu","専門外来での経過観察"],["adm","入院加療"]],
+  cert:[["sure","確定"],["prob","疑い"],["neg","否定的"]],
+  dx:[["ath","アテローム血栓性脳梗塞"],["ce","心原性脳塞栓症"],["lac","ラクナ梗塞"],["bad","BAD"],["esus","ESUS"],["oth","その他の脳梗塞"],["tia","TIA"],["ich","脳出血"],["sah","くも膜下出血"],["non","脳卒中以外"]],
+  rf:[["htn","高血圧症"],["dm","糖尿病"],["dl","脂質異常症"],["af","心房細動"],["ckd","慢性腎臓病"],["smk","喫煙"],["cad","冠動脈疾患"],["prev","脳卒中の既往"],["alc","大量飲酒"]],
+  gpurpose:[["prev","再発予防の継続加療"],["risk","血圧・脂質・糖尿病の管理"],["reha","回復期リハビリテーション"],["care","施設での療養"]],
+  sx:[["rhemi","右片麻痺"],["lhemi","左片麻痺"],["aph","失語"],["dys","構音障害"],["cons","意識障害"],["vert","めまい"],["vf","視野障害"],["sens","しびれ・感覚障害"],["atax","ふらつき"],["ha","頭痛"],["vom","嘔吐"]],
+  arr:[["ems","救急搬送"],["opd","外来を受診"],["inh","当院入院中に発症"]],
+  tx:[["tpa","rt-PA静注療法"],["mt","血栓回収療法"],["dapt","抗血小板薬2剤併用療法"],["arg","アルガトロバン"],["eda","エダラボン"],["ac","抗凝固療法"],["cea","頸動脈内膜剥離術"],["cas","頸動脈ステント留置術"],["bp","降圧療法"],["rev","抗凝固薬の中和"],["evac","開頭血腫除去術"],["endo","内視鏡下血腫除去術"],["evd","脳室ドレナージ"],["clip","開頭クリッピング術"],["coil","血管内コイル塞栓術"],["vsp","脳血管攣縮の予防・治療"],["reh","リハビリテーション"]],
+  dest:[["home","自宅へ退院"],["kaifuku","回復期リハビリテーション病院へ転院"],["shisetsu","施設へ退院"],["ryoyo","療養病院へ転院"],["other","他院へ転院"]],
+  mrs:[["0","0"],["1","1"],["2","2"],["3","3"],["4","4"],["5","5"]],
+  res:[["none","症状なし"],["rhemi","右片麻痺"],["lhemi","左片麻痺"],["aph","失語"],["dys","構音障害"],["dysph","嚥下障害"],["sens","感覚障害"],["atax","失調"],["vf","視野障害"],["hbd","高次脳機能障害"],["usn","半側空間無視"],["cog","認知機能低下"]],
+  walk:[["ind","自立"],["cane","杖で自立"],["walker","歩行器"],["watch","見守り"],["wc","車椅子"],["full","全介助"]],
+  food:[["reg","常食"],["dysd","嚥下調整食"],["ngt","経鼻胃管での経管栄養"],["peg","胃瘻での経管栄養"]],
+  kaigo:[["done","認定済み"],["apply","申請中"],["no","申請なし"]],
+  hplan:[["opd","当科外来で精査を進める"],["start","当科で治療を開始"],["adm","当科で入院加療"],["back","貴院での継続加療をお願い"],["co","当科と併診"],["end","当科は終診"]],
+  yn:[["y","付ける"],["n","付けない"]],
+  at:[["sapt","抗血小板薬1剤"],["dapt","2剤併用→1剤"],["doac","DOAC"],["wf","ワルファリン"],["none","抗血栓薬なし"]],
+  fu:[["reg","当科で定期通院"],["img","当科で画像の再検のみ"],["end","当科の通院は終了"]],
+  head:[["br","【見出し】"],["none","見出しなし"]]
+};
+const LBL={}; for(const k in OPTS){LBL[k]={};OPTS[k].forEach(([v,l])=>LBL[k][v]=l);}
+const DXNAME={ath:"アテローム血栓性脳梗塞",ce:"心原性脳塞栓症",lac:"ラクナ梗塞",bad:"分枝粥腫型梗塞（BAD）",esus:"塞栓源不明の脳塞栓症（ESUS）",oth:"その他の原因による脳梗塞",tia:"一過性脳虚血発作（TIA）",ich:"脳出血",sah:"くも膜下出血"};
+const isInf=dx=>["ath","ce","lac","bad","esus","oth","tia"].includes(dx);
+const RESTX={rhemi:"右片麻痺",lhemi:"左片麻痺",aph:"失語",dys:"構音障害",dysph:"嚥下障害",sens:"感覚障害",atax:"失調",vf:"視野障害",hbd:"高次脳機能障害",usn:"半側空間無視",cog:"認知機能低下"};
+const WALKTX={ind:"自立",cane:"杖で自立",walker:"歩行器で可能",watch:"見守りで可能",wc:"車椅子",full:"全介助"};
+
+/* ---------- 抗血栓薬・脂質の辞書（一般名, 商品名, 種類） ---------- */
+const DRUGS=[
+  ["アスピリン・ランソプラゾール","タケルダ","ap",/タケルダ|アスピリン.?ランソプラゾール/],
+  ["クロピドグレル・アスピリン","コンプラビン","ap2",/コンプラビン|クロピドグレル.?アスピリン/],
+  ["アスピリン","バイアスピリン","ap",/バイアスピリン|アスピリン|ﾊﾞｲｱｽﾋﾟﾘﾝ/],
+  ["クロピドグレル","プラビックス","ap",/プラビックス|クロピドグレル/],
+  ["プラスグレル","エフィエント","ap",/エフィエント|プラスグレル/],
+  ["シロスタゾール","プレタール","ap",/プレタール|シロスタゾール/],
+  ["チカグレロル","ブリリンタ","ap",/ブリリンタ|チカグレロル/],
+  ["チクロピジン","パナルジン","ap",/パナルジン|チクロピジン/],
+  ["アピキサバン","エリキュース","doac",/エリキュース|アピキサバン/],
+  ["エドキサバン","リクシアナ","doac",/リクシアナ|エドキサバン/],
+  ["リバーロキサバン","イグザレルト","doac",/イグザレルト|リバーロキサバン/],
+  ["ダビガトラン","プラザキサ","doac",/プラザキサ|ダビガトラン/],
+  ["ワルファリン","ワーファリン","wf",/ワーファリン|ワルファリン/]
+];
+
+/* ---------- 状態 ---------- */
+const DEF={mode:"g",dx:"",site:"",cause:"",rf:[],rfTx:"",imgRaw:"",img:"",labRaw:"",labSel:{},other:"",rxRaw:"",rx:"",
+  at:"",atManual:false,daptEnd:"",keep:"",atDrug:"",atDrugAuto:true,prev:{},fu:"",fuTx:"",
+  g:{purpose:["prev"],purposeTx:"",onset:"",admit:"",dc:"",sx:[],arr:"ems",tx:[],txTx:"",comp:"",dest:"home",course:"",mrs:"",nih:"",res:[],resTx:"",walk:"",food:"",kaigo:""},
+  h:{scene:"out",date:"",dc:"",purpose:[],purposeTx:"",dxTx:"",cert:"sure",exam:"",rxChg:"",plan:[],planTx:"",next:"",prev:"n"}};
+const SDEF={greet:"いつも大変お世話になっております。",thanks:"このたびはご紹介いただき、誠にありがとうございました。",close:"今後ともどうぞよろしくお願いいたします。",head:"br"};
+let S=JSON.parse(JSON.stringify(DEF)), SET=Object.assign({},SDEF), outDirty=false, cleared=false, labs=[];
+try{const d=JSON.parse(sessionStorage.getItem(DKEY)||"null"); if(d) S=deepMerge(JSON.parse(JSON.stringify(DEF)),d);}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(SKEY)||"null"); if(s) SET=Object.assign({},SDEF,s);}catch(e){}
+function deepMerge(a,b){for(const k in b){if(b[k]&&typeof b[k]==="object"&&!Array.isArray(b[k])&&a[k]&&typeof a[k]==="object"&&!Array.isArray(a[k]))deepMerge(a[k],b[k]);else a[k]=b[k];}return a;}
+function getK(k){return k.split(".").reduce((o,p)=>o==null?o:o[p],S);}
+function setK(k,v){const ps=k.split(".");let o=S;for(let i=0;i<ps.length-1;i++)o=o[ps[i]];o[ps[ps.length-1]]=v;}
+function save(){if(cleared)return;try{sessionStorage.setItem(DKEY,JSON.stringify(S));}catch(e){}}
+function saveSet(){try{localStorage.setItem(SKEY,JSON.stringify(SET));}catch(e){}}
+
+/* ---------- 部品の描画 ---------- */
+function drawChips(){
+  document.querySelectorAll(".chips[data-opts]").forEach(box=>{
+    const key=box.dataset.k, sk=box.dataset.s, multi=box.dataset.multi==="1";
+    box.innerHTML="";
+    OPTS[box.dataset.opts].forEach(([v,l])=>{
+      const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=l;b.dataset.v=v;
+      b.addEventListener("click",()=>{
+        if(sk){SET[sk]=v;saveSet();syncChips();update();return;}
+        if(multi){let a=getK(key)||[];a=a.includes(v)?a.filter(x=>x!==v):a.concat(v);
+          if(key==="g.res"){ if(v==="none"){if(a.includes("none"))a=["none"];} else a=a.filter(x=>x!=="none"); }
+          setK(key,a);}
+        else setK(key,getK(key)===v&&!["mode"].includes(key)?"":v);
+        onChange(key);
+      });
+      box.appendChild(b);
+    });
+  });
+  syncChips();
+}
+function syncChips(){
+  document.querySelectorAll(".chips[data-opts]").forEach(box=>{
+    const cur=box.dataset.s?SET[box.dataset.s]:getK(box.dataset.k);
+    box.querySelectorAll(".chip").forEach(b=>b.classList.toggle("on",Array.isArray(cur)?cur.includes(b.dataset.v):cur===b.dataset.v));
+  });
+}
+function bindInputs(){
+  document.querySelectorAll("[data-k]:not(.chips)").forEach(el=>{
+    el.value=getK(el.dataset.k)??"";
+    el.addEventListener("input",()=>{setK(el.dataset.k,el.value);onChange(el.dataset.k);});
+  });
+  document.querySelectorAll("[data-s]:not(.chips)").forEach(el=>{
+    el.value=SET[el.dataset.s]??"";
+    el.addEventListener("input",()=>{SET[el.dataset.s]=el.value;saveSet();update();});
+  });
+}
+function refreshInputs(){document.querySelectorAll("[data-k]:not(.chips)").forEach(el=>{if(document.activeElement!==el)el.value=getK(el.dataset.k)??"";});}
+
+/* ---------- 文字の正規化 ---------- */
+function nz(s){return (s||"").normalize("NFKC").replace(/\u3000/g," ").replace(/\r/g,"");}
+
+/* ---------- 処方の整形 ---------- */
+const RX_DRUG=/(錠|カプセル|散|顆粒|細粒|シロップ|内用液|テープ|パップ|吸入|点眼|軟膏|クリーム|ゲル|注射|注\d|\d\s*(mg|μg|mL|g)(?![a-zA-Z]))/;
+const RX_USE=/(1日|分[1-4]|毎食|朝|昼|夕|就寝前|寝る前|食後|食前|食間|頓用|頓服|起床時|週1回|隔日|日おき|必要時|疼痛時|不眠時|貼付|日分)/;
+const RX_HEAD=/^(Rp|RP|rp|処方)\s*\.?\s*\d*\s*[:：)）.]?\s*|^[\[(（]?\d{1,2}[\])）.]\s+/;
+function parseRx(raw){
+  const lines=nz(raw).split("\n").map(l=>l.trim()).filter(Boolean);
+  const groups=[];let cur=null;
+  const start=()=>{cur={drugs:[],use:[]};groups.push(cur);};
+  for(let l of lines){
+    const isHead=RX_HEAD.test(l);
+    l=l.replace(RX_HEAD,"").replace(/【般】|\[般\]|^般\s+/g,"").replace(/[【<＜][^】>＞]*[】>＞]/g,"").trim();
+    if(!l)continue;
+    const hasDrug=RX_DRUG.test(l)&&/[ァ-ヶ一-龠a-zA-Z]{2,}/.test(l.replace(new RegExp(RX_USE.source,"g"),"").replace(/錠|包|枚|本|カプセル/g,""));
+    const isUse=!hasDrug&&RX_USE.test(l);
+    if(isUse){if(cur&&cur.drugs.length)cur.use.push(l);continue;}
+    if(!hasDrug)continue;
+    if(isHead||!cur||cur.use.length)start();
+    cur.drugs.push(l);
+  }
+  const out=[];
+  groups.forEach(g=>{
+    const use=g.use.join(" ").replace(/\d+\s*日分/g,"").replace(/\s{2,}/g," ").trim();
+    g.drugs.forEach(d=>{
+      const t=d.replace(/\d+\s*日分/g,"").replace(/\s{2,}/g," ").trim();
+      out.push("・"+t+(use?" "+use:""));
+    });
+  });
+  return out.join("\n");
+}
+function detectDrugs(rx){
+  const found=[];const t=nz(rx);
+  t.split("\n").forEach(line=>{
+    for(const [gen,brand,kind,re] of DRUGS){
+      if(re.test(line)){
+        const dose=(line.match(/(\d+(?:\.\d+)?)\s*(mg|μg)/)||[])[0]||"";
+        if(!found.some(f=>f.gen===gen&&f.dose===dose))found.push({gen,brand,kind,dose:dose.replace(/\s/g," ")});
+        break;
+      }
+    }
+  });
+  return found;
+}
+const drugLabel=f=>f.gen+"（"+f.brand+"）"+(f.dose||"");
+
+/* ---------- 検査値 ---------- */
+const KEYLAB=[/LDL/i,/HDL/i,/^TG|中性脂肪|トリグリ/i,/HbA1c|A1c/i,/^(GLU|血糖|BS)/i,/^Cr|クレアチニン/i,/eGFR/i,/BUN|尿素窒素/i,/^Hb$|^Hb[^A]|ヘモグロビン/i,/^PLT|^Plt|血小板/i,/INR/i,/D.?ダイマー|D-?dimer/i,/BNP/i];
+const DATE_RE=/(\d{4}[\/.-]\d{1,2}[\/.-]\d{1,2}|\d{1,2}\/\d{1,2})/g;
+function parseLabs(raw){
+  const lines=nz(raw).split("\n");let dates=null,rev=false,tabCols=null;const rows=[];
+  for(let l of lines){
+    if(!l.trim())continue;
+    const ds=l.match(DATE_RE);
+    const rem=l.replace(DATE_RE,"").replace(/(項目名?|検査日|日付|採血日|単位|基準値|基準範囲|結果|名称|検査名)/g,"");
+    if(ds&&!/\d/.test(rem)){dates=ds;rev=ds.length>=2&&dToN(ds[0])>dToN(ds[ds.length-1]);
+      tabCols=null; if(l.includes("\t")){tabCols=[];l.split("\t").forEach((c,i)=>{const d=c.match(DATE_RE);if(d)tabCols.push([i,d[0]]);});}
+      continue;}
+    if(tabCols&&l.includes("\t")){
+      const cells=l.split("\t");const name=cells[0].trim();
+      if(name&&!/^\d/.test(name)&&name.length<=24){
+        const vals=[];
+        tabCols.forEach(([i,d])=>{const c=(cells[i]||"").trim();const mm=c.match(/^(-?\d+(?:\.\d+)?)\s*([HL↑↓*＊]?)/);if(mm)vals.push({v:mm[1],d,f:/[H↑]/.test(mm[2])?"H":/[L↓]/.test(mm[2])?"L":mm[2]?"*":""});});
+        if(vals.length){const seq=rev?vals.reverse():vals;rows.push({name,vals:seq,latest:seq[seq.length-1],date:seq[seq.length-1].d,key:KEYLAB.some(r=>r.test(name))});}
+        continue;
+      }
+    }
+    const s=l.replace(/\t/g,"  ");
+    const m=s.match(/^\s*([^\d\s][^\n]*?)(?=\s+[-+]?\d|$)/);
+    if(!m)continue;
+    const name=m[1].trim().replace(/[:：]$/,"");
+    if(!name||/^(項目|検査|単位|基準|結果|日付)/.test(name)||name.length>24)continue;
+    let rest=s.slice(m[0].length);
+    rest=rest.replace(/\d+(?:\.\d+)?\s*[-～~〜]\s*\d+(?:\.\d+)?/g," ")
+      .replace(/(×?\s*10\^?\s*\d+\s*\/\s*μ?L|×10\d|mg\/dL|g\/dL|U\/L|IU\/L|mEq\/L|mmol\/L|mL\/min\/1\.73m2?|mL\/分\/1\.73m2?|pg\/mL|ng\/mL|μg\/mL|\/μL|fL|sec|秒|%)/gi," ");
+    const vals=[];const re=/(-?\d+(?:\.\d+)?)\s*([HL↑↓*＊]?)(?![\d.])/g;let mm;
+    while((mm=re.exec(rest))){vals.push({v:mm[1],f:/[H↑]/.test(mm[2])?"H":/[L↓]/.test(mm[2])?"L":mm[2]?"*":""});}
+    if(!vals.length)continue;
+    const seq=rev?vals.slice().reverse():vals.slice();
+    let date="";
+    if(dates){date=dates.length===1?dates[0]:(rev?dates[0]:dates[dates.length-1]);}
+    rows.push({name,vals:seq,latest:seq[seq.length-1],date,key:KEYLAB.some(r=>r.test(name))});
+  }
+  return rows;
+}
+function dToN(d){const p=d.split(/[\/.-]/).map(Number);if(p.length===3)return p[0]*400+p[1]*32+p[2];return p[0]*32+p[1];}
+function drawLabs(){
+  const box=$("labList");
+  if(!labs.length){box.classList.add("hide");box.innerHTML="";return;}
+  box.classList.remove("hide");box.innerHTML="";
+  labs.forEach((r,i)=>{
+    const id=r.name;
+    if(!(id in S.labSel))S.labSel[id]=r.key||!!r.latest.f;
+    const lb=document.createElement("label");
+    const cb=document.createElement("input");cb.type="checkbox";cb.checked=!!S.labSel[id];
+    cb.addEventListener("change",()=>{S.labSel[id]=cb.checked;save();update();});
+    const sp=document.createElement("span");
+    sp.innerHTML=esc(r.name)+" "+r.vals.map(v=>esc(v.v)+(v.f?'<span class="fl">'+v.f+'</span>':"")).join(" → ");
+    lb.appendChild(cb);lb.appendChild(sp);box.appendChild(lb);
+  });
+}
+function labText(){
+  const sel=labs.filter(r=>S.labSel[r.name]);
+  if(!sel.length)return "";
+  // 最新の日付がそろっていれば見出しに、違う行だけ値の後ろに日付を付ける
+  const cnt={};sel.forEach(r=>{if(r.date)cnt[r.date]=(cnt[r.date]||0)+1;});
+  const main=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||dToN(b)-dToN(a))[0]||"";
+  const multi=sel.some(r=>r.vals.length>1);
+  const first=multi?(sel.find(r=>r.vals.length>1).vals[0].d||""):"";
+  const t=sel.map(r=>{
+    const v=r.vals.length>1?r.vals.map(x=>x.v).join("→"):r.latest.v;
+    const dd=r.date&&r.date!==main?"（"+r.date+"）":"";
+    return r.name+" "+v+(r.latest.f==="H"?"（高値）":r.latest.f==="L"?"（低値）":"")+dd;
+  }).join("、");
+  const head=main?(first&&first!==main?"（"+first+"→"+main+"）":"（"+main+"）"):"";
+  return "血液検査"+head+"："+t;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+/* ---------- 画像レポートの抜き出し ---------- */
+function pickReport(raw){
+  const t=nz(raw).trim(); if(!t)return "";
+  const blocks=t.split(/\n\s*\n+/);
+  const out=[];
+  const KW=/(結論|診断|Impression|IMPRESSION|Imp\.?|IMP|Conclusion|CONCLUSION|まとめ|所見のまとめ|判定)\s*[:：】\]]?/;
+  const lines=t.split("\n");
+  for(let i=0;i<lines.length;i++){
+    const m=lines[i].match(KW);
+    if(m&&lines[i].indexOf(m[0])<6){
+      let body=lines[i].slice(lines[i].indexOf(m[0])+m[0].length).trim();
+      let j=i+1;
+      while(j<lines.length&&lines[j].trim()&&!/^[【\[■●◆]|^(所見|Findings|FINDINGS|検査名|依頼|臨床)/.test(lines[j].trim())&&body.length<400){body+=(body?" ":"")+lines[j].trim();j++;}
+      if(body)out.push(body.replace(/\s{2,}/g," "));
+    }
+  }
+  if(out.length)return out.map(x=>"・"+x).join("\n");
+  return blocks.map(b=>b.replace(/\s*\n\s*/g," ").trim()).filter(Boolean).slice(0,3).map(x=>"・"+(x.length>300?x.slice(0,300)+"…":x)).join("\n");
+}
+
+/* ---------- 日付 ---------- */
+function jd(s){if(!s)return "";const [y,m,d]=s.split("-").map(Number);return y+"年"+m+"月"+d+"日";}
+function sameDay(a,b){return a&&b&&a===b;}
+
+/* ---------- 再発予防の項目 ---------- */
+function prevItems(){
+  const dx=S.dx, rf=S.rf, items=[];
+  const inf=isInf(dx), ich=dx==="ich", sah=dx==="sah";
+  // 抗血栓薬
+  items.push({id:"at",on:!!S.at,txt:atText()});
+  if(S.at&&S.at!=="none")items.push({id:"stop",on:true,txt:"自己判断で中止しないよう説明しています。内視鏡・手術などで休薬が必要な際は、当科にご相談ください。"});
+  items.push({id:"bp",on:dx!==""&&dx!=="non",txt:"血圧は、診察室血圧130/80 mmHg未満、家庭血圧125/75 mmHg未満を目標に管理をお願いします。"});
+  items.push({id:"bpst",on:false,txt:"主幹動脈に高度の狭窄があるため、急な降圧や過度の降圧は避けてください。"});
+  const athero=dx==="ath";
+  const ldl70=rf.includes("dm")||rf.includes("cad");
+  items.push({id:"ldl",on:athero||rf.includes("dl"),txt:athero
+    ?"LDLコレステロールは100 mg/dL未満"+(ldl70?"（糖尿病・冠動脈疾患を合併しているため70 mg/dL未満）":"")+"を目標に、スタチンを中心とした治療の継続をお願いします。"
+    :"脂質異常症の治療の継続をお願いします。"});
+  items.push({id:"dm",on:rf.includes("dm"),txt:"糖尿病は、HbA1c 7.0%未満を目安に（高齢の方は低血糖を避けた個別の目標で）管理をお願いします。"});
+  items.push({id:"smk",on:rf.includes("smk"),txt:"禁煙の継続をお願いします。"});
+  items.push({id:"alc",on:rf.includes("alc"),txt:"節酒の継続をお願いします。"});
+  items.push({id:"af",on:dx==="esus",txt:"入院中に心房細動は確認されていません。動悸の訴えや脈の不整があれば、心電図での確認をお願いします。"});
+  items.push({id:"warn",on:inf||ich||sah,txt:"顔のゆがみ、片側の手足の麻痺、言葉の障害などが突然出た場合は、すぐに救急車を呼ぶよう、ご本人とご家族に説明しています。"});
+  items.push({id:"drive",on:false,txt:"自動車の運転は、当科で再開の可否を判断するまで控えるよう説明しています。"});
+  return items;
+}
+function atText(){
+  const ds=detectDrugs(S.rx), drug=S.atDrug||"";
+  switch(S.at){
+    case "sapt": return "抗血小板薬"+(drug?"（"+drug+"）":"")+"の継続をお願いします。";
+    case "dapt": {
+      const keep=S.keep||"";
+      return (drug?drug:"抗血小板薬2剤")+"の併用を"+(S.daptEnd?jd(S.daptEnd)+"まで":"（期間）")+"続け、その後は"+(keep||"（1剤）")+"の1剤としてください。";
+    }
+    case "doac": return "心房細動に対して"+(drug||"DOAC")+"を継続してください。腎機能・年齢・体重で用量が変わるため、定期的な腎機能の確認をお願いします。";
+    case "wf": return (drug||"ワルファリン")+"を継続してください。PT-INRは2.0〜3.0（70歳以上は1.6〜2.6）を目標に調整をお願いします。";
+    case "none": return S.dx==="ich"?"抗血栓薬は現在使用していません。再開が必要な場合は当科にご相談ください。":"抗血栓薬は使用していません。";
+    default: return "";
+  }
+}
+function autoAt(){
+  // 処方から抗血栓薬の欄と方針を自動で入れる（手で選んだものは尊重）
+  const ds=detectDrugs(S.rx);
+  const ap=ds.filter(d=>d.kind==="ap"), ap2=ds.filter(d=>d.kind==="ap2"), oac=ds.filter(d=>d.kind==="doac"||d.kind==="wf");
+  if(S.atDrugAuto){
+    let list=S.at==="doac"||S.at==="wf"?oac:(S.at==="sapt"||S.at==="dapt")?ap.concat(ap2):ds;
+    if(S.at==="dapt"&&list.length>=2)S.atDrug=list.slice(0,2).map(drugLabel).join("と");
+    else S.atDrug=list.map(drugLabel).join("、");
+  }
+  if(!S.atManual)S.at="";
+  if(!S.atManual&&ds.length){
+    if(oac.length)S.at=oac[0].kind==="wf"?"wf":"doac";
+    else if(ap.length>=2||ap2.length)S.at="dapt";
+    else if(ap.length===1)S.at="sapt";
+  }
+  if(!S.atManual&&!S.at&&!ds.length&&S.dx==="ich")S.at="none";
+  // 以後続ける薬の候補
+  const sel=$("keep"), opts=ap.map(drugLabel);
+  const cur=S.keep;
+  sel.innerHTML="";
+  ["",...opts].forEach(o=>{const op=document.createElement("option");op.value=o;op.textContent=o||"（選ぶ）";sel.appendChild(op);});
+  if(cur&&!opts.includes(cur)){const op=document.createElement("option");op.value=cur;op.textContent=cur;sel.appendChild(op);}
+  sel.value=cur||"";
+  const det=$("rxDet");
+  if(ds.length){det.classList.remove("hide");det.textContent="抗血栓薬："+ds.map(drugLabel).join("、");}
+  else det.classList.add("hide");
+}
+function drawPrev(){
+  const box=$("prevList");box.innerHTML="";
+  prevItems().forEach(it=>{
+    if(it.id==="at"&&!S.at)return;
+    const st=S.prev[it.id]||{};
+    const on=("on" in st)?st.on:it.on;
+    const txt=(st.txt!=null&&st.base===it.txt)?st.txt:it.txt;
+    const d=document.createElement("div");d.className="item";
+    const cb=document.createElement("input");cb.type="checkbox";cb.checked=on;
+    cb.addEventListener("change",()=>{S.prev[it.id]=Object.assign({},S.prev[it.id],{on:cb.checked});save();update(true);});
+    const tx=document.createElement("div");tx.className="tx";
+    const ta=document.createElement("textarea");ta.value=txt;
+    ta.addEventListener("input",()=>{S.prev[it.id]=Object.assign({},S.prev[it.id],{txt:ta.value,base:it.txt,on:cb.checked});save();update(true);});
+    tx.appendChild(ta);d.appendChild(cb);d.appendChild(tx);box.appendChild(d);
+    const fit=()=>{ta.style.height="auto";ta.style.height=(ta.scrollHeight+2)+"px";};
+    requestAnimationFrame(fit);ta.addEventListener("input",fit);
+  });
+}
+function prevLines(){
+  return prevItems().filter(it=>it.id!=="at"||S.at).map(it=>{
+    const st=S.prev[it.id]||{};
+    const on=("on" in st)?st.on:it.on;
+    const txt=(st.txt!=null&&st.base===it.txt)?st.txt:it.txt;
+    return on&&txt.trim()?txt.trim():null;
+  }).filter(Boolean);
+}
+function fuText(){
+  const t=S.fuTx.trim();
+  const base={reg:"当科外来でも定期的に経過をみます。",img:"画像の再検は当科で行います。",end:"当科での定期通院は終了とします。再発が疑われる場合やご心配な点があれば、いつでもご紹介ください。"}[S.fu]||"";
+  return [base,t].filter(Boolean).join("");
+}
+
+/* ---------- 略語 ---------- */
+const ABBR=[["DAPT","抗血小板薬2剤併用療法"],["SAPT","抗血小板薬単剤療法"],["DOAC","直接作用型経口抗凝固薬（DOAC）"],["Af","心房細動"],["AF","心房細動"],["PAF","発作性心房細動"],["MCA","中大脳動脈"],["ICA","内頸動脈"],["ACA","前大脳動脈"],["PCA","後大脳動脈"],["BA","脳底動脈"],["VA","椎骨動脈"],["CCA","総頸動脈"],["MT","血栓回収療法"],["EVT","血管内治療"],["CEA","頸動脈内膜剥離術"],["CAS","頸動脈ステント留置術"],["ICH","脳出血"],["SAH","くも膜下出血"],["HT","高血圧症"],["HTN","高血圧症"],["DL","脂質異常症"],["DM","糖尿病"],["CKD","慢性腎臓病"],["n.p.","特記すべき所見なし"],["DVT","深部静脈血栓症"],["AP","誤嚥性肺炎"]];
+function expand(s){
+  if(!$("abbr").checked)return s;
+  let t=s.replace(/(?<![A-Za-z])(Rt|Lt|rt|lt|Rt\.|Lt\.)\s*(?=[A-Za-z一-龠ァ-ヶ])/g,(m,a)=>/^[Rr]/.test(a)?"右":"左");
+  ABBR.forEach(([a,j])=>{
+    const re=new RegExp("(?<![A-Za-z.\\-])"+a.replace(/\./g,"\\.")+"(?![A-Za-z\\-])","g");
+    t=t.replace(re,(m,off,str)=>{
+      // 既に日本語の直後にある（例：「心房細動（AF）」）ものは触らない
+      if(str.slice(Math.max(0,off-1),off)==="（")return m;
+      return j;
+    });
+  });
+  return t;
+}
+
+/* ---------- 文面の組み立て ---------- */
+function H(t){return SET.head==="none"?"":"【"+t+"】";}
+function sec(arr,t,body){if(!body||!String(body).trim())return;const h=H(t);arr.push(h?h+"\n"+body.trim():body.trim());}
+function dxLine(){
+  const dx=S.dx; let t="";
+  if(dx==="non"||(S.mode==="h"&&!dx))t=S.h.dxTx||"";
+  else if(dx){t=DXNAME[dx];
+    if(dx==="oth"&&S.cause)t=S.cause+"による脳梗塞";
+    if(S.site)t+="（"+S.site+"）";}
+  if(S.mode==="h"&&dx&&dx!=="non"&&S.h.dxTx)t+=(t?"\n":"")+S.h.dxTx;
+  if(S.mode==="h"&&t){if(S.h.cert==="prob")t+="の疑い";if(S.h.cert==="neg")t+="（否定的と考えます）";}
+  return t;
+}
+function rfLine(){const a=S.rf.map(v=>LBL.rf[v]);if(S.rfTx.trim())a.push(S.rfTx.trim());return a.join("、");}
+function examLines(){
+  const a=[];
+  if(S.img.trim())a.push(S.img.trim());
+  const lt=labText(); if(lt)a.push(lt);
+  if(S.other.trim())a.push(S.other.trim());
+  return a.join("\n");
+}
+function buildG(){
+  const g=S.g, out=[];
+  if(SET.greet.trim())out.push(SET.greet.trim());
+  sec(out,"傷病名",dxLine());
+  sec(out,"既往・危険因子",rfLine());
+  const pur=g.purpose.map(v=>LBL.gpurpose[v]);if(g.purposeTx.trim())pur.push(g.purposeTx.trim());
+  sec(out,"紹介目的",pur.length?"当院での急性期治療を終えましたので、"+pur.join("、")+"をお願いいたします。":"");
+  // 経過
+  const c=[];
+  const sx=g.sx.map(v=>LBL.sx[v]);
+  let s1="";
+  if(g.arr==="inh")s1=(g.onset?jd(g.onset)+"、":"")+"当院入院中に"+(sx.length?sx.join("、")+"で":"")+"発症しました。";
+  else{
+    s1=(g.onset?jd(g.onset)+"、":"")+(sx.length?sx.join("、")+"で":"")+"発症し、";
+    const arr=g.arr==="ems"?"当院に救急搬送され":"当院外来を受診し";
+    if(g.admit&&!sameDay(g.admit,g.onset))s1+=jd(g.admit)+"に"+arr.replace("当院に","当院へ")+"、入院しました。";
+    else s1+=(g.onset?"同日":"")+arr+"、入院しました。";
+    if(!g.onset&&!sx.length)s1=s1.replace(/^発症し、/,"");
+  }
+  c.push(s1);
+  const TXT={arg:"アルガトロバンの投与",eda:"エダラボンの投与",ac:"抗凝固療法",dapt:"抗血小板薬2剤併用療法"};
+  const tx=g.tx.filter(v=>v!=="reh").map(v=>TXT[v]||LBL.tx[v]);
+  if(tx.length)c.push(tx.join("、")+"を行いました。");
+  if(g.txTx.trim())c.push(g.txTx.trim());
+  if(g.comp.trim())c.push("経過中、"+g.comp.trim().replace(/。$/,"")+"がありました。");
+  if(g.course.trim())c.push(g.course.trim());
+  const dest=LBL.dest[g.dest]||"";
+  if(g.dc||dest)c.push((g.tx.includes("reh")?"リハビリテーションを行い、":"")+(g.dc?jd(g.dc)+"に":"")+(dest||"退院")+"となります。");
+  sec(out,"経過",c.join(""));
+  // 退院時
+  const d=[];
+  const sc=[];if(g.mrs!=="")sc.push("mRS "+g.mrs);if(String(g.nih).trim()!=="")sc.push("NIHSS "+g.nih+"点");
+  if(sc.length)d.push(sc.join("、")+"。");
+  const res=g.res.filter(v=>v!=="none").map(v=>RESTX[v]);
+  if(g.res.includes("none"))d.push("明らかな神経症状は残っていません。");
+  else if(res.length)d.push(res.join("、")+"が残っています。");
+  if(g.resTx.trim())d.push(g.resTx.trim().replace(/([^。])$/,"$1。"));
+  const wf=[];if(g.walk)wf.push("歩行は"+WALKTX[g.walk]);if(g.food)wf.push("食事は"+LBL.food[g.food]);
+  if(wf.length)d.push(wf.join("、")+"です。");
+  if(g.kaigo==="done")d.push("介護保険の認定を受けています。");
+  if(g.kaigo==="apply")d.push("介護保険を申請中です。");
+  sec(out,"退院時の状態",d.join(""));
+  sec(out,"検査結果",examLines());
+  sec(out,"退院時処方",S.rx);
+  const pl=prevLines();
+  sec(out,"お願いしたいこと",pl.map(x=>"・"+x).join("\n"));
+  sec(out,"当科の今後",fuText());
+  if(SET.close.trim())out.push(SET.close.trim());
+  return out.join("\n\n");
+}
+function buildH(){
+  const h=S.h, out=[];
+  if(SET.greet.trim())out.push(SET.greet.trim());
+  let first=SET.thanks.trim();
+  const dt=h.date?jd(h.date)+"に":"";
+  const scene={out:dt+"当科外来を受診されましたので、ご報告いたします。",adm:dt+"当科に入院されましたので、ご報告いたします。",dc:(h.dc?jd(h.dc)+"に":"")+"退院されましたので、ご報告いたします。"}[h.scene]||"";
+  out.push([first,scene].filter(Boolean).join(""));
+  const pur=h.purpose.map(v=>LBL.hpurpose[v]);if(h.purposeTx.trim())pur.push(h.purposeTx.trim());
+  sec(out,"ご紹介の目的",pur.join("、"));
+  sec(out,"診断",dxLine());
+  sec(out,"既往・危険因子",rfLine());
+  sec(out,"所見",h.exam);
+  sec(out,"検査結果",examLines());
+  const plan=[];
+  const P={opd:"当科外来で精査を進めます。",start:"当科で治療を開始しました。",adm:"当科で入院加療を行います。",back:"今後は貴院での継続加療をお願いいたします。",co:"当面は当科と併診とさせてください。",end:"当科での診療はいったん終了とします。"};
+  h.plan.forEach(v=>plan.push(P[v]));
+  if(h.planTx.trim())plan.push(h.planTx.trim().replace(/([^。])$/,"$1。"));
+  sec(out,"方針",plan.join(""));
+  const rx=[S.rx.trim(),h.rxChg.trim()?"（変更点）"+h.rxChg.trim():""].filter(Boolean).join("\n");
+  sec(out,"処方",rx);
+  if(h.prev==="y"){const pl=prevLines();sec(out,"お願いしたいこと",pl.map(x=>"・"+x).join("\n"));}
+  sec(out,"次回",h.next);
+  if(SET.close.trim())out.push(SET.close.trim());
+  return out.join("\n\n");
+}
+function build(){return expand(S.mode==="g"?buildG():buildH());}
+
+/* ---------- 画面の更新 ---------- */
+function layout(){
+  const g=S.mode==="g";
+  document.querySelectorAll(".only-g").forEach(e=>e.classList.toggle("hide",!g));
+  document.querySelectorAll(".only-h").forEach(e=>e.classList.toggle("hide",g));
+  document.querySelectorAll("[data-nm]").forEach(e=>{e.textContent=g?{2:1,4:5,5:6,7:7}[e.dataset.nm]:{2:2,4:4,5:5,7:7}[e.dataset.nm];});
+  document.querySelector(".dx-oth").classList.toggle("hide",S.dx!=="oth");
+  const showPrev=g?(S.dx&&S.dx!=="non"):S.h.prev==="y";
+  document.querySelector(".prevcard").classList.toggle("hide",!showPrev);
+  document.querySelectorAll(".at-dapt").forEach(e=>e.classList.toggle("hide",S.at!=="dapt"));
+  document.querySelectorAll(".at-keep").forEach(e=>e.classList.toggle("hide",S.at!=="dapt"));
+  document.querySelectorAll(".at-a").forEach(e=>e.classList.toggle("hide",!S.at||S.at==="none"));
+}
+function update(skipPrev){
+  layout();
+  if(!skipPrev)drawPrev();
+  if(!outDirty){$("out").value=build();}
+  $("dirty").classList.toggle("on",outDirty);
+  $("cnt").textContent=$("out").value.length+"字";
+}
+function onChange(k){
+  if(k==="rxRaw"){S.rx=parseRx(S.rxRaw);S.atDrugAuto=true;}
+  if(k==="rx"){S.atDrugAuto=true;}
+  if(k==="atDrug"){S.atDrugAuto=!S.atDrug;}
+  if(k==="at"){S.atDrugAuto=true;S.atManual=true;}
+  if(k==="imgRaw"){S.img=pickReport(S.imgRaw);}
+  if(k==="labRaw"){labs=parseLabs(S.labRaw);S.labSel={};drawLabs();}
+  if(k==="keep")S.keep=$("keep").value;
+  if(["rxRaw","rx","at","atDrug","dx"].includes(k))autoAt();
+  save();syncChips();refreshInputs();update();
+}
+
+/* ---------- 文面の手直し・コピー ---------- */
+$("out").addEventListener("input",()=>{outDirty=true;$("dirty").classList.add("on");$("cnt").textContent=$("out").value.length+"字";});
+$("regen").addEventListener("click",()=>{outDirty=false;update();toast("入力から作り直しました");});
+$("abbr").addEventListener("change",()=>update());
+$("copy").addEventListener("click",async()=>{
+  const t=$("out").value;let ok=false;
+  try{await navigator.clipboard.writeText(t);ok=true;}catch(e){}
+  if(!ok){try{const ta=$("out");ta.focus();ta.select();ok=document.execCommand("copy");ta.setSelectionRange(0,0);}catch(e){}}
+  toast(ok?"コピーしました。カルテの自由記載欄に貼ってください":"コピーできませんでした。文面を選んでコピーしてください");
+});
+$("jump").addEventListener("click",()=>$("outCard").scrollIntoView({behavior:"smooth"}));
+$("setReset").addEventListener("click",()=>{SET=Object.assign({},SDEF);saveSet();document.querySelectorAll("[data-s]:not(.chips)").forEach(el=>el.value=SET[el.dataset.s]);syncChips();update();toast("初期値に戻しました");});
+
+/* ---------- タブ ---------- */
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.toggle("on",x===b));
+  $("tab-make").classList.toggle("hide",b.dataset.tab!=="make");
+  $("tab-set").classList.toggle("hide",b.dataset.tab!=="set");
+  $("jump").classList.toggle("hide",b.dataset.tab!=="make");
+  window.scrollTo(0,0);
+}));
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),3200);}
+
+/* 入力クリア：この画面の下書き（sessionStorage）も消す。共通ブロックより先に動くよう capture で受ける */
+document.addEventListener("click",e=>{if(e.target&&e.target.id==="wcClrYes"){cleared=true;try{sessionStorage.removeItem(DKEY);}catch(x){}}},true);
+
+/* ---------- 起動 ---------- */
+$("ver").textContent=VER+(MODE==="pwa"?"":"（カルテ端末用）");
+drawChips();bindInputs();
+if(S.labRaw){labs=parseLabs(S.labRaw);drawLabs();}
+autoAt();refreshInputs();update();
+$("forceUpdate").addEventListener("click",async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(()=>location.reload(),800);});
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=[];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../share.js" defer></script>
+</body>
+</html>
