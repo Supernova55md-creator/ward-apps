@@ -210,6 +210,87 @@ tor+=f'<path d="M64,132 C54,110 56,84 72,78 C88,72 110,76 112,96 C114,114 110,12
 tor+=text(20,150,"本人の右",10.5,GREY,"middle","500")+text(150,150,"本人の左",10.5,GREY,"middle","500")
 ILL["massage"]=wide('<g transform="translate(85,0)">'+tor+'</g>',"おへその周りを「の」の字に|（時計回りに、やさしく）",2,"おなかのマッサージ")
 
+# ======== 追加 第3弾 ========
+# ---- 幻覚：明るさと見間違えやすい物（psy） ----
+hook=lambda x: line([(x,30),(x,40)],INK,3)
+coat=lambda x,c=INK,f="#fff": f'<path d="M{x-14},42 Q{x},34 {x+14},42 L{x+20},110 L{x-20},110 Z" fill="{f}" stroke="{c}" stroke-width="3"/>'+circle(x,30,8,c,3,f)
+dk=f'<rect x="6" y="6" width="158" height="150" rx="6" fill="#5d6466"/>'+hook(70)+coat(70,"#2b2b2b","#8a9294")+text(118,60,"？",30,"#fff")
+dk+=f'<rect x="96" y="96" width="44" height="46" fill="#4a5153" stroke="#2b2b2b" stroke-width="2"/>'+mark(146,24,False)
+lt=f'<rect x="6" y="6" width="158" height="150" rx="6" fill="#fffbea"/>'+line([(40,6),(40,30)],INK,2.5)
+lt+=f'<rect x="78" y="40" width="60" height="100" rx="3" fill="#fff" stroke="{INK}" stroke-width="3"/>'+line([(108,40),(108,140)],INK,2)+circle(102,90,2.5,INK,0,INK)+circle(114,90,2.5,INK,0,INK)
+lt+=f'<path d="M28,30 h24 l8,18 h-40 z" fill="#f2c94c" stroke="{INK}" stroke-width="2"/>'+"".join(line([(40+18*math.cos(a),56+18*math.sin(a)),(40+30*math.cos(a),56+30*math.sin(a))],"#e0a800",2.5) for a in [math.pi*k/6 for k in (1,2,3,4,5)])+text(108,154,"服はしまう",11,OK)+mark(146,24,True)
+ILL["lights"]=strip([dk,lt],["薄暗い部屋の掛けた服は|人や影に見えやすい","明かりをつけ、|見間違えやすい物は片付ける"],"見間違いを減らす部屋")
+# ---- 日中の眠気：運転しない（eds） ----
+car=f'<path d="M60,110 L74,82 Q78,74 90,74 H160 Q172,74 178,84 L196,110 Z" fill="{SOFT}" stroke="{INK}" stroke-width="3"/>'+f'<rect x="50" y="108" width="160" height="22" rx="8" fill="{SOFT}" stroke="{INK}" stroke-width="3"/>'
+car+=circle(88,132,12,INK,3)+circle(176,132,12,INK,3)+f'<path d="M84,104 L94,82 H124 V104 Z" fill="#fff" stroke="{INK}" stroke-width="2"/>'+circle(108,92,9,INK,2.5,"#fff")+f'<path d="M102,92 q3,3 6,0 M110,92 q3,3 6,0" fill="none" stroke="{INK}" stroke-width="1.8"/>'
+car+=text(124,66,"Z",16,"#7f8c8d")+text(138,54,"z",13,"#7f8c8d")+text(150,44,"z",11,"#7f8c8d")
+car+='<g transform="translate(235,40)">'+line([(-22,-22),(22,22)],NG,6)+line([(-22,22),(22,-22)],NG,6)+'</g>'
+ILL["drive"]=wide(car,"眠気がある時は車の運転をしない|（急に眠り込むことがある）",2,"眠気がある時は運転しない")
+# ---- お薬カレンダー（cog・基本） ----
+pc=f'<rect x="20" y="12" width="300" height="140" rx="6" fill="#fff" stroke="{INK}" stroke-width="3"/>'
+days=["月","火","水","木","金","土","日"]; rows=["朝","昼","夕","寝る前"]
+for i,d in enumerate(days): pc+=text(80+i*34,30,d,12)
+for j,r in enumerate(rows):
+    pc+=text(42,56+j*28,r,11.5,INK,"middle","500")
+    for i in range(7):
+        x=64+i*34; y=40+j*28
+        pc+=f'<rect x="{x}" y="{y}" width="30" height="24" rx="3" fill="{SOFT if i>=2 else "#fff"}" stroke="{INK}" stroke-width="1.5"/>'
+        if i>=2 and not (r=="昼" and False): pc+=f'<ellipse cx="{x+15}" cy="{y+12}" rx="7" ry="4" fill="#fff" stroke="{OK}" stroke-width="2"/>'
+pc+=text(98,136,"飲んだら空になる",10.5,OK,"middle","500") if False else ""
+ILL["pillcal"]=wide(pc,"お薬カレンダー（1回分ずつポケットに）|飲み忘れ・飲みすぎを防ぐ",2,"お薬カレンダー")
+# ---- 症状日記（基本） ----
+dy=f'<rect x="14" y="10" width="312" height="132" rx="6" fill="#fff" stroke="{INK}" stroke-width="2.5"/>'
+hrs=list(range(6,24,2))
+for i,h in enumerate(hrs): dy+=text(92+i*26,28,f"{h}時",10,INK,"middle","500")
+dy+=text(46,56,"薬",11.5)+text(46,90,"動き",11.5)
+for t in (7,11,15,19): dy+=f'<ellipse cx="{92+(t-6)/2*26}" cy="52" rx="7" ry="4" fill="#fff" stroke="{OK}" stroke-width="2.5"/>'
+seg=[(6,7.5,"#e8a838"),(7.5,10,"#5cb85c"),(10,11.5,"#e8a838"),(11.5,13,"#5cb85c"),(13,14,"#9b59b6"),(14,15.5,"#e8a838"),(15.5,18.5,"#5cb85c"),(18.5,19.5,"#e8a838"),(19.5,22,"#5cb85c")]
+for a,b,c in seg: dy+=f'<rect x="{92+(a-6)/2*26-13}" y="80" width="{(b-a)/2*26}" height="18" fill="{c}"/>'
+dy+=f'<rect x="30" y="112" width="12" height="10" fill="#5cb85c"/>'+text(46,121,"よく動ける",10.5,INK,"start","500")
+dy+=f'<rect x="118" y="112" width="12" height="10" fill="#e8a838"/>'+text(134,121,"動きにくい",10.5,INK,"start","500")
+dy+=f'<rect x="206" y="112" width="12" height="10" fill="#9b59b6"/>'+text(222,121,"体が勝手に動く",10.5,INK,"start","500")
+ILL["diary"]=wide(dy,"症状日記の例：飲んだ時間と体の動きを色で記録|受診の時に見せる",2,"症状日記")
+# ---- 1日のリズム（slp） ----
+ry=line([(20,92),(320,92)],INK,3)
+for h in (6,9,12,15,18,21,24): x=20+(h-6)/18*300; ry+=line([(x,86),(x,98)],INK,2)+text(x,114,f"{h}時",10,INK,"middle","500")
+sun=lambda x,y: circle(x,y,10,"#e0a800",2,"#f9e08b")+"".join(line([(x+14*math.cos(a),y+14*math.sin(a)),(x+19*math.cos(a),y+19*math.sin(a))],"#e0a800",2) for a in [k*math.pi/4 for k in range(8)])
+ry+=sun(37,56)+text(37,140,"起きて",10.5,OK)+text(37,152,"朝の光",10.5,OK)
+xn=20+(13-6)/18*300
+ry+=f'<rect x="{xn-30}" y="64" width="60" height="8" rx="3" fill="{SOFT}" stroke="{INK}" stroke-width="2"/>'+f'<rect x="{xn-30}" y="54" width="16" height="10" rx="4" fill="#fff" stroke="{INK}" stroke-width="2"/>'+circle(xn-18,50,6,INK,2.5,"#fff")+line([(xn-12,56),(xn+26,58)],INK,3.5)+text(xn-4,40,"z",11,"#7f8c8d")+text(xn+4,32,"z",9,"#7f8c8d")+text(xn,140,"昼寝は",10.5,OK)+text(xn,152,"30分まで",10.5,OK)
+xc=20+(17-6)/18*300
+ry+=f'<path d="M{xc-10},50 h20 l-3,20 h-14 z" fill="#fff" stroke="{INK}" stroke-width="2"/>'+line([(xc-16,44),(xc+16,76)],NG,3)+text(xc,140,"夕方から",10.5,NG)+text(xc,152,"コーヒー×",10.5,NG)
+xb=20+(22-6)/18*300
+ry+=f'<path d="M{xb+6},46 a14,14 0 1 0 0,26 a10,10 0 1 1 0,-26 z" fill="#c9d6ff" stroke="{INK}" stroke-width="2"/>'+text(xb,140,"毎日同じ",10.5,OK)+text(xb,152,"時刻に寝る",10.5,OK)
+ILL["rhythm"]=wide(ry,"1日のリズムを整える",2,"睡眠のリズム")
+# ---- ふくらはぎのストレッチ（rls） ----
+wl=f'<rect x="130" y="14" width="14" height="128" fill="{SOFT}" stroke="{INK}" stroke-width="3"/>'
+cs=floor()+wl+person(dict(head=(112,40),neck=(106,52),hip=(80,96),knee=(98,116),foot=(104,140),toe=(116,140),elbow=(120,64),hand=(130,62)),
+   back=dict(knee=(62,118),foot=(42,140),toe=(52,141)))+line([(80,96),(62,118),(42,140)],INK,5)+line([(42,140),(52,141)],INK,5)+f'<circle cx="44" cy="136" r="11" fill="none" stroke="{OK}" stroke-width="2.5" stroke-dasharray="4 3"/>'
+cs+=text(-6,112,"かかとを",11,OK)+text(-6,126,"床につけて",11,OK)+text(78,136,"伸びる",10,OK)
+ILL["calf"]=wide('<g transform="translate(85,0)">'+cs+'</g>',"寝る前に、ふくらはぎをゆっくり伸ばす|（壁に手をつき、後ろ足のかかとを床に）",2,"ふくらはぎのストレッチ")
+# ---- ゆっくり吐く呼吸（anx・mood） ----
+def seated(): return chair()+floor()+person(sit((74,98),(70,54),(70,40),(108,98),(108,140),(82,76),(96,94)))
+b1=AR+seated()+num(20,20,1)+arc("M118,32 L88,40")+text(132,22,"鼻から",11,OK)+text(132,58,"吸う",11,OK)
+b2=AR+seated()+num(20,20,2)+arc("M86,46 Q110,46 150,50")+arc("M86,50 Q110,58 150,66")+text(130,30,"口から",11,OK)+text(130,86,"ゆっくり吐く",11,OK)
+ILL["breath"]=strip([b1,b2],["鼻から息を吸う","口をすぼめて、|吸う時より長く吐く"],"ゆっくり吐く呼吸")
+# ---- においが分かりにくい時（sml） ----
+g1=f'<rect x="30" y="100" width="110" height="40" rx="4" fill="#fff" stroke="{INK}" stroke-width="3"/>'+f'<rect x="26" y="92" width="118" height="10" rx="2" fill="{SOFT}" stroke="{INK}" stroke-width="2.5"/>'+"".join(circle(x,121,5,INK,2.5,"#fff") for x in (60,110))
+g1+=f'<path d="M52,91 q-5,-5 0,-12 q5,7 0,12 M60,91 q-5,-5 0,-12 q5,7 0,12 M68,91 q-5,-5 0,-12 q5,7 0,12 M102,91 q-5,-5 0,-12 q5,7 0,12 M110,91 q-5,-5 0,-12 q5,7 0,12 M118,91 q-5,-5 0,-12 q5,7 0,12 " fill="#7fb6ff" stroke="#2f6fd6" stroke-width="1.6"/>'
+g1+=f'<rect x="58" y="24" width="56" height="30" rx="6" fill="{SOFT}" stroke="{OK}" stroke-width="3"/>'+circle(74,39,5,OK,2,"#fff")+line([(84,34),(104,34)],OK,2)+line([(84,44),(104,44)],OK,2)
+g1+=f'<path d="M122,30 q8,9 0,18 M130,26 q12,13 0,26" fill="none" stroke="{OK}" stroke-width="2.5"/>'
+g2=f'<path d="M62,46 L72,30 H100 L110,46 V140 H62 Z" fill="#fff" stroke="{INK}" stroke-width="3"/>'+f'<rect x="70" y="86" width="32" height="18" rx="2" fill="{SOFT}" stroke="{OK}" stroke-width="2"/>'+text(86,99,"期限",10,OK)
+g2+=f'<circle cx="124" cy="96" r="14" fill="none" stroke="{OK}" stroke-width="3"/>'+line([(134,106),(146,118)],OK,4)
+ILL["gas"]=strip([g1,g2],["ガス警報器をつける","食品は期限を目で確かめる"],"においが分かりにくい時の安全")
+# ---- 排尿日誌（uri） ----
+nd=f'<rect x="40" y="10" width="260" height="134" rx="6" fill="#fff" stroke="{INK}" stroke-width="2.5"/>'
+hdr=["時刻","量（mL）","メモ"]; xs=[80,170,250]
+for x,h in zip(xs,hdr): nd+=text(x,30,h,11.5)
+nd+=line([(40,38),(300,38)],INK,2)+line([(124,10),(124,144)],INK,1.5)+line([(214,10),(214,144)],INK,1.5)
+rowsd=[("6:30","250","起床"),("10:00","150",""),("14:20","200",""),("21:30","120","寝る前"),("1:15","180","夜中"),("3:40","200","夜中")]
+for i,(a,b,c) in enumerate(rowsd):
+    y=56+i*16; nd+=text(80,y,a,11,INK,"middle","500")+text(170,y,b,11,INK,"middle","500")+text(250,y,c,11,NG if "夜中" in c else INK,"middle","500")
+ILL["nyo"]=wide(nd,"排尿日誌の例（2〜3日分）|トイレの時刻と1回の量を書く",2,"排尿日誌")
+
 json.dump(ILL,open("illus.json","w"),ensure_ascii=False)
 html='<html><body style="font-family:sans-serif;background:#eee">'+"".join(f'<h3>{k}</h3><div style="width:640px;background:#fff">{v}</div>' for k,v in ILL.items())+'</body></html>'
 open("preview.html","w").write(html)
