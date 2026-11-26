@@ -291,6 +291,60 @@ for i,(a,b,c) in enumerate(rowsd):
     y=56+i*16; nd+=text(80,y,a,11,INK,"middle","500")+text(170,y,b,11,INK,"middle","500")+text(250,y,c,11,NG if "夜中" in c else INK,"middle","500")
 ILL["nyo"]=wide(nd,"排尿日誌の例（2〜3日分）|トイレの時刻と1回の量を書く",2,"排尿日誌")
 
+# ======== 追加 第4弾 ========
+# ---- やめられない行動（icd）：お金は家族と一緒に管理 ----
+two=person(dict(head=(60,40),neck=(60,54),hip=(60,98),knee=(60,120),foot=(60,142),toe=(72,142),elbow=(76,72),hand=(94,82)))
+two+=person(dict(head=(200,40),neck=(200,54),hip=(200,98),knee=(200,120),foot=(200,142),toe=(188,142),elbow=(184,72),hand=(166,82)))
+two+=f'<rect x="104" y="64" width="52" height="34" rx="5" fill="{SOFT}" stroke="{INK}" stroke-width="3"/>'+line([(104,76),(156,76)],INK,2)
+two+=f'<rect x="114" y="84" width="30" height="8" rx="2" fill="{TAPE}"/>'+text(130,56,"お財布・カード",11,OK)
+two+=text(60,20,"本人",11,INK,"middle","500")+text(200,20,"家族",11,INK,"middle","500")
+ILL["money"]=wide(floor(142,6,334)+'<g transform="translate(40,0)">'+two+'</g>',"お金・カード・ネットの支払いは|しばらく家族と一緒に管理する",2,"お金の管理")
+# ---- 意欲（apa）：毎日の小さな予定 ----
+pl=f'<rect x="70" y="12" width="200" height="134" rx="6" fill="#fff" stroke="{INK}" stroke-width="3"/>'+text(170,34,"今日の予定",13)
+for i,(t,ok) in enumerate([("朝の散歩",1),("植木に水やり",1),("洗濯物をたたむ",0),("夕方に体操",0)]):
+    y=58+i*24; pl+=f'<rect x="92" y="{y-12}" width="16" height="16" rx="2" fill="#fff" stroke="{INK}" stroke-width="2.5"/>'
+    if ok: pl+=line([(95,y-4),(100,y+1),(110,y-12)],OK,3.5)
+    pl+=text(120,y+1,t,12,INK,"start","500")
+ILL["plan"]=wide(pl,"毎日、小さな予定を決めて続ける|（できたら印をつける）",2,"毎日の予定")
+# ---- 気分の落ち込み（mood）：人と一緒に散歩 ----
+wk=lambda dx,c=INK: person(dict(head=(dx+10,30),neck=(dx+10,43),hip=(dx+6,90),knee=(dx+26,112),foot=(dx+36,138),toe=(dx+48,136),elbow=(dx+22,62),hand=(dx+28,82)),c,
+    back=dict(knee=(dx,116),foot=(dx-14,140),toe=(dx-4,141),elbow=(dx-2,64),hand=(dx-10,82)))
+ws=floor(142,6,334)+wk(110)+wk(190)+f'<path d="M146,2 h32 a6,6 0 0 1 6,6 v12 a6,6 0 0 1 -6,6 h-18 l-8,8 l1,-8 h-7 a6,6 0 0 1 -6,-6 v-12 a6,6 0 0 1 6,-6 z" fill="#fff" stroke="{OK}" stroke-width="2"/>'+text(162,19,"…",14,OK)
+ws+=sun(290,36)
+ILL["walk2"]=wide(ws,"日中に体を動かし、人と会う予定を作る|（散歩、デイサービス、患者会など）",2,"人と一緒に散歩")
+# ---- 吐き気・胃もたれ（gi）：少量を回数多く ----
+plate=lambda x,y,r: f'<ellipse cx="{x}" cy="{y}" rx="{r}" ry="{r*0.35}" fill="#fff" stroke="{INK}" stroke-width="3"/>'
+b1=plate(85,110,62)+f'<path d="M40,106 q45,-60 90,0 z" fill="#f2c94c" stroke="{INK}" stroke-width="2.5"/>'+mark(146,24,False)
+b2="".join(plate(x,y,26)+f'<path d="M{x-17},{y-2} q17,-22 34,0 z" fill="#f2c94c" stroke="{INK}" stroke-width="2"/>' for x,y in [(50,70),(120,70),(85,122)])+mark(146,24,True)
+ILL["meal"]=strip([b1,b2],["1回にたくさん・|脂っこい物","量を分けて、|回数を増やす"],"食事の分け方")
+# ---- 体重（wt）：月1回測って記録 ----
+sc=f'<rect x="40" y="96" width="100" height="44" rx="8" fill="{SOFT}" stroke="{INK}" stroke-width="3"/>'+f'<rect x="70" y="104" width="40" height="16" rx="3" fill="#fff" stroke="{INK}" stroke-width="2"/>'+text(90,117,"52.4",11,INK)
+sc+=person(dict(head=(90,20),neck=(90,32),hip=(90,66),knee=(90,82),foot=(90,96),toe=(100,96),elbow=(100,48),hand=(104,62)))
+cal=f'<rect x="190" y="20" width="130" height="120" rx="6" fill="#fff" stroke="{INK}" stroke-width="3"/>'+text(255,40,"体重の記録",12)
+for i,(m,v) in enumerate([("4月","53.0"),("5月","52.8"),("6月","52.4")]):
+    cal+=text(222,66+i*24,m,11.5,INK,"middle","500")+text(276,66+i*24,v+" kg",11.5,INK,"middle","500")
+ILL["weight"]=wide(floor(142,6,170)+sc+cal,"月に1回、体重を測って書いておく|（減り続ける時は相談）",2,"体重の記録")
+# ---- 痛み（pain）：座って背すじを伸ばす ----
+pn=AR+chair()+floor()+line([(72,56),(60,32),(60,8)],GREY)+person(sit((74,98),(72,56),(72,42),(108,98),(108,140),(86,32),(88,8)))+arc("M118,60 L118,24")+text(140,82,"背すじを",11,OK)+text(140,96,"伸ばす",11,OK)
+pw=AR+chair()+floor()+person(sit((74,98),(70,54),(70,40),(108,98),(108,140),(54,72),(58,94)))+f'<rect x="52" y="78" width="16" height="22" rx="4" fill="#f6b38a" stroke="{INK}" stroke-width="2"/>'+f'<path d="M48,74 q-4,-6 0,-12 M58,72 q-4,-6 0,-12" fill="none" stroke="#e07a3f" stroke-width="2"/>'+text(124,40,"腰や肩を",11,OK)+text(124,54,"温める",11,OK)
+ILL["stretch"]=strip([pn,pw],["両手を上げて、|ゆっくり背すじを伸ばす","温めると|楽になることがある"],"痛みを和らげる")
+# ---- 疲れやすさ（fat）：調子の良い時間に大事な用事 ----
+bat=lambda x,y,lv,c: f'<rect x="{x}" y="{y}" width="46" height="24" rx="4" fill="#fff" stroke="{INK}" stroke-width="2.5"/>'+f'<rect x="{x+46}" y="{y+7}" width="4" height="10" fill="{INK}"/>'+f'<rect x="{x+4}" y="{y+4}" width="{38*lv}" height="16" rx="2" fill="{c}"/>'
+ft=line([(20,80),(320,80)],INK,3)
+for h in (8,10,12,14,16,18,20): x=20+(h-8)/12*300; ft+=line([(x,74),(x,86)],INK,2)+text(x,102,f"{h}時",10,INK,"middle","500")
+ft+=bat(42,36,0.95,"#5cb85c")+text(67,126,"調子の良い時に",10.5,OK)+text(67,140,"大事な用事",10.5,OK)
+ft+=bat(147,36,0.35,"#e8a838")+text(172,126,"疲れたら",10.5,OK)+text(172,140,"休憩",10.5,OK)
+ft+=bat(247,36,0.7,"#5cb85c")+text(272,126,"休んで",10.5,OK)+text(272,140,"また少し",10.5,OK)
+ILL["energy"]=wide(ft,"休憩をはさみながら活動する",2,"疲れやすい時の過ごし方")
+# ---- 汗（swt）：水分と着替え ----
+sw1=f'<path d="M58,60 L66,138 H104 L112,60 Z" fill="#dff1ff" stroke="{INK}" stroke-width="3"/>'+line([(62,76),(108,76)],"#7fb6ff",3)+text(85,40,"水分をとる",11,OK)
+sw2=f'<path d="M50,52 L70,40 Q85,52 100,40 L120,52 L134,74 L118,82 L114,72 V140 H56 V72 L52,82 L36,74 Z" fill="{SOFT}" stroke="{INK}" stroke-width="3"/>'+text(85,26,"着替える",11,OK)
+ILL["sweat"]=strip([sw1,sw2],["汗をかいたら水分をとる","ぬれた服は着替える"],"汗が多い時")
+# ---- 二重に見える（dip）：運転しない ----
+ghost=lambda dx,op: f'<g transform="translate({dx},0)" opacity="{op}">'+f'<path d="M60,110 L74,82 Q78,74 90,74 H160 Q172,74 178,84 L196,110 Z" fill="{SOFT}" stroke="{INK}" stroke-width="3"/>'+f'<rect x="50" y="108" width="160" height="22" rx="8" fill="{SOFT}" stroke="{INK}" stroke-width="3"/>'+circle(88,132,12,INK,3)+circle(176,132,12,INK,3)+'</g>'
+dp=ghost(22,0.35)+ghost(0,1)+'<g transform="translate(275,44)">'+line([(-22,-22),(22,22)],NG,6)+line([(-22,22),(22,-22)],NG,6)+'</g>'
+ILL["double"]=wide(dp,"ものが二重に見える時は|車の運転を控える",2,"二重に見える時")
+
 json.dump(ILL,open("illus.json","w"),ensure_ascii=False)
 html='<html><body style="font-family:sans-serif;background:#eee">'+"".join(f'<h3>{k}</h3><div style="width:640px;background:#fff">{v}</div>' for k,v in ILL.items())+'</body></html>'
 open("preview.html","w").write(html)
