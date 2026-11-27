@@ -90,9 +90,9 @@ h2:first-child{margin-top:0}
   <nav id="nav"></nav>
   <div id="sfoot">
     <div>公開版：<span id="vSrv">確認中</span><br>この端末：<span id="vLoc">—</span></div>
-    <div id="upd" role="status"></div>
+    <div id="upd" role="status"></div><div id="upd2" role="status" style="color:var(--c);font-weight:700"></div>
     <button type="button" id="bUpd">最新版に更新</button><button type="button" id="bDate">更新日を取り直す</button>
-    <div>入口の版：ver1_2026-11-27a</div>
+    <div>入口の版：ver1_2026-11-27b</div>
   </div>
 </aside>
 <main>
@@ -133,7 +133,7 @@ h2:first-child{margin-top:0}
 
   /* ---------- 入口（../index.html）から一覧を読む ---------- */
   function load(){
-    return fetch("../index.html",{cache:"no-cache"}).then(function(r){return r.text();}).then(function(html){
+    return fetch("../index.html?fresh=1",{cache:"no-cache"}).then(function(r){return r.text();}).then(function(html){
       var doc=new DOMParser().parseFromString(html,"text/html"),KW={};
       var m=/var KW=(\{[\s\S]*?\});/.exec(html);
       if(m){try{KW=(new Function("return "+m[1]))();}catch(e){}}
@@ -163,7 +163,7 @@ h2:first-child{margin-top:0}
   function loadVers(){
     var q=APPS.slice(),n=0;
     function next(){var o=q.shift();if(!o)return Promise.resolve();
-      return fetch("../"+o.s+"/").then(function(r){return r.ok?r.text():"";}).then(function(t){vers[o.s]=findVer(t);if(++n%6===0)render();}).catch(function(){}).then(next);}
+      return fetch("../"+o.s+"/index.html?fresh=1").then(function(r){return r.ok?r.text():"";}).then(function(t){vers[o.s]=findVer(t);if(++n%6===0)render();}).catch(function(){}).then(next);}
     return Promise.all([next(),next(),next(),next()]).then(render);
   }
   function loadDates(force){
@@ -350,8 +350,7 @@ h2:first-child{margin-top:0}
     var p2=navigator.onLine?fetch("../sw.js",{cache:"no-store"}).then(function(r){return r.text();}).then(swVer).catch(function(){return"";}):Promise.resolve("");
     Promise.all([p1,p2]).then(function(a){
       var srv=a[1];$("vSrv").textContent=srv||(navigator.onLine?"取得できず":"オフライン");$("vLoc").textContent=loc||"未取り込み";
-      if(srv&&loc&&srv!==loc)$("upd").textContent="新しい版があります。「最新版に更新」を押してください";
-      else if(srv&&loc&&srv===loc&&!/取得/.test($("upd").textContent))$("upd").textContent="最新版です";
+      $("upd2").textContent=srv&&loc?(srv!==loc?"新しい版があります。「最新版に更新」を押してください":"最新版です"):"";
     });
   }
   $("bUpd").addEventListener("click",function(){

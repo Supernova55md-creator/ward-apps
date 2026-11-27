@@ -2,7 +2,7 @@
    アプリを更新・追加したら VERSION を必ず変える（例 a→b、日付更新）。
    新しいアプリを足すときは APPS に slug を追加する。
    画面（HTML）は no-cache で毎回サーバーに確認する（GitHub Pages の10分キャッシュで古い版が出るのを防ぐ）。 */
-const VERSION = "ward-2026-11-27a";
+const VERSION = "ward-2026-11-27b";
 const APPS = ["er", "rpt", "nih", "atn", "str", "exam", "loc", "sign", "mmt", "ltr", "pnt", "csf", "ncs", "eeg", "aed", "ha", "imm", "enc", "dementia", "updrs", "pd", "pdadv", "preg", "dm", "htn", "lipid", "inf", "kampo", "ren", "na", "tf", "nan", "iken", "shi", "lab", "setsumei", "byomei", "shokai", "referral", "ext", "qc", "study", "mac"];
 const ROOT = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "share.js", "profile.js"];
 const PER_APP = ["", "index.html", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
@@ -37,6 +37,14 @@ self.addEventListener("fetch", (e) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.endsWith("/sw.js")) return;
   if (url.pathname.endsWith(".enc")) return; // 暗号化データ（ext/data.enc）は常にサーバーから取る
+  // ?fresh を付けた取得（Mac用の入口が一覧・版を読むとき）は通信を優先し、取れなければキャッシュ
+  if (url.searchParams.has("fresh")) {
+    e.respondWith(fetch(req.url, { cache: "no-cache" }).then((res) => {
+      if (!res.ok) throw new Error(String(res.status));
+      return res;
+    }).catch(async () => (await caches.match(req, { ignoreSearch: true })) || Response.error()));
+    return;
+  }
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req.url, { cache: "no-cache", credentials: "same-origin" })
