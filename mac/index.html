@@ -90,9 +90,9 @@ h2:first-child{margin-top:0}
   <nav id="nav"></nav>
   <div id="sfoot">
     <div>公開版：<span id="vSrv">確認中</span><br>この端末：<span id="vLoc">—</span></div>
-    <div id="upd" role="status"></div><div id="upd2" role="status" style="color:var(--c);font-weight:700"></div>
+    <div id="upd" role="status"></div><div id="upd2" role="status" style="color:var(--c);font-weight:700"></div><div id="addMsg" role="status" style="color:var(--c);font-weight:700"></div>
     <button type="button" id="bUpd">最新版に更新</button><button type="button" id="bDate">更新日を取り直す</button>
-    <div>入口の版：ver1_2026-11-27b</div>
+    <div>入口の版：ver1_2026-11-27c</div>
   </div>
 </aside>
 <main>
@@ -111,7 +111,7 @@ h2:first-child{margin-top:0}
       <div id="cards"></div>
       <h2 id="feedH">最近の更新（GitHub）</h2>
       <div id="feed">読み込み中…</div>
-      <p class="note">一覧は入口（病棟アプリ）から毎回読み込むので、他の会話で足したアプリも自動で並びます。版はアプリ内の表示、更新日は GitHub の最終更新です（通信できないときは前回の値）。<br>入力はこの端末のブラウザ内にだけ保存されます。患者個人情報は入力しないでください。診療判断の補助であり、最終判断は診察と原典で行ってください。</p>
+      <p class="note">一覧は入口（病棟アプリ）から読み込むので、他の会話で足したアプリも自動で並びます（開いたままでも、画面に戻ったときと15分ごとに読み直します。新しく足したアプリは7日間「新規追加」と表示）。版はアプリ内の表示、更新日は GitHub の最終更新です（通信できないときは前回の値）。<br>入力はこの端末のブラウザ内にだけ保存されます。患者個人情報は入力しないでください。診療判断の補助であり、最終判断は診察と原典で行ってください。</p>
     </section>
     <div id="views" hidden></div>
   </div>
@@ -135,6 +135,8 @@ h2:first-child{margin-top:0}
   function load(){
     return fetch("../index.html?fresh=1",{cache:"no-cache"}).then(function(r){return r.text();}).then(function(html){
       var doc=new DOMParser().parseFromString(html,"text/html"),KW={};
+      if(!doc.querySelector("body>ul>li a"))throw new Error("empty");
+      APPS=[];BY={};CATS=[];
       var m=/var KW=(\{[\s\S]*?\});/.exec(html);
       if(m){try{KW=(new Function("return "+m[1]))();}catch(e){}}
       var c=null;
@@ -199,7 +201,7 @@ h2:first-child{margin-top:0}
   function favs(){var f=get("ward-fav",[]);return Array.isArray(f)?f.filter(function(s){return BY[s];}):[];}
   function recents(){var r=get("ward-recent",[]);return Array.isArray(r)?r.filter(function(x){return x&&BY[x.s];}):[];}
   function drawNav(){
-    var nav=$("nav"),items=[["all","すべて",APPS.length],["fav","☆ お気に入り",favs().length],["rec","最近開いた",Math.min(recents().length,10)],["new","最近更新（3日）",APPS.filter(isNew).length],["sep"]];
+    var nav=$("nav"),items=[["all","すべて",APPS.length],["fav","☆ お気に入り",favs().length],["rec","最近開いた",Math.min(recents().length,10)],["add","新しく追加（7日）",APPS.filter(isAdded).length],["new","最近更新（3日）",APPS.filter(isNew).length],["sep"]];
     CATS.forEach(function(c){items.push(["c:"+c.name,c.name,c.apps.length]);});
     nav.innerHTML="";
     items.forEach(function(it){
@@ -210,10 +212,18 @@ h2:first-child{margin-top:0}
       nav.appendChild(b);
     });
   }
+  /* 新しく追加されたアプリ（この端末で初めて一覧に出た日から7日間「新規」） */
+  var seen=get("ward-mac-seen",null);
+  function markSeen(){
+    var first=!seen||typeof seen!=="object",added=[];if(first)seen={};
+    APPS.forEach(function(o){if(!(o.s in seen)){seen[o.s]=first?0:Date.now();if(!first)added.push(o);}});
+    put("ward-mac-seen",seen);return added;
+  }
+  function isAdded(o){var t=seen&&seen[o.s];return t>0&&Date.now()-t<7*864e5;}
   function isNew(o){var t=upd.d[o.s];return t&&Date.now()-new Date(t)<3*864e5;}
   function card(o){
     var f=favs().indexOf(o.s)>=0,b=document.createElement("div");b.className="card";b.tabIndex=0;b.dataset.s=o.s;
-    var meta="";
+    var meta=isAdded(o)?"<span class='chip new'>新規追加</span>":"";
     if(vers[o.s])meta+="<span class='chip'>"+esc(vers[o.s])+"</span>";
     if(upd.d[o.s])meta+="<span class='chip"+(isNew(o)?" new":"")+"'>更新 "+esc(fmtDate(upd.d[o.s]))+"</span>";
     b.innerHTML="<img src='../"+o.s+"/icon-192.png' alt=''><div><b>"+esc(o.name)+"</b>"+(o.sub?"<span class='sub'>"+esc(o.sub)+"</span>":"")+(meta?"<div class='meta'>"+meta+"</div>":"")+"</div>"+
@@ -239,9 +249,11 @@ h2:first-child{margin-top:0}
       section("検索結果",APPS.filter(function(o){return ws.every(function(w){return o.txt.indexOf(w)>=0;});}));
     }else if(cat==="fav"){section("☆ お気に入り",favs().map(function(s){return BY[s];}));}
     else if(cat==="rec"){section("最近開いた",recents().slice(0,10).map(function(x){return BY[x.s];}));}
+    else if(cat==="add"){section("新しく追加（7日以内）",APPS.filter(isAdded).sort(function(a,b){return seen[b.s]-seen[a.s];}));}
     else if(cat==="new"){section("最近更新（3日以内・新しい順）",APPS.filter(isNew).sort(function(a,b){return upd.d[a.s]<upd.d[b.s]?1:-1;}));}
     else if(cat.indexOf("c:")===0){var c=CATS.filter(function(x){return "c:"+x.name===cat;})[0];if(c)section(c.name,c.apps);}
     else{
+      var ad=APPS.filter(isAdded);if(ad.length)section("新しく追加（7日以内）",ad);
       var f=favs();if(f.length)section("☆ お気に入り",f.map(function(s){return BY[s];}));
       CATS.forEach(function(c){section(c.name,c.apps);});
     }
@@ -381,11 +393,30 @@ h2:first-child{margin-top:0}
   /* 起動 */
   load().then(function(){
     tabs=tabs.filter(function(s){return BY[s];});
+    markSeen();
     render();
     if(tabs.length){cur=tabs[tabs.length-1];drawTabs();}
     loadVers();loadDates(false);loadFeed();checkVer();
     $("q").focus();
   }).catch(function(){$("cards").textContent="一覧を読み込めませんでした。通信を確認して再読み込みしてください。";});
+
+  /* 開いたままでも、画面に戻ったとき・15分ごとに入口を読み直し、足されたアプリを反映する */
+  var lastRefresh=Date.now();
+  function refresh(force){
+    if(!force&&Date.now()-lastRefresh<60e3)return;lastRefresh=Date.now();
+    var before=APPS.length;
+    load().then(function(){
+      var added=markSeen();render();drawTabs();checkVer();
+      if(added.length){
+        $("addMsg").textContent="アプリが追加されました："+added.map(function(o){return o.name;}).join("、");
+        added.forEach(function(o){fetch("../"+o.s+"/index.html?fresh=1").then(function(r){return r.ok?r.text():"";}).then(function(t){vers[o.s]=findVer(t);render();}).catch(function(){});});
+      }else if(APPS.length!==before){loadVers();}
+    }).catch(function(){});
+  }
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")refresh(false);});
+  window.addEventListener("focus",function(){refresh(false);});
+  window.addEventListener("online",function(){refresh(true);});
+  setInterval(function(){refresh(true);},15*60e3);
 })();
 </script>
 </body></html>
