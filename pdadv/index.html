@@ -38,7 +38,7 @@ section.card h2{font-size:16.5px;margin:0 0 8px}
 section.card h3{font-size:15px;margin:12px 0 6px}
 .muted{color:var(--muted);font-size:13.5px}
 .small{font-size:13px}
-nav.bottom{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:4px calc(4px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(4px + env(safe-area-inset-left));z-index:20}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:4px calc(4px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(4px + env(safe-area-inset-left));z-index:20}
 nav.bottom button{font:inherit;font-size:12.5px;font-weight:700;border:0;background:none;color:var(--muted);padding:8px 2px;border-radius:8px;min-height:48px;cursor:pointer;line-height:1.2}
 nav.bottom button[aria-selected="true"]{color:var(--accent);background:var(--accent-soft)}
 .btn{font:inherit;font-size:14.5px;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 14px;min-height:44px;cursor:pointer}
@@ -61,6 +61,14 @@ table.t th{font-weight:700;color:var(--muted);font-size:12.5px}
 #verdict.info{border-left:6px solid var(--info);background:var(--info-soft)}
 #verdict .big{font-weight:700;font-size:15.5px}
 .dom{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 12px;min-height:40px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--info);border-color:var(--info);color:#fff;font-weight:700}
+.grp{font-size:13px;font-weight:700;color:var(--muted);margin:6px 0 0}
+#pickOut .dom{border:none;padding:0;margin:0}
+#pickOut section{scroll-margin-top:90px}
+#pickBar[hidden]{display:none}
+#pickBar{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:flex-end;padding:8px 0;background:linear-gradient(transparent,var(--bg) 30%)}
 .dom.crit{border-left:5px solid var(--crit)}.dom.warn{border-left:5px solid var(--warn)}.dom.info{border-left:5px solid var(--info)}
 .dom label.hd{display:flex;gap:8px;align-items:flex-start;font-weight:700;cursor:pointer}
 .dom label.hd input{width:22px;height:22px;flex:none;margin-top:1px}
@@ -145,6 +153,18 @@ figure.ill{flex:1 1 260px}
   </section>
 </div>
 
+<!-- ===== 症状から選ぶ ===== -->
+<div data-tab="pick" hidden>
+  <section class="card">
+    <h2>症状を選んで説明する</h2>
+    <p class="muted" style="margin:0 0 4px">CSVがなくても使えます。症状をタップすると説明文とイラストが下に出ます（もう一度タップで外す）。選んだ症状で患者さん用の用紙を印刷できます。</p>
+    <div id="pickChips"></div>
+    <div class="row small"><button type="button" class="btn" id="pickClear">選択をすべて外す</button></div>
+  </section>
+  <div id="pickOut"></div>
+  <div id="pickBar"><button type="button" class="btn pri" id="pickGo" disabled>この症状で用紙を作る</button></div>
+</div>
+
 <!-- ===== アドバイス ===== -->
 <div data-tab="adv" hidden>
   <div id="verdict" class="info"><div class="big">CSVを読み込み、患者IDを選ぶとここに結果が出ます</div></div>
@@ -194,6 +214,7 @@ figure.ill{flex:1 1 260px}
       <li>ExChartから PD14（NMSQ）・PD01〜03（MDS-UPDRS）を CSV で出力（「文書日時・患者ID・／項目名」の生出力でも、1行見出しに整えたCSVでも読めます。文字コードは Shift_JIS／UTF-8 を自動判定）。</li>
       <li>読み込み → 患者IDを入れて「表示」。各票の最新の日付が選ばれ、1つ前の記録と比べます（日付は変えられます）。</li>
       <li>「アドバイス」タブで、載せる項目を確認して印刷。カルテ用メモはコピーして貼り付け。</li>
+      <li>CSVがない時は「症状から」タブで、運動症状・非運動症状をタップすると説明文とイラストが出ます。選んだ症状で同じ用紙を印刷できます。</li>
     </ol>
     <h3>拾い上げの基準（既定）</h3>
     <ul class="small" style="padding-left:20px;margin:0">
@@ -229,16 +250,17 @@ figure.ill{flex:1 1 260px}
 
 <nav class="bottom" role="tablist">
   <button type="button" data-go="load" aria-selected="true">読み込み</button>
+  <button type="button" data-go="pick" aria-selected="false">症状から</button>
   <button type="button" data-go="adv" aria-selected="false">アドバイス</button>
   <button type="button" data-go="lib" aria-selected="false">早見表</button>
-  <button type="button" data-go="src" aria-selected="false">使い方・出典</button>
+  <button type="button" data-go="src" aria-selected="false">使い方</button>
 </nav>
 <div id="print"></div>
 <div class="toast" id="toast"></div>
 
 <script>
 "use strict";
-const APP_VER="ver1_2026-11-26f";
+const APP_VER="ver1_2026-11-27a";
 const LS="pdadv-v1";
 document.getElementById("ver").textContent=APP_VER;
 function $(s,r){return (r||document).querySelector(s);}
@@ -681,7 +703,7 @@ fileIn.addEventListener("change",()=>{readFiles(Array.from(fileIn.files));fileIn
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("on");}));
 ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("on");}));
 drop.addEventListener("drop",e=>{if(e.dataTransfer&&e.dataTransfer.files)readFiles(Array.from(e.dataTransfer.files));});
-$("#unloadBtn").addEventListener("click",()=>{FILES=[];RECS=[];CUR=null;INC={};$("#pid").value="";$("#dateSel").innerHTML="";renderFiles();renderAdv();toast("閉じました");});
+$("#unloadBtn").addEventListener("click",()=>{FILES=[];RECS=[];CUR=null;if(MODE==="csv")INC={};$("#pid").value="";$("#dateSel").innerHTML="";renderFiles();renderAdv();toast("閉じました");});
 
 /* サンプル（架空のデータ） */
 $("#sampleBtn").addEventListener("click",()=>{
@@ -711,7 +733,7 @@ function selectPatient(){
   if(!id){toast("患者IDを入れてください");return;}
   const mine=RECS.filter(r=>r.id===id);
   if(!mine.length){CUR=null;$("#dateSel").innerHTML='<p class="warnbox">このIDの記録は読み込んだCSVにありません。</p>';renderAdv();return;}
-  CUR={id,by:{},sel:{}};INC={};
+  CUR={id,by:{},sel:{}};INC={};MODE="csv";
   FORMS.forEach(([f])=>{const a=mine.filter(r=>r.form===f).sort((x,y)=>String(y.date).localeCompare(String(x.date)));if(a.length){CUR.by[f]=a;CUR.sel[f]=0;}});
   renderDateSel();renderAdv();go("adv");
 }
@@ -754,8 +776,38 @@ function evaluate(){
   return {N,P,Np,Pp,hy,list:out};
 }
 let INC={};  // 用紙に入れる項目（メモリのみ）
+let MODE="csv";  // "csv"：CSVの判定から／"pick"：症状を選んで
+const SEL=[];    // 症状から選んだ項目のid（メモリのみ）
+const PICK_GROUPS=[
+ ["運動症状",[["",["fall","bed","adl","trm","pos","spk","swl","drl"]]]],
+ ["非運動症状",[["精神・認知",["psy","icd","mood","anx","apa","cog"]],["睡眠",["slp","rbd","eds","rls"]],["自律神経",["oh","con","fec","uri","swt","sex"]],["その他",["gi","wt","pain","fat","dip","sml","edm"]]]]];
+const DOM=id=>DOMS.find(d=>d.id===id);
+function domCardHTML(d,ctrl){return '<div class="dom">'+ctrl+'<ul>'+d.p.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul>'+illHTML(d)+'<details><summary>医師向け</summary><ul>'+d.dr.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul>'+refLine(d)+'</details></div>';}
+function renderPick(){
+  $("#pickChips").innerHTML=PICK_GROUPS.map(([g,subs])=>'<h3>'+g+'</h3>'+subs.map(([sg,ids])=>(sg?'<div class="grp">'+sg+'</div>':'')+'<div class="chips">'+ids.filter(DOM).map(id=>'<button type="button" class="chip" data-id="'+id+'" aria-pressed="'+(SEL.includes(id)?"true":"false")+'">'+esc(DOM(id).t)+'</button>').join("")+'</div>').join("")).join("");
+  $$("#pickChips .chip").forEach(b=>b.addEventListener("click",()=>{const id=b.dataset.id,i=SEL.indexOf(id);if(i>=0)SEL.splice(i,1);else SEL.push(id);renderPick();if(i<0){const c=$("#pk-"+id);if(c)c.scrollIntoView({behavior:"smooth",block:"start"});}}));
+  const ds=SEL.map(DOM).sort((a,b)=>a.ord-b.ord);
+  $("#pickOut").innerHTML=ds.map(d=>'<section class="card" id="pk-'+d.id+'" style="margin-top:10px">'+domCardHTML(d,'<div style="display:flex;gap:8px;align-items:center"><b style="flex:1">'+esc(d.t)+'</b><button type="button" class="btn" style="flex:none;min-height:36px;padding:4px 12px" data-rm="'+d.id+'">外す</button></div>')+'</section>').join("");
+  $$("#pickOut [data-rm]").forEach(b=>b.addEventListener("click",()=>{SEL.splice(SEL.indexOf(b.dataset.rm),1);renderPick();}));
+  $("#pickGo").disabled=!SEL.length;$("#pickBar").hidden=!SEL.length;$("#pickGo").textContent=SEL.length?"この"+SEL.length+"項目で用紙を作る":"この症状で用紙を作る";
+}
+$("#pickClear").addEventListener("click",()=>{SEL.length=0;renderPick();});
+$("#pickGo").addEventListener("click",()=>{if(!SEL.length)return;MODE="pick";INC={};SEL.forEach(id=>INC[id]=true);renderAdv();go("adv");});
 let LAST=null;
 function renderAdv(){
+  if(MODE==="pick"){
+    const has=SEL.length>0;
+    ["domCard","printCard","memoCard"].forEach(id=>$("#"+id).hidden=!has);$("#scoreCard").hidden=true;
+    const V=$("#verdict");
+    if(!has){V.className="info";V.innerHTML='<div class="big">「症状から」タブで症状を選ぶと、ここに用紙の内容が出ます</div>';LAST=null;return;}
+    const E={manual:true,N:null,P:{1:null,2:null,3:null},Pp:{},hy:null,list:SEL.map(DOM).sort((a,b)=>a.ord-b.ord).map(d=>({d,why:[],worse:false,tone:"warn"}))};LAST=E;
+    E.list.forEach(x=>{if(!(x.d.id in INC))INC[x.d.id]=true;});
+    V.className="info";V.innerHTML='<span class="pill info">症状から選択 '+E.list.length+'</span> <span class="big">'+esc(E.list.map(x=>x.d.t.replace(/（.*?）/g,"")).join("・"))+'</span> <button type="button" class="btn small" id="backPick">選び直す</button>';
+    $("#backPick").addEventListener("click",()=>go("pick"));
+    $("#doms").innerHTML=E.list.map(x=>domCardHTML(x.d,'<label class="hd"><input type="checkbox" data-id="'+x.d.id+'"'+(INC[x.d.id]?' checked':'')+'><span>'+esc(x.d.t)+'</span></label>')).join("");
+    $$("#doms input[type=checkbox]").forEach(c=>c.addEventListener("change",()=>{INC[c.dataset.id]=c.checked;buildMemo();}));
+    buildMemo();if(!$("#prevBox").hidden)$("#prevBox").innerHTML=buildPrint(true);return;
+  }
   const has=CUR&&Object.keys(CUR.by).length;
   ["scoreCard","domCard","printCard","memoCard"].forEach(id=>$("#"+id).hidden=!has);
   const V=$("#verdict");
@@ -788,6 +840,8 @@ $("#allOff").addEventListener("click",()=>{if(!LAST)return;LAST.list.forEach(x=>
 function buildMemo(){
   const E=LAST;if(!E){$("#memo").textContent="";return;}
   const L=[];
+  if(E.manual){const inc=E.list.filter(x=>INC[x.d.id]).map(x=>x.d.t.replace(/（.*?）/g,""));const t=new Date();
+    L.push("【PD生活指導】"+t.getFullYear()+"/"+(t.getMonth()+1)+"/"+t.getDate());L.push("生活指導の用紙を渡して説明"+(inc.length?"（"+inc.join("・")+"）":"（毎日の基本）"));$("#memo").textContent=L.join("\n");return;}
   const dates=[E.N&&E.N.date,E.P[1]&&E.P[1].date,E.P[2]&&E.P[2].date,E.P[3]&&E.P[3].date].filter(Boolean).sort();
   L.push("【PD質問票・評価のまとめ】"+(dates.length?fmtD(dates[dates.length-1]):""));
   if(E.N){const c=Object.values(E.N.v).filter(x=>x===1).length;L.push("NMSQ "+c+"/30（"+fmtD(E.N.date)+"）"+(E.Np?"　前回 "+Object.values(E.Np.v).filter(x=>x===1).length+"/30（"+fmtD(E.Np.date)+"）":""));}
@@ -807,12 +861,12 @@ function buildPrint(preview){
   const dates=E?[E.N&&E.N.date,E.P[1]&&E.P[1].date,E.P[2]&&E.P[2].date,E.P[3]&&E.P[3].date].filter(Boolean).sort():[];
   const today=new Date();const td=today.getFullYear()+"年"+(today.getMonth()+1)+"月"+today.getDate()+"日";
   let h='<h1>パーキンソン病　毎日の過ごし方のアドバイス</h1><div class="meta">お渡しした日：'+td+(dates.length?'　（質問票・診察の日：'+fmtD(dates[dates.length-1])+'）':'')+'</div>';
-  if(items.length){h+='<p>質問票のお答えから、次のことに気をつけて過ごしましょう。</p>';items.forEach(x=>{h+='<div class="blk"><h2>'+esc(x.d.t)+(x.tone==="crit"?'　（早めに相談してください）':'')+'</h2><ul>'+($("#optShort").checked?x.d.p.slice(0,3):x.d.p).map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul>'+($("#optIll").checked?illHTML(x.d):"")+'</div>';});}
+  if(items.length){h+='<p>'+(E.manual?'':'質問票のお答えから、')+'次のことに気をつけて過ごしましょう。</p>';items.forEach(x=>{h+='<div class="blk"><h2>'+esc(x.d.t)+(x.tone==="crit"?'　（早めに相談してください）':'')+'</h2><ul>'+($("#optShort").checked?x.d.p.slice(0,3):x.d.p).map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul>'+($("#optIll").checked?illHTML(x.d):"")+'</div>';});}
   if($("#optBase").checked)h+='<div class="blk"><h2>毎日の基本</h2><ul>'+BASE.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul>'+($("#optIll").checked?illHTML({ill:["diary"]}):"")+'</div>';
   if($("#optSos").checked)h+='<div class="sos"><b>次のときは、受診日を待たずにすぐ連絡・受診してください</b><ul>'+SOS.map(s=>'<li>'+esc(s)+'</li>').join("")+'</ul></div>';
   const note=$("#drNote").value.trim();
   h+='<div class="memo"><b>主治医から</b>\n'+esc(note)+'</div>';
-  h+='<div class="foot">このアドバイスは質問票のお答えをもとにした一般的な内容です。治療や薬のことは主治医と相談してください。</div>';
+  h+='<div class="foot">このアドバイスは'+(E&&E.manual?'':'質問票のお答えをもとにした')+'一般的な内容です。治療や薬のことは主治医と相談してください。</div>';
   if(preview)return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px">'+h.replace(/<h1>/,'<h3 style="margin:0 0 4px">').replace(/<\/h1>/,'</h3>').replace(/<h2>/g,'<b style="display:block;margin-top:8px">').replace(/<\/h2>/g,'</b>').replace(/class="memo"/,'style="border:1px solid var(--line);padding:6px;margin-top:8px;white-space:pre-wrap"').replace(/class="sos"/,'style="border:2px solid var(--crit);padding:6px;margin-top:8px"')+'</div>';
   return h;
 }
@@ -832,7 +886,7 @@ $("#drNote").addEventListener("input",()=>{if(!$("#prevBox").hidden)$("#prevBox"
 
 document.getElementById("forceUpdate").addEventListener("click",async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(()=>location.reload(),800);});
 document.getElementById("bookList").innerHTML=Object.keys(BOOKS).map(k=>"<li>〔"+k+"〕"+esc(BOOKS[k])+"</li>").join("");
-renderAdv();
+renderAdv();renderPick();
 </script>
 <script>
 (function(){
