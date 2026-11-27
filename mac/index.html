@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#3b4a9c">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="病棟アプリMac">
+<title>病棟アプリ（Mac）</title>
+<style>
+:root{--c:#3b4a9c;--bg:#f3f5f9;--pane:#fff;--side:#eaeef5;--line:#d5dce6;--tx:#1b2430;--sub:#5a6675;--hi:#e4e8f7;--chip:#eef1f8}
+@media (prefers-color-scheme: dark){:root{--c:#8e9ce6;--bg:#13171c;--pane:#1b2128;--side:#171c22;--line:#2d3641;--tx:#e6ebf0;--sub:#9aa7b4;--hi:#26304a;--chip:#222a33}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:var(--bg);color:var(--tx);display:flex;font-size:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+#side{width:260px;flex:none;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 10px 10px calc(10px + env(safe-area-inset-left))}
+#side h1{font-size:15px;margin:2px 4px 10px;display:flex;align-items:center;gap:8px}
+#side h1 img{width:26px;height:26px;border-radius:7px}
+#q{width:100%;font:inherit;font-size:14px;padding:8px 10px;border-radius:9px;border:1.5px solid var(--line);background:var(--pane);color:inherit}
+#q:focus{outline:none;border-color:var(--c)}
+.kbd{font-size:11px;color:var(--sub);margin:4px 4px 8px}
+#nav{flex:1;overflow:auto;margin:0 -4px;padding:0 4px}
+#nav button{display:flex;justify-content:space-between;width:100%;text-align:left;border:0;background:none;padding:7px 8px;border-radius:7px}
+#nav button:hover{background:var(--hi)}
+#nav button.on{background:var(--c);color:#fff}
+#nav button small{opacity:.7}
+#nav .sep{height:1px;background:var(--line);margin:6px 4px}
+#sfoot{font-size:11.5px;color:var(--sub);border-top:1px solid var(--line);padding-top:8px;line-height:1.5}
+#sfoot button{border:1px solid var(--line);background:var(--pane);border-radius:7px;padding:4px 8px;font-size:12px;margin:2px 4px 4px 0}
+#upd{color:var(--c);font-weight:700}
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+#bar{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);background:var(--side);padding:calc(6px + env(safe-area-inset-top)) 8px 0;min-height:42px}
+#tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto}
+.tab{display:flex;align-items:center;gap:6px;border:1px solid transparent;border-bottom:0;background:none;border-radius:8px 8px 0 0;padding:6px 8px 7px 10px;white-space:nowrap;max-width:220px;font-size:13px}
+.tab img{width:18px;height:18px;border-radius:4px}
+.tab span{overflow:hidden;text-overflow:ellipsis}
+.tab.on{background:var(--pane);border-color:var(--line);margin-bottom:-1px;font-weight:700}
+.tab .x{border:0;background:none;padding:0 2px;color:var(--sub);font-size:15px;line-height:1}
+.tab .x:hover{color:var(--tx)}
+#tools{display:flex;gap:4px;padding-bottom:5px}
+#tools button,#tools select{border:1px solid var(--line);background:var(--pane);border-radius:7px;padding:4px 8px;font-size:12.5px;color:inherit;font-family:inherit}
+#tools button[aria-pressed=true]{background:var(--c);color:#fff;border-color:var(--c)}
+#stage{flex:1;min-height:0;position:relative;background:var(--pane)}
+#home{position:absolute;inset:0;overflow:auto;padding:18px 22px 30px}
+#views{position:absolute;inset:0;display:flex;gap:0}
+#views[hidden],#home[hidden]{display:none}
+.view{flex:1;min-width:0;display:none;flex-direction:column;align-items:center;background:var(--bg);border-left:1px solid var(--line)}
+.view.show{display:flex}
+.view:first-child{border-left:0}
+.view .cap{width:100%;font-size:12px;color:var(--sub);padding:4px 10px;display:none;justify-content:space-between;background:var(--side);border-bottom:1px solid var(--line)}
+#views.split .view .cap{display:flex}
+.view.focus .cap{color:var(--c);font-weight:700}
+.view iframe{flex:1;width:100%;border:0;background:var(--pane)}
+.w-phone .view iframe{max-width:430px;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.w-mid .view iframe{max-width:760px;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+h2{font-size:13px;color:var(--c);margin:20px 0 8px;letter-spacing:.04em}
+h2:first-child{margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.card{position:relative;display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--pane);border-radius:11px;padding:10px 34px 10px 10px;min-height:66px}
+.card:hover{border-color:var(--c)}
+.card.sel{outline:2px solid var(--c);outline-offset:1px}
+.card img{width:42px;height:42px;border-radius:10px;flex:none}
+.card b{display:block;font-size:14px;line-height:1.35}
+.card .sub{display:block;font-size:12px;color:var(--sub);line-height:1.4;margin-top:2px}
+.card .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.chip{font-size:11px;background:var(--chip);color:var(--sub);border-radius:5px;padding:1px 6px}
+.chip.new{background:#fde9c8;color:#8a4b00}
+@media (prefers-color-scheme: dark){.chip.new{background:#4a3410;color:#ffcf85}}
+.card .fv{position:absolute;right:4px;top:6px;border:0;background:none;font-size:18px;color:#b8c2cc;padding:4px}
+.card .fv[aria-pressed=true]{color:#e0a800}
+.card .nw{position:absolute;right:6px;bottom:6px;border:0;background:none;font-size:13px;color:var(--sub);padding:2px 4px;opacity:0}
+.card:hover .nw{opacity:1}
+#feed{border:1px solid var(--line);border-radius:11px;padding:8px 12px;background:var(--bg);font-size:12.5px;line-height:1.55}
+#feed div{display:flex;gap:8px;padding:2px 0}
+#feed time{color:var(--sub);flex:none;width:80px}
+#feed a{color:var(--c);cursor:pointer;text-decoration:none;flex:none}
+#feed span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#none{display:none;color:var(--sub);padding:12px 0}
+.note{font-size:12px;color:var(--sub);line-height:1.6;margin-top:22px}
+@media (max-width:760px){#side{display:none}}
+</style></head><body>
+<aside id="side">
+  <h1><img src="icon-192.png" alt="">病棟アプリ（Mac）</h1>
+  <input id="q" type="search" placeholder="検索（例：DOAC、重積、eGFR）" autocomplete="off" aria-label="アプリを検索">
+  <div class="kbd">⌘K 検索 ／ ↑↓ 選択 ／ Enter 開く ／ ⌥1〜9 タブ ／ ⌥W 閉じる ／ ⌥0 一覧</div>
+  <nav id="nav"></nav>
+  <div id="sfoot">
+    <div>公開版：<span id="vSrv">確認中</span><br>この端末：<span id="vLoc">—</span></div>
+    <div id="upd" role="status"></div>
+    <button type="button" id="bUpd">最新版に更新</button><button type="button" id="bDate">更新日を取り直す</button>
+    <div>入口の版：ver1_2026-11-27a</div>
+  </div>
+</aside>
+<main>
+  <div id="bar">
+    <div id="tabs"><button type="button" class="tab on" id="tHome"><span>一覧</span></button></div>
+    <div id="tools">
+      <select id="wSel" aria-label="アプリの表示幅"><option value="w-phone">スマホ幅</option><option value="w-mid">中くらい</option><option value="w-full">全幅</option></select>
+      <button type="button" id="bSplit" aria-pressed="false" title="開いているタブ2つを左右に並べる">左右に並べる</button>
+      <button type="button" id="bRe" title="表示中のアプリを読み込み直す">再読み込み</button>
+      <button type="button" id="bOut" title="表示中のアプリを別のタブで開く">別タブで開く</button>
+    </div>
+  </div>
+  <div id="stage">
+    <section id="home">
+      <div id="none">該当するアプリがありません</div>
+      <div id="cards"></div>
+      <h2 id="feedH">最近の更新（GitHub）</h2>
+      <div id="feed">読み込み中…</div>
+      <p class="note">一覧は入口（病棟アプリ）から毎回読み込むので、他の会話で足したアプリも自動で並びます。版はアプリ内の表示、更新日は GitHub の最終更新です（通信できないときは前回の値）。<br>入力はこの端末のブラウザ内にだけ保存されます。患者個人情報は入力しないでください。診療判断の補助であり、最終判断は診察と原典で行ってください。</p>
+    </section>
+    <div id="views" hidden></div>
+  </div>
+</main>
+<script>
+(function(){
+  "use strict";
+  var REPO="Supernova55md-creator/ward-apps";
+  var $=function(id){return document.getElementById(id);};
+  function get(k,d){try{var v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v;}catch(e){return d;}}
+  function put(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function norm(t){t=String(t||"").normalize("NFKC").toLowerCase();return t.replace(/[ァ-ヶ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60);}).replace(/\s+/g," ");}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function fmtDate(iso){var d=new Date(iso);if(isNaN(d))return"";return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();}
+
+  var APPS=[],BY={},CATS=[],cat="all",sel=-1,shown=[];
+  var tabs=get("ward-mac-tabs",[]),cur=null,prev=null,split=false;
+  var vers={},upd=get("ward-mac-upd",{t:0,d:{}});
+
+  /* ---------- 入口（../index.html）から一覧を読む ---------- */
+  function load(){
+    return fetch("../index.html",{cache:"no-cache"}).then(function(r){return r.text();}).then(function(html){
+      var doc=new DOMParser().parseFromString(html,"text/html"),KW={};
+      var m=/var KW=(\{[\s\S]*?\});/.exec(html);
+      if(m){try{KW=(new Function("return "+m[1]))();}catch(e){}}
+      var c=null;
+      Array.prototype.forEach.call(doc.body.children,function(el){
+        if(el.tagName==="H2"&&el.parentNode===doc.body){c={name:el.textContent.trim(),apps:[]};CATS.push(c);}
+        else if(el.tagName==="UL"&&c&&!el.id){
+          Array.prototype.forEach.call(el.querySelectorAll(":scope>li"),function(li){
+            var a=li.querySelector("a");if(!a)return;var mm=/^([^\/]+)\//.exec(a.getAttribute("href")||"");if(!mm)return;
+            var s=mm[1],full=a.textContent.trim(),p=full.indexOf("（");
+            var o={s:s,full:full,name:p>0?full.slice(0,p):full,sub:p>0?full.slice(p+1).replace(/）$/,""):"",cat:c.name,
+              txt:norm(full+" "+s+" "+(KW[s]||"")+" "+(li.getAttribute("data-kw")||"")+" "+c.name)};
+            if(BY[s])return;BY[s]=o;APPS.push(o);c.apps.push(o);
+          });
+        }
+      });
+    });
+  }
+
+  /* ---------- 版（アプリ内の表示）と更新日（GitHub） ---------- */
+  function findVer(t){
+    var a=t.match(/ver\d+_20\d\d-\d\d-\d\d[a-z]?/g);
+    if(a&&a.length){a.sort(function(x,y){return x.split("_")[1]<y.split("_")[1]?1:-1;});return a[0];}
+    var m=/APP_VER(?:SION)?\s*=\s*["']([^"']{4,30})["']/.exec(t)||/\bVER\s*=\s*["'](20\d\d-[^"']{4,20})["']/.exec(t);
+    return m?m[1]:"";
+  }
+  function loadVers(){
+    var q=APPS.slice(),n=0;
+    function next(){var o=q.shift();if(!o)return Promise.resolve();
+      return fetch("../"+o.s+"/").then(function(r){return r.ok?r.text():"";}).then(function(t){vers[o.s]=findVer(t);if(++n%6===0)render();}).catch(function(){}).then(next);}
+    return Promise.all([next(),next(),next(),next()]).then(render);
+  }
+  function loadDates(force){
+    if(!navigator.onLine)return;
+    if(!force&&Date.now()-upd.t<6*3600e3)return;
+    var api="https://api.github.com/repos/"+REPO+"/commits?per_page=1&path=",q=APPS.slice(),d={},fail=0;
+    function next(){var o=q.shift();if(!o)return Promise.resolve();
+      return fetch(api+encodeURIComponent(o.s)).then(function(r){if(!r.ok)throw r.status;return r.json();})
+        .then(function(j){if(j&&j[0])d[o.s]=j[0].commit.committer.date;}).catch(function(){fail++;}).then(next);}
+    $("upd").textContent="更新日を取得中…";
+    Promise.all([next(),next(),next()]).then(function(){
+      if(Object.keys(d).length){upd={t:Date.now(),d:d};put("ward-mac-upd",upd);}
+      $("upd").textContent=fail?"更新日の一部を取れませんでした（GitHubの回数制限の可能性。1時間ほどで戻ります）":"";
+      render();
+    });
+  }
+  function loadFeed(){
+    var f=$("feed");
+    if(!navigator.onLine){f.textContent="オフラインのため表示できません";return;}
+    fetch("https://api.github.com/repos/"+REPO+"/commits?per_page=12").then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
+      f.innerHTML="";
+      j.forEach(function(c){
+        var msg=c.commit.message.split("\n")[0],m=/^([a-z0-9_-]+)\s*[:：]/i.exec(msg)||/（([a-z0-9_-]+)\/?）/.exec(msg),s=m&&BY[m[1]]?m[1]:null;
+        var row=document.createElement("div");
+        row.innerHTML="<time>"+esc(fmtDate(c.commit.committer.date))+"</time>"+(s?"<a data-s='"+s+"'>"+esc(BY[s].name)+"</a>":"")+"<span title='"+esc(msg)+"'>"+esc(msg)+"</span>";
+        f.appendChild(row);
+      });
+      f.querySelectorAll("a[data-s]").forEach(function(a){a.addEventListener("click",function(){openApp(a.dataset.s);});});
+    }).catch(function(){f.textContent="取得できませんでした（GitHubの回数制限か通信エラー）";});
+  }
+
+  /* ---------- サイドバー・カード ---------- */
+  function favs(){var f=get("ward-fav",[]);return Array.isArray(f)?f.filter(function(s){return BY[s];}):[];}
+  function recents(){var r=get("ward-recent",[]);return Array.isArray(r)?r.filter(function(x){return x&&BY[x.s];}):[];}
+  function drawNav(){
+    var nav=$("nav"),items=[["all","すべて",APPS.length],["fav","☆ お気に入り",favs().length],["rec","最近開いた",Math.min(recents().length,10)],["new","最近更新（3日）",APPS.filter(isNew).length],["sep"]];
+    CATS.forEach(function(c){items.push(["c:"+c.name,c.name,c.apps.length]);});
+    nav.innerHTML="";
+    items.forEach(function(it){
+      if(it[0]==="sep"){var d=document.createElement("div");d.className="sep";nav.appendChild(d);return;}
+      var b=document.createElement("button");b.type="button";b.className=cat===it[0]?"on":"";
+      b.innerHTML="<span>"+esc(it[1])+"</span><small>"+it[2]+"</small>";
+      b.addEventListener("click",function(){cat=it[0];$("q").value="";sel=-1;goHome();render();});
+      nav.appendChild(b);
+    });
+  }
+  function isNew(o){var t=upd.d[o.s];return t&&Date.now()-new Date(t)<3*864e5;}
+  function card(o){
+    var f=favs().indexOf(o.s)>=0,b=document.createElement("div");b.className="card";b.tabIndex=0;b.dataset.s=o.s;
+    var meta="";
+    if(vers[o.s])meta+="<span class='chip'>"+esc(vers[o.s])+"</span>";
+    if(upd.d[o.s])meta+="<span class='chip"+(isNew(o)?" new":"")+"'>更新 "+esc(fmtDate(upd.d[o.s]))+"</span>";
+    b.innerHTML="<img src='../"+o.s+"/icon-192.png' alt=''><div><b>"+esc(o.name)+"</b>"+(o.sub?"<span class='sub'>"+esc(o.sub)+"</span>":"")+(meta?"<div class='meta'>"+meta+"</div>":"")+"</div>"+
+      "<button type='button' class='fv' aria-label='お気に入り' aria-pressed='"+f+"'>★</button><button type='button' class='nw' title='別タブで開く'>↗</button>";
+    b.addEventListener("click",function(e){
+      if(e.target.closest(".fv")){toggleFav(o.s);return;}
+      if(e.target.closest(".nw")||e.metaKey){window.open("../"+o.s+"/","_blank");return;}
+      openApp(o.s);
+    });
+    b.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();openApp(o.s);}});
+    return b;
+  }
+  function toggleFav(s){var f=get("ward-fav",[]);if(!Array.isArray(f))f=[];var i=f.indexOf(s);if(i>=0)f.splice(i,1);else f.push(s);put("ward-fav",f);render();}
+  function render(){
+    drawNav();
+    var box=$("cards"),t=norm($("q").value).trim(),ws=t?t.split(" "):[];box.innerHTML="";shown=[];
+    function section(title,list){
+      if(!list.length)return;
+      var h=document.createElement("h2");h.textContent=title;box.appendChild(h);
+      var g=document.createElement("div");g.className="grid";list.forEach(function(o){g.appendChild(card(o));shown.push(o.s);});box.appendChild(g);
+    }
+    if(ws.length){
+      section("検索結果",APPS.filter(function(o){return ws.every(function(w){return o.txt.indexOf(w)>=0;});}));
+    }else if(cat==="fav"){section("☆ お気に入り",favs().map(function(s){return BY[s];}));}
+    else if(cat==="rec"){section("最近開いた",recents().slice(0,10).map(function(x){return BY[x.s];}));}
+    else if(cat==="new"){section("最近更新（3日以内・新しい順）",APPS.filter(isNew).sort(function(a,b){return upd.d[a.s]<upd.d[b.s]?1:-1;}));}
+    else if(cat.indexOf("c:")===0){var c=CATS.filter(function(x){return "c:"+x.name===cat;})[0];if(c)section(c.name,c.apps);}
+    else{
+      var f=favs();if(f.length)section("☆ お気に入り",f.map(function(s){return BY[s];}));
+      CATS.forEach(function(c){section(c.name,c.apps);});
+    }
+    $("none").style.display=shown.length?"none":"block";
+    var showFeed=!ws.length&&cat==="all";$("feed").hidden=$("feedH").hidden=!showFeed;
+    if(sel>=shown.length)sel=shown.length-1;
+    mark();
+  }
+  function mark(){
+    var cs=$("cards").querySelectorAll(".card");
+    Array.prototype.forEach.call(cs,function(c,i){c.classList.toggle("sel",i===sel);});
+    if(sel>=0&&cs[sel])cs[sel].scrollIntoView({block:"nearest"});
+  }
+
+  /* ---------- タブとアプリ表示 ---------- */
+  var frames={};
+  function frame(s){
+    if(frames[s])return frames[s];
+    var v=document.createElement("div");v.className="view";
+    v.innerHTML="<div class='cap'><span></span><span>クリックで操作対象</span></div>";
+    v.querySelector(".cap span").textContent=BY[s]?BY[s].name:s;
+    var f=document.createElement("iframe");f.title=BY[s]?BY[s].full:s;f.src="../"+s+"/";
+    f.addEventListener("load",function(){
+      try{
+        var w=f.contentWindow;w.addEventListener("keydown",hot);
+        w.addEventListener("focus",function(){focusTab(s);});
+        w.document.addEventListener("pointerdown",function(){focusTab(s);});
+      }catch(e){}
+    });
+    v.appendChild(f);$("views").appendChild(v);frames[s]=v;return v;
+  }
+  function focusTab(s){if(split&&s!==cur){prev=cur;cur=s;drawTabs();showViews();}}
+  function openApp(s){
+    if(!BY[s])return;
+    if(tabs.indexOf(s)<0){tabs.push(s);put("ward-mac-tabs",tabs);}
+    if(cur!==s){if(cur)prev=cur;cur=s;}
+    frame(s);drawTabs();showViews();
+    try{var r=get("ward-recent",[]);if(!Array.isArray(r))r=[];r=r.filter(function(x){return x&&x.s!==s;});r.unshift({s:s,t:Date.now()});put("ward-recent",r.slice(0,20));}catch(e){}
+  }
+  function closeTab(s){
+    var i=tabs.indexOf(s);if(i<0)return;tabs.splice(i,1);put("ward-mac-tabs",tabs);
+    if(frames[s]){frames[s].remove();delete frames[s];}
+    if(prev===s)prev=null;
+    if(cur===s){cur=prev&&tabs.indexOf(prev)>=0?prev:(tabs[i]||tabs[i-1]||null);prev=null;}
+    drawTabs();if(cur)showViews();else goHome();
+  }
+  function goHome(){$("views").hidden=true;$("home").hidden=false;homeOn=true;drawTabs();}
+  var homeOn=true;
+  function showViews(){
+    homeOn=false;$("home").hidden=true;var V=$("views");V.hidden=false;V.classList.toggle("split",split);
+    var two=split&&prev&&tabs.indexOf(prev)>=0&&prev!==cur?[prev,cur]:[cur];
+    Object.keys(frames).forEach(function(s){var v=frames[s];v.classList.toggle("show",two.indexOf(s)>=0);v.classList.toggle("focus",split&&s===cur);v.style.order=two.indexOf(s);});
+    drawTabs();
+  }
+  function drawTabs(){
+    var T=$("tabs");Array.prototype.slice.call(T.querySelectorAll(".tab[data-s]")).forEach(function(n){n.remove();});
+    $("tHome").classList.toggle("on",homeOn);
+    tabs.forEach(function(s,i){
+      var o=BY[s];if(!o)return;
+      var b=document.createElement("div");b.className="tab"+(!homeOn&&s===cur?" on":"");b.dataset.s=s;b.title=o.full+(i<9?"（⌥"+(i+1)+"）":"");b.setAttribute("role","button");
+      b.innerHTML="<img src='../"+s+"/icon-192.png' alt=''><span>"+esc(o.name)+"</span><button type='button' class='x' aria-label='閉じる'>×</button>";
+      b.addEventListener("click",function(e){if(e.target.closest(".x")){closeTab(s);return;}openApp(s);});
+      b.addEventListener("auxclick",function(e){if(e.button===1)closeTab(s);});
+      T.appendChild(b);
+    });
+    $("bSplit").setAttribute("aria-pressed",String(split));
+  }
+  $("tHome").addEventListener("click",function(){goHome();$("q").focus();});
+  $("bSplit").addEventListener("click",function(){split=!split;put("ward-mac-split",split);if(!homeOn&&cur)showViews();else drawTabs();});
+  $("bRe").addEventListener("click",function(){if(!homeOn&&cur&&frames[cur]){var f=frames[cur].querySelector("iframe");try{f.contentWindow.location.reload();}catch(e){f.src=f.src;}}else location.reload();});
+  $("bOut").addEventListener("click",function(){if(!homeOn&&cur){var f=frames[cur].querySelector("iframe"),u="../"+cur+"/";try{u=f.contentWindow.location.href;}catch(e){}window.open(u,"_blank");}});
+  var wSel=$("wSel");wSel.value=get("ward-mac-width","w-mid");
+  function applyW(){document.body.classList.remove("w-phone","w-mid","w-full");document.body.classList.add(wSel.value);put("ward-mac-width",wSel.value);}
+  wSel.addEventListener("change",applyW);applyW();
+  split=!!get("ward-mac-split",false);
+
+  /* ---------- キーボード ---------- */
+  function hot(e){
+    if((e.metaKey||e.ctrlKey)&&(e.key==="k"||e.key==="K")){e.preventDefault();goHome();var q=$("q");q.focus();q.select();return;}
+    if(e.altKey&&!e.metaKey&&!e.ctrlKey){
+      var m=/^Digit(\d)$/.exec(e.code);
+      if(m){e.preventDefault();var n=+m[1];if(n===0){goHome();}else if(tabs[n-1])openApp(tabs[n-1]);return;}
+      if(e.code==="KeyW"){e.preventDefault();if(!homeOn&&cur)closeTab(cur);return;}
+    }
+  }
+  document.addEventListener("keydown",function(e){
+    hot(e);if(e.defaultPrevented)return;
+    var inQ=document.activeElement===$("q");
+    if(e.key==="/"&&!inQ&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||"")){e.preventDefault();goHome();$("q").focus();return;}
+    if(!homeOn)return;
+    if(inQ||document.activeElement===document.body||(document.activeElement&&document.activeElement.classList.contains("card"))){
+      if(e.key==="ArrowDown"){e.preventDefault();sel=Math.min(shown.length-1,sel+1);mark();}
+      else if(e.key==="ArrowUp"){e.preventDefault();sel=Math.max(0,sel-1);mark();}
+      else if(e.key==="Enter"&&inQ){e.preventDefault();var s=shown[sel>=0?sel:0];if(s){if(e.metaKey)window.open("../"+s+"/","_blank");else openApp(s);}}
+      else if(e.key==="Escape"&&inQ){$("q").value="";sel=-1;render();}
+    }
+  });
+  $("q").addEventListener("input",function(){sel=$("q").value.trim()?0:-1;if(!homeOn)goHome();render();});
+  window.addEventListener("storage",function(e){if(e.key==="ward-fav"||e.key==="ward-recent")render();});
+
+  /* ---------- 版の確認・更新 ---------- */
+  function swVer(t){var m=/VERSION\s*=\s*"([^"]+)"/.exec(t||"");return m?m[1]:"";}
+  function checkVer(){
+    var loc="";
+    var p1=("caches" in window)?caches.keys().then(function(k){loc=k.filter(function(x){return /^ward-\d/.test(x);}).sort().pop()||"";}).catch(function(){}):Promise.resolve();
+    var p2=navigator.onLine?fetch("../sw.js",{cache:"no-store"}).then(function(r){return r.text();}).then(swVer).catch(function(){return"";}):Promise.resolve("");
+    Promise.all([p1,p2]).then(function(a){
+      var srv=a[1];$("vSrv").textContent=srv||(navigator.onLine?"取得できず":"オフライン");$("vLoc").textContent=loc||"未取り込み";
+      if(srv&&loc&&srv!==loc)$("upd").textContent="新しい版があります。「最新版に更新」を押してください";
+      else if(srv&&loc&&srv===loc&&!/取得/.test($("upd").textContent))$("upd").textContent="最新版です";
+    });
+  }
+  $("bUpd").addEventListener("click",function(){
+    $("upd").textContent="更新中…";
+    var go=function(){location.reload();};
+    try{
+      navigator.serviceWorker.getRegistration("../").then(function(reg){
+        if(!reg){go();return;}
+        reg.update().then(function(){
+          var w=reg.installing||reg.waiting;if(!w){go();return;}
+          w.addEventListener("statechange",function(){if(w.state==="activated")go();});
+          setTimeout(go,15000);
+        }).catch(go);
+      }).catch(go);
+    }catch(e){go();}
+  });
+  $("bDate").addEventListener("click",function(){loadDates(true);loadFeed();});
+
+  /* service worker（共通 sw.js） */
+  try{
+    var h=location.hostname;
+    var ok=(location.protocol==="https:"||h==="localhost"||h==="127.0.0.1")&&!/claude\.ai$|claudeusercontent|claude\.site/.test(h)&&"serviceWorker" in navigator;
+    if(ok)navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener("updatefound",function(){var nw=reg.installing;if(!nw)return;nw.addEventListener("statechange",function(){if(nw.state==="activated")checkVer();});});
+    }).catch(function(){});
+  }catch(e){}
+
+  /* 起動 */
+  load().then(function(){
+    tabs=tabs.filter(function(s){return BY[s];});
+    render();
+    if(tabs.length){cur=tabs[tabs.length-1];drawTabs();}
+    loadVers();loadDates(false);loadFeed();checkVer();
+    $("q").focus();
+  }).catch(function(){$("cards").textContent="一覧を読み込めませんでした。通信を確認して再読み込みしてください。";});
+})();
+</script>
+</body></html>
