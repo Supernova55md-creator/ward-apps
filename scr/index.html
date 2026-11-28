@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#4f4596">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="開始前検査">
+<title>治療開始前スクリーニング・定期検査ナビ</title>
+<style>
+:root{
+  /* 開始前スクリーニング＝藍紫 */
+  --accent:#4f4596; --accent-ink:#fff; --accent-soft:#ecebf7;
+  --bg:#f3f4f8; --surface:#fff; --ink:#1b1f2c; --muted:#5d6475; --line:#dadde8;
+  --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#9b5d00; --warn-soft:#fdf1dc; --crit:#b3122e; --crit-soft:#fde4e7; --info:#2b5b9a; --info-soft:#e7eef8;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --accent:#a99cf0; --accent-ink:#1c1640; --accent-soft:#2a2547;
+  --bg:#12131a; --surface:#1b1d27; --ink:#e9ebf3; --muted:#a4a9ba; --line:#2f3343;
+  --ok:#5fd39a; --ok-soft:#173326; --warn:#f2b85b; --warn-soft:#3a2a12; --crit:#ff6b80; --crit-soft:#3d1a21; --info:#8db7f2; --info-soft:#18263a;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+header.top{background:var(--accent);color:var(--accent-ink);padding:calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 8px calc(12px + env(safe-area-inset-left));position:sticky;top:0;z-index:10}
+header.top .brand{max-width:760px;margin:0 auto}
+header.top h1{font-size:18px;margin:0;line-height:1.3}
+header.top small{font-size:12px;opacity:.9}
+nav.tabs{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+nav.tabs button{font:inherit;font-size:12.5px;font-weight:700;border:0;border-radius:8px;padding:6px 1px;background:rgba(255,255,255,.16);color:inherit;min-height:38px;cursor:pointer;line-height:1.2}
+nav.tabs button[aria-selected="true"]{background:var(--accent-ink);color:var(--accent)}
+@media (prefers-color-scheme: dark){nav.tabs button{background:rgba(0,0,0,.2)}}
+main{max-width:760px;margin:0 auto;padding:12px calc(12px + env(safe-area-inset-right)) 12px calc(12px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:12px}
+.view{display:flex;flex-direction:column;gap:12px}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+h2{font-size:16px;margin:0 0 8px;line-height:1.4}
+h3{font-size:14.5px;margin:12px 0 6px}
+.hint{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.hidden{display:none!important}
+.btn{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:999px;padding:7px 14px;cursor:pointer;min-height:38px}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn.sm{font-size:12.5px;padding:4px 10px;min-height:32px}
+.rowbtn{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+a{color:var(--info)}
+/* チップ・区分ボタン */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 11px;line-height:1.3;cursor:pointer;min-height:36px;text-align:left}
+.chip small{font-size:11px;opacity:.8}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chip.na{opacity:.55;text-decoration:line-through;cursor:default}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:6px 9px;min-height:36px;cursor:pointer;line-height:1.25}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.seg button.on.bad{background:var(--crit);border-color:var(--crit);color:#fff}
+.seg button.on.mid{background:var(--warn);border-color:var(--warn);color:#fff}
+.q{margin:10px 0 0}
+.q>.lb{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px}
+/* 対象薬の帯 */
+.selbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13.5px}
+.selbar .tg{background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:2px 8px;font-weight:700}
+.selbar .none{color:var(--muted)}
+/* 判定 */
+.verdict{border-radius:12px;padding:12px 14px;border:1.5px solid var(--line);display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+.verdict.ok{background:var(--ok-soft);border-color:var(--ok)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.crit{background:var(--crit-soft);border-color:var(--crit)}
+.verdict.info{background:var(--info-soft);border-color:var(--info)}
+.pill{align-self:flex-start;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:#fff;background:var(--muted)}
+.verdict.ok .pill{background:var(--ok)}.verdict.warn .pill{background:var(--warn)}.verdict.crit .pill{background:var(--crit)}.verdict.info .pill{background:var(--info)}
+@media (prefers-color-scheme: dark){.pill{color:#111}}
+.big{font-size:17px;font-weight:700;line-height:1.45}
+.al{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.al li{border-left:4px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 10px;font-size:14px}
+.al li.crit{border-left-color:var(--crit)}.al li.warn{border-left-color:var(--warn)}.al li.info{border-left-color:var(--info)}.al li.ok{border-left-color:var(--ok)}
+/* チェックリスト */
+.cat{font-size:12.5px;font-weight:700;color:var(--accent);margin:12px 0 4px;letter-spacing:.04em}
+.ck{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.ck:first-of-type{border-top:0}
+.ck input{width:22px;height:22px;margin-top:1px;flex:none;accent-color:var(--ok)}
+.ck .bd{flex:1;min-width:0}
+.ck .t{font-size:15px;font-weight:700;line-height:1.4}
+.ck .who{font-size:12px;color:var(--muted)}
+.ck .nt{font-size:13px;margin-top:2px}
+.ck.done .t{color:var(--ok)}
+.ck.done .t::after{content:" 済";font-size:12px}
+.ck.opt .t::before{content:"考慮 ";font-size:11px;color:var(--muted);font-weight:700}
+.res{margin-top:6px;padding:8px;border-radius:8px;background:var(--bg)}
+.res .q:first-child{margin-top:0}
+/* 表 */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px}
+table.map{border-collapse:collapse;font-size:12.5px;min-width:640px;width:100%}
+table.map th,table.map td{border-bottom:1px solid var(--line);padding:5px 4px;text-align:center;vertical-align:middle}
+table.map th{background:var(--accent-soft);color:var(--accent);font-size:11.5px;position:sticky;top:0;white-space:nowrap}
+table.map td.dn{text-align:left;position:sticky;left:0;background:var(--surface);min-width:108px;max-width:118px;font-weight:700;cursor:pointer;line-height:1.3;font-size:12px;box-shadow:1px 0 0 var(--line)}
+table.map td.dn small{display:block;font-weight:400;color:var(--muted);font-size:10.5px}
+table.map th.dn{position:sticky;left:0;z-index:2;text-align:left}
+table.map tr.grp td{background:var(--bg);text-align:left;font-weight:700;color:var(--muted);font-size:12px;position:static}
+table.map td.y{color:var(--accent);font-weight:700}
+table.map td.o{color:var(--muted)}
+table.map tr.sel td.dn{color:var(--accent)}
+table.sch{border-collapse:collapse;width:100%;font-size:14px}
+table.sch td{border-bottom:1px solid var(--line);padding:7px 4px;vertical-align:top}
+table.sch td.d{white-space:nowrap;font-weight:700;width:6.2em;font-variant-numeric:tabular-nums}
+table.sch td.d small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+table.sch tr.past{opacity:.45}
+table.sch tr.next td{background:var(--accent-soft)}
+.it{display:inline-block;margin:0 6px 4px 0;padding:2px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--line);font-size:13.5px;line-height:1.35}
+.it small{color:var(--muted);font-size:11px}
+.it.u::after{content:"目安";font-size:10px;color:var(--warn);margin-left:4px;font-weight:700}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:0 6px;margin-left:4px;vertical-align:1px}
+.tag.v{background:var(--ok-soft);color:var(--ok)}.tag.u{background:var(--warn-soft);color:var(--warn)}.tag.x{background:var(--info-soft);color:var(--info)}.tag.off{background:var(--crit-soft);color:var(--crit)}
+/* 注意点 */
+details.dr{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}
+details.dr+details.dr{margin-top:8px}
+details.dr summary{font-weight:700;cursor:pointer;font-size:15px}
+details.dr[open] summary{margin-bottom:6px}
+ul.pl{margin:4px 0 0;padding-left:1.2em;font-size:14px}
+ul.pl li{margin:2px 0}
+.kv{font-size:13.5px;margin:4px 0}
+.kv b{color:var(--muted);font-weight:700;margin-right:4px}
+table.tb{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:6px}
+table.tb th,table.tb td{border:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+table.tb th{background:var(--accent-soft);color:var(--accent);font-size:12.5px}
+input[type=date],textarea,select{font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{width:100%;line-height:1.5;resize:vertical}
+.ref{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.ref div{border-left:3px solid var(--accent);padding-left:8px}
+.ref small{display:block;color:var(--muted);font-size:12px}
+.fine{font-size:12px;color:var(--muted);line-height:1.7}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:9;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.grpttl{font-size:13px;font-weight:700;color:var(--muted);margin:10px 0 6px}
+.dinfo{font-size:13px;color:var(--muted);margin:6px 0 0}
+@media print{header.top,nav.tabs{position:static}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>開始前スクリーニング・定期検査</h1><small>免疫治療薬・分子標的薬・抗Aβ抗体薬・抗てんかん薬</small></div>
+  <nav class="tabs" role="tablist" aria-label="画面">
+    <button type="button" role="tab" data-v="map" aria-selected="true">早見表</button>
+    <button type="button" role="tab" data-v="sel" aria-selected="false">薬</button>
+    <button type="button" role="tab" data-v="pre" aria-selected="false">開始前</button>
+    <button type="button" role="tab" data-v="sch" aria-selected="false">定期</button>
+    <button type="button" role="tab" data-v="cau" aria-selected="false">注意</button>
+    <button type="button" role="tab" data-v="out" aria-selected="false">出力</button>
+    <button type="button" role="tab" data-v="ref" aria-selected="false">出典</button>
+  </nav>
+</header>
+
+<main>
+<!-- ===== 早見表 ===== -->
+<div id="v-map" class="view">
+  <section class="card">
+    <h2>薬 × 開始前検査</h2>
+    <p class="hint">●必須・推奨　○考慮。薬の名前を押すと選択に加わり「開始前」に進みます。表は左右にスクロールできます。</p>
+    <div class="chips" id="mapGrp" style="margin:8px 0"></div>
+    <div class="tw"><table class="map" id="mapTbl"></table></div>
+  </section>
+  <section class="card">
+    <h2>どの薬にも共通の原則</h2>
+    <ul class="pl">
+      <li><b>生ワクチン</b>は免疫抑制の開始4週前までに。開始後は原則禁忌（PSL 20 mg/日以上を2週以上、免疫抑制薬・生物学的製剤）<span class="tag u">未照合</span></li>
+      <li><b>不活化ワクチン</b>は開始2週前までが目安。B細胞除去薬（リツキシマブ・オファツムマブ・イネビリズマブ）は開始後の抗体反応が落ちる<span class="tag u">未照合</span></li>
+      <li><b>HBV</b>：免疫抑制・分子標的薬の前に HBs抗原 → HBc抗体・HBs抗体 → 既往感染ならHBV-DNA（日本肝臓学会）<span class="tag v">照合</span></li>
+      <li><b>結核</b>：IGRA と胸部X線、既往・接触歴。陽性ならLTBI治療を先行</li>
+      <li><b>IVIgの前に</b>HBs抗体・HBc抗体を採る（投与後は製剤由来の抗体で見かけ上陽性になる）</li>
+    </ul>
+  </section>
+</div>
+
+<!-- ===== 薬を選ぶ ===== -->
+<div id="v-sel" class="view hidden">
+  <section class="card">
+    <h2>薬を選ぶ（複数可）</h2>
+    <div class="selbar" id="selbar1"></div>
+    <div class="rowbtn"><button type="button" class="btn sm" id="selClear">選択をすべて外す</button><button type="button" class="btn sm pri" data-go="pre">開始前チェックへ</button></div>
+    <div class="chips" id="grpChips" style="margin-top:10px"></div>
+    <div id="drugChips" style="margin-top:6px"></div>
+    <p class="fine" id="naNote" style="margin-top:10px"></p>
+  </section>
+</div>
+
+<!-- ===== 開始前 ===== -->
+<div id="v-pre" class="view hidden">
+  <div class="selbar" id="selbar2"></div>
+  <div id="verdict" class="verdict"><span class="pill">開始前</span><span class="big" id="vBig">薬を選んでください</span><ul class="al" id="vList"></ul></div>
+  <section class="card">
+    <h2>開始予定日（任意）</h2>
+    <div class="rowbtn" style="margin-top:0"><input type="date" id="startD"><button type="button" class="btn sm" id="startToday">今日</button></div>
+    <p class="hint" id="startInfo">入れると、ワクチンの期限と定期検査の予定日を出します（日付だけ。患者情報は入れない）。</p>
+  </section>
+  <section class="card" id="resCard">
+    <h2>結果で方針が分かれる項目</h2>
+    <p class="hint">未入力のままで構いません。入れたものは「済」として扱います。</p>
+    <div id="resBox"></div>
+  </section>
+  <section class="card">
+    <h2>開始前チェックリスト</h2>
+    <p class="hint">既定は未チェック。済んだものだけ押してください。併用時は同じ検査を1つにまとめています。</p>
+    <div class="rowbtn" style="margin-top:4px"><button type="button" class="btn sm" id="ckReset">チェックを外す</button></div>
+    <div id="ckBox"></div>
+  </section>
+</div>
+
+<!-- ===== 定期検査 ===== -->
+<div id="v-sch" class="view hidden">
+  <div class="selbar" id="selbar3"></div>
+  <section class="card">
+    <h2>定期検査の予定日</h2>
+    <div class="rowbtn" style="margin-top:0"><span style="font-size:13px;color:var(--muted)">開始日</span><input type="date" id="startD2"></div>
+    <div class="q"><span class="lb">表示する期間</span><div class="seg" id="hzSeg"><button data-v="3">3ヵ月</button><button data-v="6">6ヵ月</button><button data-v="12" class="on">12ヵ月</button><button data-v="24">24ヵ月</button></div></div>
+    <div class="q"><span class="lb">近い日の検査</span><div class="seg" id="mgSeg"><button data-v="1" class="on">7日以内はまとめる</button><button data-v="0">そのまま</button></div></div>
+    <p class="hint">「目安」は添付文書と照合していない一般的な間隔です。施設の方針と最新の電子添文で調整してください。</p>
+  </section>
+  <section class="card"><div id="schBox"><p class="hint">開始日を入れてください。</p></div></section>
+</div>
+
+<!-- ===== 注意点 ===== -->
+<div id="v-cau" class="view hidden">
+  <div class="selbar" id="selbar4"></div>
+  <div id="cauSpecial"></div>
+  <section class="card"><h2>薬ごとの注意点</h2><p class="hint">中止・休薬の基準、感染症時の扱い、ワクチンの時期。</p><div id="cauBox"></div></section>
+  <section class="card">
+    <h2>ワクチンの時期（共通）</h2>
+    <table class="tb">
+      <tr><th>種類</th><th>開始前</th><th>治療中</th></tr>
+      <tr><td>生ワクチン（MR・水痘・おたふく・黄熱など）</td><td>開始4週前までに</td><td>原則禁忌。中止後の再開時期は薬ごとに確認</td></tr>
+      <tr><td>不活化（インフルエンザ・COVID-19・肺炎球菌）</td><td>2週前までが目安</td><td>接種可。B細胞除去薬・FcRn阻害薬では効果が落ちる</td></tr>
+      <tr><td>帯状疱疹 組換え（シングリックス、2回・2ヵ月間隔）</td><td>S1P受容体調節薬・JAK・長期ステロイドで勧める</td><td>接種可</td></tr>
+      <tr><td>髄膜炎菌 4価結合型（メンクアッドフィ）</td><td>補体阻害薬の2週前まで。免疫抑制中は8週以上あけて2回</td><td>追加接種は5年毎が目安</td></tr>
+    </table>
+    <p class="fine">髄膜炎菌は「髄膜炎菌感染症リスク管理の手引き」（神経免疫ナビと同じ）。他は一般的な目安<span class="tag u">未照合</span>。</p>
+  </section>
+</div>
+
+<!-- ===== 出力 ===== -->
+<div id="v-out" class="view hidden">
+  <div class="selbar" id="selbar5"></div>
+  <section class="card">
+    <h2>カルテに貼る文</h2>
+    <div class="q" style="margin-top:0"><span class="lb">入れる予定</span><div class="seg" id="outN"><button data-v="1">次回のみ</button><button data-v="3" class="on">3件</button><button data-v="99">表示期間すべて</button></div></div>
+    <div class="q"><span class="lb">オーダーの控え</span><div class="seg" id="outO"><button data-v="1" class="on">入れる</button><button data-v="0">入れない</button></div></div>
+    <textarea id="outTxt" rows="14" spellcheck="false"></textarea>
+    <div class="rowbtn"><button type="button" class="btn pri" id="copyBtn">コピー</button><button type="button" class="btn sm" id="regen">作り直す</button></div>
+    <p class="hint">日付と検査名だけです。患者の氏名・IDは入れていません。手で直した後に入力を変えると、作り直すまで上書きしません。</p>
+  </section>
+</div>
+
+<!-- ===== 出典 ===== -->
+<div id="v-ref" class="view hidden">
+  <section class="card">
+    <h2>使い方</h2>
+    <ul class="pl">
+      <li>「早見表」は入力なしで使える一覧。薬名を押すと選択に加わる</li>
+      <li>「薬」で複数選ぶと、開始前検査・定期検査を重ねずにまとめる</li>
+      <li>「開始前」で結果を入れると、HBV・髄膜炎菌・JCV・遺伝子型などの対応が上に出る</li>
+      <li>「定期」は開始日からの予定日（日付だけ）。「出力」でカルテ用の文にしてコピー</li>
+    </ul>
+    <p class="fine">関連：<a href="../imm/">神経免疫治療ナビ</a>（使い分け・髄膜炎菌の日程・GIOP・PJP）／<a href="../dementia/">認知症外来ナビ</a>（抗Aβ抗体薬の適格性・ARIA判定）／<a href="../aed/">抗てんかん薬ナビ</a>（選択・相互作用・切替）／<a href="../preg/">妊娠・授乳と神経疾患薬ナビ</a></p>
+  </section>
+  <section class="card">
+    <h2>出典</h2>
+    <p class="hint"><span class="tag v">照合</span>は添付文書・適正使用ガイド・ガイドラインの記載と照らしたもの、<span class="tag u">未照合</span>・「目安」は一般的な目安です。</p>
+    <div class="ref" id="refBox"></div>
+  </section>
+  <section class="card">
+    <p>アプリの版：<b id="ver"></b>　<button type="button" class="btn sm" id="forceUpdate">最新版に更新</button></p>
+    <div class="fine">
+      <p>診療判断の補助ツールです。最終判断は診察と最新の電子添文・ガイドラインで行ってください。適応外使用の薬は、使用の可否を施設の手続きで確認してください。</p>
+      <p>入力はこの端末のブラウザ内にだけ保存されます。患者の氏名・IDなど個人を特定できる情報は入れないでください。</p>
+    </div>
+  </section>
+</div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const MODE="pwa";
+const VER="ver1_2026-11-28a";
+const KEY="scr-nav-v1";
+
+/* ---------- 開始前チェックの項目（併用時はキーでまとめる） ---------- */
+const CAT=["感染","ワクチン","遺伝子","画像","心臓","眼","妊娠","採血","その他"];
+const CK={
+ hbv:{c:"感染",s:"●",l:"HBV：HBs抗原 → HBc抗体・HBs抗体（既往感染ならHBV-DNA）",o:"HBs抗原, HBc抗体, HBs抗体",res:"hbv"},
+ tb:{c:"感染",s:"●",l:"結核：IGRA（T-SPOT／QFT）・胸部X線、既往・接触歴",o:"IGRA（T-SPOT または QFT）, 胸部X線",res:"igra"},
+ jcv:{c:"感染",s:"●",l:"抗JCV抗体（index）",o:"抗JCV抗体（index）",res:"jcv"},
+ live:{c:"ワクチン",s:"生",l:"生ワクチンの要否（開始4週前まで。開始後は原則禁忌）"},
+ inact:{c:"ワクチン",s:"不",l:"不活化ワクチン（インフルエンザ・肺炎球菌・COVID-19）を開始2週前までに"},
+ hz:{c:"ワクチン",s:"帯",l:"帯状疱疹ワクチン（シングリックス、2回・2ヵ月間隔）"},
+ men:{c:"ワクチン",s:"髄",l:"髄膜炎菌ワクチン（メンクアッドフィ）を開始の2週前までに",res:"men"},
+ pnc:{c:"ワクチン",s:"莢",l:"肺炎球菌・インフルエンザ菌b型など莢膜菌のワクチン歴"},
+ vzv:{c:"ワクチン",s:"VZV",l:"水痘・帯状疱疹の既往／接種歴（なければVZV抗体）",o:"VZV抗体（IgG）",res:"vzv"},
+ nudt:{c:"遺伝子",s:"NUDT15",l:"NUDT15遺伝子型",o:"NUDT15遺伝子多型",res:"nudt"},
+ hla:{c:"遺伝子",s:"HLA",l:"HLA-A*31:01（日本人）／東南アジア系の祖先ならHLA-B*15:02",res:"hla"},
+ cyp:{c:"遺伝子",s:"CYP2C9",l:"CYP2C9遺伝子型",o:"CYP2C9遺伝子型",res:"cyp"},
+ apoe:{c:"遺伝子",s:"APOE",l:"APOE遺伝子型（ε4）",o:"APOE遺伝子検査",res:"apoe"},
+ sod1:{c:"遺伝子",s:"SOD1",l:"SOD1遺伝子変異の確認"},
+ mri:{c:"画像",s:"●",l:"基準MRI（最近3ヵ月以内）",o:"頭部MRI"},
+ mriA:{c:"画像",s:"ARIA",l:"基準MRI（開始前1年以内。FLAIR・T2*／SWI：浮腫・微小出血・脳表ヘモジデリン沈着）",o:"頭部MRI（FLAIR・T2*/SWI）"},
+ cxr:{c:"画像",s:"胸X",l:"胸部X線（間質性肺炎・線維症の有無）",o:"胸部X線"},
+ ecg:{c:"心臓",s:"ECG",l:"心電図（心拍数・PR・QT）",o:"12誘導心電図"},
+ echo:{c:"心臓",s:"エコー",l:"心エコー（弁膜症・肺高血圧）",o:"心エコー"},
+ eye:{c:"眼",s:"眼底",l:"眼科（眼底・OCT）",o:"眼科（眼底）"},
+ vf:{c:"眼",s:"視野",l:"視野検査（ベースライン）",o:"視野検査"},
+ preg:{c:"妊娠",s:"●",l:"妊娠していないことの確認・避妊の説明"},
+ cbc:{c:"採血",s:"血算",l:"血算（白血球分画・リンパ球・好中球・血小板）",o:"血算（分画）"},
+ lft:{c:"採血",s:"肝",l:"肝機能（AST・ALT・γGTP・ビリルビン）",o:"AST, ALT, γGTP, T-Bil"},
+ ren:{c:"採血",s:"腎",l:"腎機能・電解質（Cr・eGFR・K）",o:"Cr, eGFR, Na, K"},
+ na:{c:"採血",s:"Na",l:"血清Na",o:"Na"},
+ igg:{c:"採血",s:"IgG",l:"IgG（ベースライン）",o:"IgG"},
+ iga:{c:"採血",s:"IgA",l:"IgA（欠損ならアナフィラキシーの危険）",o:"IgA"},
+ lip:{c:"採血",s:"脂",l:"脂質（LDL-C・TG）",o:"LDL-C, TG"},
+ glu:{c:"採血",s:"糖",l:"血糖・HbA1c",o:"血糖, HbA1c"},
+ thy:{c:"採血",s:"甲",l:"甲状腺機能（TSH・FT4）",o:"TSH, FT4"},
+ coag:{c:"採血",s:"凝",l:"血小板・凝固（PT・APTT）",o:"PT, APTT"},
+ uri:{c:"採血",s:"尿",l:"尿検査（蛋白・潜血）",o:"尿定性"},
+ amy:{c:"採血",s:"Amy",l:"アミラーゼ・リパーゼ",o:"アミラーゼ, リパーゼ"},
+ vitA:{c:"採血",s:"VitA",l:"ビタミンAの補充を準備（血中濃度は任意）"},
+ bone:{c:"その他",s:"骨",l:"骨密度・胸腰椎X線（経口ステロイド3ヵ月以上）",o:"骨密度（DXA）, 胸腰椎X線"},
+ pjp:{c:"その他",s:"PJP",l:"ニューモシスチス肺炎予防の要否"},
+ bp:{c:"その他",s:"BP",l:"血圧"},
+ dep:{c:"その他",s:"うつ",l:"抑うつ・自殺念慮の問診"},
+ reg:{c:"その他",s:"登録",l:"製造販売業者への登録・患者カード・同意"}
+};
+const MAPCOL=[["HBV",["hbv"]],["結核",["tb"]],["ワクチン",["live","inact","hz","men","pnc","vzv"]],["JCV",["jcv"]],["遺伝子",["nudt","hla","cyp","apoe","sod1"]],["MRI等",["mri","mriA","cxr"]],["心臓",["ecg","echo"]],["眼",["eye","vf"]],["妊娠",["preg"]],["採血",["cbc","lft","ren","na","igg","iga","lip","glu","thy","coag","uri","amy","vitA"]],["その他",["bone","pjp","bp","dep","reg"]]];
+
+/* ---------- 定期検査の名前（併用時はキーでまとめる） ---------- */
+const SL={cbc:"血算",lft:"肝機能",ren:"腎機能・電解質",na:"Na",lip:"脂質",glu:"血糖・HbA1c",igg:"IgG",hbv:"HBV-DNA",mri:"MRI",jcv:"抗JCV抗体",eye:"眼科（眼底）",ecg:"心電図",echo:"心エコー",vf:"視野検査",lvl:"血中濃度",uri:"尿検査",coag:"血小板・凝固",bp:"血圧",bone:"骨密度",cog:"認知機能・臨床症状の評価",pet:"アミロイドPET",dose:"投与",step:"増量",vac:"ワクチン",thy:"甲状腺機能",amy:"アミラーゼ・リパーゼ",skin:"皮膚の診察",eval:"効果判定"};
+
+const GRP=[["ms","MS"],["nmo","NMOSD"],["mg","MG・CIDP"],["ims","免疫抑制薬"],["ster","ステロイド"],["ivig","IVIg・血漿交換"],["ab","抗Aβ抗体薬"],["aed","抗てんかん薬"],["oth","ALS・SMA・PD・ATTR"]];
+
+/* m(k, 開始日からの日数[], 以後の繰り返し間隔(日), 注記, 未照合=1) ／ 日数に "3m" と書くと3ヵ月後 */
+function m(k,d,r,n,u){return {k,d,r:r||0,n:n||"",u:u?1:0};}
+/* hbv：a＝リツキシマブ等（月1回・終了後12ヵ月）、c＝ステロイド・免疫抑制薬（6ヵ月は月1回→3ヵ月毎）、b＝その他の分子標的薬（1〜3ヵ月毎） */
+const D=[
+/* ===== MS ===== */
+{id:"ifn",s:"IFNβ",g:"インターフェロンβ",b:"アボネックス（β-1a）・ベタフェロン（β-1b）",grp:["ms"],ap:"ok",ind:"MSの再発予防",hbv:"",
+ pre:["cbc","lft","thy","dep","preg?","mri?"],
+ mon:[m("cbc",[30,91,182],182,"",1),m("lft",[30,91,182],182,"",1),m("thy",[182],365,"",1)],
+ cau:{stop:["NMOSD（抗AQP4抗体陽性）では悪化させるので使わない","肝機能障害（ALT 基準上限の5倍超など）・血球減少が強ければ休薬（目安）","抑うつ・自殺念慮が出たら中止を検討"],inf:["投与初期の感冒様症状は解熱鎮痛薬（アセトアミノフェン〈カロナール〉）で対処"],vac:["ワクチンの制限は少ない"]},ver:"u"},
+{id:"gla",s:"GA",g:"グラチラマー酢酸塩",b:"コパキソン皮下注20mgシリンジ",grp:["ms"],ap:"ok",ind:"MSの再発予防",hbv:"",
+ pre:["preg?","mri?"],mon:[],
+ cau:{stop:["注射直後の全身反応（胸部圧迫感・動悸・呼吸困難）は数分で治まることが多い","注射部位の脂肪萎縮・皮膚壊死"],inf:["感染症時の休薬は原則不要"],vac:["ワクチンの制限は少ない"]},ver:"u"},
+{id:"dmf",s:"DMF",g:"フマル酸ジメチル",b:"テクフィデラカプセル120mg・240mg",grp:["ms"],ap:"ok",ind:"MSの再発予防・身体的障害の進行抑制",hbv:"b",
+ pre:["cbc","lft","ren","uri","hbv?","mri?"],
+ mon:[m("cbc",[91],91,"リンパ球数",1),m("lft",[91],182,"",1),m("ren",[91],182,"",1),m("uri",[91],182,"",1)],
+ cau:{stop:["リンパ球数 500/μL未満が6ヵ月以上続けば中止を検討（PML）","PMLを疑う症状（片麻痺・失語・認知機能低下）があれば直ちに中断"],inf:["重い感染症では休薬"],vac:["生ワクチンは避ける"]},ver:"u"},
+{id:"drf",s:"DRF",g:"ジロキシメルフマラート",b:"ブメリティカプセル231mg（2026年6月承認）",grp:["ms"],ap:"ok",ind:"再発寛解型MSの再発予防・身体的障害の進行抑制",hbv:"b",noPreg:1,
+ pre:["cbc","lft","ren","uri","preg","hbv?","mri?"],
+ mon:[m("step",[7],0,"1回231 mg 1日2回 → 1回462 mg 1日2回"),m("cbc",[91],91,"リンパ球数",1),m("lft",[91],182,"",1),m("ren",[91],182,"",1),m("uri",[91],182,"",1)],
+ cau:{stop:["妊婦は禁忌（電子添文 2.2）","リンパ球減少・PMLはフマル酸ジメチルと同じ扱い","潮紅・消化器症状が強ければ1ヵ月程度 1回231 mgに減らす（患者向け資材）"],inf:["重い感染症では休薬"],vac:["生ワクチンは避ける"]},ver:"p"},
+{id:"fty",s:"FTY",g:"フィンゴリモド",b:"ジレニア・イムセラカプセル0.5mg",grp:["ms"],ap:"ok",ind:"MSの再発予防・身体的障害の進行抑制",hbv:"b",noPreg:1,
+ pre:["cbc","lft","vzv","ecg","eye","preg","hz?","hbv?","mri?"],
+ pn:{eye:"糖尿病・ぶどう膜炎の既往は特に。投与開始前と3〜4ヵ月後",ecg:"初回投与前と6時間後に12誘導心電図"},
+ mon:[m("dose",[0],0,"初回：6時間までは1時間ごとにバイタル、投与前と6時間後に12誘導心電図、24時間は心拍数・血圧"),m("eye",[105],0,"投与開始3〜4ヵ月後"),m("lft",[30,91],91,"",1),m("cbc",[30,91],91,"リンパ球数",1),m("skin",[365],365,"基底細胞癌など",1)],
+ cau:{stop:["リンパ球数 200/μL未満が続けば休薬を検討（目安）","黄斑浮腫・PML・クリプトコッカス髄膜炎","中止後2〜3ヵ月は重い再発（リバウンド）に注意","一定期間休薬した後の再開時は初回と同じ観察（期間は電子添文で）"],inf:["重い感染症では休薬。帯状疱疹・ヘルペスの播種に注意"],vac:["VZV抗体陰性なら水痘ワクチン（生）を接種し、1ヵ月あけてから開始","治療中と中止後2ヵ月は生ワクチンを避ける"]},ver:"p"},
+{id:"sipo",s:"SIP",g:"シポニモド",b:"メーゼント錠0.25mg・2mg",grp:["ms"],ap:"ok",ind:"二次性進行型MSの再発予防・身体的障害の進行抑制",hbv:"b",noPreg:1,
+ pre:["cyp","cbc","lft","vzv","ecg","eye","preg","hz?","hbv?"],
+ pn:{cyp:"*3/*3は禁忌。*1/*3・*2/*3は維持量1 mg"},
+ mon:[m("dose",[0],0,"0.25 mgから漸増（維持量は遺伝子型で1 mgか2 mg）"),m("eye",[105],0,"投与開始3〜4ヵ月後",1),m("lft",[30,91],91,"",1),m("cbc",[30,91],91,"リンパ球数",1)],
+ cau:{stop:["CYP2C9*3/*3は禁忌（電子添文）","黄斑浮腫・PML・重い感染症","中止後のリバウンドに注意"],inf:["重い感染症では休薬"],vac:["VZV抗体陰性なら水痘ワクチンを接種し、1ヵ月あけてから開始","治療中は生ワクチンを避ける"]},ver:"p"},
+{id:"ofa",s:"OFA",g:"オファツムマブ",b:"ケシンプタ皮下注20mgペン",grp:["ms"],ap:"ok",ind:"再発寛解型MS・活動性のある二次性進行型MS",hbv:"a",
+ pre:["hbv","igg","live","inact","tb?","hz?","mri?"],
+ mon:[m("igg",[182],182,"",1),m("cbc",[91],182,"",1)],
+ cau:{stop:["HBs抗原陽性には使わない（再活性化）","初回注射の全身性反応（発熱・頭痛・悪寒）は初回が最も多い","IgG低下と感染の反復があれば継続を再評価"],inf:["活動性の感染症が治まるまで投与を延期"],vac:["生ワクチンは開始4週前まで、不活化は2週前まで（開始後は効果が落ちる）"]},ver:"u"},
+{id:"ntz",s:"NTZ",g:"ナタリズマブ",b:"タイサブリ点滴静注300mg",grp:["ms"],ap:"ok",ind:"MSの再発予防・身体的障害の進行抑制（1回300 mg 4週毎）",hbv:"b",
+ pre:["jcv","mri","reg","lft?","cbc?","hbv?"],
+ pn:{mri:"開始前3ヵ月以内（適正使用ガイド）",jcv:"結果を説明し同意を得る"},
+ mon:[m("jcv",[182],182,"6ヵ月毎（陰性でも再検）"),m("mri",[365],365,"少なくとも年1回。高リスクは3〜6ヵ月毎"),m("lft",[91],182,"",1)],
+ cau:{stop:["PMLを疑う症状（片麻痺・四肢麻痺・認知機能障害・失語・視覚障害）→ 直ちに中断し、MRI（DWIを含む）と髄液JCV-DNA。否定できず疑いが残れば再開しない","急性網膜壊死（視力低下・霧視・結膜充血・眼痛）→ 中断して眼科","中止後数ヵ月はリバウンドに注意し、次の薬へつなぐ"],inf:["日和見感染を疑えば中断し、除外されるまで再開しない","ヘルペス脳炎・髄膜炎"],vac:["生ワクチンは避ける"]},ver:"v"},
+/* ===== NMOSD・MG ===== */
+{id:"sat",s:"SAT",g:"サトラリズマブ",b:"エンスプリング皮下注120mgシリンジ",grp:["nmo"],ap:"ok",ind:"NMOSD（抗AQP4抗体陽性）の再発予防。MOGADは2026年7月に効能追加申請",hbv:"c",
+ pre:["hbv","tb","cbc","lft","lip","live","inact?"],
+ mon:[m("cbc",[28,56,84],91,"好中球",1),m("lft",[28,56,84],91,"",1),m("lip",[91],182,"",1)],
+ cau:{stop:["好中球減少・肝機能障害で休薬"],inf:["CRP上昇・発熱が出にくく感染症が隠れる（症状・白血球で判断）"],vac:["生ワクチンは避ける"]},ver:"u"},
+{id:"ine",s:"INE",g:"イネビリズマブ",b:"ユプリズナ点滴静注100mg",grp:["nmo","mg"],ap:"ok",ind:"NMOSD（抗AQP4抗体陽性）の再発予防。gMGは2026年に追加承認",hbv:"a",
+ pre:["hbv","tb","igg","cbc","live","inact"],
+ mon:[m("dose",[0,14],182,"300 mg：初回・2週後、以後6ヵ月毎"),m("igg",[182],182,"投与前",1),m("cbc",[182],182,"投与前",1)],
+ cau:{stop:["infusion reaction：前投薬（メチルプレドニゾロン〈ソル・メドロール〉、d-クロルフェニラミン〈ポララミン〉、アセトアミノフェン〈カロナール〉）","低γグロブリン血症・感染の反復で継続を再評価","HBV再活性化（MINTで1例中止）"],inf:["活動性の感染症では投与を延期"],vac:["生ワクチンは投与4週以上前、不活化は2週以上前（神経免疫ナビと同じ）"]},ver:"p"},
+{id:"ecu",s:"ECU",g:"エクリズマブ",b:"ソリリス点滴静注300mg",grp:["nmo","mg"],ap:"ok",ind:"gMG（抗AChR抗体陽性）、NMOSD（抗AQP4抗体陽性）の再発予防",hbv:"",cpl:"3ヵ月",
+ pre:["men","pnc?","reg","hbv?"],
+ mon:[],
+ cau:{stop:["患者安全性カードは中止後も最低3ヵ月携帯","投与間隔が遅れると効果が落ちる","血漿交換・IVIgの施行日は補充投与（電子添文で確認）"],inf:["発熱・頭痛・項部硬直・点状出血 → 髄膜炎菌を疑い、血液培養2セット後に原因菌を待たずセフトリアキソン 2 g 12時間毎。補体阻害薬は中止し処方医へ"],vac:["髄膜炎菌ワクチンは開始の少なくとも2週前まで。緊急開始では接種後2週間は抗菌薬を予防投与","B群ワクチンは国内未承認"]},ver:"v"},
+{id:"rav",s:"RAV",g:"ラブリズマブ",b:"ユルトミリスHI点滴静注",grp:["nmo","mg"],ap:"ok",ind:"gMG（抗AChR抗体陽性）、NMOSD（抗AQP4抗体陽性）の再発予防",hbv:"",cpl:"8ヵ月",
+ pre:["men","pnc?","reg","hbv?"],
+ mon:[m("dose",[0,14],56,"負荷投与 → 2週後から8週毎")],
+ cau:{stop:["患者安全性カードは中止後も最低8ヵ月携帯（作用が長い）","エクリズマブからの切替は最終投与2週後に負荷投与"],inf:["発熱・頭痛 → 髄膜炎菌を疑い、血液培養後にセフトリアキソン。補体阻害薬は中止し処方医へ"],vac:["髄膜炎菌ワクチンは開始の少なくとも2週前まで"]},ver:"v"},
+{id:"rtx",s:"RTX",g:"リツキシマブ",b:"リツキサン点滴静注",grp:["nmo","mg"],ap:"part",ind:"NMOSDの再発予防（2022年追加）。MG・CIDPは適応外",hbv:"a",
+ pre:["hbv","igg","cbc","live","inact","tb?"],
+ mon:[m("igg",[182],182,"次の投与前",1),m("cbc",[30,182],182,"",1)],
+ cau:{stop:["infusion reaction：前投薬（抗ヒスタミン薬・解熱鎮痛薬、必要ならステロイド）","IgG低値・感染の反復があれば投与間隔の延長や補充を検討","遅発性好中球減少（数週〜数ヵ月後）"],inf:["活動性の感染症では投与を延期"],vac:["生ワクチンは開始4週前まで、不活化は2週前まで（開始後は6ヵ月以上効果が落ちる）"]},ver:"p"},
+{id:"zil",s:"ZIL",g:"ジルコプラン",b:"ジルビスク皮下注シリンジ",grp:["mg"],ap:"ok",ind:"gMG（抗AChR抗体陽性、ステロイド・免疫抑制剤で効果不十分）",hbv:"",cpl:"2ヵ月",
+ pre:["men","amy","pnc?","reg"],
+ mon:[m("amy",[28],91,"膵炎",1),m("eval",[84],0,"12週までに改善がなければ継続を再検討")],
+ cau:{stop:["患者安全性カードは最終投与後2ヵ月は携帯","膵炎（アミラーゼ・リパーゼ上昇）"],inf:["発熱・頭痛 → 髄膜炎菌を疑う（エクリズマブと同じ対応）"],vac:["髄膜炎菌ワクチンは開始の少なくとも2週前まで"]},ver:"p"},
+{id:"efg",s:"EFG",g:"エフガルチギモド アルファ",b:"ウィフガート点滴静注400mg／ヒフデュラ配合皮下注",grp:["mg"],ap:"ok",ind:"gMG（ステロイド・免疫抑制剤で効果不十分）。ヒフデュラはCIDPも",hbv:"b",
+ pre:["igg","inact","live?","hbv?"],
+ mon:[m("dose",[0,7,14,21],0,"週1回×4回で1サイクル")],
+ cau:{stop:["IVIg・血漿交換と時期をずらす（効果が相殺）"],inf:["感染症の間はサイクルを延期"],vac:["不活化ワクチンはサイクルの前に。生ワクチンは治療中避ける"]},ver:"p"},
+{id:"roz",s:"ROZ",g:"ロザノリキシズマブ",b:"リスティーゴ皮下注280mg",grp:["mg"],ap:"ok",ind:"gMG（抗AChR抗体・抗MuSK抗体を問わない）",hbv:"b",
+ pre:["igg","inact","live?","hbv?"],
+ mon:[m("dose",[0,7,14,21,28,35],0,"週1回×6回で1サイクル")],
+ cau:{stop:["頭痛が多い（MycarinGで約4割）","IVIgはサイクル最終投与2週後以降が望ましい","血液浄化療法との併用は避ける"],inf:["感染症の間はサイクルを延期"],vac:["生ワクチンは治療中避ける"]},ver:"p"},
+{id:"nipo",s:"NIP",g:"ニポカリマブ",b:"アイマービー点滴静注1200mg・300mg",grp:["mg"],ap:"ok",ind:"gMG（成人と12歳以上、2025年9月承認）",hbv:"b",
+ pre:["igg","inact","live?","hbv?"],
+ mon:[m("dose",[0],14,"初回30 mg/kg、以後15 mg/kgを2週毎")],
+ cau:{stop:["FcRnに結合する薬（エフガルチギモドなど）を始めるときは本剤の最終投与2週後以降が望ましい（電子添文）","血漿浄化療法との併用は避けることが望ましい（電子添文）"],inf:["感染症に注意（持続投与）"],vac:["生ワクチン・弱毒生ワクチンは避ける（電子添文の相互作用）"]},ver:"p"},
+/* ===== 免疫抑制薬 ===== */
+{id:"aza",s:"AZA",g:"アザチオプリン",b:"イムラン錠50mg・アザニン錠50mg",grp:["ims"],ap:"off",ind:"神経領域（MG・NMOSDなど）は適応外",hbv:"c",
+ pre:["nudt","cbc","lft","hbv","live","tb?","preg?"],
+ mon:[m("cbc",[7,14,21,28,42,56],"1m","",1),m("lft",[14,28,56],"1m","",1)],
+ cau:{stop:["フェブキソスタット（フェブリク）・トピロキソスタット（トピロリック）は併用禁忌。アロプリノール（ザイロリック）は本剤を減量","白血球 3,000/μL未満・血小板 10万/μL未満なら休薬（目安）","肝機能障害・膵炎","日光対策（皮膚がん）"],inf:["重い感染症では休薬"],vac:["生ワクチンは避ける"]},ver:"u"},
+{id:"tac",s:"TAC",g:"タクロリムス",b:"プログラフカプセル0.5mg・1mg",grp:["ims"],ap:"ok",ind:"全身型MG（MGは1日1回3 mg 夕食後）",hbv:"c",
+ pre:["ren","glu","bp","hbv","lip?","tb?"],
+ mon:[m("lvl",[14,28],"1m","トラフ値",1),m("ren",[14,28,56],"1m","Cr・K",1),m("glu",[14,28,56],"1m","",1)],
+ cau:{stop:["トラフの目安は施設基準で（MGでは低めの目標で使われることが多い）","腎障害・高K血症・高血糖・振戦","CYP3A4阻害薬（クラリスロマイシン〈クラリス〉、イトラコナゾール〈イトリゾール〉、グレープフルーツ）で濃度上昇"],inf:["重い感染症では休薬"],vac:["生ワクチンは避ける"]},ver:"u"},
+{id:"csa",s:"CsA",g:"シクロスポリン",b:"ネオーラルカプセル",grp:["ims"],ap:"ok",ind:"全身型MG（MGは1日5 mg/kgを分2）",hbv:"c",
+ pre:["ren","bp","lip","hbv","tb?"],
+ mon:[m("lvl",[14,28],"1m","トラフ値",1),m("ren",[14,28,56],"1m","Cr・K・Mg・尿酸",1),m("bp",[14,28],"1m","",1)],
+ cau:{stop:["腎障害（Crが前値の30%以上上昇なら減量の目安）","高血圧・歯肉増殖・多毛","CYP3A4で多くの薬と相互作用"],inf:["重い感染症では休薬"],vac:["生ワクチンは避ける"]},ver:"u"},
+{id:"mmf",s:"MMF",g:"ミコフェノール酸 モフェチル",b:"セルセプトカプセル250",grp:["ims"],ap:"off",ind:"神経領域は適応外",hbv:"c",noPreg:1,
+ pre:["cbc","lft","preg","hbv","live"],
+ mon:[m("cbc",[7,14,21,28,42,56,70,84],"1m","",1),m("lft",[28,84],91,"",1)],
+ cau:{stop:["妊婦は禁忌（催奇形性）。開始前の妊娠検査と、投与中・終了後の避妊","白血球減少・下痢"],inf:["重い感染症では休薬。CMV感染"],vac:["生ワクチンは避ける"]},ver:"u"},
+{id:"mtx",s:"MTX",g:"メトトレキサート",b:"リウマトレックスカプセル2mg",grp:["ims"],ap:"off",ind:"神経領域は適応外",hbv:"c",noPreg:1,
+ pre:["cbc","lft","ren","cxr","hbv","preg","live"],
+ mon:[m("cbc",[14,28,56,84],91,"",1),m("lft",[14,28,56,84],91,"",1),m("ren",[28,84],91,"",1)],
+ cau:{stop:["葉酸（フォリアミン）を併用","腎機能低下では減量・禁忌","間質性肺炎（乾いた咳・発熱）が出たら中止","妊婦は禁忌"],inf:["重い感染症では休薬"],vac:["生ワクチンは避ける"]},ver:"u"},
+{id:"cpa",s:"CPA",g:"シクロホスファミド",b:"エンドキサン錠50mg・注射用",grp:["ims"],ap:"off",ind:"神経領域は原則適応外（施設の手続きで）",hbv:"c",noPreg:1,
+ pre:["cbc","ren","uri","preg","hbv","pjp"],
+ mon:[m("cbc",[10,14],"1m","最低値は投与後10〜14日",1),m("uri",[1,7],"1m","出血性膀胱炎",1)],
+ cau:{stop:["出血性膀胱炎（水分負荷、メスナ〈ウロミテキサン〉）","累積量と性腺機能障害（妊孕性温存の相談）","骨髄抑制"],inf:["好中球減少時の発熱は緊急対応"],vac:["生ワクチンは避ける"]},ver:"u"},
+{id:"tcz",s:"TCZ",g:"トシリズマブ",b:"アクテムラ点滴静注用・皮下注",grp:["ims","nmo"],ap:"off",ind:"神経領域（NMOSDなど）は適応外",hbv:"c",
+ pre:["hbv","tb","cbc","lft","lip","live"],
+ mon:[m("cbc",[28,56,84],91,"",1),m("lft",[28,56,84],91,"",1),m("lip",[91],182,"",1)],
+ cau:{stop:["好中球減少・肝機能障害","消化管穿孔（憩室炎の既往）"],inf:["CRPが上がらず感染症が隠れる"],vac:["生ワクチンは避ける"]},ver:"u"},
+/* ===== ステロイド ===== */
+{id:"psl",s:"PSL",g:"プレドニゾロン（長期内服）",b:"プレドニン錠5mg など",grp:["ster"],ap:"ok",ind:"MG・NMOSD・CIDP・自己免疫性脳炎など",hbv:"c",
+ pre:["hbv","tb","glu","bp","bone","pjp","live","inact","lip?","eye?"],
+ mon:[m("glu",[3,7,14,28],"1m","昼食後〜夕食前",1),m("bp",[3,7,14,28],"1m","",1),m("lip",[91],182,"",1),m("bone",[365],365,"",1),m("eye",[182],365,"白内障・緑内障",1)],
+ cau:{stop:["急な中止で副腎不全。シックデイは増量を指導"],inf:["PSL 20 mg/日以上を4週以上 → PJP予防（ST合剤：バクタ配合錠 1錠/日 連日、または2錠 週3回）","感染症の症状・発熱が出にくい"],vac:["PSL 20 mg/日以上を2週以上では生ワクチン禁忌","不活化ワクチンは接種可"]},ver:"u"},
+{id:"mpp",s:"パルス",g:"メチルプレドニゾロン（パルス）",b:"ソル・メドロール静注用",grp:["ster"],ap:"ok",ind:"MS・NMOSDの急性期、MG・自己免疫性脳炎など",hbv:"c",
+ pre:["hbv","glu","bp","ren","tb?","ecg?"],
+ mon:[m("glu",[0,1,2],0,"パルス中は毎日",1),m("bp",[0,1,2],0,"",1)],
+ cau:{stop:["高血糖・高血圧・不整脈（急速静注を避ける）","精神症状・不眠","MGでは初期増悪（クリーゼに備える）"],inf:["感染症の悪化。発熱があれば培養を先に"],vac:["パルス後の生ワクチンは時期を空ける"]},ver:"u"},
+/* ===== IVIg・血漿交換 ===== */
+{id:"ivig",s:"IVIg",g:"免疫グロブリン静注（IVIg）",b:"献血ヴェノグロブリンIH・献血グロベニン-I・ピリヴィジェン など",grp:["ivig"],ap:"ok",ind:"gMG・CIDP・GBS など（製剤ごとに適応が違う）",hbv:"",
+ pre:["hbv","ren","iga?","coag?"],
+ pn:{hbv:"投与後は製剤由来の抗体で見かけ上陽性になるため、投与前に採る"},
+ mon:[m("ren",[4],0,"投与3〜5日後にCr",1),m("cbc",[7],0,"溶血（Hb）",1)],
+ cau:{stop:["血栓症（高齢・脱水・過粘稠）","無菌性髄膜炎・頭痛","急性腎障害","溶血"],inf:["感染症時でも投与は可能"],vac:["投与後しばらくは生ワクチンの効果が落ちる（数ヵ月あける）"]},ver:"u"},
+{id:"pe",s:"PE",g:"血漿交換・血液浄化療法",b:"単純血漿交換・二重膜濾過・免疫吸着",grp:["ivig"],ap:"ok",ind:"MG・NMOSD・GBS・CIDPなど",hbv:"",
+ pre:["coag","cbc","ren","igg?"],
+ pn:{coag:"毎回の前にフィブリノゲン・Ca・血小板も"},
+ mon:[],
+ cau:{stop:["抗体製剤（補体阻害薬・FcRn阻害薬・リツキシマブなど）を除去する → 投与時期を調整","ACE阻害薬の併用はブラジキニン反応の原因（免疫吸着・二重膜濾過）"],inf:["カテーテル感染"],vac:["施行中はワクチンの抗体も除去される"]},ver:"u"},
+/* ===== 抗Aβ抗体薬 ===== */
+{id:"lec",s:"LEC",g:"レカネマブ",b:"レケンビ点滴静注200mg・500mg",grp:["ab"],ap:"ok",ind:"ADによるMCI・軽度認知症（10 mg/kg 2週毎）",hbv:"",
+ pre:["mriA","apoe","reg","coag?"],
+ mon:[m("cog",[182],182,"約6ヵ月毎"),m("eval",[546],0,"原則18ヵ月。超える場合は有効性・安全性を評価して判断")],
+ cau:{stop:["ARIAの対応は下の表（認知症外来ナビと同じ）","抗凝固薬の併用はARIAに伴う出血を考えて慎重に"],inf:["infusion reaction（初回に多い）"],vac:["ワクチンの制限は特にない"]},ver:"v"},
+{id:"don",s:"DON",g:"ドナネマブ",b:"ケサンラ点滴静注液350mg",grp:["ab"],ap:"ok",ind:"ADによるMCI・軽度認知症（350→700→1,050 mg、以後1,400 mg 4週毎）",hbv:"",
+ pre:["mriA","apoe","reg","coag?"],
+ mon:[m("cog",[182],182,"約6ヵ月毎"),m("pet",[365],0,"12ヵ月目安。除去を確認すれば投与完了"),m("eval",[546],0,"原則18ヵ月で完了")],
+ cau:{stop:["ARIAの対応は下の表","ARIAは開始後24週以内に多い（重篤例は12週以内）"],inf:["infusion reaction"],vac:["ワクチンの制限は特にない"]},ver:"v"},
+/* ===== 抗てんかん薬 ===== */
+{id:"cbz",s:"CBZ",g:"カルバマゼピン",b:"テグレトール錠100mg・200mg",grp:["aed"],ap:"ok",ind:"焦点てんかん・三叉神経痛など",hbv:"",
+ pre:["hla","cbc","lft","na","ecg?","preg?"],
+ pn:{hla:"日本人で薬疹の危険が高い（添付文書に記載）。検査は保険適用外（2018年時点）",ecg:"高齢・伝導障害"},
+ mon:[m("lvl",[21],182,"自己誘導後（目安4〜12 μg/mL）",1),m("cbc",[14,28,56,91],182,"",1),m("lft",[14,28,56,91],182,"",1),m("na",[14,28,91],182,"",1)],
+ cau:{stop:["皮疹は開始8週以内に多い → 出たら中止（SJS・DIHS）","低Na血症（高齢者）","房室ブロック"],inf:["感染症時の休薬は不要"],vac:["酵素誘導で経口避妊薬・DOAC・免疫抑制薬などの濃度を下げる"]},ver:"u"},
+{id:"pht",s:"PHT",g:"フェニトイン／ホスフェニトイン",b:"アレビアチン錠・ホストイン静注",grp:["aed"],ap:"ok",ind:"てんかん・重積",hbv:"",
+ pre:["lft","cbc","hla?","ecg?"],
+ pn:{hla:"東南アジア系の祖先ではHLA-B*15:02",ecg:"静注時は心電図・血圧をモニター"},
+ mon:[m("lvl",[7,28],182,"10〜20 μg/mL（低アルブミンでは補正値）",1),m("lft",[28],182,"",1),m("cbc",[28],182,"",1)],
+ cau:{stop:["非線形の薬物動態：少しの増量で中毒域","小脳失調・眼振は過量のサイン","歯肉増殖・骨量低下（長期）"],inf:["感染症時の休薬は不要"],vac:["酵素誘導で多くの薬の濃度を下げる"]},ver:"u"},
+{id:"vpa",s:"VPA",g:"バルプロ酸",b:"デパケン錠・デパケンR錠・セレニカR",grp:["aed"],ap:"ok",ind:"てんかん・片頭痛予防など",hbv:"",noPreg:1,
+ pre:["lft","cbc","preg","coag?"],
+ mon:[m("lvl",[14],182,"50〜100 μg/mL",1),m("lft",[14,28,56,91],91,"開始6ヵ月は特に",1),m("cbc",[14,28,56,91],91,"血小板",1)],
+ cau:{stop:["妊娠可能年齢の女性では原則避ける（催奇形性・児の発達への影響）","高アンモニア血症（意識障害があれば測定）","カルバペネム系（メロペネム〈メロペン〉など）と併用禁忌","膵炎・血小板減少"],inf:["感染症時の休薬は不要"],vac:["ラモトリギンの濃度を約2倍にする"]},ver:"u"},
+{id:"ltg",s:"LTG",g:"ラモトリギン",b:"ラミクタール錠",grp:["aed"],ap:"ok",ind:"てんかん・双極性障害",hbv:"",
+ pre:["preg?"],
+ mon:[],
+ cau:{stop:["皮疹（SJS・TEN・DIHS）は開始8週以内に多い。用法用量（漸増）を守る","バルプロ酸併用で濃度が約2倍","5半減期（目安5日）以上中断したら最初の漸増からやり直す（抗てんかん薬ナビと同じ）","エストロゲン含有の避妊薬で濃度が約半分に"],inf:["感染症時の休薬は不要"],vac:["ワクチンの制限はない"]},ver:"u"},
+{id:"oxc",s:"OXC",g:"オクスカルバゼピン",b:"オクノベル錠",grp:["aed"],ap:"ok",ind:"焦点てんかん（併用）",hbv:"",
+ pre:["na","hla?"],
+ mon:[m("na",[14,28,91],182,"",1)],
+ cau:{stop:["低Na血症はカルバマゼピンより多い","カルバマゼピンで薬疹の既往があれば交差反応に注意"],inf:["感染症時の休薬は不要"],vac:["経口避妊薬の効果を弱める"]},ver:"u"},
+{id:"lcm",s:"LCM",g:"ラコサミド",b:"ビムパット錠・点滴静注",grp:["aed"],ap:"ok",ind:"焦点てんかん・強直間代発作（併用）",hbv:"",
+ pre:["ecg?"],pn:{ecg:"心疾患・高齢・PRを延ばす薬の併用時は開始前と増量後"},
+ mon:[m("ecg",[14],0,"増量後（心疾患・高齢）",1)],
+ cau:{stop:["PR延長・房室ブロック・心房細動","めまい・複視"],inf:["感染症時の休薬は不要"],vac:["相互作用は少ない"]},ver:"u"},
+{id:"vgb",s:"VGB",g:"ビガバトリン",b:"サブリル散分包500mg",grp:["aed"],ap:"ok",ind:"点頭てんかん",hbv:"",
+ pre:["vf","reg"],pn:{vf:"乳幼児では網膜電図などで代える"},
+ mon:[m("vf",[91],91,"3ヵ月毎を目安",1)],
+ cau:{stop:["不可逆的な視野狭窄 → 効果がなければ早く中止","乳児のMRI信号変化"],inf:["感染症時の休薬は不要"],vac:["ワクチンの制限はない"]},ver:"u"},
+{id:"ffa",s:"FFA",g:"フェンフルラミン",b:"フィンテプラ内用液2.2mg/mL",grp:["aed"],ap:"ok",ind:"Dravet症候群・Lennox-Gastaut症候群（併用）",hbv:"",
+ pre:["echo","reg"],
+ mon:[m("echo",[182],182,"中止後3〜6ヵ月にも",1)],
+ cau:{stop:["心臓弁膜症・肺高血圧が出たら中止を検討","食欲低下・体重減少"],inf:["感染症時の休薬は不要"],vac:["ワクチンの制限はない"]},ver:"u"},
+/* ===== その他 ===== */
+{id:"ril",s:"RIL",g:"リルゾール",b:"リルテック錠50",grp:["oth"],ap:"ok",ind:"ALS",hbv:"",
+ pre:["lft","cbc","cxr?"],
+ mon:[m("lft",[30,61,91],91,"最初の3ヵ月は毎月",1),m("cbc",[30,61,91],91,"好中球",1)],
+ cau:{stop:["ALTが基準上限の5倍を超えたら中止（目安）","間質性肺炎（咳・呼吸困難）","好中球減少"],inf:["発熱時は好中球を確認"],vac:["ワクチンの制限はない"]},ver:"u"},
+{id:"tof",s:"TOF",g:"トフェルセン",b:"クアルソディ髄注100mg",grp:["oth"],ap:"ok",ind:"SOD1遺伝子変異を有するALS",hbv:"",
+ pre:["sod1","coag","ren","cbc"],
+ mon:[m("dose",[0,14,28],28,"髄腔内投与：初回・2週後・4週後、以後4週毎"),m("coag",[0],28,"腰椎穿刺の前に",1)],
+ cau:{stop:["脊髄炎・神経根炎、乳頭浮腫・頭蓋内圧亢進","投与前に投与量と同程度の髄液を除去（電子添文14.2.1）"],inf:["腰椎穿刺部の感染"],vac:["ワクチンの制限はない"]},ver:"p"},
+{id:"nus",s:"NUS",g:"ヌシネルセン",b:"スピンラザ髄注12mg（高用量製剤 2025年11月発売）",grp:["oth"],ap:"ok",ind:"SMA",hbv:"",
+ pre:["coag","uri","cbc"],
+ mon:[m("dose",[0,14,28,63],122,"12 mg：0・2・4・9週、以後4ヵ月毎（高用量製剤は電子添文で）"),m("coag",[0,14,28,63],122,"毎回の投与前に血小板・凝固",1),m("uri",[0,14,28,63],122,"毎回の投与前に尿蛋白",1)],
+ cau:{stop:["腎毒性（尿蛋白）・血小板減少・凝固異常","交通性水頭症"],inf:["腰椎穿刺部の感染"],vac:["ワクチンの制限はない"]},ver:"u"},
+{id:"cab",s:"CAB",g:"カベルゴリン（麦角系）",b:"カバサール錠",grp:["oth"],ap:"ok",ind:"パーキンソン病など",hbv:"",
+ pre:["echo","cxr?"],
+ mon:[m("echo",[182],365,"",1)],
+ cau:{stop:["心臓弁膜症：弁尖の肥厚・逆流があれば中止","胸膜・後腹膜の線維症","ペルゴリド（ペルマックス）も同じ扱い"],inf:["感染症時の休薬は不要"],vac:["ワクチンの制限はない"]},ver:"u"},
+{id:"vut",s:"VUT",g:"ブトリシラン",b:"アムヴトラ皮下注25mgシリンジ",grp:["oth"],ap:"ok",ind:"トランスサイレチン型アミロイドーシス",hbv:"",
+ pre:["vitA","eye?"],
+ mon:[m("dose",[0],91,"3ヵ月毎に皮下注")],
+ cau:{stop:["ビタミンAを推奨量で補充。夜盲・眼の乾燥は眼科へ","妊娠を考えるときは事前に相談（ビタミンA）"],inf:["感染症時の休薬は不要"],vac:["ワクチンの制限はない"]},ver:"u"},
+{id:"pat",s:"PAT",g:"パチシラン",b:"オンパットロ点滴静注2mg/mL",grp:["oth"],ap:"ok",ind:"トランスサイレチン型家族性アミロイドポリニューロパチー",hbv:"",
+ pre:["vitA"],
+ mon:[m("dose",[0],21,"3週毎に点滴（前投薬）")],
+ cau:{stop:["前投薬（ステロイド・H1／H2受容体拮抗薬・アセトアミノフェン）","ビタミンAを補充"],inf:["infusion reaction"],vac:["ワクチンの制限はない"]},ver:"u"}
+];
+const NA_NOTE="オクレリズマブ（Ocrevus）・ポネシモド（Ponvory）は2026年11月時点で国内承認を確認できなかったため載せていません（海外では承認）。MS・NMOSD・MG以外（CIDPのSCIg：ハイゼントラなど）は神経免疫ナビを参照。";
+
+/* ---------- 出典 ---------- */
+const REFS=[
+ ["HBV","日本肝臓学会 B型肝炎治療ガイドライン（第4版・簡易版、2022年6月）","https://www.jsh.or.jp/lib/files/medical/guidelines/jsh_guidlines/B_v4_20220817.pdf"],
+ ["HBV","資料3 免疫抑制・化学療法により発症するB型肝炎対策ガイドライン（日本肝臓学会）— 注5 a/b/c のモニタリング間隔、注6 の 20 IU/mL","https://www.jsh.or.jp/lib/files/medical/guidelines/jsh_guidlines/B_document-3_v2.pdf"],
+ ["MS","タイサブリ点滴静注300mg 適正使用ガイド（RMP資材、PMDA）— 抗JCV抗体6ヵ月毎、index 0.9／1.5、MRI","https://www.pmda.go.jp/RMP/www/630499/54072df3-fac3-4c4c-80d4-8b77723f21ac/630499_1190402A1028_01_006RMPm.pdf"],
+ ["MS","McGuigan C, et al. Stratification and monitoring of natalizumab-associated progressive multifocal leukoencephalopathy risk: recommendations from an expert group. J Neurol Neurosurg Psychiatry. 2016;87(2):117-125.","https://pubmed.ncbi.nlm.nih.gov/26492930/"],
+ ["MS","Bloomgren G, et al. Risk of natalizumab-associated progressive multifocal leukoencephalopathy. N Engl J Med. 2012;366(20):1870-80.","https://pubmed.ncbi.nlm.nih.gov/22591293/"],
+ ["MS","メーゼント 患者向け資材（ノバルティス）— CYP2C9遺伝子型と維持量","https://www.pro.novartis.com/jp-ja/sites/onecms_emeaspare5_com/files/2024-08/maz_guide_202101.pdf"],
+ ["MS","ブメリティカプセル231mg 適正使用ガイド（RMP資材、PMDA）","https://www.pmda.go.jp/RMP/www/630499/9d92bc64-9ed3-484a-8581-931e55efc06e/630499_11900C3M1027_01_001RMPm.pdf"],
+ ["MS","ブメリティ 審議結果報告書・審査報告書（PMDA、2026年）","https://www.pmda.go.jp/drugs/2026/P20260623004/630499000_30800AMX00152_A100_1.pdf"],
+ ["NMOSD/MG","髄膜炎菌感染症リスク管理の手引き（抗補体薬、2024年9月作成）— 日本神経学会サイト","https://neurology-jp.org/news/pdf/news_20251119_01_01.pdf"],
+ ["NMOSD/MG","ジルビスク 適正使用ガイド（RMP資材、PMDA）","https://www.pmda.go.jp/RMP/www/820110/c050cb26-c6a1-4dfe-9cea-d65280e55cc2/820110_39994F3G1025_01_001RMPm.pdf"],
+ ["NMOSD/MG","PMDA 審査報告書：ユプリズナ点滴静注100mg（全身型重症筋無力症の効能追加、2026年8月）","https://www.pmda.go.jp/drugs/2026/P20261005002/400315000_30300AMX00255_A100_1.pdf"],
+ ["MG","アイマービー点滴静注 電子添文（PMDA）","https://www.pmda.go.jp/PmdaSearch/iyakuDetail/800155_6399434A1027_1_04"],
+ ["MG","Antozzi C, et al. Safety and efficacy of nipocalimab in adults with generalised myasthenia gravis (Vivacity-MG3). Lancet Neurol. 2025;24(2):105-116.","https://pubmed.ncbi.nlm.nih.gov/39862879/"],
+ ["MG","Nowak RJ, et al. A Phase 3 Trial of Inebilizumab in Generalized Myasthenia Gravis (MINT). N Engl J Med. 2025;392(23):2309-2320.","https://pubmed.ncbi.nlm.nih.gov/40202593/"],
+ ["抗Aβ","レケンビ点滴静注 添付文書（KEGG/JAPIC）","https://www.kegg.jp/medicus-bin/japic_med?japic_code=00071040"],
+ ["抗Aβ","ケサンラ点滴静注液350mg 添付文書（KEGG/JAPIC）","https://www.kegg.jp/medicus-bin/japic_med?japic_code=00071554"],
+ ["抗Aβ","ドナネマブ 使用上の注意の改訂（PMDA, 2026年6月5日）","https://www.pmda.go.jp/files/000281057.pdf"],
+ ["抗Aβ","レカネマブ 使用上の注意の改訂（PMDA, 2026年6月5日）","https://www.pmda.go.jp/files/000281059.pdf"],
+ ["抗Aβ","Cummings J, et al. Lecanemab: Appropriate Use Recommendations. J Prev Alzheimers Dis. 2023;10(3):362-377.","https://pubmed.ncbi.nlm.nih.gov/37357276/"],
+ ["抗てんかん薬","Mushiroda T, et al. Association of HLA-A*31:01 Screening With the Incidence of Carbamazepine-Induced Cutaneous Adverse Reactions in a Japanese Population (GENCAT). JAMA Neurol. 2018.","https://pmc.ncbi.nlm.nih.gov/articles/PMC6145764/"],
+ ["抗てんかん薬","AMED プレスリリース（2018年4月）：HLA-A*31:01検査でカルバマゼピンの薬疹が減少（検査は保険未収載と記載）","https://www.amed.go.jp/news/release_20180403-01.html"],
+ ["免疫抑制薬","Moriyama T, et al. NUDT15 polymorphisms alter thiopurine metabolism and hematopoietic toxicity. Nat Genet. 2016;48(4):367-373.","https://pubmed.ncbi.nlm.nih.gov/26878724/"],
+ ["ALS","クアルソディ髄注100mg 電子添文（PMDA）","https://www.pmda.go.jp/PmdaSearch/iyakuDetail/630499_1190411A1027_1_02"],
+ ["共通","PMDA 医療用医薬品 情報検索（電子添文の最新版）","https://www.pmda.go.jp/PmdaSearch/iyakuSearch/"]
+];
+
+/* ---------- 状態 ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const DM={};D.forEach(d=>DM[d.id]=d);
+let S={sel:[],done:{},res:{},start:"",hz:"12",mg:"1",outN:"3",outO:"1",tab:"map",mapG:"all",selG:"all"};
+function load(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");if(o)S=Object.assign(S,o);}catch(e){}S.sel=(S.sel||[]).filter(id=>DM[id]);}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const R=k=>(S.res||{})[k]||"";
+function prof(){try{return window.WardProfile?WardProfile.get():{};}catch(e){return {};}}
+
+/* ---------- 日付 ---------- */
+function pd(s){if(!s)return null;const a=s.split("-").map(Number);if(a.length<3||!a[0])return null;return new Date(a[0],a[1]-1,a[2]);}
+function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function addD(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function addM(d,n){const x=new Date(d);const day=x.getDate();x.setDate(1);x.setMonth(x.getMonth()+n);const last=new Date(x.getFullYear(),x.getMonth()+1,0).getDate();x.setDate(Math.min(day,last));return x;}
+function off(d,o){if(typeof o==="string"&&/m$/.test(o))return addM(d,parseInt(o,10));return addD(d,+o);}
+const WD="日月火水木金土";
+function fmt(d){return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+"（"+WD[d.getDay()]+"）";}
+function fmtS(d){return (d.getMonth()+1)+"/"+d.getDate()+"（"+WD[d.getDay()]+"）";}
+function today(){const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate());}
+
+/* ---------- 選択薬からまとめる ---------- */
+function sel(){return S.sel.map(id=>DM[id]).filter(Boolean);}
+function has(id){return S.sel.indexOf(id)>=0;}
+function hasAny(a){return a.some(has);}
+const CPL=["ecu","rav","zil"],BDEP=["ofa","ine","rtx"],IMMS=["psl","mpp","aza","tac","csa","mmf","mtx","cpa","tcz","sat","ine","rtx","ofa","fty","sipo","ntz","dmf","drf"];
+function merged(){
+  const map={};
+  sel().forEach(d=>{(d.pre||[]).forEach(p=>{const opt=/\?$/.test(p),k=p.replace("?","");if(!CK[k])return;
+    const e=map[k]||(map[k]={k,req:false,who:[],notes:[]});if(!opt)e.req=true;e.who.push(d.s);
+    if(d.pn&&d.pn[k])e.notes.push(d.s+"："+d.pn[k]);});});
+  return map;
+}
+function hbvClass(){
+  let c="";sel().forEach(d=>{let x=d.hbv;if(!x&&(d.pre||[]).some(p=>p.replace("?","")==="hbv"))x="b";
+    const rk={"":0,b:1,c:2,a:3};if(rk[x]>rk[c])c=x;});return c;
+}
+function hbvState(){
+  const s=R("hbs"),c=R("hbc"),ab=R("hbsab"),dna=R("dna");
+  if(!s)return "none";
+  if(s==="p")return "carrier";
+  if(!c||!ab)return "neg-partial";
+  if(c==="p"||ab==="p"){if(!dna)return "past-nodna";return dna==="hi"?"past-hi":"past-lo";}
+  return "naive";
+}
+function resDone(k){
+  switch(k){
+    case "hbv":{const st=hbvState();return st!=="none"&&st!=="neg-partial"&&st!=="past-nodna";}
+    case "igra":return !!R("igra");
+    case "jcv":return !!R("jcv");
+    case "men":return R("men")==="2"||(R("men")==="1"&&!!R("menD"));
+    case "vzv":return !!R("vzv");
+    case "nudt":return !!R("nudt");case "hla":return !!R("hla");case "cyp":return !!R("cyp");case "apoe":return !!R("apoe");
+  }return false;
+}
+function isDone(k){const c=CK[k];if(S.done[k])return true;if(c&&c.res)return resDone(c.res);return false;}
+
+/* ---------- 要対応の判定 ---------- */
+function alerts(){
+  const A=[],p=prof(),M=merged(),add=(t,m)=>A.push({t,m});
+  const ds=sel();if(!ds.length)return A;
+  /* HBV */
+  if(M.hbv){const st=hbvState(),cl=hbvClass();
+    const mon={a:"HBV-DNAを月1回、治療中と終了後少なくとも12ヵ月（リツキシマブ等：高リスク）",c:"開始後と治療内容の変更・中止後少なくとも6ヵ月は月1回、以後3ヵ月毎にHBV-DNA",b:"HBV-DNAを1〜3ヵ月毎を目安（治療内容で間隔と期間を調整）"}[cl||"b"];
+    if(st==="carrier")add("crit","HBs抗原陽性：開始前に肝臓専門医へ。HBe抗原・HBe抗体・HBV-DNAを測り、核酸アナログ（エンテカビル〈バラクルード〉、テノホビル アラフェナミド〈ベムリディ〉）を開始してから"+(hasAny(BDEP)?"。B細胞除去薬は特に危険（オファツムマブはHBs抗原陽性に使わない）":""));
+    else if(st==="past-nodna")add("warn","HBV既往感染（HBc抗体または HBs抗体陽性）：リアルタイムPCRでHBV-DNAを測定");
+    else if(st==="past-hi")add("crit","HBV-DNA 20 IU/mL（1.3 LogIU/mL）以上：直ちに核酸アナログを開始（肝臓専門医と相談）。免疫抑制薬はすぐに止めず方針を相談");
+    else if(st==="past-lo")add("warn","HBV既往感染・HBV-DNA 20 IU/mL未満："+mon+"。20 IU/mL以上で直ちに核酸アナログ");
+    else if(st==="naive"&&R("hbsab")==="n")add("info","HBV未感染：HBワクチンを検討（効果は開始前のほうが出やすい）");
+    else if(st==="naive")add("ok","HBV：通常の対応");
+  }
+  /* 結核 */
+  if(M.tb){const g=R("igra");if(g==="p")add("warn","IGRA陽性（潜在性結核）：LTBI治療（イソニアジド〈イスコチン〉6〜9ヵ月など）を先行。生物学的製剤はLTBI治療開始後3週を目安に開始。活動性結核は胸部X線・CTで除外");else if(g==="i")add("warn","IGRA判定保留：再検、または胸部画像・接触歴で判断（呼吸器内科と相談）");}
+  /* 髄膜炎菌 */
+  if(hasAny(CPL)){const mv=R("men"),md=pd(R("menD")),st=pd(S.start),imm=hasAny(IMMS);
+    if(!mv)add("crit","髄膜炎菌ワクチン未接種：メンクアッドフィを開始の少なくとも2週前までに。緊急で始めるときは接種後2週間は抗菌薬を予防投与（施設の方針で選択）");
+    else{
+      if(md){const safe=addD(md,14);
+        if(st&&st<safe)add("warn","開始予定日 "+fmt(st)+" はワクチン1回目から2週未満："+fmt(safe)+" までは抗菌薬を予防投与");
+        else if(st)add("ok","髄膜炎菌ワクチン：1回目から2週以上あけて開始できる（"+fmt(safe)+"以降）");
+        if(mv==="1"&&imm)add("warn","免疫抑制薬・ステロイドを併用中：2回目を "+fmt(addD(md,56))+" 以降（8週以上あける）");
+      }else if(mv==="1")add("info","1回目の接種日を入れると、2週後・2回目の日付を出します");
+    }
+    const cards=ds.filter(d=>d.cpl).map(d=>d.s+"：中止後"+d.cpl);add("info","患者安全性カード（"+cards.join("、")+"は携帯）。B群ワクチンは国内未承認");
+  }
+  /* JCV（ナタリズマブ） */
+  if(has("ntz")){const j=R("jcv"),is=R("ntzIS")==="y";
+    const T={n:["info","抗JCV抗体陰性：PML推定 0.1/1,000人。新規感染・偽陰性に備え6ヵ月毎に再検"],l:["info","抗JCV抗体陽性・index 0.9以下：投与72回（6年）時点の累積推定 1.6/1,000人。6ヵ月毎にindexを再検"],m:["warn","index 0.9超〜1.5以下：6年時点の累積推定 8.5/1,000人。継続の利益とリスクを定期的に評価"],h:["crit","index 1.5超：6年時点の累積推定 28.0/1,000人。投与継続の是非を再評価（他剤への切替を検討）。継続するならMRIを3〜6ヵ月毎に"]};
+    if(!j)add("warn","ナタリズマブ：開始前に抗JCV抗体（index）を測り、結果を説明して同意を得る");
+    else add(T[j][0],T[j][1]);
+    if(j&&j!=="n"&&is)add("crit","免疫抑制剤の治療歴あり：PMLリスクがさらに高い（適正使用ガイドの表で確認）。MRIの頻度を増やす");
+  }
+  /* VZV（S1P受容体調節薬） */
+  if(M.vzv&&R("vzv")==="n")add("warn","VZV抗体陰性：水痘ワクチン（乾燥弱毒生水痘ワクチン「ビケン」）を接種し、1ヵ月あけてから開始");
+  /* CYP2C9 */
+  if(has("sipo")){const c=R("cyp");if(c==="33")add("crit","CYP2C9*3/*3：シポニモドは禁忌");else if(c==="13")add("warn","CYP2C9*1/*3・*2/*3：シポニモドの維持量は1 mg");else if(c==="11")add("ok","CYP2C9 *1/*1・*1/*2・*2/*2：維持量は2 mg");else add("warn","シポニモド：開始前にCYP2C9遺伝子型が必要");}
+  /* NUDT15 */
+  if(has("aza")){const n=R("nudt");if(n==="hom")add("crit","NUDT15 ホモ（Cys/Cys など）：重い白血球減少・全脱毛の危険。アザチオプリンは避ける");else if(n==="het")add("warn","NUDT15 ヘテロ：少量から開始し、血算をこまめに");else if(!n)add("warn","アザチオプリン：開始前にNUDT15遺伝子型を確認");}
+  /* HLA */
+  if(hasAny(["cbz","oxc"])){const h=R("hla");if(h==="p")add("crit","HLA-A*31:01陽性：カルバマゼピンは避け、代替薬を選ぶ（オクスカルバゼピンも交差に注意）");else if(h==="n")add("info","HLA-A*31:01陰性でも薬疹は起こる（GENCATで2.0%）。開始8週は皮疹に注意");else if(has("cbz"))add("info","HLA-A*31:01は任意（保険適用外、2018年時点）。検査しないときは開始8週の皮疹に特に注意");}
+  /* APOE・抗凝固 */
+  if(hasAny(["lec","don"])){const a=R("apoe");if(a==="hom")add("warn","APOE ε4ホモ接合型：ARIAの頻度・重症度・症候性ARIAが高い。適応を慎重に判断");else if(!a)add("info","APOE遺伝子検査は2026年7月に保険収載。8月の添付文書改訂で投与前の実施を考慮と追記");
+    if(p.at==="ac"||p.at==="both")add("warn","抗凝固薬を内服中（共通プロファイル）：ARIAに伴う脳出血のリスク。適応を慎重に");}
+  /* ラモトリギン */
+  if(has("ltg")){const c=ltgCombo();add("info","ラモトリギンの漸増："+LTG[c].name+"（定期タブに増量日）");}
+  /* ステロイド */
+  if(has("psl")){const d=R("pslD"),w=R("pslW");
+    if(d==="hi"&&(w==="l"||w==="vl"))add("warn","PSL 20 mg/日以上を4週以上：PJP予防（ST合剤：バクタ配合錠 1錠/日 連日、または2錠 週3回）");
+    if(w==="vl")add("warn","経口ステロイド3ヵ月以上：GIOPの評価（骨密度・既存骨折）。骨粗鬆症薬：アレンドロン酸（フォサマック・ボナロン）、デノスマブ（プラリア）など");
+    if(d==="hi"&&w&&w!=="s")add("info","PSL 20 mg/日以上を2週以上：生ワクチンは禁忌");}
+  /* 妊娠 */
+  if(p.preg==="preg"){const ng=ds.filter(d=>d.noPreg);if(ng.length)add("crit","妊娠中（共通プロファイル）："+ng.map(d=>d.g).join("、")+" は禁忌・原則避ける。妊娠・授乳と神経疾患薬ナビで確認");}
+  /* 腎機能 */
+  if(p.renal==="lt15"||p.renal==="15-29"){if(has("mtx"))add("crit","腎機能高度低下（共通プロファイル）：メトトレキサートは禁忌・大幅減量");if(has("ivig"))add("warn","腎機能低下（共通プロファイル）：IVIgは急性腎障害に注意（スクロース非含有の製剤・投与速度）");}
+  /* 開始日とワクチン期限 */
+  const st=pd(S.start);
+  if(st&&(M.live||M.inact)){const lv=addD(st,-28),ia=addD(st,-14),t=today();
+    if(M.live)add(lv<t?"warn":"info",lv<t?"開始まで4週を切っている：生ワクチンが必要なら接種して開始を4週以上遅らせる（不要なら打たずに開始）":"生ワクチンの期限："+fmt(lv)+"（開始4週前）");
+    if(M.inact)add("info","不活化ワクチンの目安："+fmt(ia)+"まで（開始2週前）");}
+  /* 適応外 */
+  const off=ds.filter(d=>d.ap==="off");if(off.length)add("info","適応外："+off.map(d=>d.g).join("、")+"（施設の手続きで）");
+  return A;
+}
+
+/* ---------- ラモトリギンの漸増 ---------- */
+const LTG={
+ mono:{name:"単剤・その他の併用",steps:[[0,"25 mg/日"],[14,"50 mg/日"],[28,"100 mg/日（以後1〜2週ごとに最大100 mgずつ、維持100〜200 mg/日）"]]},
+ vpa:{name:"バルプロ酸併用",steps:[[0,"25 mg 隔日"],[14,"25 mg/日"],[28,"以後1〜2週ごとに25〜50 mgずつ（維持100〜200 mg/日）"]]},
+ ind:{name:"誘導薬併用（バルプロ酸なし）",steps:[[0,"50 mg/日"],[14,"100 mg/日 分2"],[28,"以後1週ごとに最大100 mgずつ（維持200〜400 mg/日）"]]}
+};
+function ltgCombo(){const c=R("ltgC");if(c)return c;if(has("vpa"))return "vpa";if(hasAny(["cbz","pht"]))return "ind";return "mono";}
+
+/* ---------- 定期検査の予定 ---------- */
+function occs(){
+  const st=pd(S.start);if(!st)return [];
+  const end=addM(st,+S.hz),O=[];
+  const push=(date,k,n,who,u)=>{if(date>end)return;O.push({date,k,n,who,u});};
+  sel().forEach(d=>{(d.mon||[]).forEach(it=>{
+    // 特殊：ナタリズマブ高リスクはMRIを3ヵ月毎
+    let r=it.r,n=it.n,dd=it.d;
+    if(d.id==="ntz"&&it.k==="mri"){const j=R("jcv");if(j==="h"||(j&&j!=="n"&&R("ntzIS")==="y")){dd=[91];r=91;n="高リスク：3〜6ヵ月毎（ここでは3ヵ月で表示）";}}
+    let last=null;dd.forEach(o=>{const dt=off(st,o);last=dt;push(dt,it.k,n,d.s,it.u);});
+    if(r&&last){let i=1,dt;while(i<200){dt=(typeof r==="string")?addM(last,parseInt(r,10)*i):addD(last,r*i);if(dt>end)break;push(dt,it.k,n,d.s,it.u);i++;}}
+  });});
+  /* 抗Aβ抗体薬：投与回数でMRI */
+  if(has("lec"))[[3,"3回目投与前・望ましい"],[5,"5回目投与前"],[7,"7回目投与前"],[14,"14回目投与前"]].forEach(([n,l])=>push(addD(st,(n-1)*14),"mri",l+"・ARIA","LEC",0));
+  if(has("don"))[[2,"2回目投与前"],[3,"3回目投与前・必須"],[4,"4回目投与前"],[7,"7回目投与前"]].forEach(([n,l])=>push(addD(st,(n-1)*28),"mri",l+"・ARIA","DON",0));
+  /* HBV-DNA */
+  const hs=hbvState(),cl=hbvClass()||"b";
+  if(hs==="past-lo"||hs==="past-nodna"){
+    if(cl==="a"){for(let i=1;i<=+S.hz;i++)push(addM(st,i),"hbv","月1回（終了後も12ヵ月以上）","HBV",0);}
+    else if(cl==="c"){for(let i=1;i<=6;i++)push(addM(st,i),"hbv","6ヵ月までは月1回","HBV",0);for(let i=9;i<=+S.hz;i+=3)push(addM(st,i),"hbv","以後3ヵ月毎","HBV",0);}
+    else{for(let i=2;i<=+S.hz;i+=2)push(addM(st,i),"hbv","1〜3ヵ月毎（ここでは2ヵ月で表示）","HBV",0);}
+  }
+  /* 髄膜炎菌 */
+  const md=pd(R("menD"));
+  if(hasAny(CPL)&&md){if(R("men")==="1"&&hasAny(IMMS))push(addD(md,56),"vac","髄膜炎菌 2回目（8週以上あける）","MEN",0);push(addD(md,365*5),"vac","髄膜炎菌 追加接種（5年毎が目安）","MEN",0);}
+  /* ラモトリギン */
+  if(has("ltg"))LTG[ltgCombo()].steps.forEach(([o,t])=>push(addD(st,o),"step","ラモトリギン "+t,"LTG",1));
+  return O.sort((a,b)=>a.date-b.date);
+}
+function visits(){
+  const O=occs(),V=[],win=S.mg==="1"?6:0;
+  O.forEach(o=>{
+    let v=V.length?V[V.length-1]:null;
+    if(!v||(o.date-v.date)/864e5>win){v={date:o.date,items:{}};V.push(v);}
+    const key=o.k+(o.k==="lvl"||o.k==="dose"||o.k==="step"||o.k==="vac"||o.k==="eval"?"|"+o.who+o.n:"");
+    const it=v.items[key]||(v.items[key]={k:o.k,who:[],n:[],u:0});
+    if(it.who.indexOf(o.who)<0)it.who.push(o.who);if(o.n&&it.n.indexOf(o.n)<0)it.n.push(o.n);if(o.u)it.u=1;
+  });
+  return V;
+}
+function itemText(it,html){
+  const lab=SL[it.k]||it.k,n=it.n.join("／"),w=it.who.join("・");
+  if(html)return '<span class="it'+(it.u?' u':'')+'">'+esc(lab)+(n?'：'+esc(n):'')+' <small>'+esc(w)+'</small></span>';
+  return lab+(n&&(it.k==="dose"||it.k==="step"||it.k==="vac"||it.k==="eval"||it.k==="mri")?"（"+n+"）":"")+"〔"+w+"〕";
+}
+
+/* ---------- 描画：早見表 ---------- */
+function renderMap(){
+  const g=S.mapG;
+  $("mapGrp").innerHTML=[["all","すべて"]].concat(GRP).map(([k,l])=>'<button type="button" class="chip'+(g===k?' on':'')+'" data-mg="'+k+'">'+l+'</button>').join("");
+  let h='<thead><tr><th class="dn">薬</th>'+MAPCOL.map(c=>'<th>'+c[0]+'</th>').join("")+'</tr></thead><tbody>';
+  GRP.forEach(([gk,gl])=>{if(g!=="all"&&g!==gk)return;
+    const ds=D.filter(d=>d.grp[0]===gk||(g!=="all"&&d.grp.indexOf(gk)>=0));if(!ds.length)return;
+    h+='<tr class="grp"><td colspan="'+(MAPCOL.length+1)+'">'+gl+'</td></tr>';
+    ds.forEach(d=>{const pre={};(d.pre||[]).forEach(p=>{pre[p.replace("?","")]=/\?$/.test(p)?"o":"y";});
+      h+='<tr class="'+(has(d.id)?'sel':'')+'"><td class="dn" data-pick="'+d.id+'">'+esc(d.g)+(d.ap==="off"?' <span class="tag off">適応外</span>':d.ap==="part"?' <span class="tag x">一部適応外</span>':'')+'<small>'+esc(d.b)+'</small></td>';
+      MAPCOL.forEach(([,ks])=>{const y=ks.filter(k=>pre[k]==="y"),o=ks.filter(k=>pre[k]==="o");
+        const txt=y.map(k=>CK[k].s).concat(o.map(k=>"("+CK[k].s+")"));
+        const cls=y.length?"y":o.length?"o":"";
+        h+='<td class="'+cls+'">'+(txt.join(" ").replace(/\(●\)/g,"○")||"")+'</td>';});
+      h+='</tr>';});
+  });
+  $("mapTbl").innerHTML=h+'</tbody>';
+}
+/* ---------- 描画：薬を選ぶ ---------- */
+function renderSel(){
+  const g=S.selG;
+  $("grpChips").innerHTML=[["all","すべて"]].concat(GRP).map(([k,l])=>'<button type="button" class="chip'+(g===k?' on':'')+'" data-sg="'+k+'">'+l+'</button>').join("");
+  let h="";
+  GRP.forEach(([gk,gl])=>{if(g!=="all"&&g!==gk)return;
+    const ds=D.filter(d=>g==="all"?d.grp[0]===gk:d.grp.indexOf(gk)>=0);if(!ds.length)return;
+    h+='<div class="grpttl">'+gl+'</div><div class="chips">'+ds.map(d=>'<button type="button" class="chip'+(has(d.id)?' on':'')+'" data-pick="'+d.id+'">'+esc(d.g)+(d.ap==="off"?'（適応外）':'')+'<br><small>'+esc(d.b)+'</small></button>').join("")+'</div>';
+  });
+  $("drugChips").innerHTML=h;$("naNote").textContent=NA_NOTE;
+}
+function renderSelbars(){
+  const ds=sel();
+  const h=ds.length?'<span style="color:var(--muted)">対象：</span>'+ds.map(d=>'<span class="tg">'+esc(d.g)+'</span>').join("")+' <button type="button" class="btn sm" data-go="sel">変更</button>':'<span class="none">薬が選ばれていません。</span> <button type="button" class="btn sm" data-go="sel">薬を選ぶ</button>';
+  ["selbar1","selbar2","selbar3","selbar4","selbar5"].forEach(id=>{$(id).innerHTML=h;});
+}
+/* ---------- 描画：開始前 ---------- */
+function seg(k,opts,lab){
+  const v=R(k);
+  return '<div class="q"><span class="lb">'+lab+'</span><div class="seg" data-rk="'+k+'">'+opts.map(([val,t,c])=>'<button type="button" data-v="'+val+'" class="'+(v===val?'on '+(c||''):'')+'">'+t+'</button>').join("")+'</div></div>';
+}
+function renderRes(){
+  const M=merged();let h="";
+  if(M.hbv)h+='<h3>HBV</h3><div class="res">'+seg("hbs",[["","未"],["n","陰性"],["p","陽性","bad"]],"HBs抗原")+(R("hbs")!=="p"?seg("hbc",[["","未"],["n","陰性"],["p","陽性","mid"]],"HBc抗体")+seg("hbsab",[["","未"],["n","陰性"],["p","陽性","mid"],["v","陽性（ワクチン歴が明らか）"]],"HBs抗体"):"")+((R("hbc")==="p"||R("hbsab")==="p")&&R("hbs")!=="p"?seg("dna",[["","未"],["lo","20 IU/mL未満（検出せずを含む）"],["hi","20 IU/mL以上","bad"]],"HBV-DNA"):"")+'</div>';
+  if(M.tb)h+='<h3>結核</h3><div class="res">'+seg("igra",[["","未"],["n","陰性"],["p","陽性","bad"],["i","判定保留","mid"]],"IGRA")+'</div>';
+  if(hasAny(CPL))h+='<h3>髄膜炎菌ワクチン</h3><div class="res">'+seg("men",[["","未接種","bad"],["1","1回済"],["2","必要回数済"]],"接種状況")+'<div class="q"><span class="lb">1回目の接種日</span><input type="date" id="menD" value="'+esc(R("menD"))+'"></div></div>';
+  if(has("ntz"))h+='<h3>抗JCV抗体（ナタリズマブ）</h3><div class="res">'+seg("jcv",[["","未"],["n","陰性"],["l","陽性 index ≤0.9"],["m","0.9〜1.5","mid"],["h","1.5超","bad"]],"抗体・index")+seg("ntzIS",[["","なし"],["y","あり","bad"]],"免疫抑制剤の治療歴")+'</div>';
+  if(M.vzv)h+='<h3>VZV</h3><div class="res">'+seg("vzv",[["","未"],["h","既往・接種歴あり"],["p","抗体陽性"],["n","抗体陰性","mid"]],"水痘・帯状疱疹")+'</div>';
+  if(has("sipo"))h+='<h3>CYP2C9（シポニモド）</h3><div class="res">'+seg("cyp",[["","未"],["11","*1/*1・*1/*2・*2/*2"],["13","*1/*3・*2/*3","mid"],["33","*3/*3","bad"]],"遺伝子型")+'</div>';
+  if(has("aza"))h+='<h3>NUDT15（アザチオプリン）</h3><div class="res">'+seg("nudt",[["","未"],["wt","Arg/Arg（通常）"],["het","ヘテロ（Arg/Cys・Arg/His など）","mid"],["hom","ホモ・複合ヘテロ（Cys/Cys など）","bad"]],"遺伝子型")+'</div>';
+  if(hasAny(["cbz","oxc"]))h+='<h3>HLA-A*31:01</h3><div class="res">'+seg("hla",[["","未（任意）"],["n","陰性"],["p","陽性","bad"]],"結果")+'</div>';
+  if(hasAny(["lec","don"]))h+='<h3>APOE</h3><div class="res">'+seg("apoe",[["","未"],["non","ε4 非保有"],["het","ヘテロ"],["hom","ホモ","mid"]],"遺伝子型")+'</div>';
+  if(has("psl"))h+='<h3>ステロイドの量と期間</h3><div class="res">'+seg("pslD",[["","未選択"],["lo","PSL 20 mg/日未満"],["hi","20 mg/日以上","mid"]],"量")+seg("pslW",[["","未選択"],["s","4週未満"],["l","4週〜3ヵ月"],["vl","3ヵ月以上"]],"予定期間")+'</div>';
+  if(has("ltg"))h+='<h3>ラモトリギンの併用</h3><div class="res">'+seg("ltgC",[["","自動（選んだ薬から）"],["mono","単剤・その他"],["vpa","バルプロ酸併用"],["ind","誘導薬併用（バルプロ酸なし）"]],"漸増の表")+'</div>';
+  $("resCard").classList.toggle("hidden",!h);$("resBox").innerHTML=h;
+  const md=$("menD");if(md)md.addEventListener("change",()=>{S.res.menD=md.value;save();renderAll();});
+}
+function renderCk(){
+  const M=merged(),ks=Object.keys(M);
+  if(!ks.length){$("ckBox").innerHTML='<p class="hint">薬を選ぶと出ます。</p>';return;}
+  let h="";
+  CAT.forEach(c=>{const items=ks.filter(k=>CK[k].c===c).sort((a,b)=>(M[b].req?1:0)-(M[a].req?1:0));if(!items.length)return;
+    h+='<div class="cat">'+c+'</div>';
+    items.forEach(k=>{const e=M[k],dn=isDone(k),auto=!S.done[k]&&dn;
+      h+='<label class="ck'+(dn?' done':'')+(e.req?'':' opt')+'"><input type="checkbox" data-ck="'+k+'"'+(dn?' checked':'')+(auto?' disabled':'')+'><span class="bd"><span class="t">'+esc(CK[k].l)+'</span><span class="who">'+esc(e.who.join("・"))+(CK[k].res?'　→ 結果は上の欄で':'')+'</span>'+(e.notes.length?'<div class="nt">'+e.notes.map(esc).join("<br>")+'</div>':'')+'</span></label>';});
+  });
+  $("ckBox").innerHTML=h;
+}
+function summary(){
+  const ds=sel();if(!ds.length)return {tone:"info",pill:"開始前",big:"薬を選んでください",list:[]};
+  const M=merged(),req=Object.keys(M).filter(k=>M[k].req),rem=req.filter(k=>!isDone(k));
+  const A=alerts(),crit=A.filter(a=>a.t==="crit"),warn=A.filter(a=>a.t==="warn");
+  let tone="ok",pill="開始可（チェック完了）",big="開始前チェックはすべて済み";
+  if(crit.length){tone="crit";pill="要対応";big=crit[0].m.split("：")[0]+(crit.length>1?" ほか"+(crit.length-1)+"件":"")+(rem.length?"／未"+rem.length+"項目":"");}
+  else if(warn.length||rem.length){tone="warn";pill=rem.length?"未 "+rem.length+"項目":"確認あり";big=rem.length?"開始前チェック 残り"+rem.length+"項目"+(warn.length?"・確認"+warn.length+"件":""):warn[0].m.split("：")[0];}
+  return {tone,pill,big,list:A,rem};
+}
+function renderPre(){
+  renderRes();renderCk();
+  const s=summary(),v=$("verdict");
+  v.className="verdict "+s.tone;v.querySelector(".pill").textContent=s.pill;$("vBig").textContent=s.big;
+  $("vList").innerHTML=s.list.map(a=>'<li class="'+a.t+'">'+esc(a.m)+'</li>').join("");
+  $("startD").value=S.start||"";$("startD2").value=S.start||"";
+  try{if(window.wcSum){if(sel().length)wcSum.set((sel().map(d=>d.s).join("+"))+"："+s.big,{tone:s.tone,pill:s.pill});else wcSum.set(null);}}catch(e){}
+}
+/* ---------- 描画：定期 ---------- */
+function renderSch(){
+  $$("#hzSeg button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.hz));
+  $$("#mgSeg button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.mg));
+  const st=pd(S.start);
+  if(!sel().length){$("schBox").innerHTML='<p class="hint">薬を選んでください。</p>';return;}
+  if(!st){$("schBox").innerHTML='<p class="hint">開始日を入れてください（初回投与日）。</p>';return;}
+  const V=visits(),t=today();let nextDone=false;
+  if(!V.length){$("schBox").innerHTML='<p class="hint">この期間に決まった定期検査はありません（症状に応じて）。</p>';return;}
+  let h='<table class="sch">';
+  V.forEach(v=>{const past=v.date<t;let cls=past?"past":"";if(!past&&!nextDone){cls="next";nextDone=true;}
+    const wk=Math.round((v.date-st)/864e5/7);
+    h+='<tr class="'+cls+'"><td class="d">'+fmtS(v.date)+'<small>'+v.date.getFullYear()+'年・'+(wk<0?'開始前':wk+'週')+'</small></td><td>'+Object.values(v.items).map(it=>itemText(it,true)).join("")+'</td></tr>';});
+  $("schBox").innerHTML=h+'</table><p class="hint">症状が出たとき（感染・PML・ARIAを疑うときなど）は予定に関係なく検査する。</p>';
+}
+/* ---------- 描画：注意 ---------- */
+function renderCau(){
+  const ds=sel();let sp="";
+  if(has("ntz")){sp+='<section class="card"><h2>ナタリズマブのPMLリスク層別</h2><table class="tb"><tr><th>抗JCV抗体</th><th>推定PML発現（/1,000人）</th><th>モニタリング</th></tr><tr><td>陰性</td><td>0.1</td><td>6ヵ月毎に再検、MRI 年1回以上</td></tr><tr><td>陽性 index ≤0.9</td><td>1.6（投与72回＝6年時点の累積）</td><td>6ヵ月毎にindex</td></tr><tr><td>0.9超〜1.5</td><td>8.5（同）</td><td>継続の是非を定期的に評価</td></tr><tr><td>1.5超</td><td>28.0（同）</td><td>切替を検討。継続ならMRI 3〜6ヵ月毎</td></tr></table><p class="fine">免疫抑制剤の治療歴があるとリスクはさらに高い。出典：タイサブリ適正使用ガイド<span class="tag v">照合</span>。PMLを疑えば中断し、DWIを含むMRIと髄液JCV-DNA。</p></section>';}
+  if(hasAny(["lec","don"])){sp+='<section class="card"><h2>ARIAの重症度と対応</h2><table class="tb"><tr><th>所見</th><th>レカネマブ</th><th>ドナネマブ</th></tr><tr><td>ARIA-E・ARIA-H 軽度・無症候性</td><td colspan="2">慎重に臨床評価のうえ継続可（注意深く経過観察）</td></tr><tr><td>軽度でも症候性、または中等度</td><td>症状・画像所見が消失（ARIA-Hは安定）するまで中断</td><td>中等度・無症候性は中断。症候性は中断または中止</td></tr><tr><td>重度</td><td>中断（再開は慎重に）</td><td>中断または中止</td></tr><tr><td>1 cmを超える脳出血</td><td>画像が安定するまで中断</td><td>中止</td></tr></table><p class="fine">中断後のMRIは発現から約2〜4ヵ月後。投与前MRI：レカネマブは開始前1年以内・5・7・14回目の前（3回目前も望ましい）、ドナネマブは2・3・4・7回目の前（3回目前は必須）。いずれも以後も定期的に。認知症外来ナビ（各添付文書 7項、2026年6月改訂）と同じ<span class="tag v">照合</span>。</p></section>';}
+  if(has("ltg")){const c=ltgCombo();sp+='<section class="card"><h2>ラモトリギンの漸増（'+esc(LTG[c].name)+'）</h2><table class="tb"><tr><th>時期</th><th>用量</th></tr>'+LTG[c].steps.map(([o,t])=>'<tr><td>'+(o===0?'1〜2週':o===14?'3〜4週':'5週以降')+'</td><td>'+esc(t)+'</td></tr>').join("")+'</table><p class="fine">抗てんかん薬ナビと同じ値<span class="tag u">未照合</span>。併用の区分は「開始前」で変えられる。</p></section>';}
+  $("cauSpecial").innerHTML=sp;
+  if(!ds.length){$("cauBox").innerHTML='<p class="hint">薬を選ぶと出ます。</p>';return;}
+  $("cauBox").innerHTML=ds.map(d=>{const c=d.cau||{};
+    return '<details class="dr" open><summary>'+esc(d.g)+'（'+esc(d.b)+'）'+(d.ver==="v"?'<span class="tag v">照合</span>':d.ver==="p"?'<span class="tag x">一部照合</span>':'<span class="tag u">未照合</span>')+'</summary><p class="kv"><b>適応</b>'+esc(d.ind)+(d.ap==="off"?' <span class="tag off">適応外</span>':'')+'</p>'+
+      (c.stop?'<p class="kv"><b>中止・休薬</b></p><ul class="pl">'+c.stop.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>':'')+
+      (c.inf?'<p class="kv"><b>感染症時</b></p><ul class="pl">'+c.inf.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>':'')+
+      (c.vac?'<p class="kv"><b>ワクチン・相互作用</b></p><ul class="pl">'+c.vac.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>':'')+'</details>';}).join("");
+}
+/* ---------- 出力 ---------- */
+let outDirty=false;
+function resLine(){
+  const L=[],M=merged();
+  if(M.hbv&&R("hbs")){const t={n:"陰性",p:"陽性",v:"陽性（ワクチン）"};let s="HBs抗原 "+t[R("hbs")];if(R("hbc"))s+="／HBc抗体 "+t[R("hbc")];if(R("hbsab"))s+="／HBs抗体 "+t[R("hbsab")];if(R("dna"))s+="／HBV-DNA "+(R("dna")==="hi"?"20 IU/mL以上":"20 IU/mL未満");L.push(s);}
+  if(M.tb&&R("igra"))L.push("IGRA "+({n:"陰性",p:"陽性",i:"判定保留"}[R("igra")]));
+  if(hasAny(CPL))L.push("髄膜炎菌ワクチン "+({"":"未接種","1":"1回済","2":"必要回数済"}[R("men")])+(R("menD")?"（1回目 "+fmt(pd(R("menD")))+"）":""));
+  if(has("ntz")&&R("jcv"))L.push("抗JCV抗体 "+({n:"陰性",l:"陽性 index≤0.9",m:"陽性 index 0.9〜1.5",h:"陽性 index>1.5"}[R("jcv")]));
+  if(M.vzv&&R("vzv"))L.push("VZV "+({h:"既往・接種歴あり",p:"抗体陽性",n:"抗体陰性"}[R("vzv")]));
+  if(has("sipo")&&R("cyp"))L.push("CYP2C9 "+({"11":"*1/*1等","13":"*1/*3・*2/*3","33":"*3/*3"}[R("cyp")]));
+  if(has("aza")&&R("nudt"))L.push("NUDT15 "+({wt:"Arg/Arg",het:"ヘテロ",hom:"ホモ"}[R("nudt")]));
+  if(hasAny(["cbz","oxc"])&&R("hla"))L.push("HLA-A*31:01 "+({n:"陰性",p:"陽性"}[R("hla")]));
+  if(hasAny(["lec","don"])&&R("apoe"))L.push("APOE "+({non:"ε4非保有",het:"ε4ヘテロ",hom:"ε4ホモ"}[R("apoe")]));
+  return L;
+}
+function shortL(k){return CK[k].l.split("（")[0].replace(/：.*/,"")+(k==="hbv"?"（HBs抗原・HBc抗体・HBs抗体）":"");}
+function buildOut(){
+  const ds=sel();if(!ds.length)return "";
+  const M=merged(),ks=Object.keys(M),done=ks.filter(isDone),todo=ks.filter(k=>!isDone(k)&&M[k].req),opt=ks.filter(k=>!isDone(k)&&!M[k].req);
+  let t="【治療開始前スクリーニング】"+ds.map(d=>d.g+"（"+d.b.split("・")[0].split("／")[0]+"）").join("、")+"\n";
+  t+="済："+(done.length?done.map(shortL).join("、"):"なし")+"\n";
+  t+="未："+(todo.length?todo.map(shortL).join("、"):"なし")+"\n";
+  if(opt.length)t+="考慮："+opt.map(shortL).join("、")+"\n";
+  const rl=resLine();if(rl.length)t+="結果："+rl.join("／")+"\n";
+  const A=alerts().filter(a=>a.t==="crit"||a.t==="warn");if(A.length)t+="要対応：\n"+A.map(a=>"・"+a.m).join("\n")+"\n";
+  const st=pd(S.start);
+  if(st){const V=visits().filter(v=>v.date>=today()),n=+S.outN;
+    t+="【次回検査予定】開始日 "+fmt(st)+"\n";
+    t+=V.length?V.slice(0,n).map(v=>"・"+fmt(v.date)+" "+Object.values(v.items).map(it=>itemText(it,false)).join("、")).join("\n")+"\n":"・予定なし（症状に応じて）\n";
+  }
+  if(S.outO==="1"){const ord=[];todo.concat(opt.filter(k=>M[k].req)).forEach(k=>{if(CK[k].o)CK[k].o.split(", ").forEach(x=>{if(ord.indexOf(x)<0)ord.push(x);});});
+    const hs=hbvState();if(M.hbv&&hs==="past-nodna"&&ord.indexOf("HBV-DNA（リアルタイムPCR）")<0)ord.push("HBV-DNA（リアルタイムPCR）");
+    if(ord.length)t+="【オーダーの控え】"+ord.join("、")+"\n";}
+  return t.trim();
+}
+function renderOut(force){
+  $$("#outN button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.outN));
+  $$("#outO button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.outO));
+  if(!outDirty||force){$("outTxt").value=buildOut()||"薬を選ぶと、カルテに貼る文を作ります。";outDirty=false;}
+}
+function renderRef(){
+  $("refBox").innerHTML=REFS.map(r=>'<div><small>'+esc(r[0])+'</small><a href="'+esc(r[2])+'" target="_blank" rel="noopener">'+esc(r[1])+'</a></div>').join("");
+  $("ver").textContent=VER+(MODE==="pwa"?"":"（カルテ端末用）");
+}
+function $$(q){return Array.from(document.querySelectorAll(q));}
+function renderAll(){renderSelbars();renderMap();renderSel();renderPre();renderSch();renderCau();renderOut();}
+
+/* ---------- タブ ---------- */
+function setTab(v){S.tab=v;$$("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v?"true":"false"));
+  $$(".view").forEach(x=>x.classList.toggle("hidden",x.id!=="v-"+v));save();try{window.scrollTo(0,0);}catch(e){}}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),2600);}
+
+/* ---------- イベント ---------- */
+document.addEventListener("click",e=>{
+  const tb=e.target.closest("nav.tabs button");if(tb){setTab(tb.dataset.v);return;}
+  const go=e.target.closest("[data-go]");if(go){setTab(go.dataset.go);return;}
+  const pk=e.target.closest("[data-pick]");if(pk){const id=pk.dataset.pick,i=S.sel.indexOf(id),inMap=!!pk.closest("#mapTbl");
+    if(i>=0)S.sel.splice(i,1);else S.sel.push(id);
+    outDirty=false;save();renderAll();if(inMap&&i<0){setTab("pre");toast(DM[id].g+" を加えました");}return;}
+  const mg=e.target.closest("[data-mg]");if(mg){S.mapG=mg.dataset.mg;save();renderMap();return;}
+  const sg=e.target.closest("[data-sg]");if(sg){S.selG=sg.dataset.sg;save();renderSel();return;}
+  const rb=e.target.closest(".seg[data-rk] button");if(rb){const k=rb.parentNode.dataset.rk;S.res[k]=(S.res[k]===rb.dataset.v&&rb.dataset.v!=="")?"":rb.dataset.v;outDirty=false;save();renderAll();return;}
+  const hz=e.target.closest("#hzSeg button");if(hz){S.hz=hz.dataset.v;outDirty=false;save();renderSch();renderOut();return;}
+  const mgb=e.target.closest("#mgSeg button");if(mgb){S.mg=mgb.dataset.v;outDirty=false;save();renderSch();renderOut();return;}
+  const on=e.target.closest("#outN button");if(on){S.outN=on.dataset.v;save();renderOut(true);return;}
+  const oo=e.target.closest("#outO button");if(oo){S.outO=oo.dataset.v;save();renderOut(true);return;}
+});
+document.addEventListener("change",e=>{const c=e.target.closest("[data-ck]");if(c){const k=c.dataset.ck;if(c.checked)S.done[k]=true;else delete S.done[k];outDirty=false;save();renderPre();renderOut();}});
+function setStart(v){S.start=v;outDirty=false;save();renderAll();}
+$("startD").addEventListener("change",e=>setStart(e.target.value));
+$("startD2").addEventListener("change",e=>setStart(e.target.value));
+$("startToday").addEventListener("click",()=>setStart(ymd(today())));
+$("selClear").addEventListener("click",()=>{S.sel=[];outDirty=false;save();renderAll();});
+$("ckReset").addEventListener("click",()=>{S.done={};outDirty=false;save();renderAll();});
+$("outTxt").addEventListener("input",()=>{outDirty=true;});
+$("regen").addEventListener("click",()=>renderOut(true));
+$("copyBtn").addEventListener("click",async()=>{const ta=$("outTxt"),t=ta.value;
+  try{await navigator.clipboard.writeText(t);toast("コピーしました");}
+  catch(e){try{ta.focus();ta.select();document.execCommand("copy");toast("コピーしました");}catch(_){toast("コピーできませんでした。選択してコピーしてください");}}});
+
+load();renderRef();renderAll();setTab(S.tab||"map");
+document.addEventListener("DOMContentLoaded",()=>{try{if(window.WardProfile)WardProfile.onChange(()=>{outDirty=false;renderAll();});}catch(e){}renderAll();});
+window.addEventListener("load",()=>renderPre());
+document.getElementById("forceUpdate").addEventListener("click",async()=>{toast("最新版を確認しています…");try{if("serviceWorker" in navigator){const r=await navigator.serviceWorker.getRegistration("../");if(r)await r.update();}}catch(e){}try{await fetch(location.href,{cache:"reload"});}catch(e){toast("通信できないため更新を確認できません");return;}setTimeout(()=>location.reload(),800);});
+</script>
+<script>
+(function(){
+  try{
+    var h=location.hostname;
+    var secure = location.protocol==='https:' || h==='localhost' || h==='127.0.0.1';
+    var onClaude = /(^|\.)claude\.ai$/.test(h) || /claudeusercontent|claude\.site/.test(h) || !!window.claude;
+    if(!('serviceWorker' in navigator) || !secure || onClaude) return;
+    navigator.serviceWorker.register("../sw.js",{scope:"../"}).then(function(reg){
+      reg.addEventListener('updatefound', function(){
+        var w=reg.installing; if(!w) return;
+        w.addEventListener('statechange', function(){
+          if(w.state==='installed' && navigator.serviceWorker.controller) toast('新しい版を取り込みました。次に開いたときに反映されます');
+        });
+      });
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
+<!-- wc-sum:start（病棟アプリ共通の結果の固定表示。編集時はこのブロックごと差し替える。書き換えるのは SRC と HOST だけ） -->
+<style>
+#wcSum{display:none;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:6px 0 0;padding:6px 10px;min-height:34px;border:0;border-left:5px solid #6B7A86;border-radius:8px;background:#FFFFFF;color:#1B2428;font:700 13.5px/1.35 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#wcSum.on{display:flex}
+#wcSum .t{flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wcSum .p{flex:none;font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#6B7A86;color:#fff}
+#wcSum .g{flex:none;font-size:12px;color:#6B7A86;font-weight:500}
+#wcSum.ok{border-left-color:#1F7A4D;background:#E9F6EF}#wcSum.ok .p{background:#1F7A4D}
+#wcSum.warn{border-left-color:#B7791F;background:#FFF5E0}#wcSum.warn .p{background:#B7791F}
+#wcSum.crit{border-left-color:#B42318;background:#FDECEA}#wcSum.crit .p{background:#B42318}
+#wcSum.info{border-left-color:#1E5FA8;background:#EAF2FB}#wcSum.info .p{background:#1E5FA8}
+@media (prefers-color-scheme: dark){
+  #wcSum{background:#1F2427;color:#ECEFF0}#wcSum .g{color:#A9B3B6}
+  #wcSum.ok{background:#12301F}#wcSum.warn{background:#3A2C0C}#wcSum.crit{background:#3A1512}#wcSum.info{background:#122A45}
+}
+@media print{#wcSum{display:none!important}}
+</style>
+<script>
+(function(){
+  /* ① 要約の元にする要素（CSSセレクタ）。画面に見えている最初の1つを使う。.big があればその文、.pill があれば先頭に付ける */
+  var SRC=["#verdict"];
+  /* ② 固定表示を置く場所（sticky のヘッダー）。共通プロファイルの帯があればその下に入る */
+  var HOST="header.top";
+  var h=document.querySelector(HOST)||document.querySelector("body>header")||document.querySelector("header");
+  if(!h||document.getElementById("wcSum"))return;
+  var b=document.createElement("button");b.type="button";b.id="wcSum";b.setAttribute("aria-live","polite");
+  b.innerHTML='<span class="p"></span><span class="t"></span><span class="g">▼</span>';
+  h.appendChild(b);
+  var manual=null,cur=null,last="";
+  function vis(e){return !!(e&&e.getClientRects().length)&&!e.closest("[hidden]");}
+  function tone(e){var c=" "+(e.className||"")+" ";
+    if(/ (crit|red|danger|ng|bad) /.test(c))return"crit";if(/ (warn|caution|yellow|amber) /.test(c))return"warn";
+    if(/ (ok|green|safe|good) /.test(c))return"ok";if(/ (info|blue) /.test(c))return"info";return"";}
+  function txt(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),a=[],x;while((x=w.nextNode()))a.push(x.nodeValue);return a.join(" ");}
+  function clean(s){return String(s||"").replace(/\s+/g," ").trim();}
+  function pick(){
+    for(var i=0;i<SRC.length;i++){var l=document.querySelectorAll(SRC[i]);
+      for(var j=0;j<l.length;j++)if(vis(l[j])&&!b.contains(l[j]))return l[j];}
+    return null;
+  }
+  function draw(){
+    var t="",p="",tn="",e=null;
+    if(manual){t=manual.text;p=manual.pill||"";tn=manual.tone||"";}
+    else{e=pick();if(e){var bg=e.querySelector(".big"),pl=e.querySelector(".pill");
+      t=clean(txt(bg||e));if(t.length>120)t=t.slice(0,118)+"…";p=clean(pl?pl.textContent:"");tn=tone(e);}}
+    cur=e;var key=t+"|"+p+"|"+tn;if(key===last)return;last=key;
+    if(!t){b.className="";return;}
+    b.className="on "+tn;b.querySelector(".t").textContent=t;
+    var pe=b.querySelector(".p");pe.textContent=p;pe.style.display=p?"":"none";
+    b.querySelector(".g").style.display=e?"":"none";
+  }
+  var q=false;function sched(){if(q)return;q=true;requestAnimationFrame(function(){q=false;draw();});}
+  try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){if(!b.contains(ms[i].target)){sched();return;}}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class","style","aria-selected"]});}catch(e){}
+  document.addEventListener("input",sched,true);document.addEventListener("change",sched,true);document.addEventListener("click",function(){setTimeout(sched,0);},true);
+  b.addEventListener("click",function(){if(!cur)return;try{cur.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){cur.scrollIntoView();}});
+  /* アプリ側から直接指定するとき：wcSum.set("文", {tone:"crit", pill:"レッド"})、自動に戻す：wcSum.set(null) */
+  window.wcSum={set:function(t,o){manual=t?{text:String(t),tone:o&&o.tone,pill:o&&o.pill}:null;last="";draw();},refresh:function(){last="";draw();}};
+  draw();
+})();
+</script>
+<!-- wc-sum:end -->
+<!-- wc-clear:start（病棟アプリ共通の入力クリア。編集時はこのブロックごと差し替える） -->
+<style>
+#wcClrBtn{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + 8px);z-index:2147483000;display:inline-flex;align-items:center;gap:4px;font:700 12.5px/1 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;padding:8px 11px;min-height:34px;border-radius:999px;border:1.5px solid #D9534F;background:#FFFFFF;color:#B42318;box-shadow:0 1px 5px rgba(0,0,0,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#wcClrBtn svg{width:14px;height:14px}
+#wcClrDlg{position:fixed;inset:0;z-index:2147483001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:24px}
+#wcClrDlg.on{display:flex}
+#wcClrDlg .bx{background:#FFFFFF;color:#1B2428;border-radius:14px;max-width:340px;width:100%;padding:18px 16px 14px;font:15px/1.6 -apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#wcClrDlg .bx b{display:block;font-size:16px;margin-bottom:4px}
+#wcClrDlg .bx p{margin:0 0 14px;font-size:13.5px;color:#5B666B}
+#wcClrDlg .rw{display:flex;gap:8px;justify-content:flex-end}
+#wcClrDlg button{font:inherit;font-size:15px;border-radius:9px;padding:10px 16px;min-height:44px;cursor:pointer;border:1px solid #D0D7DA;background:#FFFFFF;color:#1B2428}
+#wcClrDlg button.dg{background:#B42318;border-color:#B42318;color:#FFFFFF;font-weight:700}
+@media (prefers-color-scheme: dark){
+  #wcClrBtn{background:#1F2427;color:#FF8A80;border-color:#FF8A80}
+  #wcClrDlg .bx{background:#1F2427;color:#ECEFF0}
+  #wcClrDlg .bx p{color:#A9B3B6}
+  #wcClrDlg button{background:#2A3034;color:#ECEFF0;border-color:#3A4246}
+  #wcClrDlg button.dg{background:#D9534F;border-color:#D9534F;color:#fff}
+}
+[data-wc-pad]{padding-right:calc(108px + env(safe-area-inset-right))!important;box-sizing:border-box}
+@media (max-width:430px){[data-wc-hs] small{display:none!important}[data-wc-hs] h1{white-space:normal!important;line-height:1.3}}
+@media print{#wcClrBtn,#wcClrDlg{display:none!important}}
+</style>
+<button type="button" id="wcClrBtn" aria-label="入力をすべてクリア"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>入力クリア</button>
+<div id="wcClrDlg" role="dialog" aria-modal="true" aria-labelledby="wcClrT"><div class="bx"><b id="wcClrT">入力をすべて消しますか？</b><p>この画面に入力した内容（この端末に保存された入力途中のデータを含む）を消して、最初の状態に戻します。元には戻せません。</p><div class="rw"><button type="button" id="wcClrNo">やめる</button><button type="button" class="dg" id="wcClrYes">消す</button></div></div></div>
+<script>
+(function(){
+  var KEYS=["scr-nav-v1"];
+  try{document.querySelectorAll("header.top .brand").forEach(function(e){e.setAttribute("data-wc-pad","");if(true)e.setAttribute("data-wc-hs","");});}catch(e){}
+  var btn=document.getElementById("wcClrBtn"),dlg=document.getElementById("wcClrDlg");
+  function close(){dlg.classList.remove("on");}
+  btn.addEventListener("click",function(){dlg.classList.add("on");document.getElementById("wcClrNo").focus();});
+  document.getElementById("wcClrNo").addEventListener("click",close);
+  dlg.addEventListener("click",function(e){if(e.target===dlg)close();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")close();});
+  document.getElementById("wcClrYes").addEventListener("click",function(){
+    try{
+      var ls=window.localStorage,orig=ls.setItem.bind(ls);
+      var names=[];
+      KEYS.forEach(function(k){try{
+        if(typeof k==="string"){ls.removeItem(k);names.push(k);return;}
+        /* 保存した記録・ケースなど keep に挙げた項目は残し、入力だけ消す */
+        var o=null;try{o=JSON.parse(ls.getItem(k.k)||"null");}catch(e){}
+        var n={};if(o&&k.keep)k.keep.forEach(function(f){if(f in o)n[f]=o[f];});
+        if(Object.keys(n).length)orig(k.k,JSON.stringify(n));else ls.removeItem(k.k);
+        names.push(k.k);
+      }catch(e){}});
+      /* 再読み込み前の自動保存で書き戻されないように止める */
+      Storage.prototype.setItem=function(k,v){if(this===ls&&names.indexOf(k)>=0)return;return orig(k,v);};
+    }catch(e){}
+    try{Array.prototype.forEach.call(document.querySelectorAll("input,select,textarea"),function(el){
+      if(el.closest&&el.closest("#wcClrDlg"))return;
+      if(el.type==="checkbox"||el.type==="radio")el.checked=el.defaultChecked;
+      else if(el.tagName==="SELECT")el.selectedIndex=Math.max(0,Array.prototype.findIndex.call(el.options,function(o){return o.defaultSelected;}));
+      else if(el.type!=="button"&&el.type!=="submit"&&el.type!=="hidden"&&el.type!=="file")el.value=el.defaultValue;
+    });}catch(e){}
+    try{window.scrollTo(0,0);}catch(e){}
+    location.reload();
+  });
+})();
+</script>
+<!-- wc-clear:end -->
+<script src="../profile.js" defer></script>
+<script src="../share.js" defer></script>
+</body>
+</html>

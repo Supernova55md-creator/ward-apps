@@ -305,6 +305,18 @@
       ]
     },
     {
+      "name": "治療開始前スクリーニング・定期検査ナビ",
+      "short_name": "開始前検査",
+      "url": "scr/",
+      "icons": [
+        {
+          "src": "scr/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "糖尿病治療ナビ（病棟用）",
       "short_name": "糖尿病ナビ",
       "url": "dm/",
