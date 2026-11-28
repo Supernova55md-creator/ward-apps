@@ -25,7 +25,8 @@ def build(slug, outdir):
     def inline_js(name):
         p = os.path.join(ROOT, name)
         js = open(p, encoding="utf-8").read()
-        assert "</script" not in js.lower(), name
+        # インライン化したスクリプト内の "</script"（コメント中など）で script 要素が途中で閉じないようにする
+        js = re.sub(r"</(script)", r"<\\/\1", js, flags=re.I)
         return "<script>\n/* inlined: " + name + " */\n" + js + "\n</script>"
 
     html = re.sub(r'<script src="\.\./profile\.js"[^>]*></script>', lambda m: inline_js("profile.js"), html)

@@ -264,7 +264,7 @@ textarea{width:100%;line-height:1.5;resize:vertical}
       <li>「開始前」で結果を入れると、HBV・髄膜炎菌・JCV・遺伝子型などの対応が上に出る</li>
       <li>「定期」は開始日からの予定日（日付だけ）。「出力」でカルテ用の文にしてコピー</li>
     </ul>
-    <p class="fine">関連：<a href="../imm/">神経免疫治療ナビ</a>（使い分け・髄膜炎菌の日程・GIOP・PJP）／<a href="../dementia/">認知症外来ナビ</a>（抗Aβ抗体薬の適格性・ARIA判定）／<a href="../aed/">抗てんかん薬ナビ</a>（選択・相互作用・切替）／<a href="../preg/">妊娠・授乳と神経疾患薬ナビ</a></p>
+    <p class="fine" id="relLinks">関連：<a href="../imm/">神経免疫治療ナビ</a>（使い分け・髄膜炎菌の日程・GIOP・PJP）／<a href="../dementia/">認知症外来ナビ</a>（抗Aβ抗体薬の適格性・ARIA判定）／<a href="../aed/">抗てんかん薬ナビ</a>（選択・相互作用・切替）／<a href="../preg/">妊娠・授乳と神経疾患薬ナビ</a></p>
   </section>
   <section class="card">
     <h2>出典</h2>
@@ -282,8 +282,8 @@ textarea{width:100%;line-height:1.5;resize:vertical}
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
-const MODE="pwa";
-const VER="ver1_2026-11-28a";
+const MODE=(location.protocol==="file:")?"karte":"pwa";
+const VER="ver1_2026-11-28b";
 const KEY="scr-nav-v1";
 
 /* ---------- 開始前チェックの項目（併用時はキーでまとめる） ---------- */
@@ -895,6 +895,7 @@ function renderOut(force){
 function renderRef(){
   $("refBox").innerHTML=REFS.map(r=>'<div><small>'+esc(r[0])+'</small><a href="'+esc(r[2])+'" target="_blank" rel="noopener">'+esc(r[1])+'</a></div>').join("");
   $("ver").textContent=VER+(MODE==="pwa"?"":"（カルテ端末用）");
+  if(MODE!=="pwa")$$("#relLinks a").forEach(a=>{const s=document.createElement("b");s.textContent=a.textContent;a.replaceWith(s);});
 }
 function $$(q){return Array.from(document.querySelectorAll(q));}
 function renderAll(){renderSelbars();renderMap();renderSel();renderPre();renderSch();renderCau();renderOut();}
